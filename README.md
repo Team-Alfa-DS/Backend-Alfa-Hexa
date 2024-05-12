@@ -23,6 +23,15 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## Documentation
+```bash
+#local
+localhost:<PORT>/doc
+
+#production
+...
+```
+
 ## Test
 
 ```bash
