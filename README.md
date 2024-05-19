@@ -3,6 +3,17 @@
 Crear el archivo ".env" usando las variables de ".env.template" y llenar las variables.
 
 - PORT - 3000 por defecto
+- DB_HOST
+- DB_PORT
+- DB_USERNAME
+- DB_PASSWORD
+- DB_NAME
+- PG_EMAIL
+- PG_PASSWORD
+- JWT
+- CLOUDINARY_NAME
+- CLOUDINARY_API_KEY
+- CLOUDINARY_API_SECRET
 
 ## Installation
 
