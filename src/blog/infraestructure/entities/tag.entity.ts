@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Blog } from "./blog.entity";
-import { Course } from "src/course/infraestructure/entities/course.entity";
+import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
 
 @Entity('tag')
 export class Tag {
@@ -13,6 +13,6 @@ export class Tag {
     @ManyToMany(() => Blog, blog => blog.tags)
     blogs: Blog[];
 
-    @ManyToMany(() => Course, course => course.tags)
-    courses: Course[];
+    @ManyToMany(() => CourseEntity, course => course.tags)
+    courses: CourseEntity[];
 }
