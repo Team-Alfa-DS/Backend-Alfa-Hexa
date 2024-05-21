@@ -6,7 +6,7 @@ export class Lesson {
   imageUrl?: string;
 
   constructor(id: string, title: string, content: string, videoUrl?: string, imageUrl?: string) {
-    if(!imageUrl !== !videoUrl) {
+    if(!imageUrl !== !videoUrl) { //!Chequear que esta regla de verdad sea necesaria, porque si lo es, hay que buscar una mejor manera de evitarla en la BD
       this.id = id;
       this.title = title;
       this.content = content;
