@@ -2,10 +2,10 @@ import { Tag } from "src/blog/infraestructure/entities/tag.entity";
 import { Category } from "src/category/infraestructure/entities/category.entity";
 import { Trainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Lesson } from "./lesson.entity";
+import { LessonEntity } from "./lesson.entity";
 
 @Entity('course')
-export class Course {
+export class CourseEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -19,16 +19,16 @@ export class Course {
     publication_date: Date;
 
     @Column()
-    minutes: string;
+    minutes: number;
 
     @Column()
-    weeks: string;
+    weeks: number;
 
     @Column()
     image: string;
 
-    @OneToMany(() => Lesson, lesson => lesson.course)
-    lessons: Lesson[];
+    @OneToMany(() => LessonEntity, lesson => lesson.course)
+    lessons: LessonEntity[];
 
     @ManyToOne(() => Category, category => category.blogs)
     @JoinColumn({name: 'category_id'})

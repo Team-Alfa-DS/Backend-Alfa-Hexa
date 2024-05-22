@@ -1,5 +1,5 @@
 import { Blog } from "src/blog/infraestructure/entities/blog.entity";
-import { Course } from "src/course/infraestructure/entities/course.entity";
+import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('trainer')
@@ -22,6 +22,6 @@ export class Trainer {
     @OneToMany(() => Blog, blog => blog.trainer)
     blogs: Blog[];
 
-    @OneToMany(() => Course, course => course.trainer)
-    courses: Course[];
+    @OneToMany(() => CourseEntity, course => course.trainer)
+    courses: CourseEntity[];
 }

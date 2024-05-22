@@ -1,0 +1,19 @@
+export class Lesson {
+  id: string;
+  title: string;
+  content: string;
+  videoUrl?: string;
+  imageUrl?: string;
+
+  constructor(id: string, title: string, content: string, videoUrl?: string, imageUrl?: string) {
+    if(!imageUrl !== !videoUrl) { //!Chequear que esta regla de verdad sea necesaria, porque si lo es, hay que buscar una mejor manera de evitarla en la BD
+      this.id = id;
+      this.title = title;
+      this.content = content;
+      this.videoUrl = videoUrl;
+      this.imageUrl = imageUrl;
+    } else {
+      throw new Error("Una lección tiene que tener video o imagen, no ambas");
+    }
+  }
+}
