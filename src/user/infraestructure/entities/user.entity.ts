@@ -1,9 +1,9 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Comment } from "src/comment/infraestructure/entities/comment.entity";
-import { Progress } from "./progress.entity";
+import { ProgressEntity } from "./progress.entity";
 
 @Entity('user')
-export class User {
+export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -22,12 +22,12 @@ export class User {
     @Column()
     type: string;
 
-    @Column()
+    @Column({nullable: true})
     image: string;
 
     @OneToMany(() => Comment, comment => comment.user)
     comments: Comment[];
 
-    @OneToMany(() => Progress, progress => progress.user)
-    progress: Progress[];
+    @OneToMany(() => ProgressEntity, progress => progress.user)
+    progress: ProgressEntity[];
 }

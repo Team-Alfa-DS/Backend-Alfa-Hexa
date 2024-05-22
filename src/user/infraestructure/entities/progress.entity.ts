@@ -1,9 +1,9 @@
 import { Lesson } from "src/course/infraestructure/entities/lesson.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { User } from "./user.entity";
+import { UserEntity } from "./user.entity";
 
 @Entity('progress')
-export class Progress {
+export class ProgressEntity {
     @PrimaryColumn({type: 'uuid'})
     lesson_id: string;
 
@@ -20,8 +20,8 @@ export class Progress {
     @JoinColumn({name: 'lesson_id'})
     lesson: Lesson;
 
-    @ManyToOne(() => User, user => user.progress)
+    @ManyToOne(() => UserEntity, user => user.progress)
     @JoinColumn({name: 'user_id'})
-    user: User;
+    user: UserEntity;
 
 }
