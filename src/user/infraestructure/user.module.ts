@@ -5,7 +5,7 @@ import { ProgressEntity } from './entities/progress.entity';
 import { UserController } from './controllers/user.controller';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserEntity, ProgressEntity])],
+    imports: [],
     controllers: [UserController]
 })
 export class UserModule {}

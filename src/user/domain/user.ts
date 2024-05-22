@@ -1,17 +1,17 @@
 import { Entity } from "src/common/domain/entity";
-import { TypeUser } from "./types/type-user.type";
+import { UserRole } from "./enums/role-user.type";
 
 export class User extends Entity<string> {
     private email: string;
     private name: string;
     private password: string;
     private phone: string;
-    private type: TypeUser;
+    private type: UserRole;
     private image?: string;
     // private comments?: string se necesita crear la entity de comentarios
     // private progress?: string se necesita crear la entity de progreso
     
-    private constructor (id: string, email: string, name: string, password: string, phone: string, type: TypeUser, image: string) {
+    private constructor (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
         super(id);
         this.email = email;
         this.name = name;
@@ -37,7 +37,7 @@ export class User extends Entity<string> {
         return this.phone;
     }
 
-    get Type(): TypeUser {
+    get Type(): UserRole {
         return this.type;
     }
 
@@ -45,7 +45,7 @@ export class User extends Entity<string> {
         return this.image;
     }
 
-    static Create(id: string, email: string, name: string, password: string, phone: string, type: TypeUser) {
+    static Create(id: string, email: string, name: string, password: string, phone: string, type: UserRole) {
         return new User(id, email, name, password, phone, type, null)
     }
 
@@ -65,7 +65,7 @@ export class User extends Entity<string> {
         this.phone = phone;
     }
 
-    UpdateType(type: TypeUser): void {
+    UpdateType(type: UserRole): void {
         this.type = type;
     }
 
