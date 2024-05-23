@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Course } from "./course.entity";
-import { Progress } from "src/user/infraestructure/entities/progress.entity";
+import { ProgressEntity } from "src/user/infraestructure/entities/progress.entity";
 
 @Entity('lesson')
 export class Lesson {
@@ -23,7 +23,7 @@ export class Lesson {
     @JoinColumn({name: 'course_id'})
     course: Course;
 
-    @OneToMany(() => Progress, progress => progress.lesson)
-    progress: Progress[];
+    @OneToMany(() => ProgressEntity, progress => progress.lesson)
+    progress: ProgressEntity[];
 
 }
