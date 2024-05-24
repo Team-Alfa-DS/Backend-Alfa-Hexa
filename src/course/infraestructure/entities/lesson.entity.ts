@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Course } from "./course.entity";
-import { ProgressEntity } from "src/user/infraestructure/entities/progress.entity";
+import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
 
 @Entity('lesson')
 export class Lesson {

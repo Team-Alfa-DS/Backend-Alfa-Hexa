@@ -6,5 +6,5 @@ export interface IUserRepository {
     findUserById(id: string, runner: ITransactionHandler): Promise<Result<User>>; 
     findUserByEmail(email: string, runner: ITransactionHandler): Promise<Result<User>>; 
     updatePassword(email: string, password: string, runner: ITransactionHandler): Promise<Result<User>>;
-    saveUser(user: User, runner: ITransactionHandler): Promise<Result<User>>
+    saveUser(user: User, runner: ITransactionHandler): Promise<Result<User>>;
 }
