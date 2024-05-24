@@ -1,10 +1,10 @@
 import { IApplicationService } from "src/user/application/application-service/application-service.interface";
-import { CurrentUserDto } from "../dtos/current-user.dto";
+import { ForgetUserPasswordDto } from "../dtos/forget-user-password.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 
-export class CurrentUserService implements IApplicationService<CurrentUserDto, any> {
+export class ForgetUserPasswordService implements IApplicationService<ForgetUserPasswordDto, any> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -13,24 +13,18 @@ export class CurrentUserService implements IApplicationService<CurrentUserDto, a
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
     }
-    
-    async execute(value: CurrentUserDto): Promise<Result<any>> {
-        const userFound = await this.userRepository.findUserById(value.id, this.transactionHandler);
 
-        if (!userFound.isSuccess) {
-            return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
+    async execute(value: ForgetUserPasswordDto): Promise<Result<any>> {
+        const user = await this.userRepository.findUserByEmail(value.email, this.transactionHandler);
+        if (!user.isSuccess) {
+            return Result.fail(user.Error, user.StatusCode, user.Message)
         }
-
         const response = {
-            id: userFound.Value.Id,
-            email: userFound.Value.Email,
-            name: userFound.Value.Name,
-            phone: userFound.Value.Phone,
-            image: userFound.Value.Image,
+            date: new Date()
         }
-
         return Result.success(response, 200);
     }
+
     get name(): string {
         return this.constructor.name;
     }

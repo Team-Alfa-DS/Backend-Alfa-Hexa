@@ -46,7 +46,7 @@ export class LoginUserService implements IApplicationService<LoginUserDto, any> 
         return Result.success(response, 200);
     }
     get name(): string {
-        throw new Error("Method not implemented.");
+        return this.constructor.name;
     }
 
 

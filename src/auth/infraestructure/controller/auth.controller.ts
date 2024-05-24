@@ -16,6 +16,8 @@ import { RegisterUserDto } from '../dtos/register-user.dto';
 import { LoginUserDto } from '../dtos/login-user.dto';
 import { CurrentUserService } from 'src/auth/application/services/current-user.service';
 import { JwtAuthGuard } from '../guards/jwt-guard.guard';
+import { ForgetUserPasswordDto } from '../dtos/forget-user-password.dto';
+import { ForgetUserPasswordService } from 'src/auth/application/services/forget-user-password.service';
 
 @Controller('auth')
 export class AuthController {
@@ -32,12 +34,14 @@ export class AuthController {
     private registerUserService: RegisterUserService;
     private loginUserService: LoginUserService;
     private currentUserService: CurrentUserService;
+    private forgetUserPasswordService: ForgetUserPasswordService;
 
     constructor(private jwtService: JwtService) {
         this.jwtGen = new JwtGen(jwtService);
         this.registerUserService = new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator);
         this.loginUserService = new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen);
         this.currentUserService = new CurrentUserService(this.userRepository, this.transactionHandler);
+        this.forgetUserPasswordService = new ForgetUserPasswordService(this.userRepository, this.transactionHandler)
     }
 
     @Post('register')
@@ -54,6 +58,11 @@ export class AuthController {
     @Get('current')
     async currentUser(@Request() req) {
         return (await this.currentUserService.execute({id: req.user.tokenUser.id}))
+    }
+
+    @Post('forget/password')
+    async forgetUserPassword(@Body() user: ForgetUserPasswordDto) {
+        return (await this.forgetUserPasswordService.execute(user))
     }
 
 }
