@@ -22,7 +22,7 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
     }
 
     async execute(newUser: RegisterUserDto): Promise<Result<{id: string}>> {
-        await this.transactionHandler.startTransaction();
+        // await this.transactionHandler.startTransaction();
         const userFound = await this.userRepository.findUserByEmail(newUser.email, this.transactionHandler);
 
         if (userFound.isSuccess) {
