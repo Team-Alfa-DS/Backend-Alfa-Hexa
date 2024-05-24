@@ -18,6 +18,10 @@ import { CurrentUserService } from 'src/auth/application/services/current-user.s
 import { JwtAuthGuard } from '../guards/jwt-guard.guard';
 import { ForgetUserPasswordDto } from '../dtos/forget-user-password.dto';
 import { ForgetUserPasswordService } from 'src/auth/application/services/forget-user-password.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import { NodeMailer } from 'src/common/infraestructure/mailer/node-mailer';
+import { ICodeGen } from 'src/common/application/code-gen/code-gen.interface';
+import { CodeGenMath } from 'src/common/infraestructure/code-gen/code-gen-math';
 
 @Controller('auth')
 export class AuthController {
@@ -31,17 +35,21 @@ export class AuthController {
     );
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
+    private readonly mailer: NodeMailer;
+    private readonly codeGenerator: ICodeGen = new CodeGenMath();
+    private code: number;
     private registerUserService: RegisterUserService;
     private loginUserService: LoginUserService;
     private currentUserService: CurrentUserService;
     private forgetUserPasswordService: ForgetUserPasswordService;
 
-    constructor(private jwtService: JwtService) {
+    constructor(private jwtService: JwtService, private mailerService: MailerService) {
         this.jwtGen = new JwtGen(jwtService);
+        this.mailer = new NodeMailer(mailerService);
         this.registerUserService = new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator);
         this.loginUserService = new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen);
         this.currentUserService = new CurrentUserService(this.userRepository, this.transactionHandler);
-        this.forgetUserPasswordService = new ForgetUserPasswordService(this.userRepository, this.transactionHandler)
+        this.forgetUserPasswordService = new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer);
     }
 
     @Post('register')
@@ -62,7 +70,8 @@ export class AuthController {
 
     @Post('forget/password')
     async forgetUserPassword(@Body() user: ForgetUserPasswordDto) {
-        return (await this.forgetUserPasswordService.execute(user))
+        this.code = this.codeGenerator.genCode();
+        return (await this.forgetUserPasswordService.execute({...user, code: this.code}))
     }
 
 }
