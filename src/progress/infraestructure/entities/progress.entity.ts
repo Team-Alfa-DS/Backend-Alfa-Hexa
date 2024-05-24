@@ -1,6 +1,6 @@
 import { Lesson } from "src/course/infraestructure/entities/lesson.entity";
+import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { UserEntity } from "./user.entity";
 
 @Entity('progress')
 export class ProgressEntity {
@@ -24,4 +24,17 @@ export class ProgressEntity {
     @JoinColumn({name: 'user_id'})
     user: UserEntity;
 
+    static create (
+        lesson_id: string,
+        user_id: string,
+        markAsCompleted: boolean,
+        time?: number
+    ) {
+        const progress = new ProgressEntity()
+        progress.lesson_id = lesson_id;
+        progress.user_id = user_id;
+        progress.markAsCompleted = markAsCompleted;
+        progress.time = time;
+        return progress;
+    }
 }

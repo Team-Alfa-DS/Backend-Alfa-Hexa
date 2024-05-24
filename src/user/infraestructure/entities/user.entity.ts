@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Comment } from "src/comment/infraestructure/entities/comment.entity";
-import { ProgressEntity } from "./progress.entity";
 import { UserRole } from "src/user/domain/enums/role-user.type";
+import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
 
 @Entity('user')
 export class UserEntity {

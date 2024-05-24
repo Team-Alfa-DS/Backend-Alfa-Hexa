@@ -13,6 +13,7 @@ import { JwtStrategy } from './auth/infraestructure/strategies/jwt.strategy';
 import { UserController } from './user/infraestructure/controllers/user.controller';
 import { AuthController } from './auth/infraestructure/controller/auth.controller';
 // import { ConfigPostgres } from './common/infraestructure/database/config';
+import { ProgressController } from './progress/infraestructure/controller/progress.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -45,7 +46,8 @@ import { AuthController } from './auth/infraestructure/controller/auth.controlle
   ],
   controllers: [
     UserController,
-    AuthController
+    AuthController,
+    ProgressController
   ],
   providers: [JwtStrategy],
 })

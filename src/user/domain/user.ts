@@ -1,5 +1,6 @@
 import { Entity } from "src/common/domain/entity";
 import { UserRole } from "./enums/role-user.type";
+import { Progress } from "src/progress/domain/progress";
 
 export class User extends Entity<string> {
     private email: string;
@@ -9,7 +10,7 @@ export class User extends Entity<string> {
     private type: UserRole;
     private image?: string;
     // private comments?: string se necesita crear la entity de comentarios
-    // private progress?: string se necesita crear la entity de progreso
+    private progress?: Progress[]
     
     private constructor (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
         super(id);
@@ -43,6 +44,10 @@ export class User extends Entity<string> {
 
     get Image(): string {
         return this.image;
+    }
+
+    get Progress(): Progress[] {
+        return this.progress;
     }
 
     static Create(id: string, email: string, name: string, password: string, phone: string, type: UserRole) {
