@@ -45,7 +45,7 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
         if (!userCreate.isSuccess) {
             return Result.fail(userCreate.Error, userCreate.StatusCode, userCreate.Message);
         }
-        await this.transactionHandler.commitTransaction();
+        // await this.transactionHandler.commitTransaction();
         return Result.success({id}, 200);
     }
 
