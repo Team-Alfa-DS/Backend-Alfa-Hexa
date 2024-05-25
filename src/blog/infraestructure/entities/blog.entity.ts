@@ -1,8 +1,9 @@
+/* eslint-disable prettier/prettier */
 import { Comment } from "src/comment/infraestructure/entities/comment.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Image } from "./image.entity";
 import { Tag } from "./tag.entity";
-import { Category } from "src/category/infraestructure/entities/category.entity";
+import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { Trainer } from "src/trainer/infraestructure/entities/trainer.entity";
 
 @Entity('blog')
@@ -25,9 +26,9 @@ export class Blog {
     @OneToMany(() => Image, image => image.blog)
     images: Image[];
 
-    @ManyToOne(() => Category, category => category.blogs)
+    @ManyToOne(() => CategoryEntity, category => category.blogs)
     @JoinColumn({name: 'category_id'})
-    category: Category;
+    category: CategoryEntity;
 
     @ManyToOne(() => Trainer, trainer => trainer.blogs)
     @JoinColumn({name: 'trainer_id'})

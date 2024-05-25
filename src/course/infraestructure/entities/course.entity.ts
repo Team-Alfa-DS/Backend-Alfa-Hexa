@@ -1,5 +1,6 @@
+/* eslint-disable prettier/prettier */
 import { Tag } from "src/blog/infraestructure/entities/tag.entity";
-import { Category } from "src/category/infraestructure/entities/category.entity";
+import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { Trainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { LessonEntity } from "./lesson.entity";
@@ -30,9 +31,9 @@ export class CourseEntity {
     @OneToMany(() => LessonEntity, lesson => lesson.course)
     lessons: LessonEntity[];
 
-    @ManyToOne(() => Category, category => category.blogs)
+    @ManyToOne(() => CategoryEntity, category => category.blogs)
     @JoinColumn({name: 'category_id'})
-    category: Category;
+    category: CategoryEntity;
 
     @ManyToOne(() => Trainer, trainer => trainer.blogs)
     @JoinColumn({name: 'trainer_id'})
