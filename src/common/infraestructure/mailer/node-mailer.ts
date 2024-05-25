@@ -1,5 +1,6 @@
 import { MailerService } from "@nestjs-modules/mailer";
 import { IMailer } from "src/common/application/mailer/mailer.interface";
+import { htmlMailer } from "./html-mailer";
 
 export class NodeMailer implements IMailer {
 
@@ -14,7 +15,8 @@ export class NodeMailer implements IMailer {
             from: 'gymnastic.alfa@gmail.com',
             to: email,
             subject,
-            text: `${message}: ${code}`
+            text: `${message}: ${code}`,
+            html: htmlMailer(code.toString())
         })
     }
 

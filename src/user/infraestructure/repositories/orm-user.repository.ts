@@ -21,7 +21,7 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
         if (!userfound) {
             return Result.fail(new Error('User not found'), 404, 'User not found');
         }
-        const userUpdated = await runnerTransaction.manager.save({...userfound, password});
+        const userUpdated = await runnerTransaction.manager.save(UserEntity, {...userfound, password});
         const domainUser = await this.ormUserMapper.toDomain(userUpdated);
         return Result.success<User>(domainUser, 200);
     }

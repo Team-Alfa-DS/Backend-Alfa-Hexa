@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { IEncryptor } from 'src/auth/application/encryptor/encryptor.interface';
 import { RegisterUserService } from 'src/auth/application/services/register-user.service';
 import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
@@ -22,6 +22,11 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { NodeMailer } from 'src/common/infraestructure/mailer/node-mailer';
 import { ICodeGen } from 'src/common/application/code-gen/code-gen.interface';
 import { CodeGenMath } from 'src/common/infraestructure/code-gen/code-gen-math';
+import { ValidateUserCodeDto } from '../dtos/validate-user-code.dto';
+import { UserCode } from '../types/user-code.type';
+import { ValidateUserCodeService } from 'src/auth/application/services/validate-user-code.service';
+import { ChangeUserPasswordDto } from '../dtos/change-user-password.dto';
+import { ChangeUserPasswordService } from 'src/auth/application/services/change-user-password.service';
 
 @Controller('auth')
 export class AuthController {
@@ -37,11 +42,13 @@ export class AuthController {
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: NodeMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
-    private code: number;
+    private userCodeList: UserCode[] = [];
     private registerUserService: RegisterUserService;
     private loginUserService: LoginUserService;
     private currentUserService: CurrentUserService;
     private forgetUserPasswordService: ForgetUserPasswordService;
+    private validateUserCodeService: ValidateUserCodeService;
+    private changeUserPasswordService: ChangeUserPasswordService;
 
     constructor(private jwtService: JwtService, private mailerService: MailerService) {
         this.jwtGen = new JwtGen(jwtService);
@@ -50,6 +57,8 @@ export class AuthController {
         this.loginUserService = new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen);
         this.currentUserService = new CurrentUserService(this.userRepository, this.transactionHandler);
         this.forgetUserPasswordService = new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer);
+        this.validateUserCodeService = new ValidateUserCodeService(this.userRepository, this.transactionHandler);
+        this.changeUserPasswordService = new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor);
     }
 
     @Post('register')
@@ -70,8 +79,37 @@ export class AuthController {
 
     @Post('forget/password')
     async forgetUserPassword(@Body() user: ForgetUserPasswordDto) {
-        this.code = this.codeGenerator.genCode();
-        return (await this.forgetUserPasswordService.execute({...user, code: this.code}))
+        const code = this.codeGenerator.genCode();
+        const indexUser = this.userCodeList.findIndex(userCode => userCode.email == user.email);
+        if (indexUser != -1) {
+            this.userCodeList[indexUser].code = code;
+        }
+        else {
+            this.userCodeList.push({email: user.email, code});
+        }
+        
+        return (await this.forgetUserPasswordService.execute({...user, code}))
+    }
+
+    @Post('code/validate')
+    async validateCode(@Body() validate: ValidateUserCodeDto) {
+        const userCode = this.userCodeList.find(userCode => userCode.email == validate.email);
+        if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);
+
+        return (await this.validateUserCodeService.execute({...validate, codeSaved: userCode.code}));
+    }
+
+    @Put('change/password')
+    async changePassword(@Body() newPassword: ChangeUserPasswordDto) {
+        const userCode = this.userCodeList.find(userCode => userCode.email == newPassword.email);
+        if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);
+        const validate = await this.validateUserCodeService.execute({code: newPassword.code, email: newPassword.email, codeSaved: userCode.code})
+
+        if (!validate.isSuccess) {
+            throw new HttpException('Codigo incorrecto', HttpStatus.BAD_REQUEST);
+        }
+        this.userCodeList = this.userCodeList.filter(userCode => userCode.email != newPassword.email);
+        return (await this.changeUserPasswordService.execute(newPassword));
     }
 
 }
