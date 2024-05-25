@@ -12,6 +12,7 @@ import { CategoryModule } from './category/infraestructure/category.module';
 import { CommonModule } from './common/infraestructure/common.module';
 //import { DataSourceSingleton } from './common/infraestructure/database/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CategoryController } from './category/infraestructure/controller/category.controller';
 //import { ConfigPostgres } from './common/infraestructure/database/config';
 
 @Module({
@@ -26,7 +27,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       entities: [__dirname + '/src/*/.entity{.ts,.js}'],
       synchronize: true,}), 
       UserModule, AuthModule, BlogModule, CourseModule, NotifyModule, CommentModule, TrainerModule, CategoryModule, CommonModule],
-  controllers: [],
+  controllers: [CategoryController],
   providers: [],
 })
 export class AppModule {}
