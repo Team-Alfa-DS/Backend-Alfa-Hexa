@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Blog } from "src/blog/infraestructure/entities/blog.entity";
 import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
