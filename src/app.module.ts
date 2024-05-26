@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BlogModule } from './blog/infraestructure/blog.module';
-import { CourseModule } from './course/infraestructure/course.module';
 import { NotifyModule } from './notify/infraestructure/notify.module';
 import { CommentModule } from './comment/infraestructure/comment.module';
 import { TrainerModule } from './trainer/infraestructure/trainer.module';
 import { CategoryModule } from './category/infraestructure/category.module';
-import { CommonModule } from './common/infraestructure/common.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/infraestructure/strategies/jwt.strategy';
@@ -15,6 +13,7 @@ import { AuthController } from './auth/infraestructure/controller/auth.controlle
 // import { ConfigPostgres } from './common/infraestructure/database/config';
 import { ProgressController } from './progress/infraestructure/controller/progress.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CourseController } from './course/infraestructure/controllers/course.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -55,17 +54,16 @@ import { MailerModule } from '@nestjs-modules/mailer';
       })
     }),
     BlogModule, 
-    CourseModule, 
     NotifyModule, 
     CommentModule, 
     TrainerModule, 
-    CategoryModule, 
-    CommonModule
+    CategoryModule
   ],
   controllers: [
     UserController,
     AuthController,
-    ProgressController
+    ProgressController,
+    CourseController
   ],
   providers: [JwtStrategy],
 })

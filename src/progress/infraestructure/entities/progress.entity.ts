@@ -1,4 +1,4 @@
-import { Lesson } from "src/course/infraestructure/entities/lesson.entity";
+import { LessonEntity } from "src/course/infraestructure/entities/lesson.entity";
 import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
@@ -16,9 +16,9 @@ export class ProgressEntity {
     @Column({nullable: true})
     time: number;
 
-    @ManyToOne(() => Lesson, lesson => lesson.progress)
+    @ManyToOne(() => LessonEntity, lesson => lesson.progress)
     @JoinColumn({name: 'lesson_id'})
-    lesson: Lesson;
+    lesson: LessonEntity;
 
     @ManyToOne(() => UserEntity, user => user.progress)
     @JoinColumn({name: 'user_id'})

@@ -1,4 +1,4 @@
-import { IApplicationService } from "src/user/application/application-service/application-service.interface";
+import { IApplicationService } from "src/common/application/application-service/application-service.interface";
 import { CurrentUserDto } from "../dtos/current-user.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";

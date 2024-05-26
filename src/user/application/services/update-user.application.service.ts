@@ -1,5 +1,5 @@
 import { User } from "src/user/domain/user";
-import { IApplicationService } from "../application-service/application-service.interface";
+import { IApplicationService } from "../../../common/application/application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { UpdateUserDto } from "../dtos/update-user.dto";
