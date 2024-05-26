@@ -27,6 +27,13 @@ export class Result<T> {
         return !this.error;
     }
 
+    get Message(): string {
+        if (this.message) {
+            return this.message
+        }
+        throw new Error('El mensaje no existe');
+    }
+
     static success<T>(value: T, statusCode: number): Result<T> {
         return new Result<T>(value, null, statusCode, null);
     }
