@@ -1,9 +1,10 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Comment } from "src/comment/infraestructure/entities/comment.entity";
-import { Progress } from "./progress.entity";
+import { UserRole } from "src/user/domain/enums/role-user.type";
+import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
 
 @Entity('user')
-export class User {
+export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -19,15 +20,35 @@ export class User {
     @Column()
     phone: string;
 
-    @Column()
-    type: string;
+    @Column({type: 'enum', enum: UserRole, default: UserRole.CLIENT})
+    type: UserRole;
 
-    @Column()
+    @Column({nullable: true})
     image: string;
 
     @OneToMany(() => Comment, comment => comment.user)
     comments: Comment[];
 
-    @OneToMany(() => Progress, progress => progress.user)
-    progress: Progress[];
+    @OneToMany(() => ProgressEntity, progress => progress.user)
+    progress: ProgressEntity[];
+
+    static create (
+        id: string, 
+        email: string, 
+        name: string, 
+        password: string, 
+        phone: string, 
+        type: UserRole, 
+        image?: string,
+    ) {
+        const user = new UserEntity()
+        user.id = id;
+        user.email = email;
+        user.name = name;
+        user.password = password;
+        user.phone = phone;
+        user.type = type;
+        user.image = image;
+        return user
+    }
 }
