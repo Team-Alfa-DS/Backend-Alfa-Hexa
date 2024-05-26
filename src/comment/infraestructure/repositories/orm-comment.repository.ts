@@ -5,6 +5,7 @@ import { Result } from "src/common/domain/result-handler/result";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { Comment } from "src/comment/domain/Comment";
+import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 
 
 export class OrmCommentRepository extends Repository<CommentEntity> implements ICommentRepository{
@@ -16,15 +17,38 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         this.ormCommentMapper = ormCommentMapper;
     }
     
-    async findAllComments(id: string, runner: TransactionHandler): Promise<Result<Comment[]>> {
+    async findAllCommentsByBlogId(id: string, runner: TransactionHandler): Promise<Result<Comment[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blogId: id }});
+        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog: id }});
 
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
-        return Result.success<Comment[]>(commentsFound,200);
+        const ListMapper = []
+        commentsFound.forEach(e => { ListMapper.push( this.ormCommentMapper.toDomain(e ))  
+        });
+
+        //const domainComment = await Promise.all(commentsFound.map(comment => this.ormCommentMapper.toDomain(comment)));
+        //return Result.success<Comment[]>(domainComment,200);
+        
+        return Result.success<Comment[]>(ListMapper,200);
     }
+
+    async findAllCommentsByLessonId(id: string, runner: TransactionHandler): Promise<Result<Comment[]>> {
+        const runnerTransaction = runner.getRunner();
+
+        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { lesson: id }});
+
+        if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
+
+        const ListMapper = []
+        commentsFound.forEach(e => { ListMapper.push( this.ormCommentMapper.toDomain(e ))  
+        });
+
+        //const domainComment = await Promise.all(commentsFound.map(comment => this.ormCommentMapper.toDomain(comment)));
+        return Result.success<Comment[]>(ListMapper,200);
+    }
+
     async saveComment(comment: Comment, runner: TransactionHandler): Promise<Result<Comment>> {
 
         try{
@@ -37,6 +61,6 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
             return Result.fail<Comment>(new Error(err.message), err.code, err.message);
         }
 
-    }
+    };
 
 }

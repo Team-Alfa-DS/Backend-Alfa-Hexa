@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Comment } from "src/comment/infraestructure/entities/comment.entity";
+import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
 import { Progress } from "./progress.entity";
 
 @Entity('user')
@@ -25,7 +25,7 @@ export class User {
     @Column()
     image: string;
 
-    @OneToMany(() => Comment, comment => comment.user)
+    @OneToMany(() => CommentEntity, comment => comment.user)
     comments: Comment[];
 
     @OneToMany(() => Progress, progress => progress.user)
