@@ -3,7 +3,7 @@ import { IEncryptor } from 'src/auth/application/encryptor/encryptor.interface';
 import { RegisterUserService } from 'src/auth/application/services/register-user.service';
 import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { DataSourceSingleton } from 'src/common/infraestructure/database/config';
+import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
@@ -27,16 +27,18 @@ import { UserCode } from '../types/user-code.type';
 import { ValidateUserCodeService } from 'src/auth/application/services/validate-user-code.service';
 import { ChangeUserPasswordDto } from '../dtos/change-user-password.dto';
 import { ChangeUserPasswordService } from 'src/auth/application/services/change-user-password.service';
+import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
 
     private userMapper: OrmUserMapper = new OrmUserMapper();
     private readonly jwtGen: JwtGen;
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, DataSourceSingleton.getInstance());
+        this.userMapper, DatabaseSingleton.getInstance());
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        DataSourceSingleton.getInstance().createQueryRunner()
+        DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
@@ -71,6 +73,8 @@ export class AuthController {
         return (await this.loginUserService.execute(user));
     }
 
+    @ApiBearerAuth('token')
+    @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
     @UseGuards(JwtAuthGuard)
     @Get('current')
     async currentUser(@Request() req) {
