@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Course } from "./course.entity";
+import { CourseEntity } from "./course.entity";
 import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
 
 @Entity('lesson')
-export class Lesson {
+export class LessonEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -14,14 +14,14 @@ export class Lesson {
     content: string;
 
     @Column({nullable: true})
-    video: Date;
+    video: string;
 
     @Column({nullable: true})
     image: string;
 
-    @ManyToOne(() => Course, course => course.lessons)
+    @ManyToOne(() => CourseEntity, course => course.lessons)
     @JoinColumn({name: 'course_id'})
-    course: Course;
+    course: CourseEntity;
 
     @OneToMany(() => ProgressEntity, progress => progress.lesson)
     progress: ProgressEntity[];
