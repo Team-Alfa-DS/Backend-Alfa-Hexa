@@ -21,17 +21,20 @@ export class OrmTrainerRepository
 
   async findTrainerById(id: string): Promise<Result<Trainer>> {
     const trainer = await this.findOneBy({ id });
-    if (!trainer)
+    if (!trainer) {
       return Result.fail<Trainer>(
         new Error('Trainer not found'),
         404,
         'Trainer not found',
       );
+    }
+
     const trainerDomain = await this.ormTrainerMapper.toDomain(trainer);
-    return Result.success<Trainer>(trainerDomain, 200);
+    const oneTrainer = Result.success<Trainer>(trainerDomain, 202);
+    return oneTrainer;
   }
 
-  async findAllTrainers(): Promise<Result<Trainer[]>> {
+  /*async findAllTrainers(): Promise<Result<Trainer[]>> {
     const trainer = await this.find();
     if (!trainer)
       return Result.fail<Trainer[]>(
@@ -84,5 +87,5 @@ export class OrmTrainerRepository
       );
     }
     return Result.success<Trainer>(trainer, 200);
-  }
+  }*/
 }

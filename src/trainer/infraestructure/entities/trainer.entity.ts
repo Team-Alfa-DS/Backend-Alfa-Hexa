@@ -1,6 +1,14 @@
 import { Blog } from 'src/blog/infraestructure/entities/blog.entity';
 import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/user/infraestructure/entities/user.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('trainer')
 export class OrmTrainer {
@@ -24,6 +32,10 @@ export class OrmTrainer {
 
   @OneToMany(() => CourseEntity, (course) => course.trainer)
   courses: CourseEntity[];
+
+  @ManyToMany(() => User)
+  @JoinTable()
+  users: User[];
 
   static create(
     id: string,

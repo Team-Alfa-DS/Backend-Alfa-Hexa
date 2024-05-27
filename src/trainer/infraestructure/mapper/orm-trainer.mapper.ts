@@ -32,11 +32,11 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
     return null;
   }
 
-  async arrayToDomain(entities: OrmTrainer[]): Promise<Trainer[]> {
+  /*async arrayToDomain(entities: OrmTrainer[]): Promise<Trainer[]> {
     const courses: Trainer[] = [];
     for (let entity of entities) {
       courses.push(await this.toDomain(entity));
     }
     return courses;
-  }
+  }*/
 }
