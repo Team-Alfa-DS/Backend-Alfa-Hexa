@@ -1,9 +1,10 @@
-import { Controller, Get, Inject, Param } from "@nestjs/common";
+import { Controller, Get, Inject, Param, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetAllCoursesService } from "src/course/application/services/getAllCourses.service";
 import { GetCourseByIdService } from "src/course/application/services/getCourseById.service";
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 
 @ApiTags('Course')
 @ApiBearerAuth('token')
@@ -30,7 +31,8 @@ export class CourseController {
   @Get("many")
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
-  getAllCourses() {
+  getAllCourses(@Query() manyCoursesDto: GetManyCoursesQueryDto) {
+    
     return this.getAllCoursesService.execute();
   }
 }
