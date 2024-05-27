@@ -23,7 +23,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
       
       // console.log('Debug: ', result);
       const courses = CourseMapper.arrayToDomain(result);
-      console.log(courses);
+      // console.log(courses);
       
       return courses;
     } catch (error) {
