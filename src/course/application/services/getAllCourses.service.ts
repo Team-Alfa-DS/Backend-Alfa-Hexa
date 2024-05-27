@@ -11,6 +11,14 @@ export class GetAllCoursesService implements IService<TGetAllCourses, Promise<Co
 }
 
 export class TGetAllCourses implements TService {
+  constructor(
+    private readonly filter?: string,
+    private readonly category?: string,
+    private readonly trainer?: string,
+    private readonly page?: number,
+    private readonly perpage?: number,
+  ) {}
+
   toString(): string {
     return "GetAllCourses";
   }

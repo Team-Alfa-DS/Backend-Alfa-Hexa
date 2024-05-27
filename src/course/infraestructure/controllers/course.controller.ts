@@ -36,9 +36,14 @@ export class CourseController {
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
   getAllCourses(@Query() manyCoursesDto: GetManyCoursesQueryDto) {
+    const service = new TGetAllCourses(
+      manyCoursesDto.filter,
+      manyCoursesDto.category,
+      manyCoursesDto.trainer,
+      manyCoursesDto.page,
+      manyCoursesDto.perpage
+    );
     
-    // return this.getAllCoursesService.execute();
-  // getAllCourses() {
-    return this.getAllCoursesService.execute(new TGetAllCourses());
+    return this.getAllCoursesService.execute(service);
   }
 }
