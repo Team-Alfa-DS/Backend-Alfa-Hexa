@@ -1,6 +1,6 @@
 import { Blog } from 'src/blog/infraestructure/entities/blog.entity';
 import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
-import { User } from 'src/user/infraestructure/entities/user.entity';
+import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 import {
   Column,
   Entity,
@@ -33,9 +33,11 @@ export class OrmTrainer {
   @OneToMany(() => CourseEntity, (course) => course.trainer)
   courses: CourseEntity[];
 
-  @ManyToMany(() => User)
+  @ManyToMany(() => UserEntity, (UserEntity) => UserEntity.trainers, {
+    cascade: true,
+  })
   @JoinTable()
-  users: User[];
+  users: UserEntity[];
 
   static create(
     id: string,

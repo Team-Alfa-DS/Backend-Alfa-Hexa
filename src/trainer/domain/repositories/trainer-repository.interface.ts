@@ -3,6 +3,10 @@ import { Trainer } from '../trainer';
 
 export interface ITrainerRepository {
   findTrainerById(id: string): Promise<Result<Trainer>>;
+  followTrainer(data: {
+    idTrainer: string;
+    idUser: string;
+  }): Promise<Result<Trainer>>;
   // findAllTrainers(): Promise<Result<Trainer[]>>;
   // updateTrainer(idTrainer: string, payload: string): Promise<Result<Trainer>>;
   // saveTrainer(trainer: Trainer): Promise<Result<Trainer>>;
