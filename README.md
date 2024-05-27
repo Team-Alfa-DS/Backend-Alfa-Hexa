@@ -14,6 +14,11 @@ Crear el archivo ".env" usando las variables de ".env.template" y llenar las var
 - CLOUDINARY_NAME
 - CLOUDINARY_API_KEY
 - CLOUDINARY_API_SECRET
+- OAUTH_CLIENT_ID
+- OAUTH_CLIENT_SECRET
+- OAUTH_REFRESH_TOKEN
+- EMAIL_USERNAME
+- EMAIL_PASSWORD
 
 ## Installation
 
