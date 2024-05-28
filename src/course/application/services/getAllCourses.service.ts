@@ -6,7 +6,7 @@ export class GetAllCoursesService implements IService<TGetAllCourses, Promise<Co
   constructor(private readonly courseRepository: ICourseRepository){}
 
   execute(service: TGetAllCourses): Promise<Course[]> {
-    return this.courseRepository.getAllCourses();
+    return this.courseRepository.getManyCourses();
   }
 }
 
