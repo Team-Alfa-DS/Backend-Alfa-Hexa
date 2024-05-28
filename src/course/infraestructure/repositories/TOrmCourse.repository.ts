@@ -21,9 +21,16 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
         }
       })
       
-      //!Para hacer búsquedas filtradas necesito los repositorios de las otras entidades como los trainers y las categorías 
+      //TODO: Para hacer búsquedas filtradas necesito los repositorios de las otras entidades como los trainers y las categorías 
       //if (filter) {result.filter((element) => element.tags.findIndex())}
       //if (category) {}
+      //if (trainer) {}
+
+      if (perpage) {
+        if (!page) {page = 0};
+
+        result.splice(page, page + (perpage - 1));
+      }
       
       // console.log('Debug: ', result);
       const courses = CourseMapper.arrayToDomain(result);

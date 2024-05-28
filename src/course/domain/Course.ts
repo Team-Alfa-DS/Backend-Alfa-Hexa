@@ -22,6 +22,7 @@ export class Course {
     this.minutes = minutes;
     this.weeks = weeks;
     this.lessons = lessons;
+    //TODO: añadir entidades externas
     //this.tags = tags;
     //this.category = category;
     //this.trainer = trainer;
