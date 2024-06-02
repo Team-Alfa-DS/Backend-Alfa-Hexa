@@ -2,9 +2,10 @@ import { DataSource, Repository } from "typeorm";
 import { ProgressEntity } from "../entities/progress.entity";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Progress } from "src/progress/domain/progress";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { Lesson } from "src/course/domain/Lesson";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
@@ -16,10 +17,32 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         this.ormProgressMapper = ormProgressMapper;
     }
 
-    saveProgress(progress: Progress, runner: ITransactionHandler): Promise<Result<Progress>> {
-        throw new Error("Method not implemented.");
+    async saveProgress(progress: Progress, runner: TransactionHandler): Promise<Result<Progress>> {
+        const runnerTransaction = runner.getRunner()
+        try {
+            const ormProgress = await this.ormProgressMapper.toOrm(progress);
+            await runnerTransaction.manager.save(ProgressEntity, ormProgress);
+            return Result.success<Progress>(progress, 200)
+        } catch(err) {
+            return Result.fail<Progress>(new Error(err.message), err.code, err.message);
+        }
     }
-    findProgressByUser(id: string, runner: ITransactionHandler): Promise<Result<Progress>> {
-        throw new Error("Method not implemented.");
+    
+    async findProgressByUserCourse(userId: string, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
+        const runnerTransaction = runner.getRunner();
+        try {
+            const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId});
+            const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id == pro.lesson_id) != -1);
+            const progressDomainList: Progress[] = [];
+            
+            for (const progress of progressCourse) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
+
+            return Result.success(progressDomainList, 200)
+        } catch(err) {
+            return Result.fail<Progress[]>(new Error(err.message), err.code, err.message);
+        }
+
     }
 }
