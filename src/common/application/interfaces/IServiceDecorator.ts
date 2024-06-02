@@ -1,10 +1,14 @@
-import { IService, TService } from "./IService";
+import { IService, ServiceRequestDto, ServiceResponseDto} from "./IService";
 
-export abstract class IServiceDecorator<O> implements IService<TService, O> {
-  protected decoratee: IService<TService, O>;
+export abstract class IServiceDecorator<I extends ServiceRequestDto, O extends ServiceResponseDto> implements IService<I, O> {
+  protected readonly decoratee: IService<I, O>;
 
-  constructor(decoratee: IService<TService, O>) {
+  constructor(decoratee: IService<I, O>) {
     this.decoratee = decoratee;
   }
-  abstract execute(input: TService): O;
+
+  get name() {
+    return this.decoratee.constructor.name;
+  }
+  abstract execute(input: I): Promise<O>;
 }

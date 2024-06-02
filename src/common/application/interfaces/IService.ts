@@ -1,9 +1,12 @@
-export interface IService<TService, O> {
-  execute(service: TService): O;
+export interface IService<I extends ServiceRequestDto, O extends ServiceResponseDto> {
+  execute(service: I): Promise<O>; //Acción singular que realiza el servicio
 }
 
-export interface TService {
-  //Debería guardar los aspectos comunes de todos los servicios (Usuario que lo ejecuta, autorización, etc)
-  
-  toString(): string; //Para las implementaciones, nada más debe devolver el nombre del Servicio
+//Por cosas de como funciona el logging en TS, hace falta que los DTO de petición y respuesta implementen una interfaz
+export interface ServiceRequestDto {
+  dataToString(): string; //Esto debería devolver un string con los datos formateados para loggear
+}
+
+export interface ServiceResponseDto {
+  dataToString(): string; //Esto debería devolver un string con los datos formateados para loggear
 }
