@@ -26,6 +26,7 @@ export class Result<T> {
     get isSuccess(): boolean {
         return !this.error;
     }
+
     get Message(): string {
         if (this.message) {
             return this.message

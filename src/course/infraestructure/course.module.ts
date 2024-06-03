@@ -4,11 +4,11 @@ import { CourseEntity } from './entities/course.entity';
 import { LessonEntity } from './entities/lesson.entity';
 import { CourseController } from './controllers/course.controller';
 import { GetCourseByIdService } from '../application/services/getCourseById.service';
-import { GetAllCoursesService } from '../application/services/getAllCourses.service';
+import { GetManyCoursesService } from '../application/services/getManyCourses.service';
 
 @Module({
     imports: [TypeOrmModule.forFeature([CourseEntity, LessonEntity])],
     controllers: [CourseController],
-    providers: [GetCourseByIdService, GetAllCoursesService]
+    providers: [GetCourseByIdService, GetManyCoursesService]
 })
 export class CourseModule {}
