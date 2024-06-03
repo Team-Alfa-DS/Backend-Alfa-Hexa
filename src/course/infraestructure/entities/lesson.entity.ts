@@ -13,6 +13,9 @@ export class LessonEntity {
     @Column()
     content: string;
 
+    @Column()
+    seconds: number;
+
     @Column({nullable: true})
     video: string;
 
