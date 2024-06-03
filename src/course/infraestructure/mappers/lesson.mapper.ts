@@ -7,6 +7,7 @@ export class LessonMapper {
       entity.id,
       entity.title,
       entity.content,
+      entity.seconds,
       entity.video,
       entity.image
     );
