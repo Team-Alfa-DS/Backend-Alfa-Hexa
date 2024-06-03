@@ -15,11 +15,15 @@ export class GetAllNotify implements IApplicationService<void, Notify[]> {
     }
 
     async execute(): Promise<Result<Notify[]>> {
-        const notify = await this.repository.getAllNotify();
-        if(!notify.isSuccess) {
-            return Result.fail<Notify[]>(notify.Error, notify.StatusCode, notify.Message)
+        try {
+            const result = await this.repository.getAllNotify();
+            if (result.Error) {
+                return Result.fail<Notify[]>(result.Error, result.StatusCode, result.Message);
+            }
+            return Result.success<Notify[]>(result.Value, result.StatusCode);
+        } catch(err) {
+            return Result.fail<Notify[]>(new Error(err.message), 500, err.message);
         }
-        return Result.success<Notify[]>(notify.Value, notify.StatusCode);
     }
 
 

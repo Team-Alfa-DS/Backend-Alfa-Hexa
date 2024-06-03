@@ -3,7 +3,7 @@ import { IApplicationService } from "../application-service/application-service.
 import { Result } from "src/common/domain/result-handler/result";
 import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
 
-export class findNotifyById implements IApplicationService<string, Notify> {
+export class getfindNotifyById implements IApplicationService<string, Notify> {
     private readonly repository: INotifyRepository;
 
     constructor(repository: INotifyRepository) {
@@ -11,7 +11,7 @@ export class findNotifyById implements IApplicationService<string, Notify> {
     }
 
     get name(): string {
-        return 'findNotifyById';
+        return 'getfindNotifyById';
     }
 
     async execute(id: string): Promise<Result<Notify>> {

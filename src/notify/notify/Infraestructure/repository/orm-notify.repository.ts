@@ -28,11 +28,16 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
     }
 
     async findNotifyById(id: string): Promise<Result<Notify>> {
-            const notifyfound = await this.findOneBy({id});
-            if(!notifyfound) 
+        try{
+            const notifyfound = await this.findOne({where: {id: id}});
+            if(!notifyfound)
                 return Result.fail<Notify>(null, 404, 'Notify not found');
-            const notify = await NotifyMapper.toDomain(notifyfound);
+            const notify = NotifyMapper.toDomain(notifyfound);
             return Result.success<Notify>(notify, 200);
+        }
+        catch(err){
+            return Result.fail<Notify>(new Error(err.message), 500, err.message);
+        }
 }
 
     async saveNotify(notify: Notify): Promise<Result<Notify>> {
@@ -57,11 +62,11 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
     }
 
     async countnotreaded(): Promise<Result<number>> {
-        const count = await this.createQueryBuilder('notify')
-        .where('notify.userReaded = :false',{ userReaded : false})
+        const count = await this.createQueryBuilder("notify")
+        .where('notify.userReaded = :userReaded',{ userReaded : false})
         .getCount();
         if(!count){
-            Result.fail<number>(null, 404, 'Notify not found')
+           return Result.fail<number>(null, 404, 'Notify not found')
         }
         return Result.success<number>(count, 200)    
 }
