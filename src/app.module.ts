@@ -14,6 +14,7 @@ import { AuthController } from './auth/infraestructure/controller/auth.controlle
 import { ProgressController } from './progress/infraestructure/controller/progress.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CourseController } from './course/infraestructure/controllers/course.controller';
+import { SearchController } from './search/infraestructure/controller/search.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -63,7 +64,8 @@ import { CourseController } from './course/infraestructure/controllers/course.co
     UserController,
     AuthController,
     ProgressController,
-    CourseController
+    CourseController,
+    SearchController
   ],
   providers: [JwtStrategy],
 })
