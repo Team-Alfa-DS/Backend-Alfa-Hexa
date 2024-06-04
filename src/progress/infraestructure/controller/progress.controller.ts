@@ -14,6 +14,7 @@ import { ITransactionHandler } from 'src/common/domain/transaction-handler/trans
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { GetOneProgressService } from 'src/progress/application/services/get-one-progress.service';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { TrendingProgressService } from 'src/progress/application/services/trending-progress.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('token')
@@ -43,6 +44,7 @@ export class ProgressController {
 
     private markEndProgressService: MarkEndProgressService;
     private getOneProgressService: GetOneProgressService;
+    private trendingProgressService: TrendingProgressService;
 
     constructor() {
         this.markEndProgressService = new MarkEndProgressService(
@@ -57,6 +59,12 @@ export class ProgressController {
             this.courseRepository,
             this.transactionHandler
         );
+        this.trendingProgressService = new TrendingProgressService(
+            this.userRepository,
+            this.progressRepository,
+            this.courseRepository,
+            this.transactionHandler
+        )
     }
 
     @Post('mark/end')
@@ -71,6 +79,6 @@ export class ProgressController {
     
     @Get('trending')
     async progressTrending(@Request() req: JwtRequest) {
-        
+        return (await this.trendingProgressService.execute({userId: req.user.tokenUser.id}))
     }
 }

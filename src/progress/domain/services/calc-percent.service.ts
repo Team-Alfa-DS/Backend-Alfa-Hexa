@@ -10,10 +10,13 @@ export class CalcPercentService {
         let lessonList: LessonProgress[] = [];
         for (const pro of progressUser) {
             let percent = 0;
+
             if (pro.MarkAsCompleted) {
                 contCompleted++;
-                percent = 100
             }
+            
+            const lesson = lessonsCourse.find(lesson => lesson.id == pro.LessonId);
+            percent = pro.Time / lesson.seconds * 100
             lessonList.push({lessonId: pro.LessonId, percent});
         }
 

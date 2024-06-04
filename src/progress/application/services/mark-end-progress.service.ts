@@ -1,5 +1,5 @@
 import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { MarkEndProgressDto } from "../dtos/mark-end-progress.dto";
+import { MarkEndProgressDto } from "../dtos/request/mark-end-progress.request.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
@@ -38,7 +38,8 @@ export class MarkEndProgressService implements IApplicationService<MarkEndProgre
                 value.userId, 
                 value.lessonId, 
                 value.markAsCompleted, 
-                value.time
+                value.time,
+                new Date()
             ),
             this.transactionHandler
         );
