@@ -16,6 +16,21 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         super(ProgressEntity, dataSource.manager);
         this.ormProgressMapper = ormProgressMapper;
     }
+    
+    async findLastProgressByUser(userId: string, runner: TransactionHandler): Promise<Result<Progress>> {
+        const runnerTransaction = runner.getRunner();
+        try {
+            const progress = await runnerTransaction.manager
+            .createQueryBuilder(ProgressEntity, "progress")
+            .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId})
+            .getOne();
+            
+            const progressDomain = await this.ormProgressMapper.toDomain(progress);
+            return Result.success(progressDomain, 200);
+        } catch (err) {
+            return Result.fail<Progress>(new Error(err.message), err.code, err.message);
+        }
+    }
 
     async saveProgress(progress: Progress, runner: TransactionHandler): Promise<Result<Progress>> {
         const runnerTransaction = runner.getRunner()

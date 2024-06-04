@@ -3,12 +3,14 @@ export class Progress {
     private lessonId: string;
     private markAsCompleted: boolean;
     private time?: number;
+    private lastTime?: Date;
 
-    private constructor(userId: string, lessonId: string, markAsCompleted: boolean, time: number) {
+    private constructor(userId: string, lessonId: string, markAsCompleted: boolean, time: number, lastTime: Date) {
         this.userId = userId;
         this.lessonId = lessonId;
         this.markAsCompleted = markAsCompleted;
         this.time = time;
+        this.lastTime = lastTime;
     }
 
     get UserId(): string {
@@ -27,8 +29,12 @@ export class Progress {
         return this.time;
     }
 
-    static create(userId: string, lessonId: string, markAsCompleted: boolean, time?: number) {
-        return new Progress(userId, lessonId, markAsCompleted, time);
+    get LastTime(): Date {
+        return this.lastTime;
+    }
+
+    static create(userId: string, lessonId: string, markAsCompleted: boolean, time?: number, lastTime?: Date) {
+        return new Progress(userId, lessonId, markAsCompleted, time, lastTime);
     }
 
     UpdateMarkAsCompleted(markAsCompleted: boolean): void {
@@ -37,5 +43,9 @@ export class Progress {
 
     UpdateTime(time: number): void {
         this.time = time;
+    }
+
+    UpdateLastTime(lastTime: Date): void {
+        this.lastTime = lastTime;
     }
 }

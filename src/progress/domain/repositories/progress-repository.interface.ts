@@ -7,4 +7,5 @@ export interface IProgressRepository {
 
     saveProgress(progress: Progress, runner: ITransactionHandler): Promise<Result<Progress>>;
     findProgressByUserCourse(userId: string, lessons: Lesson[], runner: ITransactionHandler): Promise<Result<Progress[]>>;
+    findLastProgressByUser(userId: string, runner: ITransactionHandler): Promise<Result<Progress>>;
 }
