@@ -30,7 +30,13 @@ export class TrendingProgressService implements IApplicationService<TrendingProg
     }
 
     async execute(value: TrendingProgressDto): Promise<Result<TrendingProgressResponse>> {
-        throw new Error("Method not implemented.");
+        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
+        if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
+
+        const progress = await this.progressRepository.findLastProgressByUser(value.userId, this.transactionHandler);
+        if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
+        
+        throw new Error('Falta implementar');
     }
     get name(): string {
         return this.constructor.name;
