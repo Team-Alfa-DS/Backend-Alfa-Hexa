@@ -1,4 +1,4 @@
-import { Blog } from "src/blog/infraestructure/entities/blog.entity";
+import { BlogEntity } from "src/blog/infraestructure/entities/blog.entity";
 import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
@@ -26,7 +26,7 @@ export class Comment {
     @JoinColumn({name: 'user_id'})
     user: UserEntity;
 
-    @ManyToOne(() => Blog, blog => blog.comments)
+    @ManyToOne(() => BlogEntity, blog => blog.comments)
     @JoinColumn({name: 'blog_id'})
-    blog: Blog;
+    blog: BlogEntity;
 }

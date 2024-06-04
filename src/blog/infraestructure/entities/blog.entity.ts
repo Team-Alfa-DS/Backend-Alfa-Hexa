@@ -6,7 +6,7 @@ import { Category } from "src/category/infraestructure/entities/category.entity"
 import { Trainer } from "src/trainer/infraestructure/entities/trainer.entity";
 
 @Entity('blog')
-export class Blog {
+export class BlogEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
