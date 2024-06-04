@@ -10,7 +10,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     super(CourseEntity, database.manager)
   }
 
-  async getAllCourses(): Promise<Course[]> {
+  async getManyCourses(filter?: string, category?: string, trainer?: string, page?: number, perpage?: number): Promise<Course[]> {
     try {
       const result = await this.find({
         relations: {
@@ -21,9 +21,20 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
         }
       })
       
+      //TODO: Para hacer búsquedas filtradas necesito los repositorios de las otras entidades como los trainers y las categorías 
+      //if (filter) {result.filter((element) => element.tags.findIndex())}
+      //if (category) {}
+      //if (trainer) {}
+
+      if (perpage) {
+        if (!page) {page = 0};
+
+        result.splice(page, page + (perpage - 1));
+      }
+      
       // console.log('Debug: ', result);
       const courses = CourseMapper.arrayToDomain(result);
-      console.log(courses);
+      // console.log(courses);
       
       return courses;
     } catch (error) {
