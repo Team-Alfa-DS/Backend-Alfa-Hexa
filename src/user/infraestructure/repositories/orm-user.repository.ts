@@ -35,6 +35,10 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
             return Result.fail<User>(new Error('User not found'), 404, 'User not found');
         }
 
+        if (userfound.image) {
+            userfound.image = Buffer.from(userfound.image).toString('base64url');
+        }
+
         const domainUser = await this.ormUserMapper.toDomain(userfound);
         return Result.success<User>(domainUser, 200);
     }

@@ -23,7 +23,7 @@ export class UserEntity {
     @Column({type: 'enum', enum: UserRole, default: UserRole.CLIENT})
     type: UserRole;
 
-    @Column({nullable: true})
+    @Column('bytea', {nullable: true})
     image: string;
 
     @OneToMany(() => Comment, comment => comment.user)
