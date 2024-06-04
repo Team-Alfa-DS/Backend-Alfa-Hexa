@@ -4,7 +4,6 @@ import { CategoryEntity } from "../entities/category.entity";
 import { DataSource, Repository } from "typeorm";
 import { Category } from "src/category/domain/Category";
 import { IMapper } from "src/category/application/mapper/mapper.interface";
-import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
 import { HttpException, HttpStatus } from "@nestjs/common";
 //import { InjectRepository } from "@nestjs/typeorm";
 
@@ -21,11 +20,13 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
         try {
           const result = await this.find({})
           
-          // console.log('Debug: ', result);
-          const categorys: any = OrmCategoryMapper.arrayToDomain(result);
-          console.log(categorys);
+          let categories: Category[] = [];
           
-          return categorys;
+          for (const category of result) {
+            categories.push( await this.ormCategoryMapper.toDomain(category))
+          }
+          
+          return categories;
         } catch (error) {
           throw new HttpException("No se encontraron categorias", HttpStatus.BAD_REQUEST);
         }

@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmCategoryRepository } from "../repositories/orm-category.repository";
 import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
-import { DataSourceSingleton } from "src/common/infraestructure/database/config";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 
@@ -18,12 +18,16 @@ import { GetAllCategorysService } from "src/category/application/services/getAll
 export class CategoryController {
     
     private categoryMapper: OrmCategoryMapper = new OrmCategoryMapper();
+    private getAllCategorysService: GetAllCategorysService;
     private readonly categoryRepository: OrmCategoryRepository = new OrmCategoryRepository(
         this.categoryMapper,
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
+
+    constructor() {
+      this.getAllCategorysService = new GetAllCategorysService(this.categoryRepository);
+    }
     
-    private getAllCategorysService: GetAllCategorysService;
     @ApiTags('Category')
     @Get("many")
     @ApiBearerAuth('token')
