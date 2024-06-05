@@ -36,7 +36,22 @@ export class TrendingProgressService implements IApplicationService<TrendingProg
         const progress = await this.progressRepository.findLastProgressByUser(value.userId, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
         
-        throw new Error('Falta implementar');
+        const course = await this.courseRepository.getCourseByLessonId(progress.Value.LessonId);
+        if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
+
+        const totalProgress = await this.progressRepository.findProgressByUserCourse(value.userId, course.Value.lessons, this.transactionHandler);
+        if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error, totalProgress.StatusCode, totalProgress.Message);
+
+        const result = this.calcPercentService.execute(course.Value.lessons, totalProgress.Value);
+
+        const response: TrendingProgressResponse = {
+            percent: result.percent,
+            courseTitle: course.Value.name,
+            courseId: course.Value.id,
+            lastTime: progress.Value.LastTime
+        } 
+
+        return Result.success(response, 200);
     }
     get name(): string {
         return this.constructor.name;
