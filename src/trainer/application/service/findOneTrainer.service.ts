@@ -11,9 +11,9 @@ export class FindOneTrainerService implements IApplicationService<string, any> {
     const trainer = await this.trainerRepository.findTrainerById(data);
     if (!trainer.isSuccess) {
       return Result.fail(
-        new Error('Error trainer not found'),
+        new Error('Trainer not found'),
         404,
-        'Error trainer not found',
+        'Trainer not found',
       );
     }
     return Result.success(trainer, 202);

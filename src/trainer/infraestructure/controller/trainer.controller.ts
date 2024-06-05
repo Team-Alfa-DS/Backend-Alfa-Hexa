@@ -52,7 +52,10 @@ export class TrainerController {
   })
   async getTrainerById(@Param('id', ParseUUIDPipe) trainerId: string) {
     const oneTrainer = await this.findOneTrainerService.execute(trainerId);
-    return oneTrainer;
+    if (!oneTrainer.isSuccess) {
+      return oneTrainer;
+    }
+    return oneTrainer.Value;
   }
 
   @Post('/toggle/follow')
@@ -72,6 +75,9 @@ export class TrainerController {
       idUser: idUser,
     };
     const follow = await this.followTrainerService.execute(data);
+    if (!follow.isSuccess) {
+      return follow;
+    }
     return follow;
   }
 }

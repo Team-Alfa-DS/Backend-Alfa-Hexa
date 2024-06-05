@@ -52,11 +52,18 @@ export class OrmTrainerRepository
   }): Promise<Result<Trainer>> {
     try {
       const trainer = await this.findTrainerById(data.idTrainer);
+      if (!trainer.isSuccess) {
+        return trainer;
+      }
 
       const user = await this.userRepository.findUserById(
         data.idUser,
         this.transactionHandler,
       );
+
+      if (!user.isSuccess) {
+        return Result.fail(new Error('User not found'), 404, 'User not found');
+      }
 
       const ormTrainer = await this.ormTrainerMapper.toOrm(trainer.Value);
 
@@ -70,6 +77,16 @@ export class OrmTrainerRepository
           users: true,
         },
       });
+      const a = trainersWithUsers[0].users.find((user) => {
+        if (user.id === ormUser.id) return true;
+      });
+      if (a) {
+        return Result.fail(
+          new Error('User already follow this trainer'),
+          404,
+          'User already follow this trainer',
+        );
+      }
       let array = [];
       for (let x = 0; x < trainersWithUsers[0].users.length; x++) {
         array.push(trainersWithUsers[0].users[x]);

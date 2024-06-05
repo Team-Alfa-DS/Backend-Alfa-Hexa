@@ -15,13 +15,9 @@ export class FollowTrainerService
   }): Promise<Result<any>> {
     const trainer = await this.trainerRepository.followTrainer(data);
     if (!trainer.isSuccess) {
-      return Result.fail(
-        new Error('Error trainer not found'),
-        404,
-        'Error trainer not found',
-      );
+      return trainer;
     }
-    return Result.success(trainer, 202);
+    return Result.success('Trainer Followed!!', 202);
   }
 
   get name(): string {
