@@ -9,7 +9,8 @@ export class OrmProgressMapper implements IMapper<Progress, ProgressEntity> {
             domainEntity.LessonId,
             domainEntity.UserId,
             domainEntity.MarkAsCompleted,
-            domainEntity.Time
+            domainEntity.Time,
+            domainEntity.LastTime
         )
         return ormProgress;
     }
@@ -19,7 +20,8 @@ export class OrmProgressMapper implements IMapper<Progress, ProgressEntity> {
             ormEntity.user_id,
             ormEntity.lesson_id,
             ormEntity.markAsCompleted,
-            ormEntity.time
+            ormEntity.time,
+            ormEntity.lastTime
         )
         return domainProgress;
     }

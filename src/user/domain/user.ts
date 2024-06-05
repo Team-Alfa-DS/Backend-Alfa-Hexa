@@ -50,8 +50,8 @@ export class User extends Entity<string> {
         return this.progress;
     }
 
-    static Create(id: string, email: string, name: string, password: string, phone: string, type: UserRole) {
-        return new User(id, email, name, password, phone, type, null)
+    static Create(id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
+        return new User(id, email, name, password, phone, type, image)
     }
 
     UpdateEmail(email: string): void {
