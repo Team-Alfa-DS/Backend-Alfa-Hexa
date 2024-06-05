@@ -1,27 +1,57 @@
-import { Blog } from "src/blog/infraestructure/entities/blog.entity";
-import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Blog } from 'src/blog/infraestructure/entities/blog.entity';
+import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
+import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('trainer')
-export class Trainer {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+export class OrmTrainer {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    followers: number;
+  @Column()
+  followers: number;
 
-    @Column()
-    userFollow: boolean
+  @Column()
+  userFollow: boolean;
 
-    @Column()
-    location: string
+  @Column()
+  location: string;
 
-    @OneToMany(() => Blog, blog => blog.trainer)
-    blogs: Blog[];
+  @OneToMany(() => Blog, (blog) => blog.trainer)
+  blogs: Blog[];
 
-    @OneToMany(() => CourseEntity, course => course.trainer)
-    courses: CourseEntity[];
+  @OneToMany(() => CourseEntity, (course) => course.trainer)
+  courses: CourseEntity[];
+
+  @ManyToMany(() => UserEntity, (UserEntity) => UserEntity.trainers, {
+    cascade: true,
+  })
+  @JoinTable()
+  users: UserEntity[];
+
+  static create(
+    id: string,
+    name: string,
+    followers: number,
+    userFollow: boolean,
+    location: string,
+  ): OrmTrainer {
+    const trainer = new OrmTrainer();
+    trainer.id = id;
+    trainer.name = name;
+    trainer.followers = followers;
+    trainer.userFollow = userFollow;
+    trainer.location = location;
+    return trainer;
+  }
 }
