@@ -1,6 +1,5 @@
 import { Lesson } from "src/course/domain/Lesson";
 import { Progress } from "../progress";
-import { Result } from "src/common/domain/result-handler/result";
 import { GetOneProgressResponse, LessonProgress } from "../response/get-one-progress.response";
 
 export class CalcPercentService {

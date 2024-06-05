@@ -28,6 +28,7 @@ import { ValidateUserCodeService } from 'src/auth/application/services/validate-
 import { ChangeUserPasswordDto } from '../dtos/change-user-password.dto';
 import { ChangeUserPasswordService } from 'src/auth/application/services/change-user-password.service';
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -77,7 +78,7 @@ export class AuthController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
     @UseGuards(JwtAuthGuard)
     @Get('current')
-    async currentUser(@Request() req) {
+    async currentUser(@Request() req: JwtRequest) {
         return (await this.currentUserService.execute({id: req.user.tokenUser.id}))
     }
 

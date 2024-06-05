@@ -25,7 +25,6 @@ export class UpdateUserService implements IApplicationService<UpdateUserDto, any
         if (!user.isSuccess) {
             return Result.fail<User>(user.Error, user.StatusCode, user.Message)
         }
-        const hashPassword = await this.encryptor.hash(data.password); 
         const newUser = user.Value;
         if(data.email) {
             const userEmailCheck = await this.userRepository.findUserByEmail(data.email, this.transactionHandler)
@@ -33,7 +32,10 @@ export class UpdateUserService implements IApplicationService<UpdateUserDto, any
             newUser.UpdateEmail(data.email);
         }
         if(data.name) newUser.UpdateName(data.name);
-        if(data.password) newUser.UpdatePassword(hashPassword);
+        if(data.password) {
+            const hashPassword = await this.encryptor.hash(data.password); 
+            newUser.UpdatePassword(hashPassword);
+        }
         if(data.phone) newUser.UpdatePhone(data.phone);
         if(data.image) newUser.UpdateImage(data.image);
 
