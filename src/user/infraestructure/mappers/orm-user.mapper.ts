@@ -24,7 +24,8 @@ export class OrmUserMapper implements IMapper<User, UserEntity> {
             ormEntity.name,
             ormEntity.password,
             ormEntity.phone,
-            ormEntity.type
+            ormEntity.type,
+            ormEntity.image
         )
         return domainUser;
     }

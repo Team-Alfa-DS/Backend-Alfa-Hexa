@@ -1,4 +1,4 @@
-import { Body, Controller, Put, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, FileTypeValidator, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
@@ -9,6 +9,8 @@ import { UpdateUserDto } from "../dtos/update-user.dto";
 import { IEncryptor } from "src/auth/application/encryptor/encryptor.interface";
 import { BcryptEncryptor } from "src/auth/infraestructure/encryptor/bcrypt";
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @ApiTags('User')
 @ApiBearerAuth('token')
@@ -37,8 +39,8 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Put('update')
-    updateUser(@Request() req, @Body() data: UpdateUserDto) {
-        const dataUser = {id: req.user.tokenUser.id, ...data}
+    updateUser(@Request() req: JwtRequest, @Body() data: UpdateUserDto) {
+        let dataUser: any = {id: req.user.tokenUser.id, ...data};
         return this.updateUserService.execute(dataUser);
     }
 }

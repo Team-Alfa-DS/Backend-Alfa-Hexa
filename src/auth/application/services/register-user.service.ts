@@ -38,7 +38,8 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
                 newUser.name,
                 hashPassword,
                 newUser.phone,
-                newUser.type
+                newUser.type,
+                null
             ),
             this.transactionHandler
         );
