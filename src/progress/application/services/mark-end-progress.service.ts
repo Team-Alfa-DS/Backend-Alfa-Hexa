@@ -29,9 +29,9 @@ export class MarkEndProgressService implements IApplicationService<MarkEndProgre
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
         const user = await this.userRepository.findUserById(value.userId, this.transactionHandler)
 
-        if (!course) return Result.fail(new Error('No se encontro el curso'), 404, 'No se encontro el curso');
+        if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
-        if (course.lessons.findIndex(lesson => lesson.id == value.lessonId) == -1) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion')
+        if (course.Value.lessons.findIndex(lesson => lesson.id == value.lessonId) == -1) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion')
 
         await this.progressRepository.saveProgress(
             Progress.create(

@@ -34,12 +34,12 @@ export class GetOneProgressService implements IApplicationService<GetOneProgress
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
 
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
-        if (!course) return Result.fail(new Error('No se encontro el curso'), 404, 'No se encontro el curso');
+        if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
 
-        const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.lessons, this.transactionHandler);
+        const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.Value.lessons, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
 
-        const response = this.calcPercentService.execute(course.lessons, progress.Value);
+        const response = this.calcPercentService.execute(course.Value.lessons, progress.Value);
 
         return Result.success(response, 200);
     }
