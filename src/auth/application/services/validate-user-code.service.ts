@@ -1,10 +1,10 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { ValidateUserCodeDto } from "../dtos/validate-user-code.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { IService } from "src/common/application/interfaces/IService";
+import { ValidateUserCodeRequest } from "../dtos/request/validate-user-code.request";
 
-export class ValidateUserCodeService implements IApplicationService<ValidateUserCodeDto, any> {
+export class ValidateUserCodeService implements IService<ValidateUserCodeRequest, undefined> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -14,7 +14,7 @@ export class ValidateUserCodeService implements IApplicationService<ValidateUser
         this.transactionHandler = transactionHandler;
     }
 
-    async execute(value: ValidateUserCodeDto): Promise<Result<any>> {
+    async execute(value: ValidateUserCodeRequest): Promise<Result<undefined>> {
         const user = await this.userRepository.findUserByEmail(value.email, this.transactionHandler);
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message)
@@ -24,11 +24,6 @@ export class ValidateUserCodeService implements IApplicationService<ValidateUser
             return Result.fail(new Error('El codigo no es correcto'), 500, 'El codigo no es correcto');
         }
 
-        return Result.success({}, 200);
+        return Result.success(undefined, 200);
     }
-
-    get name(): string {
-        return this.constructor.name;
-    }
-
 }

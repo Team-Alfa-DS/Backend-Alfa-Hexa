@@ -1,26 +1,19 @@
 import { Result } from 'src/common/domain/result-handler/result';
 import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
-import { IApplicationService } from '../application-service/application-service.interface';
+import { IService } from 'src/common/application/interfaces/IService';
+import { FollowTrainerRequest } from '../dto/request/follow-trainer.request';
 
-export class FollowTrainerService
-  implements IApplicationService<{ idTrainer: string; idUser: string }, any>
+export class FollowTrainerService implements IService<FollowTrainerRequest, undefined>
 {
   constructor(private readonly trainerRepository: ITrainerRepository) {
     this.trainerRepository = trainerRepository;
   }
 
-  async execute(data: {
-    idTrainer: string;
-    idUser: string;
-  }): Promise<Result<any>> {
+  async execute(data: FollowTrainerRequest): Promise<Result<undefined>> {
     const trainer = await this.trainerRepository.followTrainer(data);
     if (!trainer.isSuccess) {
-      return trainer;
+      return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message);
     }
-    return Result.success('Trainer Followed!!', 202);
-  }
-
-  get name(): string {
-    return this.constructor.name;
+    return Result.success(undefined, 202);
   }
 }
