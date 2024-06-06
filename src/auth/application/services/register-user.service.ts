@@ -1,5 +1,3 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { RegisterUserDto } from "../dtos/register-user.dto";
 import { User } from "src/user/domain/user";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";

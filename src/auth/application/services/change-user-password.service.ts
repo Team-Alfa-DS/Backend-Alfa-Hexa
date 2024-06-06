@@ -4,8 +4,9 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IEncryptor } from "../encryptor/encryptor.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { ChangeUserPasswordRequest } from "../dtos/request/change-user-password.request";
+import { ChangeUserPasswordResponse } from "../dtos/response/change-user-password.response";
 
-export class ChangeUserPasswordService implements IService<ChangeUserPasswordRequest, undefined> {
+export class ChangeUserPasswordService implements IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -17,7 +18,7 @@ export class ChangeUserPasswordService implements IService<ChangeUserPasswordReq
         this.encryptor = encryptor;
     }
 
-    async execute(value: ChangeUserPasswordRequest): Promise<Result<undefined>> {
+    async execute(value: ChangeUserPasswordRequest): Promise<Result<ChangeUserPasswordResponse>> {
 
         const hashPassword = await this.encryptor.hash(value.password);
 
@@ -25,7 +26,7 @@ export class ChangeUserPasswordService implements IService<ChangeUserPasswordReq
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message);
         }
-
-        return Result.success(undefined, 200);
+        const response = new ChangeUserPasswordResponse();
+        return Result.success(response, 200);
     }
 }

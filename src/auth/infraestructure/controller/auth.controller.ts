@@ -42,6 +42,8 @@ import { ValidateUserCodeRequest } from 'src/auth/application/dtos/request/valid
 import { ChangeUserPasswordRequest } from 'src/auth/application/dtos/request/change-user-password.request';
 import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
 import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
+import { ChangeUserPasswordResponse } from 'src/auth/application/dtos/response/change-user-password.response';
+import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/validate-user-code.response';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -67,8 +69,8 @@ export class AuthController {
     private loginUserService: IService<LoginUserRequest, LoginUserResponse>;
     private currentUserService: IService<CurrentUserRequest, CurrentUserResponse>;
     private forgetUserPasswordService: IService<ForgetUserPasswordRequest, ForgetUserPasswordResponse>;
-    private validateUserCodeService: IService<ValidateUserCodeRequest, undefined>;
-    private changeUserPasswordService: IService<ChangeUserPasswordRequest, undefined>;
+    private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
+    private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
     constructor(private jwtService: JwtService, private mailerService: MailerService) {
         this.jwtGen = new JwtGen(jwtService);

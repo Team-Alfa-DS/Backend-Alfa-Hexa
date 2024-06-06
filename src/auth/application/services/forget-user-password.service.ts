@@ -1,5 +1,3 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { ForgetUserPasswordDto } from "../dtos/forget-user-password.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";

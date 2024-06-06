@@ -23,6 +23,7 @@ import { FindOneTrainerResponse } from 'src/trainer/application/dto/response/fin
 import { FollowTrainerRequest } from 'src/trainer/application/dto/request/follow-trainer.request';
 import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
 import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
+import { FollowTrainerResponse } from 'src/trainer/application/dto/response/follow-trainer.response';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -42,7 +43,7 @@ export class TrainerController {
     );
 
   private findOneTrainerService: IService<FindOneTrainerRequest, FindOneTrainerResponse>;
-  private followTrainerService: IService<FollowTrainerRequest, undefined>;
+  private followTrainerService: IService<FollowTrainerRequest, FollowTrainerResponse>;
 
   constructor() {
     this.findOneTrainerService = new ServiceDBLoggerDecorator(
