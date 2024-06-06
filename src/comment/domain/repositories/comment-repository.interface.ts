@@ -4,7 +4,7 @@ import { Comment } from "src/comment/domain/Comment";
 
 
 export interface ICommentRepository {
-    findAllCommentsByBlogId(id: string, runner: ITransactionHandler): Promise<Result<Comment[]>>;
-    findAllCommentsByLessonId(id: string, runner: ITransactionHandler): Promise<Result<Comment[]>>;
+    findAllCommentsByBlogId(id: string, page: number, perPage: number, runner: ITransactionHandler): Promise<Result<Comment[]>>;
+    findAllCommentsByLessonId(id: string, page: number, perPage: number, runner: ITransactionHandler): Promise<Result<Comment[]>>;
     saveComment(comment: Comment, runner: ITransactionHandler): Promise<Result<Comment>>;
 }

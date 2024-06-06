@@ -17,10 +17,12 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         this.ormCommentMapper = ormCommentMapper;
     }
     
-    async findAllCommentsByBlogId(id: string, runner: TransactionHandler): Promise<Result<Comment[]>> {
+    async findAllCommentsByBlogId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog: id }});
+        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog: id },
+            take: page,
+            skip: perPage,});
 
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
@@ -34,10 +36,12 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         return Result.success<Comment[]>(ListMapper,200);
     }
 
-    async findAllCommentsByLessonId(id: string, runner: TransactionHandler): Promise<Result<Comment[]>> {
+    async findAllCommentsByLessonId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { lesson: id }});
+        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { lesson: id },
+            take: page,
+            skip: perPage,});
 
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 

@@ -22,7 +22,7 @@ export class GetCommentLessonService implements IApplicationService<GetLessonCom
     }
     
     execute(data : GetLessonCommentsServiceDto): Promise<Result<Comment[]>> {
-        return this.commentRepository.findAllCommentsByBlogId(data.lessonId,this.transactionHandler);
+        return this.commentRepository.findAllCommentsByBlogId(data.lessonId, data.pagination.page, data.pagination.perPage, this.transactionHandler);
     }
 
 }
