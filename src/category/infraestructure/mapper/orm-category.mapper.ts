@@ -9,6 +9,9 @@ import { CategoryEntity } from "../entities/category.entity";
 /* eslint-disable prettier/prettier */
 
 export class OrmCategoryMapper implements IMapper<Category, CategoryEntity> {
+    static toDomain(result: CategoryEntity): Category | PromiseLike<Category> {
+      throw new Error("Method not implemented.");
+    }
 
     async toOrm(domainEntity: Category):Promise<CategoryEntity> {
 

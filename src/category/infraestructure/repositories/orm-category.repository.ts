@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable prefer-const */
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CategoryEntity } from "../entities/category.entity";
 import { DataSource, Repository } from "typeorm";
@@ -31,6 +32,16 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
           throw new HttpException("No se encontraron categorias", HttpStatus.BAD_REQUEST);
         }
       }
+
+      async getCategoryById(idCategory: string): Promise<Category> {
+        try {
+          const result = await this.findOne({where: {id: idCategory}
+          });
+          return result;
+        } catch (error) {
+          throw new HttpException("No se encontraro una categoria con esa id", HttpStatus.BAD_REQUEST);
+        }
+       }
     
     //async getAllCategory(): Promise<Category[]> {
         //const query = this.categoryRepository.createQueryBuilder('category');
