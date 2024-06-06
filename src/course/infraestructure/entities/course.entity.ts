@@ -1,17 +1,8 @@
-import { Tag } from 'src/blog/infraestructure/entities/tag.entity';
-import { Category } from 'src/category/infraestructure/entities/category.entity';
-import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { LessonEntity } from './lesson.entity';
+import { Tag } from "src/blog/infraestructure/entities/tag.entity";
+import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
+import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { LessonEntity } from "./lesson.entity";
 
 @Entity('course')
 export class CourseEntity {
@@ -39,9 +30,9 @@ export class CourseEntity {
   @OneToMany(() => LessonEntity, (lesson) => lesson.course)
   lessons: LessonEntity[];
 
-  @ManyToOne(() => Category, (category) => category.blogs)
-  @JoinColumn({ name: 'category_id' })
-  category: Category;
+    @ManyToOne(() => CategoryEntity, category => category.blogs)
+    @JoinColumn({name: 'category_id'})
+    category: CategoryEntity;
 
   @ManyToOne(() => OrmTrainer, (trainer) => trainer.blogs)
   @JoinColumn({ name: 'trainer_id' })
