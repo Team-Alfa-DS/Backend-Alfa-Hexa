@@ -15,6 +15,7 @@ import { AuthController } from './auth/infraestructure/controller/auth.controlle
 import { ProgressController } from './progress/infraestructure/controller/progress.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CourseController } from './course/infraestructure/controllers/course.controller';
+import { MailjetModule } from 'nest-mailjet';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -37,21 +38,12 @@ import { CourseController } from './course/infraestructure/controllers/course.co
         signOptions: {expiresIn: '10d'}
       })
     }),
-    MailerModule.forRootAsync({
+    MailjetModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        transport: {
-          service: 'gmail',
-          auth: {
-            type: 'OAuth2',
-            user: configService.getOrThrow('EMAIL_USERNAME'),
-            pass: configService.getOrThrow('EMAIL_PASSWORD'),
-            clientId: configService.getOrThrow('OAUTH_CLIENT_ID'),
-            clientSecret: configService.getOrThrow('OAUTH_CLIENT_SECRET'),
-            refreshToken: configService.getOrThrow('OAUTH_REFRESH_TOKEN'),
-          }
-        }
+        apiKey: configService.getOrThrow('MAILJET_API_KEY'),
+        apiSecret: configService.getOrThrow('MAILJET_API_SECRET'),
       })
     }),
     BlogModule, 

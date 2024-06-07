@@ -4,7 +4,7 @@ export interface LessonProgress {
     percent: number;
 }
 
-export interface GetOneProgressResponse {
+export interface CalcPercentProgressResponse {
     percent: number;
     lessons: LessonProgress[];
 }

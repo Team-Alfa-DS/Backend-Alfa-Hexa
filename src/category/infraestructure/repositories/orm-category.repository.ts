@@ -6,6 +6,7 @@ import { DataSource, Repository } from "typeorm";
 import { Category } from "src/category/domain/Category";
 import { IMapper } from "src/category/application/mapper/mapper.interface";
 import { HttpException, HttpStatus } from "@nestjs/common";
+import { Result } from "src/common/domain/result-handler/result";
 //import { InjectRepository } from "@nestjs/typeorm";
 
 export class OrmCategoryRepository extends Repository<CategoryEntity> implements ICategoryRepository {
@@ -17,9 +18,14 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
         this.ormCategoryMapper = ormCategoryMapper;
     }
     
-    async getAllCategory(): Promise<Category[]> {
+    async getAllCategory(page: number, perpage: number): Promise<Result<Category[]>> {
         try {
-          const result = await this.find({})
+          const result = await this.find(
+            {
+              take: page,
+              skip: perpage
+            }
+          )
           
           let categories: Category[] = [];
           
@@ -27,19 +33,19 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
             categories.push( await this.ormCategoryMapper.toDomain(category))
           }
           
-          return categories;
+          return Result.success<Category[]>(categories, 200);
         } catch (error) {
-          throw new HttpException("No se encontraron categorias", HttpStatus.BAD_REQUEST);
+          return Result.fail<Category[]>(new Error(error.message), error.code, error.message);
         }
       }
 
-      async getCategoryById(idCategory: string): Promise<Category> {
+      async getCategoryById(idCategory: string): Promise<Result<Category>> {
         try {
           const result = await this.findOne({where: {id: idCategory}
           });
-          return result;
+          return Result.success<Category>(result, 200);
         } catch (error) {
-          throw new HttpException("No se encontraro una categoria con esa id", HttpStatus.BAD_REQUEST);
+          return Result.fail<Category>(new Error(error.message), error.code, error.message);
         }
        }
     

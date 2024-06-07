@@ -1,14 +1,14 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { GetOneProgressDto } from "../dtos/request/get-one-progress.request.dto";
-import { GetOneProgressResponse } from "../../domain/response/get-one-progress.response";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
+import { IService } from "src/common/application/interfaces/IService";
+import { GetOneProgressResponse } from "../dtos/response/get-one-progress.response";
+import { GetOneProgressRequest } from "../dtos/request/get-one-progress.request.dto";
 
-export class GetOneProgressService implements IApplicationService<GetOneProgressDto, GetOneProgressResponse> {
+export class GetOneProgressService implements IService<GetOneProgressRequest, GetOneProgressResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly progressRepository: IProgressRepository;
@@ -29,7 +29,7 @@ export class GetOneProgressService implements IApplicationService<GetOneProgress
         this.calcPercentService = new CalcPercentService();
     }
 
-    async execute(value: GetOneProgressDto): Promise<Result<GetOneProgressResponse>> {
+    async execute(value: GetOneProgressRequest): Promise<Result<GetOneProgressResponse>> {
         const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
 
@@ -39,7 +39,8 @@ export class GetOneProgressService implements IApplicationService<GetOneProgress
         const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.Value.lessons, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
 
-        const response = this.calcPercentService.execute(course.Value.lessons, progress.Value);
+        const calc = this.calcPercentService.execute(course.Value.lessons, progress.Value);
+        const response = new GetOneProgressResponse(calc.percent, calc.lessons);
 
         return Result.success(response, 200);
     }

@@ -1,14 +1,16 @@
 import { Result } from 'src/common/domain/result-handler/result';
 import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
-import { IApplicationService } from '../application-service/application-service.interface';
+import { IService } from 'src/common/application/interfaces/IService';
+import { FindOneTrainerRequest } from '../dto/request/find-one-trainer.request';
+import { FindOneTrainerResponse } from '../dto/response/find-one-trainer.response';
 
-export class FindOneTrainerService implements IApplicationService<string, any> {
+export class FindOneTrainerService implements IService<FindOneTrainerRequest, FindOneTrainerResponse> {
   constructor(private readonly trainerRepository: ITrainerRepository) {
     this.trainerRepository = trainerRepository;
   }
 
-  async execute(data: string): Promise<Result<any>> {
-    const trainer = await this.trainerRepository.findTrainerById(data);
+  async execute(data: FindOneTrainerRequest): Promise<Result<FindOneTrainerResponse>> {
+    const trainer = await this.trainerRepository.findTrainerById(data.id);
     if (!trainer.isSuccess) {
       return Result.fail(
         new Error('Trainer not found'),
@@ -16,10 +18,7 @@ export class FindOneTrainerService implements IApplicationService<string, any> {
         'Trainer not found',
       );
     }
-    return Result.success(trainer, 202);
-  }
-
-  get name(): string {
-    return this.constructor.name;
+    const response = new FindOneTrainerResponse(trainer.Value);
+    return Result.success(response, 202);
   }
 }
