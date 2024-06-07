@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CourseEntity } from "./course.entity";
-import { Progress } from "src/user/infraestructure/entities/progress.entity";
+import { ProgressEntity } from "src/user/infraestructure/entities/progress.entity";
 import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
 
 @Entity('lesson')
@@ -13,6 +13,9 @@ export class LessonEntity {
 
     @Column()
     content: string;
+
+    @Column()
+    seconds: number;
 
     @Column({nullable: true})
     video: string;
@@ -28,6 +31,6 @@ export class LessonEntity {
     progress: Progress[];
 
     @OneToMany(() => CommentEntity, comment => comment.lesson)
-    comments: Comment[];
+    comments: CommentEntity[];
 
 }

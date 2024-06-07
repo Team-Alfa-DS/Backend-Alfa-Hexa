@@ -1,3 +1,3 @@
-export interface ICodeGen{
+export interface ICodeGen {
     genCode(): number;
 }
