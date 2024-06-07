@@ -1,18 +1,9 @@
-import { Comment } from 'src/comment/infraestructure/entities/comment.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  JoinTable,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Image } from './image.entity';
-import { Tag } from './tag.entity';
-import { Category } from 'src/category/infraestructure/entities/category.entity';
-import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
+import { Comment } from "src/comment/infraestructure/entities/comment.entity";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Image } from "./image.entity";
+import { Tag } from "./tag.entity";
+import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
+import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
 
 @Entity('blog')
 export class Blog {
@@ -34,9 +25,9 @@ export class Blog {
   @OneToMany(() => Image, (image) => image.blog)
   images: Image[];
 
-  @ManyToOne(() => Category, (category) => category.blogs)
-  @JoinColumn({ name: 'category_id' })
-  category: Category;
+    @ManyToOne(() => CategoryEntity, category => category.blogs)
+    @JoinColumn({name: 'category_id'})
+    category: CategoryEntity;
 
   @ManyToOne(() => OrmTrainer, (trainer) => trainer.blogs)
   @JoinColumn({ name: 'trainer_id' })
