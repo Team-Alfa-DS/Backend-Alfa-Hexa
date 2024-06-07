@@ -18,8 +18,6 @@ import { CurrentUserService } from 'src/auth/application/services/current-user.s
 import { JwtAuthGuard } from '../guards/jwt-guard.guard';
 import { ForgetUserPasswordDto } from '../dtos/forget-user-password.dto';
 import { ForgetUserPasswordService } from 'src/auth/application/services/forget-user-password.service';
-import { MailerService } from '@nestjs-modules/mailer';
-import { NodeMailer } from 'src/common/infraestructure/mailer/node-mailer';
 import { ICodeGen } from 'src/common/application/code-gen/code-gen.interface';
 import { CodeGenMath } from 'src/common/infraestructure/code-gen/code-gen-math';
 import { ValidateUserCodeDto } from '../dtos/validate-user-code.dto';
@@ -44,6 +42,9 @@ import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/service
 import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
 import { ChangeUserPasswordResponse } from 'src/auth/application/dtos/response/change-user-password.response';
 import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/validate-user-code.response';
+import { MailjetService } from 'nest-mailjet';
+import { MailJet } from 'src/common/infraestructure/mailer/mailjet';
+import { IMailer } from 'src/common/application/mailer/mailer.interface';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -61,7 +62,7 @@ export class AuthController {
     );
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
-    private readonly mailer: NodeMailer;
+    private readonly mailer: IMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
     private userCodeList: UserCode[] = [];
 
@@ -72,9 +73,9 @@ export class AuthController {
     private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
     private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
-    constructor(private jwtService: JwtService, private mailerService: MailerService) {
+    constructor(private jwtService: JwtService, private mailerService: MailjetService) {
         this.jwtGen = new JwtGen(jwtService);
-        this.mailer = new NodeMailer(mailerService);
+        this.mailer = new MailJet(mailerService);
 
         this.registerUserService = new ServiceDBLoggerDecorator(
             new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),

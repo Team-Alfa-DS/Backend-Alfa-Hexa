@@ -24,7 +24,7 @@ export class ForgetUserPasswordService implements IService<ForgetUserPasswordReq
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }
 
-        await this.mailer.sendMail('Codigo de seguridad', 'pruebas de email', user.Value.Email, value.code);
+        await this.mailer.sendMail('Codigo de seguridad', 'Envio de código de verificación', user.Value.Email, value.code);
 
         const response = new ForgetUserPasswordResponse(new Date());
         return Result.success(response, 200);
