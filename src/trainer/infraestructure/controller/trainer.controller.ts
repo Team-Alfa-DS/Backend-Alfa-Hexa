@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -16,6 +17,13 @@ import { FindOneTrainerService } from 'src/trainer/application/service/findOneTr
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { OrmTrainerRepository } from '../repositories/orm-trainer.repositorie';
 import { FollowTrainerService } from 'src/trainer/application/service/followTrainer.service';
+import { IService } from 'src/common/application/interfaces/IService';
+import { FindOneTrainerRequest } from 'src/trainer/application/dto/request/find-one-trainer.request';
+import { FindOneTrainerResponse } from 'src/trainer/application/dto/response/find-one-trainer.response';
+import { FollowTrainerRequest } from 'src/trainer/application/dto/request/follow-trainer.request';
+import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
+import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
+import { FollowTrainerResponse } from 'src/trainer/application/dto/response/follow-trainer.response';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -30,18 +38,27 @@ export class TrainerController {
       this.trainerMapper,
       DatabaseSingleton.getInstance(),
     );
+    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
+      DatabaseSingleton.getInstance()
+    );
 
-  private findOneTrainerService: FindOneTrainerService;
-  private followTrainerService: FollowTrainerService;
+  private findOneTrainerService: IService<FindOneTrainerRequest, FindOneTrainerResponse>;
+  private followTrainerService: IService<FollowTrainerRequest, FollowTrainerResponse>;
 
   constructor() {
-    this.findOneTrainerService = new FindOneTrainerService(
-      this.trainerRepository,
-      //this.transactionHandler
+    this.findOneTrainerService = new ServiceDBLoggerDecorator(
+      new FindOneTrainerService(
+        this.trainerRepository,
+        //this.transactionHandler
+      ),
+      this.auditRepository
     );
-    this.followTrainerService = new FollowTrainerService(
-      this.trainerRepository,
-      //this.transactionHandler
+    this.followTrainerService = new ServiceDBLoggerDecorator(
+      new FollowTrainerService(
+        this.trainerRepository,
+        //this.transactionHandler
+      ),
+      this.auditRepository
     );
   }
 
@@ -51,9 +68,10 @@ export class TrainerController {
     description: 'Acceso no autorizado, no se pudo encontrar el token',
   })
   async getTrainerById(@Param('id', ParseUUIDPipe) trainerId: string) {
-    const oneTrainer = await this.findOneTrainerService.execute(trainerId);
+    const request = new FindOneTrainerRequest(trainerId);
+    const oneTrainer = await this.findOneTrainerService.execute(request);
     if (!oneTrainer.isSuccess) {
-      return oneTrainer;
+      throw new HttpException(oneTrainer.Message, oneTrainer.StatusCode);
     }
     return oneTrainer.Value;
   }
@@ -70,14 +88,11 @@ export class TrainerController {
     /*if ((idTrainer || idUser) === undefined) {
       return Result.fail(new Error('Try Again'), 404, 'Try Again');
     }*/
-    const data = {
-      idTrainer: idTrainer,
-      idUser: idUser,
-    };
-    const follow = await this.followTrainerService.execute(data);
+    const request = new FollowTrainerRequest(idTrainer, idUser);
+    const follow = await this.followTrainerService.execute(request);
     if (!follow.isSuccess) {
-      return follow;
+      throw new HttpException(follow.Message, follow.StatusCode);
     }
-    return follow;
+    return follow.Value;
   }
 }

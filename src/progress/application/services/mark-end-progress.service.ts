@@ -1,13 +1,14 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { MarkEndProgressDto } from "../dtos/request/mark-end-progress.request.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Progress } from "src/progress/domain/progress";
+import { IService } from "src/common/application/interfaces/IService";
+import { MarkEndProgressResponse } from "../dtos/response/mark-end-progress.response";
+import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.request.dto";
 
-export class MarkEndProgressService implements IApplicationService<MarkEndProgressDto, undefined> {
+export class MarkEndProgressService implements IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
     private readonly progressRepository: IProgressRepository;
     private readonly courseRepository: ICourseRepository;
@@ -25,7 +26,7 @@ export class MarkEndProgressService implements IApplicationService<MarkEndProgre
         this.transactionHandler = transactionHandler;
     }
 
-    async execute(value: MarkEndProgressDto): Promise<Result<undefined>> {
+    async execute(value: MarkEndProgressRequest): Promise<Result<MarkEndProgressResponse>> {
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
         const user = await this.userRepository.findUserById(value.userId, this.transactionHandler)
 
@@ -44,7 +45,9 @@ export class MarkEndProgressService implements IApplicationService<MarkEndProgre
             this.transactionHandler
         );
 
-        return Result.success(undefined, 200);
+        const response = new MarkEndProgressResponse()
+
+        return Result.success(response, 200);
     }
 
     get name(): string {

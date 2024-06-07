@@ -1,10 +1,10 @@
 import { Lesson } from "src/course/domain/Lesson";
 import { Progress } from "../progress";
-import { GetOneProgressResponse, LessonProgress } from "../response/get-one-progress.response";
+import { CalcPercentProgressResponse, LessonProgress } from "../response/calc-percent-progress.response";
 
 export class CalcPercentService {
 
-    execute(lessonsCourse: Lesson[], progressUser: Progress[]): GetOneProgressResponse {
+    execute(lessonsCourse: Lesson[], progressUser: Progress[]): CalcPercentProgressResponse {
         let contCompleted = 0;
         let lessonList: LessonProgress[] = [];
         for (const pro of progressUser) {
@@ -20,7 +20,7 @@ export class CalcPercentService {
         }
 
         const totalProgress = contCompleted / lessonsCourse.length * 100;
-        const response: GetOneProgressResponse = {
+        const response: CalcPercentProgressResponse = {
             percent: totalProgress,
             lessons: lessonList
         }

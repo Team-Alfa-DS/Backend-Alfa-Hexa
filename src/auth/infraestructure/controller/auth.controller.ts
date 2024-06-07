@@ -29,6 +29,21 @@ import { ChangeUserPasswordDto } from '../dtos/change-user-password.dto';
 import { ChangeUserPasswordService } from 'src/auth/application/services/change-user-password.service';
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { IService } from 'src/common/application/interfaces/IService';
+import { RegisterUserRequest } from 'src/auth/application/dtos/request/register-user.request';
+import { RegisterUserResponse } from 'src/auth/application/dtos/response/register-user.response';
+import { LoginUserRequest } from 'src/auth/application/dtos/request/login-user.request';
+import { LoginUserResponse } from 'src/auth/application/dtos/response/login-user.response';
+import { CurrentUserRequest } from 'src/auth/application/dtos/request/current-user.request';
+import { CurrentUserResponse } from 'src/auth/application/dtos/response/current-user.response';
+import { ForgetUserPasswordRequest } from 'src/auth/application/dtos/request/forget-user-password.request';
+import { ForgetUserPasswordResponse } from 'src/auth/application/dtos/response/forget-user-password.response';
+import { ValidateUserCodeRequest } from 'src/auth/application/dtos/request/validate-user-code.request';
+import { ChangeUserPasswordRequest } from 'src/auth/application/dtos/request/change-user-password.request';
+import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
+import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
+import { ChangeUserPasswordResponse } from 'src/auth/application/dtos/response/change-user-password.response';
+import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/validate-user-code.response';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -41,37 +56,68 @@ export class AuthController {
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
         DatabaseSingleton.getInstance().createQueryRunner()
     );
+    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
+        DatabaseSingleton.getInstance()
+    );
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: NodeMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
     private userCodeList: UserCode[] = [];
-    private registerUserService: RegisterUserService;
-    private loginUserService: LoginUserService;
-    private currentUserService: CurrentUserService;
-    private forgetUserPasswordService: ForgetUserPasswordService;
-    private validateUserCodeService: ValidateUserCodeService;
-    private changeUserPasswordService: ChangeUserPasswordService;
+
+    private registerUserService: IService<RegisterUserRequest, RegisterUserResponse>;
+    private loginUserService: IService<LoginUserRequest, LoginUserResponse>;
+    private currentUserService: IService<CurrentUserRequest, CurrentUserResponse>;
+    private forgetUserPasswordService: IService<ForgetUserPasswordRequest, ForgetUserPasswordResponse>;
+    private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
+    private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
     constructor(private jwtService: JwtService, private mailerService: MailerService) {
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new NodeMailer(mailerService);
-        this.registerUserService = new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator);
-        this.loginUserService = new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen);
-        this.currentUserService = new CurrentUserService(this.userRepository, this.transactionHandler);
-        this.forgetUserPasswordService = new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer);
-        this.validateUserCodeService = new ValidateUserCodeService(this.userRepository, this.transactionHandler);
-        this.changeUserPasswordService = new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor);
+
+        this.registerUserService = new ServiceDBLoggerDecorator(
+            new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
+            this.auditRepository
+        )
+        this.loginUserService = new ServiceDBLoggerDecorator(
+            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
+            this.auditRepository
+        );
+        this.currentUserService = new ServiceDBLoggerDecorator(
+            new CurrentUserService(this.userRepository, this.transactionHandler),
+            this.auditRepository
+        );
+        this.forgetUserPasswordService = new ServiceDBLoggerDecorator(
+            new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer),
+            this.auditRepository
+        );
+        this.validateUserCodeService = new ServiceDBLoggerDecorator(
+            new ValidateUserCodeService(this.userRepository, this.transactionHandler),
+            this.auditRepository
+        );
+        this.changeUserPasswordService = new ServiceDBLoggerDecorator(
+            new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor),
+            this.auditRepository
+        );
     }
 
     @Post('register')
     async registerUser(@Body() newUser: RegisterUserDto) {
-        return (await this.registerUserService.execute(newUser));
+        const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
+
+        const response = await this.registerUserService.execute(request);
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('login')
     async loginUser(@Body() user: LoginUserDto) {
-        return (await this.loginUserService.execute(user));
+        const request = new LoginUserRequest(user.email, user.password);
+
+        const response = await this.loginUserService.execute(request);
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @ApiBearerAuth('token')
@@ -79,7 +125,11 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('current')
     async currentUser(@Request() req: JwtRequest) {
-        return (await this.currentUserService.execute({id: req.user.tokenUser.id}))
+        const request = new CurrentUserRequest(req.user.tokenUser.id);
+
+        const response = await this.currentUserService.execute(request);
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('forget/password')
@@ -92,8 +142,11 @@ export class AuthController {
         else {
             this.userCodeList.push({email: user.email, code});
         }
-        
-        return (await this.forgetUserPasswordService.execute({...user, code}))
+        const request = new ForgetUserPasswordRequest(user.email, code)
+
+        const response = await this.forgetUserPasswordService.execute(request)
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('code/validate')
@@ -101,20 +154,31 @@ export class AuthController {
         const userCode = this.userCodeList.find(userCode => userCode.email == validate.email);
         if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);
 
-        return (await this.validateUserCodeService.execute({...validate, codeSaved: userCode.code}));
+        const request = new ValidateUserCodeRequest(validate.email, validate.code, userCode.code);
+
+        const response = await this.validateUserCodeService.execute(request)
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Put('change/password')
     async changePassword(@Body() newPassword: ChangeUserPasswordDto) {
         const userCode = this.userCodeList.find(userCode => userCode.email == newPassword.email);
         if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);
-        const validate = await this.validateUserCodeService.execute({code: newPassword.code, email: newPassword.email, codeSaved: userCode.code})
+
+        const requestVal = new ValidateUserCodeRequest(newPassword.email, newPassword.code, userCode.code);
+        const validate = await this.validateUserCodeService.execute(requestVal)
 
         if (!validate.isSuccess) {
             throw new HttpException('Codigo incorrecto', HttpStatus.BAD_REQUEST);
         }
         this.userCodeList = this.userCodeList.filter(userCode => userCode.email != newPassword.email);
-        return (await this.changeUserPasswordService.execute(newPassword));
+
+        const requestChange = new ChangeUserPasswordRequest(newPassword.email, newPassword.code, newPassword.password);
+
+        const response = await this.changeUserPasswordService.execute(requestChange);
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
 }
