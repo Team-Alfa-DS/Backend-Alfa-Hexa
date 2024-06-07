@@ -57,7 +57,7 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
 
         try{
             const runnerTransaction = runner.getRunner();
-            const ormComment = await this.ormCommentMapper.toORM(comment);
+            const ormComment = await this.ormCommentMapper.toOrm(comment);
             await runnerTransaction.manager.save(ormComment);
             return Result.success<Comment>(comment, 200);
 

@@ -3,8 +3,9 @@ import { CommentEntity } from "../entities/comment.entity";
 import { Comment } from "src/comment/domain/Comment";
 
 
-export class OrmCommentMapper implements IMapper<Comment,CommentEntity>{
-    async toORM(DomainEntity: Comment): Promise<CommentEntity> {
+export class OrmCommentMapper implements IMapper<Comment,CommentEntity> {
+
+    async toOrm(DomainEntity: Comment): Promise<CommentEntity> {
         const ormComment = CommentEntity.create(
             DomainEntity.Id,
             DomainEntity.DDate,
@@ -19,6 +20,7 @@ export class OrmCommentMapper implements IMapper<Comment,CommentEntity>{
         )
         return ormComment;
     }
+    
     async toDomain(OrmEntity: CommentEntity): Promise<Comment> {
         const domainComment = Comment.create(
             OrmEntity.Id,

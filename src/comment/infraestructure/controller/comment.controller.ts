@@ -2,7 +2,7 @@ import { Controller, Get, Inject, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { DataSource } from "typeorm";
-import { User } from "src/user/infraestructure/entities/user.entity";
+import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { GetBlogCommentsServiceDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { GetLessonCommentsServiceDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
@@ -72,7 +72,7 @@ export class CommentController{
     }
     
     @Get(":many")
-    async getCommets (user:User, @Query() commentsQueryParams: GetAllCommentsQueryDto){
+    async getCommets (user: UserEntity, @Query() commentsQueryParams: GetAllCommentsQueryDto){
         if(commentsQueryParams.blog){
             const data: GetBlogCommentsServiceDto = {
                 blogId: GetAllCommentsQueryDto.Id,
@@ -94,7 +94,7 @@ export class CommentController{
     }
 
     @Post( ":release" )
-    async addComment(user:User, @Query() addCommentEntryDto: AddCommentEntryDto){
+    async addComment(user: UserEntity, @Query() addCommentEntryDto: AddCommentEntryDto){
         const data: AddCommentToServiceDto = {
             targetId: addCommentEntryDto.target,
             body: addCommentEntryDto.body,
