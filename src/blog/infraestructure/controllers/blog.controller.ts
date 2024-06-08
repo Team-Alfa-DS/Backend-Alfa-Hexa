@@ -10,6 +10,7 @@ import { OrmCategoryRepository } from "src/category/infraestructure/repositories
 import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
 import { Result } from "src/common/domain/result-handler/result";
 import { GetAllBlogsResponseDTO } from "src/blog/application/interfaces/getAllBlogsResponseDTO.interface";
+import { GetBlogByIdRequestDTO, GetBlogByIdResponseDTO } from "src/blog/application/interfaces/getBlogByIdDTOS.interface";
 
 
 
@@ -24,21 +25,24 @@ export class BlogController {
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), DatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance())
         this.getAllBlogService = new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance);
-        this.getBlogByIdService = new GetBlogByIdService(blogRepositoryInstance);
+        this.getBlogByIdService = new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance);
 
 
     }
 
     @Get('one/:id')
-    getBlogById(@Param('id') blogId: string) {
-        return this.getBlogByIdService.execute(blogId);
+    async getBlogById(@Param('id') blogId: string) {
+        const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
+        if (result.Value)
+            return result.Value
+        return result.Error
     }
 
     @Get('many')
     async  getAllBlogs() {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute();
         if (result.Value)
-            return result.Value
+            return result.Value.blogs
         return result.Error
     }
 }
