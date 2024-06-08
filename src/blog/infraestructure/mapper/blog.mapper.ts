@@ -23,9 +23,9 @@ interface BlogFromORM {
     trainer:{
         id: string;
         name: string;
-        followers: number;
-        userFollow: boolean;
-        location: string;
+        followers?: number;
+        userFollow?: boolean;
+        location?: string;
     },
     category:{
         id: string;
