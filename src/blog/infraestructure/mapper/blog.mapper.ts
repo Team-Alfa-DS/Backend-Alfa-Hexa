@@ -1,5 +1,20 @@
 import { Blog } from "src/blog/domain/Blog";
 
+interface Tag {
+    id: string;
+    name: string;
+}
+
+interface Image {
+    id: string;
+    url: string;
+}
+
+interface Comment {
+    id: string;
+}
+
+
 interface BlogFromORM {
     id: string;
     title: string;
@@ -17,17 +32,11 @@ interface BlogFromORM {
         name: string;
         icon: string;
     },
-    tags: {
-        id: string;
-        name: string;
-        }[],
-    images: {
-        id: string;
-        url: string;
-    }[],
-    comments: {
-        id: string;
-    }[]
+    tags: Tag[],
+    
+    images: Image[],
+    
+    comments: Comment[]
 
     
 }
@@ -39,7 +48,7 @@ export class BlogMapper {
             blog.title,
             blog.description,
             blog.publication_date,
-            blog.comments.map((comment: any) => comment.id),
+            blog.comments.map((comment: Comment) => comment.id),
             blog.category.id,
             blog.trainer.id,
             blog.tags,
