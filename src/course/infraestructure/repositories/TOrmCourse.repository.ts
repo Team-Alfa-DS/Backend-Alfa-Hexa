@@ -4,51 +4,95 @@ import { DataSource, Repository } from "typeorm";
 import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CourseMapper } from "../mappers/course.mapper";
+import { Result } from "src/common/domain/result-handler/result";
 
 export class TOrmCourseRepository extends Repository<CourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
     super(CourseEntity, database.manager)
   }
 
-  async getAllCourses(): Promise<Course[]> {
-    try {
-      const result = await this.find({
-        relations: {
-          category: true,
-          lessons: true,
-          trainer: true,
-          tags: true,
-        }
-      })
-      
-      // console.log('Debug: ', result);
-      const courses = CourseMapper.arrayToDomain(result);
-      // console.log(courses);
-      
-      return courses;
-    } catch (error) {
-      throw new HttpException("No se encontraron cursos", HttpStatus.BAD_REQUEST);
+  async getManyCourses(filter?: string, category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>> {
+    let result = await this.find({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true,
+      }
+    });
+    
+    if (result.length > 0) {
+
+    if (perpage) { 
+      if (!page) {page = 0};
+
+      result = result.slice(page, ((perpage) + page));
+    }
+    
+    let courses = CourseMapper.arrayToDomain(result);
+    
+    if (filter) {courses = courses.filter((course) => course.tags.includes(filter))}
+    if (category) {courses = courses.filter((course) => course.category === category)} //Aplicar los filtros que correspondan
+    if (trainer) {courses = courses.filter((course) => course.trainer.name === trainer)}
+
+    return Result.success(courses, HttpStatus.OK);
+    } else {
+      return Result.fail(new Error("No se encontraron Cursos"), HttpStatus.BAD_REQUEST, "No se encontraron Cursos");
     }
   }
 
-  async getCourseById(courseId: string): Promise<Course> {
-    try {
-      const result = await this.findOne({
-        relations: {
-          category: true,
-          lessons: true,
-          trainer: true,
-          tags: true
-        }, 
-        where: {
-          id: courseId
-        }
-      });
+  async getCourseById(courseId: string): Promise<Result<Course>> {
+    const result = await this.findOne({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true
+      }, 
+      where: {
+        id: courseId
+      }
+    });
 
-      return CourseMapper.toDomain(result);
-    } catch (error) {
-      throw new HttpException("No se encontró el curso pedido", HttpStatus.BAD_REQUEST);
+    if (result) {
+      const course = CourseMapper.toDomain(result);
+      return Result.success(course, HttpStatus.OK);
+    } else {
+      return Result.fail(new Error("No se encontró el Curso"), HttpStatus.BAD_REQUEST, "No se encontró el Curso");
     }
   }
 
+
+  async getCoursesByTag(tag: string): Promise<Result<Course[]>> {
+    const result = await this.find({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true
+      }
+    });
+    
+    if (result.length > 0) {
+      let courses = CourseMapper.arrayToDomain(result);
+      courses = courses.filter((course) => course.tags.includes(tag));
+
+      return Result.success(courses, HttpStatus.OK);
+    } else {
+      return Result.fail(new Error("No se encontró el curso"), HttpStatus.BAD_REQUEST, "No se encontró el curso");
+    }
+  }
+
+  async getCourseByLessonId(lessonId: string): Promise<Result<Course>> {
+    const result = await this.find();
+
+    for (let course of result) {
+      for (let lesson of course.lessons) {
+        if (lesson.id === lessonId) {
+          return Result.success(CourseMapper.toDomain(course), 200);
+        }
+      }
+    }
+    return Result.fail(new Error("No se encontró el curso"), HttpStatus.BAD_REQUEST, "No se encontró el curso");
+  }
 }

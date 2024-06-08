@@ -10,10 +10,10 @@ export class CourseMapper {
       
       domainLessons.push(LessonMapper.toDomain(lesson));
     }
-    // const domainTags: Tag[] = [];
-    // for (let tag of entity.tags) {
-    //   domainTags.push(TagMapper.toDomain(tag));
-    // }
+    const domainTags: string[] = [];
+    for (let tag of entity.tags) {
+      domainTags.push(tag.name);
+    }
     const course = new Course(
       entity.id,
       entity.name,
@@ -22,10 +22,10 @@ export class CourseMapper {
       entity.publication_date,
       entity.minutes,
       entity.weeks,
-      domainLessons
-      //domainTags,
-      //CategoryMapper.toDomain(entity.category);
-      //TrainerMapper.toDomain(entity.trainer)
+      domainLessons,
+      domainTags,
+      entity.category.name,
+      {id: entity.trainer.id, name: entity.trainer.name}
     );
 
     return course;
