@@ -2,6 +2,8 @@ import { IApplicationService } from "src/common/application-service.interface/ap
 import { AddCommentToServiceDto } from "../../dto/blog/add-comment-to-service.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
+import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
+import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
@@ -10,17 +12,20 @@ import { Comment } from "src/comment/domain/Comment";
 export class RegisterBlogCommentServices implements IApplicationService<AddCommentToServiceDto,Comment>{
     
     private readonly commentRepository: ICommentRepository;
+    private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen
     //private readonly encryptor: IEncryptor;
 
     constructor(
         commentRepository: ICommentRepository,
+        userRepository: IUserRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
         //encryptor: IEncryptor
     ){
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.idGenerator = idGenerator;
         //this.encryptor = encryptor;
@@ -28,6 +33,14 @@ export class RegisterBlogCommentServices implements IApplicationService<AddComme
     
     async execute( data: AddCommentToServiceDto ): Promise<Result<Comment>> {
         const commentID = await this.idGenerator.genId();
+
+        let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
+
+        if ( !user.isSuccess ) return Result.fail<Comment>( user.Error, user.StatusCode,user.Message  );
+
+        
+
+        
 
         const comment: Comment = Comment.create(
         commentID,

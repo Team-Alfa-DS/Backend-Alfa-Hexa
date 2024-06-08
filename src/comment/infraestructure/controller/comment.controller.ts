@@ -1,16 +1,18 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
+import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
+import { CourseMapper } from "src/course/infraestructure/mappers/course.mapper";
+import { OrmCommentRepository } from "../repositories/orm-comment.repository";
+import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
+import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
+import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
-import { DataSource } from "typeorm";
-import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { GetBlogCommentsServiceDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { GetLessonCommentsServiceDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
 import { DataSourceSingleton } from "src/common/infraestructure/database/config";
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
-import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
-import { OrmCommentRepository } from "../repositories/orm-comment.repository";
-import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetCommentLessonService } from "src/comment/application/service/query/get-comment-lesson.service";
 import { AddCommentEntryDto } from "../dto/entry/add-commet.dto";
 import { AddCommentToServiceDto } from "src/comment/application/dto/blog/add-comment-to-service.dto";
@@ -19,7 +21,6 @@ import { RegisterBlogCommentServices } from "src/comment/application/service/com
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
 import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
-import { Result } from "src/common/domain/result-handler/result";
 
 
 @ApiTags( 'Comments' )
@@ -28,16 +29,32 @@ export class CommentController{
 
 
     private readonly idGenerator: IIdGen = new UuidGen();
+    
+    //*Mappers
+    private commentMapper: OrmCommentMapper = new OrmCommentMapper();
+    private userMapper: OrmUserMapper = new OrmUserMapper();
+    private courseMapper: CourseMapper = new CourseMapper();
 
-    private  commentMapper: OrmCommentMapper = new OrmCommentMapper();
-
+    //* Repositorios
     private readonly commentRepository: ICommentRepository = new OrmCommentRepository(
         this.commentMapper,
         DataSourceSingleton.getInstance()
     );
+
+    private readonly userRepository: OrmUserRepository = new OrmUserRepository(
+        this.userMapper,
+        DataSourceSingleton.getInstance()
+    );
+
+    private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
+        DataSourceSingleton.getInstance());
+
+    //*transactionHandler
     private readonly transactionHandler = new TransactionHandler(
         DataSourceSingleton.getInstance().createQueryRunner()
     );
+
+
     //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
@@ -60,12 +77,15 @@ export class CommentController{
         );
         this.registerLessonCommentService = new RegisterLessonCommentServices(
             this.commentRepository,
+            this.userRepository,
+            this.courseRepository,
             this.transactionHandler,
             this.idGenerator,
             //this.encryptor
         );
         this.registerBlogCommentService = new RegisterBlogCommentServices(
             this.commentRepository,
+            this.userRepository,
             this.transactionHandler,
             this.idGenerator,
             //this.encryptor
@@ -114,9 +134,9 @@ export class CommentController{
         } 
 
 
-        if (addCommentEntryDto.targetType == "LESSON") this.registerLessonCommentService.execute( data );
+        if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
 
-        if(addCommentEntryDto.targetType == "BLOG") this.registerBlogCommentService.execute( data );
+        if(addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
         
     }
 

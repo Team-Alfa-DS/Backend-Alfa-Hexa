@@ -5,22 +5,30 @@ import { ICommentRepository } from "src/comment/domain/repositories/comment-repo
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
+import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
+import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 
 
 export class RegisterLessonCommentServices implements IApplicationService<AddCommentToServiceDto,any>{
     
     private readonly commentRepository: ICommentRepository;
+    private readonly userRepository: IUserRepository;
+    private readonly courseRepository: ICourseRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen
     //private readonly encryptor: IEncryptor;
 
     constructor(
         commentRepository: ICommentRepository,
+        userRepository: IUserRepository,
+        courseRepository: ICourseRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
         //encryptor: IEncryptor
     ){
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
         this.transactionHandler = transactionHandler;
         this.idGenerator = idGenerator;
         //this.encryptor = encryptor;
@@ -28,6 +36,14 @@ export class RegisterLessonCommentServices implements IApplicationService<AddCom
     
     async execute( data: AddCommentToServiceDto ): Promise<Result<Comment>> {
         const commentID = await this.idGenerator.genId();
+
+        let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
+
+        if ( !user.isSuccess ) return Result.fail<Comment>( user.Error, user.StatusCode,user.Message  );
+
+        let course = await this.courseRepository.getCourseByLessonId( data.targetId );
+
+        if ( !course.isSuccess ) return Result.fail<Comment>( course.Error, course.StatusCode,course.Message  );
 
         const comment: Comment = Comment.create(
         commentID,
