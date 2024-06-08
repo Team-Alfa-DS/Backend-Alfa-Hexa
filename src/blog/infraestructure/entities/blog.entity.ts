@@ -1,4 +1,4 @@
-import { Comment } from "src/comment/infraestructure/entities/comment.entity";
+import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Image } from "./image.entity";
 import { Tag } from "./tag.entity";
@@ -19,8 +19,8 @@ export class Blog {
   @Column()
   publication_date: Date;
 
-  @OneToMany(() => Comment, (comment) => comment.blog)
-  comments: Comment[];
+    @OneToMany(() => CommentEntity, comment => comment.blog)
+    comments: CommentEntity[];
 
   @OneToMany(() => Image, (image) => image.blog)
   images: Image[];
