@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsString, Max, Min } from "class-validator";
+import { IsEmail, IsEnum, IsString, Max, MaxLength, Min, MinLength } from "class-validator";
 import { UserRole } from "src/user/domain/enums/role-user.type";
 
 export class RegisterUserDto {
@@ -13,8 +13,8 @@ export class RegisterUserDto {
     password: string;
 
     @IsString()
-    @Min(11)
-    @Max(11)
+    @MinLength(11)
+    @MaxLength(11)
     phone: string;
 
     @IsEnum(UserRole)
