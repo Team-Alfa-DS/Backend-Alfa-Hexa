@@ -7,9 +7,9 @@ import { Result } from "src/common/domain/result-handler/result";
 import { GetCategoryRequest } from "../dtos/request/get-category.request";
 import { GetCategoryResponse } from "../dtos/response/get-category.response";
 
-export class GetCategoryByIdService implements IService<GetCategoryRequest, GetCategoryResponse>{
+export class GetCategoryByIdService extends IService<GetCategoryRequest, GetCategoryResponse>{
     OrmCategoryRepository: any;
-    constructor (private readonly categoryRepository: ICategoryRepository){}
+    constructor (private readonly categoryRepository: ICategoryRepository){super()}
     
     async execute(value: GetCategoryRequest): Promise<Result<GetCategoryResponse>>{
         const result = await this.categoryRepository.getCategoryById(value.categoryId);

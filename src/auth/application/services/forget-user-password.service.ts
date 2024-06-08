@@ -6,13 +6,14 @@ import { IService } from "src/common/application/interfaces/IService";
 import { ForgetUserPasswordRequest } from "../dtos/request/forget-user-password.request";
 import { ForgetUserPasswordResponse } from "../dtos/response/forget-user-password.response";
 
-export class ForgetUserPasswordService implements IService<ForgetUserPasswordRequest, ForgetUserPasswordResponse> {
+export class ForgetUserPasswordService extends IService<ForgetUserPasswordRequest, ForgetUserPasswordResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly mailer: IMailer;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, mailer: IMailer) {
+        super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.mailer = mailer;

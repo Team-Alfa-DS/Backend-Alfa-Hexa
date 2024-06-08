@@ -5,12 +5,13 @@ import { IService } from "src/common/application/interfaces/IService";
 import { CurrentUserRequest } from "../dtos/request/current-user.request";
 import { CurrentUserResponse } from "../dtos/response/current-user.response";
 
-export class CurrentUserService implements IService<CurrentUserRequest, CurrentUserResponse> {
+export class CurrentUserService extends IService<CurrentUserRequest, CurrentUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler) {
+        super()
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
     }

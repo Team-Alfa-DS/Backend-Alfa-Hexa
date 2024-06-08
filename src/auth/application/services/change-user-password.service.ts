@@ -6,13 +6,14 @@ import { IService } from "src/common/application/interfaces/IService";
 import { ChangeUserPasswordRequest } from "../dtos/request/change-user-password.request";
 import { ChangeUserPasswordResponse } from "../dtos/response/change-user-password.response";
 
-export class ChangeUserPasswordService implements IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
+export class ChangeUserPasswordService extends IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor) {
+        super()
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;

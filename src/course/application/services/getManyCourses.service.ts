@@ -3,8 +3,8 @@ import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 
-export class GetManyCoursesService implements IService<GetManyCoursesRequest, GetManyCoursesResponse> {
-  constructor(private readonly courseRepository: ICourseRepository){}
+export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
+  constructor(private readonly courseRepository: ICourseRepository){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     const r = await this.courseRepository.getManyCourses(

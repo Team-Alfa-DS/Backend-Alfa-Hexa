@@ -8,7 +8,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { MarkEndProgressResponse } from "../dtos/response/mark-end-progress.response";
 import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.request.dto";
 
-export class MarkEndProgressService implements IService<MarkEndProgressRequest, MarkEndProgressResponse> {
+export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
     private readonly progressRepository: IProgressRepository;
     private readonly courseRepository: ICourseRepository;
@@ -20,6 +20,7 @@ export class MarkEndProgressService implements IService<MarkEndProgressRequest, 
         userRepository: IUserRepository, 
         transactionHandler: ITransactionHandler)
         { 
+        super();
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
@@ -50,8 +51,8 @@ export class MarkEndProgressService implements IService<MarkEndProgressRequest, 
         return Result.success(response, 200);
     }
 
-    get name(): string {
-        return this.constructor.name;
-    }
+    // get name(): string {
+    //     return this.constructor.name;
+    // }
 
 }
