@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Post, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query, Request } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { DataSource } from "typeorm";
@@ -18,6 +18,7 @@ import { RegisterLessonCommentServices } from "src/comment/application/service/c
 import { RegisterBlogCommentServices } from "src/comment/application/service/command/register-blog-comment.service";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
+import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
 
 
 @ApiTags( 'Comments' )
@@ -25,7 +26,7 @@ import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
 export class CommentController{
 
 
-    private readonly idGenerator: IIdGen
+    private readonly idGenerator: IIdGen = new UuidGen();
 
     private  commentMapper: OrmCommentMapper = new OrmCommentMapper();
 
@@ -45,6 +46,7 @@ export class CommentController{
     private readonly registerBlogCommentService:RegisterBlogCommentServices;
     
     constructor() {
+
         this.getCommentBlogService = new GetCommentBlogService(
             this.commentRepository,
             this.transactionHandler,
@@ -68,47 +70,46 @@ export class CommentController{
             //this.encryptor
         );
 
-        this.idGenerator = new UuidGen();
+    
     }
     
-    @Get(":many")
-    async getCommets (user: UserEntity, @Query() commentsQueryParams: GetAllCommentsQueryDto){
-        if(commentsQueryParams.blog){
+    @Get(':many')
+    async getCommets (//@Request() req: JwtRequest,
+    @Query() commentsQueryParams: GetAllCommentsQueryDto){
+        console.log(commentsQueryParams);
+        if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
+            console.log("entro a blog");
             const data: GetBlogCommentsServiceDto = {
-                blogId: GetAllCommentsQueryDto.Id,
-                pagination: {page: GetAllCommentsQueryDto.page, perPage: GetAllCommentsQueryDto.perPage} ,
-                userId: user.id
+                blogId: commentsQueryParams.blog,
+                pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
+                userId: "hola"//req.user.tokenUser.id
             }
-            
-            return this.getCommentBlogService.execute( data );
-
-        }else if(commentsQueryParams.lesson){
+            //return this.getCommentBlogService.execute( data );
+        }else {
+            console.log("entro a lesson");
             const data: GetLessonCommentsServiceDto = {
-                lessonId: GetAllCommentsQueryDto.Id,
-                pagination: {page: GetAllCommentsQueryDto.page, perPage: GetAllCommentsQueryDto.perPage} ,
-                userId: user.id
+                lessonId: commentsQueryParams.lesson,
+                pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
+                userId: "hola"//req.user.tokenUser.id
             }
-
+            console.log(data);
             return this.getCommentLessonService.execute( data );
         }
     }
 
-    @Post( ":release" )
-    async addComment(user: UserEntity, @Query() addCommentEntryDto: AddCommentEntryDto){
+    @Post( '/release' )
+    async addComment(@Request() req: JwtRequest, 
+    @Body() addCommentEntryDto: AddCommentEntryDto){
         const data: AddCommentToServiceDto = {
             targetId: addCommentEntryDto.target,
             body: addCommentEntryDto.body,
-            userId: user.id
+            userId: req.user.tokenUser.id
         } 
 
 
-        if (addCommentEntryDto.targetType === "LESSON"){
-            this.registerLessonCommentService.execute( data );
+        if (addCommentEntryDto.targetType == "LESSON") this.registerLessonCommentService.execute( data );
 
-        }else(addCommentEntryDto.targetType === "BLOG")
-        {
-            this.registerBlogCommentService.execute( data );
-        }
+        if(addCommentEntryDto.targetType == "BLOG") this.registerBlogCommentService.execute( data );
         
     }
 

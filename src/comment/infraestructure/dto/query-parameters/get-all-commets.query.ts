@@ -1,9 +1,10 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { Type } from "class-transformer";
 import { PaginationDto } from "src/common/infraestructure/dto/entry/pagination.dto";
 
 
 export class GetAllCommentsQueryDto extends PaginationDto { 
-    
+
     @IsString()
     @IsOptional()
     blog?: string;
@@ -11,8 +12,5 @@ export class GetAllCommentsQueryDto extends PaginationDto {
     @IsString()
     @IsOptional()
     lesson?: string;
-    static Id: string;
-    static page: number;
-    static perPage: any;
-    
+
 }

@@ -37,8 +37,9 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
     }
 
     async findAllCommentsByLessonId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
+        console.log("llegue")
         const runnerTransaction = runner.getRunner();
-
+        
         const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { lesson: id },
             take: page,
             skip: perPage,});
@@ -54,13 +55,11 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
     }
 
     async saveComment(comment: Comment, runner: TransactionHandler): Promise<Result<Comment>> {
-
+        const runnerTransaction = runner.getRunner();
         try{
-            const runnerTransaction = runner.getRunner();
             const ormComment = await this.ormCommentMapper.toOrm(comment);
             await runnerTransaction.manager.save(ormComment);
-            return Result.success<Comment>(comment, 200);
-
+            return Result.success<Comment>(comment, 200);                                                    
         }catch(err){
             return Result.fail<Comment>(new Error(err.message), err.code, err.message);
         }

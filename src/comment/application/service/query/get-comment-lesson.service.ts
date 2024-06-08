@@ -21,7 +21,9 @@ export class GetCommentLessonService implements IApplicationService<GetLessonCom
         //this.encryptor = encryptor;
     }
     
-    execute(data : GetLessonCommentsServiceDto): Promise<Result<Comment[]>> {
+    execute(data: GetLessonCommentsServiceDto): Promise<Result<Comment[]>> {
+        console.log("data");
+        console.log(data);
         return this.commentRepository.findAllCommentsByBlogId(data.lessonId, data.pagination.page, data.pagination.perPage, this.transactionHandler);
     }
 
