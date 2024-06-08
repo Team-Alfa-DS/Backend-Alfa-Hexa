@@ -27,19 +27,16 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
         const ListMapper = []
-        commentsFound.forEach(e => { ListMapper.push( this.ormCommentMapper.toDomain(e ))  
+        commentsFound.forEach(async e => { 
+            ListMapper.push( 
+                await this.ormCommentMapper.toDomain(e ))  
         });
 
-        //const domainComment = await Promise.all(commentsFound.map(comment => this.ormCommentMapper.toDomain(comment)));
-        //return Result.success<Comment[]>(domainComment,200);
-        
         return Result.success<Comment[]>(ListMapper,200);
     }
 
     async findAllCommentsByLessonId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
-        console.log("llegue")
         const runnerTransaction = runner.getRunner();
-        console.log("pase el getRunner")
         //const commentsFound = await runnerTransaction.manager.createQueryBuilder(CommentEntity, "comment")
         //    .where("comment.lesson_id = :id", { id })
         //    .take(page)
@@ -49,13 +46,14 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
             take: page, 
             skip: perPage 
         });
-        console.log("pase el commentsFound")
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
-        console.log(commentsFound)
-        console.log("antes del mapper")
+
         const ListMapper = []
-        await commentsFound.forEach(e => { ListMapper.push( this.ormCommentMapper.toDomain(e )) });
-        console.log(ListMapper)
+        commentsFound.forEach(async e => {
+            ListMapper.push( 
+                await this.ormCommentMapper.toDomain(e ))
+        });
+
         return Result.success<Comment[]>(ListMapper,200);
     }
 

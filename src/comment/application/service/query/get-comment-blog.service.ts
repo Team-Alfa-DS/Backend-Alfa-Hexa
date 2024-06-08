@@ -21,8 +21,21 @@ export class GetCommentBlogService implements IApplicationService<GetBlogComment
         //this.encryptor = encryptor;
     }
     
-    execute(data : GetBlogCommentsServiceDto): Promise<Result<Comment[]>> {
-        return this.commentRepository.findAllCommentsByBlogId(data.blogId, data.pagination.page, data.pagination.perPage, this.transactionHandler);
+    async execute(data : GetBlogCommentsServiceDto): Promise<Result<Comment[]>> {
+        if (!data.pagination.page) data.pagination.page = 0;
+        
+        const comments = await this.commentRepository.findAllCommentsByBlogId(
+            data.blogId, 
+            data.pagination.page, 
+            data.pagination.perPage, 
+            this.transactionHandler);
+
+                
+        if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
+
+
+        return Result.success<Comment[]>(comments.Value, comments.StatusCode);
     }
+
 
 }

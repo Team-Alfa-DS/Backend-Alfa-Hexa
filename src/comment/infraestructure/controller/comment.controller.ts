@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Request } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Post, Query, Request } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { DataSource } from "typeorm";
@@ -19,6 +19,7 @@ import { RegisterBlogCommentServices } from "src/comment/application/service/com
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
 import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
+import { Result } from "src/common/domain/result-handler/result";
 
 
 @ApiTags( 'Comments' )
@@ -74,24 +75,32 @@ export class CommentController{
     }
     
     @Get(':many')
-    async getCommets (//@Request() req: JwtRequest,
+    async getCommets (@Request() req: JwtRequest,
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
-        console.log(commentsQueryParams);
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data: GetBlogCommentsServiceDto = {
                 blogId: commentsQueryParams.blog,
                 pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
-                userId: "hola"//req.user.tokenUser.id
+                userId: req.user.tokenUser.id
             }
-            //return this.getCommentBlogService.execute( data );
+            const result = await this.getCommentBlogService.execute( data );
+
+            if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+
+            return result.Value;
+
         }else {
             const data: GetLessonCommentsServiceDto = {
                 lessonId: commentsQueryParams.lesson,
                 pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
-                userId: "hola"//req.user.tokenUser.id
+                userId: req.user.tokenUser.id
             }
-            console.log(data);
-            return await (await this.getCommentLessonService.execute( data )).Value;
+
+            const result = await this.getCommentLessonService.execute( data );
+
+            if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+
+            return result.Value;
         }
     }
 

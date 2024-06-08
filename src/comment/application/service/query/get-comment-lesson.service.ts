@@ -25,7 +25,6 @@ export class GetCommentLessonService implements IApplicationService<GetLessonCom
 
         if (!data.pagination.page) data.pagination.page = 0;
                 
-
         const comments = await this.commentRepository.findAllCommentsByLessonId(
             data.lessonId, 
             data.pagination.page, 
@@ -33,11 +32,8 @@ export class GetCommentLessonService implements IApplicationService<GetLessonCom
             this.transactionHandler
         );
         
-
         if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
 
-        console.log("comments en el service")
-        console.log(comments.Value)
 
         return Result.success<Comment[]>(comments.Value, comments.StatusCode);
     }
