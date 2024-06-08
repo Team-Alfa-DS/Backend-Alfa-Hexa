@@ -1,3 +1,4 @@
+import { error } from "console";
 import { Blog } from "../domain/Blog";
 import { IBlogRepository } from "../domain/repositories/IBlog.repository";
 
@@ -8,6 +9,8 @@ export class GetBlogByIdService {
     ) {}
 
     execute(id: string): Promise<Blog>{
-        return this.blogRepository.getBlogById(id);
+        //return this.blogRepository.getBlogById(id);
+        throw new error("Hola Mundo")
+
     }
 }

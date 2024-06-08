@@ -3,6 +3,7 @@ import { DataSource, Repository } from "typeorm";
 import { BlogEntity } from "../entities/blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { BlogMapper } from '../mapper/blog.mapper';
+import { Result } from '../../../common/domain/result-handler/result';
 
 export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRepository {
 
@@ -11,7 +12,7 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
     }
 
 
-    async getAllBLogs(): Promise<Blog[]> {
+    async getAllBLogs(): Promise<Result<Blog[]>> {
        try {
         const resp = await this.createQueryBuilder('blog')
         .leftJoinAndSelect('blog.trainer', 'trainer')
@@ -20,15 +21,17 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
         .leftJoinAndSelect('blog.images', 'images')
         .leftJoinAndSelect('blog.comments', 'comments')
         .getMany();
-        return resp.map(blog => BlogMapper.toDomain(blog));
+        const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
+        return Result.success(domainBlogs, 200);
+
        } catch (error) {
         console.log(error);
-        throw new Error("Blogs not found"); 
+        return Result.fail(error, 404, 'Blogs not found'); 
        }
     }
 
 
-   async  getBlogById(id: string): Promise<Blog> {
+   async  getBlogById(id: string): Promise<Result<Blog>> {
         try {
             const blog = await this.createQueryBuilder('blog')
             .leftJoinAndSelect('blog.trainer', 'trainer')
@@ -38,10 +41,11 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
             .leftJoinAndSelect('blog.comments', 'comments')
             .where('blog.id = :id', {id})
             .getOne();
-            return BlogMapper.toDomain(blog);
+            const domainBlog =  BlogMapper.toDomain(blog);
+            return Result.success(domainBlog, 200);
            } catch (error) {
             console.log(error);
-            throw new Error(`Blog with id= ${id} not found`); 
+            return Result.fail(error, 404, `Blog with id= ${id} not found`); 
            }
     }
 }
