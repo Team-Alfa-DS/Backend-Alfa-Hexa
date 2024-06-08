@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Comment } from 'src/comment/infraestructure/entities/comment.entity';
+import { CommentEntity } from 'src/comment/infraestructure/entities/comment.entity';
 import { UserRole } from 'src/user/domain/enums/role-user.type';
 import { ProgressEntity } from 'src/progress/infraestructure/entities/progress.entity';
 import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
@@ -30,11 +30,11 @@ export class UserEntity {
   @Column({ type: 'enum', enum: UserRole, default: UserRole.CLIENT })
   type: UserRole;
 
-  @Column({ nullable: true })
+  @Column('bytea', { nullable: true })
   image: string;
 
-  @OneToMany(() => Comment, (comment) => comment.user)
-  comments: Comment[];
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments: CommentEntity[];
 
   @OneToMany(() => ProgressEntity, (progress) => progress.user)
   progress: ProgressEntity[];

@@ -13,25 +13,25 @@ export class OrmTrainer {
   name: string;
 
   @Column()
-  followers: number;
+  followers?: number;
 
   @Column()
-  userFollow: boolean;
+  userFollow?: boolean;
 
   @Column()
-  location: string;
+  location?: string;
 
-    @OneToMany(() => BlogEntity, blog => blog.trainer)
-    blogs: BlogEntity[];
+  @OneToMany(() => BlogEntity, (blog) => blog.trainer)
+  blogs: BlogEntity[];
 
   @OneToMany(() => CourseEntity, (course) => course.trainer)
-  courses: CourseEntity[];
+  courses?: CourseEntity[];
 
   @ManyToMany(() => UserEntity, (UserEntity) => UserEntity.trainers, {
     cascade: true,
   })
   @JoinTable()
-  users: UserEntity[];
+  users?: UserEntity[];
 
   static create(
     id: string,

@@ -4,8 +4,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BlogModule } from './blog/infraestructure/blog.module';
 import { NotifyModule } from './notify/infraestructure/notify.module';
 import { CommentModule } from './comment/infraestructure/comment.module';
-import { TrainerModule } from './trainer/infraestructure/trainer.module';
-import { CategoryModule } from './category/infraestructure/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/infraestructure/strategies/jwt.strategy';
@@ -16,6 +14,9 @@ import { ProgressController } from './progress/infraestructure/controller/progre
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CourseController } from './course/infraestructure/controllers/course.controller';
 import { MailjetModule } from 'nest-mailjet';
+import { CloudinaryProvider } from './common/infraestructure/providers/cloudinary.provider';
+import { TrainerController } from './trainer/infraestructure/controller/trainer.controller';
+import { CategoryController } from './category/infraestructure/controller/category.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -48,16 +49,17 @@ import { MailjetModule } from 'nest-mailjet';
     }),
     BlogModule, 
     NotifyModule, 
-    CommentModule, 
-    TrainerModule, 
-    CategoryModule
+    CommentModule
   ],
   controllers: [
     UserController,
     AuthController,
     ProgressController,
-    CourseController
+    CourseController,
+    TrainerController,
+    CourseController,
+    CategoryController
   ],
-  providers: [JwtStrategy],
+  providers: [JwtStrategy, CloudinaryProvider],
 })
 export class AppModule {}

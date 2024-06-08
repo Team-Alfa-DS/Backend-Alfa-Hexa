@@ -35,7 +35,7 @@ export class CourseController {
       {
         return result.Value;
       } else {
-        return new HttpException(result.Message, result.StatusCode);
+        throw new HttpException(result.Message, result.StatusCode);
       }
   }
 
@@ -57,7 +57,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      return new HttpException(result.Message, result.StatusCode);
+      throw new HttpException(result.Message, result.StatusCode);
     }
     
   }
