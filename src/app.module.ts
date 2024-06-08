@@ -16,6 +16,7 @@ import { ProgressController } from './progress/infraestructure/controller/progre
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CourseController } from './course/infraestructure/controllers/course.controller';
 import { MailjetModule } from 'nest-mailjet';
+import { CloudinaryProvider } from './common/infraestructure/providers/cloudinary.provider';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -58,6 +59,6 @@ import { MailjetModule } from 'nest-mailjet';
     ProgressController,
     CourseController
   ],
-  providers: [JwtStrategy],
+  providers: [JwtStrategy, CloudinaryProvider],
 })
 export class AppModule {}
