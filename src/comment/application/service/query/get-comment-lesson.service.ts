@@ -21,10 +21,25 @@ export class GetCommentLessonService implements IApplicationService<GetLessonCom
         //this.encryptor = encryptor;
     }
     
-    execute(data: GetLessonCommentsServiceDto): Promise<Result<Comment[]>> {
-        console.log("data");
-        console.log(data);
-        return this.commentRepository.findAllCommentsByBlogId(data.lessonId, data.pagination.page, data.pagination.perPage, this.transactionHandler);
+    async execute(data: GetLessonCommentsServiceDto): Promise<Result<Comment[]>> {
+
+        if (!data.pagination.page) data.pagination.page = 0;
+                
+
+        const comments = await this.commentRepository.findAllCommentsByLessonId(
+            data.lessonId, 
+            data.pagination.page, 
+            data.pagination.perPage, 
+            this.transactionHandler
+        );
+        
+
+        if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
+
+        console.log("comments en el service")
+        console.log(comments.Value)
+
+        return Result.success<Comment[]>(comments.Value, comments.StatusCode);
     }
 
 }

@@ -78,7 +78,6 @@ export class CommentController{
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
         console.log(commentsQueryParams);
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
-            console.log("entro a blog");
             const data: GetBlogCommentsServiceDto = {
                 blogId: commentsQueryParams.blog,
                 pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
@@ -86,14 +85,13 @@ export class CommentController{
             }
             //return this.getCommentBlogService.execute( data );
         }else {
-            console.log("entro a lesson");
             const data: GetLessonCommentsServiceDto = {
                 lessonId: commentsQueryParams.lesson,
                 pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
                 userId: "hola"//req.user.tokenUser.id
             }
             console.log(data);
-            return this.getCommentLessonService.execute( data );
+            return await (await this.getCommentLessonService.execute( data )).Value;
         }
     }
 
