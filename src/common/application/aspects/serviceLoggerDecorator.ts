@@ -16,7 +16,7 @@ export class ServiceLoggerDecorator<I extends ServiceRequestDto, O extends Servi
     let r = await this.decoratee.execute(service);
 
     if (r.isSuccess) {
-      this.logger.writeToLog("Time: " + new Date() + " | Service: " + this.decoratee.constructor.name + " | InputData: "+ service.dataToString() + " | ResponseData: " + r.Value.dataToString());
+      this.logger.writeToLog(`Time: ${new Date()} | Service: ${this.decoratee.constructor.name} | ${service.dataToString()} | ${r.Value.dataToString()}`);
     }
 
     return r;

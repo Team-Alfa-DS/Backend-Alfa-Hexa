@@ -22,7 +22,7 @@ export class GetCourseByIdRequest implements ServiceRequestDto{
   constructor(readonly courseId: string) {}
 
   dataToString(): string {
-    return this.courseId; 
+    return `GetCourseByIdRequest: {id: ${this.courseId} }`; 
   }
 }
 
@@ -30,6 +30,6 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
   constructor(readonly course: Course) {};
 
   dataToString(): string {
-    return "" + this.course;
+    return `GetCourseByIdResponse: ${JSON.stringify(this.course)}`;
   }
 }

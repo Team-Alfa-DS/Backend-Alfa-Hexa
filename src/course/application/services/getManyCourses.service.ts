@@ -51,11 +51,7 @@ export class GetManyCoursesRequest implements ServiceRequestDto {
   }
 
   dataToString(): string {
-    return "Query: { filter: " + this.filter + 
-                    "| category: " + this.category +
-                    "| trainer: " + this.trainer +
-                    "| page: " + this.page +
-                    "| perpage: " + this.perpage + " }";
+    return `Query: { filter: ${this.filter} | category: ${this.category} | trainer: ${this.trainer} | page: ${this.page} | perpage: ${this.perpage} }`;
   }
 }
 
@@ -63,6 +59,6 @@ export class GetManyCoursesResponse implements ServiceResponseDto {
   constructor(readonly courses: Course[]) {}
 
   dataToString(): string {
-    return this.courses.toString();
+    return `GetManyCoursesResponse: ${JSON.stringify(this.courses)}`;
   }
 }
