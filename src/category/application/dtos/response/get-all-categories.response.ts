@@ -13,6 +13,7 @@ export class GetAllCategoriesResponse implements ServiceResponseDto {
     ) {}
 
     dataToString(): string {
-        return `GetAllCategoriesRes: { categories: ${this.categories} }`  //aplicar algun metodo para volver string la lista de categorias
+        const message = JSON.stringify(this.categories);
+        return `GetAllCategoriesRes: { categories: ${message} }`  //aplicar algun metodo para volver string la lista de categorias
     }
 }

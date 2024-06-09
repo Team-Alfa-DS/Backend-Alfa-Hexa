@@ -9,6 +9,6 @@ export class GetOneProgressResponse implements ServiceResponseDto {
     ) {}
 
     dataToString(): string {
-        return `GetOneProgressRes: { percent: ${this.percent} }` //falta agregar el array de lessons
+        return `GetOneProgressRes: { percent: ${this.percent}, lessons: ${JSON.stringify(this.lessons)} }` //falta agregar el array de lessons
     }
 }

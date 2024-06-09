@@ -8,7 +8,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { RegisterUserRequest } from "../dtos/request/register-user.request";
 import { RegisterUserResponse } from "../dtos/response/register-user.response";
 
-export class RegisterUserService implements IService<RegisterUserRequest, RegisterUserResponse> {
+export class RegisterUserService extends IService<RegisterUserRequest, RegisterUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -16,6 +16,7 @@ export class RegisterUserService implements IService<RegisterUserRequest, Regist
     private readonly idGenerator: IIdGen;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, idGenerator: IIdGen) {
+        super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
