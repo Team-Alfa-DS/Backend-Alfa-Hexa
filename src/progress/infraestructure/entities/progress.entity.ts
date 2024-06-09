@@ -16,6 +16,9 @@ export class ProgressEntity {
     @Column({nullable: true})
     time: number;
 
+    @Column('timestamptz', {default: () => "CURRENT_TIMESTAMP"})
+    lastTime: Date;
+
     @ManyToOne(() => LessonEntity, lesson => lesson.progress)
     @JoinColumn({name: 'lesson_id'})
     lesson: LessonEntity;
@@ -28,13 +31,15 @@ export class ProgressEntity {
         lesson_id: string,
         user_id: string,
         markAsCompleted: boolean,
-        time?: number
+        time?: number,
+        lastTime?: Date
     ) {
         const progress = new ProgressEntity()
         progress.lesson_id = lesson_id;
         progress.user_id = user_id;
         progress.markAsCompleted = markAsCompleted;
         progress.time = time;
+        progress.lastTime = lastTime;
         return progress;
     }
 }

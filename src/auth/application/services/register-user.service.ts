@@ -1,13 +1,14 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { RegisterUserDto } from "../dtos/register-user.dto";
 import { User } from "src/user/domain/user";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IEncryptor } from "../encryptor/encryptor.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
+import { IService } from "src/common/application/interfaces/IService";
+import { RegisterUserRequest } from "../dtos/request/register-user.request";
+import { RegisterUserResponse } from "../dtos/response/register-user.response";
 
-export class RegisterUserService implements IApplicationService<RegisterUserDto, {id: string}> {
+export class RegisterUserService implements IService<RegisterUserRequest, RegisterUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -21,7 +22,7 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
         this.idGenerator = idGenerator;
     }
 
-    async execute(newUser: RegisterUserDto): Promise<Result<{id: string}>> {
+    async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
         // await this.transactionHandler.startTransaction();
         const userFound = await this.userRepository.findUserByEmail(newUser.email, this.transactionHandler);
 
@@ -38,7 +39,8 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
                 newUser.name,
                 hashPassword,
                 newUser.phone,
-                newUser.type
+                newUser.type,
+                null
             ),
             this.transactionHandler
         );
@@ -46,11 +48,8 @@ export class RegisterUserService implements IApplicationService<RegisterUserDto,
             return Result.fail(userCreate.Error, userCreate.StatusCode, userCreate.Message);
         }
         // await this.transactionHandler.commitTransaction();
-        return Result.success({id}, 200);
-    }
+        const response = new RegisterUserResponse(id);
 
-    get name(): string {
-        return this.constructor.name;
+        return Result.success(response, 200);
     }
-
 }

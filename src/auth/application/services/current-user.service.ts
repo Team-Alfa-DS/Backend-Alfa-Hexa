@@ -1,10 +1,11 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { CurrentUserDto } from "../dtos/current-user.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { IService } from "src/common/application/interfaces/IService";
+import { CurrentUserRequest } from "../dtos/request/current-user.request";
+import { CurrentUserResponse } from "../dtos/response/current-user.response";
 
-export class CurrentUserService implements IApplicationService<CurrentUserDto, any> {
+export class CurrentUserService implements IService<CurrentUserRequest, CurrentUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -14,25 +15,21 @@ export class CurrentUserService implements IApplicationService<CurrentUserDto, a
         this.transactionHandler = transactionHandler;
     }
     
-    async execute(value: CurrentUserDto): Promise<Result<any>> {
+    async execute(value: CurrentUserRequest): Promise<Result<CurrentUserResponse>> {
         const userFound = await this.userRepository.findUserById(value.id, this.transactionHandler);
 
         if (!userFound.isSuccess) {
             return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
         }
 
-        const response = {
-            id: userFound.Value.Id,
-            email: userFound.Value.Email,
-            name: userFound.Value.Name,
-            phone: userFound.Value.Phone,
-            image: userFound.Value.Image,
-        }
+        const response = new CurrentUserResponse(
+            userFound.Value.Id,
+            userFound.Value.Email,
+            userFound.Value.Name,
+            userFound.Value.Phone,
+            userFound.Value.Image
+        );
 
         return Result.success(response, 200);
     }
-    get name(): string {
-        return this.constructor.name;
-    }
-
 }
