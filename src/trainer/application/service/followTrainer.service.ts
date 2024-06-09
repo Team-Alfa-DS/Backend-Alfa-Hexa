@@ -4,9 +4,10 @@ import { IService } from 'src/common/application/interfaces/IService';
 import { FollowTrainerRequest } from '../dto/request/follow-trainer.request';
 import { FollowTrainerResponse } from '../dto/response/follow-trainer.response';
 
-export class FollowTrainerService implements IService<FollowTrainerRequest, FollowTrainerResponse>
+export class FollowTrainerService extends IService<FollowTrainerRequest, FollowTrainerResponse>
 {
   constructor(private readonly trainerRepository: ITrainerRepository) {
+    super();
     this.trainerRepository = trainerRepository;
   }
 

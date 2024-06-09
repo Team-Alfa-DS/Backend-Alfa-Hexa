@@ -15,7 +15,7 @@ export class ServiceDBLoggerDecorator<I extends ServiceRequestDto, O extends Ser
         let r = await this.decoratee.execute(service);
 
         if (r.isSuccess) {
-            await this.logger.saveLog("Time: " + new Date() + " | Service: " + this.decoratee.constructor.name + " | InputData: "+ service.dataToString() + " | ResponseData: " + r.Value.dataToString());
+            await this.logger.saveLog("Time: " + new Date() + " | Service: " + this.decoratee.name + " | InputData: "+ service.dataToString() + " | ResponseData: " + r.Value.dataToString());
         }
 
         return r;

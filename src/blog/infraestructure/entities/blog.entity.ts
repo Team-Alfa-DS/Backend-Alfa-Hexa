@@ -10,20 +10,20 @@ export class BlogEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
-  title: string;
+    @Column()
+    title: string;
 
-  @Column()
-  description: string;
+    @Column()
+    description: string;
 
-  @Column()
-  publication_date: Date;
+    @Column()
+    publication_date: Date
 
     @OneToMany(() => CommentEntity, comment => comment.blog)
     comments: CommentEntity[];
 
-  @OneToMany(() => Image, (image) => image.blog)
-  images: Image[];
+    @OneToMany(() => Image, image => image.blog)
+    images: Image[];
 
     @ManyToOne(() => CategoryEntity, category => category.blogs)
     @JoinColumn({name: 'category_id'})

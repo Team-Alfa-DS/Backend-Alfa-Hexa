@@ -6,13 +6,14 @@ import { IService } from "src/common/application/interfaces/IService";
 import { UpdateUserRequest } from "../dtos/request/update-user.request";
 import { UpdateUserResponse } from "../dtos/response/update-user.response";
 
-export class UpdateUserService implements IService<UpdateUserRequest, UpdateUserResponse> {
+export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor) {
+        super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;

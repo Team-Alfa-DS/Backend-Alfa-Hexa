@@ -6,8 +6,8 @@ import { GetAllCategoriesRequest } from "../dtos/request/get-all-categories.requ
 import { GetAllCategoriesResponse } from "../dtos/response/get-all-categories.response";
 import { Result } from "src/common/domain/result-handler/result";
 
-export class GetAllCategorysService implements IService<GetAllCategoriesRequest, GetAllCategoriesResponse>{
-    constructor (private readonly categoryRepository: ICategoryRepository){}
+export class GetAllCategorysService extends IService<GetAllCategoriesRequest, GetAllCategoriesResponse>{
+    constructor (private readonly categoryRepository: ICategoryRepository){super()}
     
     async execute(value: GetAllCategoriesRequest): Promise<Result<GetAllCategoriesResponse>>{
 
