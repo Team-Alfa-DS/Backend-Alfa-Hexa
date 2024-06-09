@@ -21,6 +21,7 @@ import { RegisterBlogCommentServices } from "src/comment/application/service/com
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
 import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
+import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog.repository";
 
 
 @ApiTags( 'Comments' )
@@ -46,8 +47,13 @@ export class CommentController{
         DataSourceSingleton.getInstance()
     );
 
+    private readonly blogRepository = new OrmBlogRepository(
+        DataSourceSingleton.getInstance()
+    );
+
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        DataSourceSingleton.getInstance());
+        DataSourceSingleton.getInstance()
+    );
 
     //*transactionHandler
     private readonly transactionHandler = new TransactionHandler(
@@ -86,6 +92,7 @@ export class CommentController{
         this.registerBlogCommentService = new RegisterBlogCommentServices(
             this.commentRepository,
             this.userRepository,
+            this.blogRepository,
             this.transactionHandler,
             this.idGenerator,
             //this.encryptor

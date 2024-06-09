@@ -7,12 +7,14 @@ import { ICourseRepository } from "src/course/application/repositories/ICourse.r
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
+import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 
 
 export class RegisterBlogCommentServices implements IApplicationService<AddCommentToServiceDto,Comment>{
     
     private readonly commentRepository: ICommentRepository;
     private readonly userRepository: IUserRepository;
+    private readonly blogRepository: IBlogRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen
     //private readonly encryptor: IEncryptor;
@@ -20,12 +22,14 @@ export class RegisterBlogCommentServices implements IApplicationService<AddComme
     constructor(
         commentRepository: ICommentRepository,
         userRepository: IUserRepository,
+        blogRepository: IBlogRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
         //encryptor: IEncryptor
     ){
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
+        this.blogRepository = blogRepository;
         this.transactionHandler = transactionHandler;
         this.idGenerator = idGenerator;
         //this.encryptor = encryptor;
@@ -38,9 +42,9 @@ export class RegisterBlogCommentServices implements IApplicationService<AddComme
 
         if ( !user.isSuccess ) return Result.fail<Comment>( user.Error, user.StatusCode,user.Message  );
 
-        
+        let blog = await this.blogRepository.getBlogById( data.targetId );
 
-        
+        if ( !blog.isSuccess ) return Result.fail<Comment>( blog.Error, blog.StatusCode,blog.Message  );
 
         const comment: Comment = Comment.create(
         commentID,
