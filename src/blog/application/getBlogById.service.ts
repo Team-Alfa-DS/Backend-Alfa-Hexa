@@ -14,6 +14,9 @@ export class GetBlogByIdService implements IService<GetBlogByIdRequestDTO,  GetB
         private readonly trainerRepository: ITrainerRepository,
         private readonly categoryRepository: ICategoryRepository
     ) {}
+    get name(): string {
+        return this.constructor.name;
+    }
 
     async execute({Id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
         const domainBlogResult = await this.blogRepository.getBlogById(Id);
