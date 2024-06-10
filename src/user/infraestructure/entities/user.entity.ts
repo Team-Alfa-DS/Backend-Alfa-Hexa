@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Comment } from "src/comment/infraestructure/entities/comment.entity";
 import { UserRole } from "src/user/domain/enums/role-user.type";
 import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
+import { NotifyEntity } from "src/notify/notify/Infraestructure/entities/notify.entity";
 
 @Entity('user')
 export class UserEntity {
@@ -31,6 +32,10 @@ export class UserEntity {
 
     @OneToMany(() => ProgressEntity, progress => progress.user)
     progress: ProgressEntity[];
+
+    @OneToMany(()=>NotifyEntity, notify => notify.user)
+    notify: NotifyEntity[];
+
 
     static create (
         id: string, 

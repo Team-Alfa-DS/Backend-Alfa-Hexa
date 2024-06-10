@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from "typeorm";
+import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 
 @Entity('notify')
 export class NotifyEntity {
@@ -11,11 +12,15 @@ export class NotifyEntity {
     @Column()
     body: string;
 
-    @Column()
+    @Column({type:'date', default: () => 'CURRENT_TIMESTAMP'})
     date: Date;
 
     @Column()
     userReaded: boolean;
+
+    @ManyToOne(() => UserEntity, user => user.notify)
+    @JoinColumn({name: 'user_id'})
+    user: UserEntity;
 
 
     static create (

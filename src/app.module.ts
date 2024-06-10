@@ -52,7 +52,8 @@ import { CourseController } from './course/infraestructure/controllers/course.co
           }
         }
       })
-    }),
+    })
+    ,
     BlogModule, 
     NotifyModule, 
     CommentModule, 

@@ -6,7 +6,7 @@ export class Notify extends Entity<string> {
     private body: string;
     private date: Date;
     private userReaded: boolean;
-    //private user?: string  no tenia la carpeta de user creada y en el diagrama no estaba aun ni conectado 
+    private user?: string  
 
   constructor( id: string, title: string, body: string, date: Date, userReaded: boolean) {
     super(id);
@@ -14,7 +14,7 @@ export class Notify extends Entity<string> {
     this.body = body;
     this.date = date;
     this.userReaded = userReaded;
-    //this.user = user;
+    this.user = this.user;
  }
 
 
@@ -35,6 +35,10 @@ export class Notify extends Entity<string> {
 
 get UserReaded(): boolean {
     return this.userReaded;
+}
+
+get User(): string {
+    return this.user;
 }
 
 static Create(id: string, title: string, body: string, date: Date, userReaded: boolean){
