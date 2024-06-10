@@ -56,7 +56,8 @@ import { SearchController } from './search/infraestructure/controller/search.con
     UserController,
     AuthController,
     ProgressController,
-    CourseController
+    CourseController,
+    SearchController
   ],
   providers: [JwtStrategy, CloudinaryProvider],
 })

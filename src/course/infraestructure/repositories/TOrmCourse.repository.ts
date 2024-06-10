@@ -11,7 +11,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     super(CourseEntity, database.manager)
   }
 
-  async getManyCourses(filter?: string, category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>> {
+  async getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>> {
     let result = await this.find({
       relations: {
         category: true,
@@ -29,7 +29,14 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
 
     let courses = CourseMapper.arrayToDomain(result);
     
-    if (filter) {courses = courses.filter((course) => course.tags.includes(filter))}
+    if (filter) {
+      for (let tag of filter) {
+        if (tag) {
+          courses = courses.filter((course) => course.tags.includes(tag));
+        } 
+      }
+      // courses = courses.filter((course) => course.tags.includes(filter))
+    }
     if (category) {courses = courses.filter((course) => course.category === category)} //Aplicar los filtros que correspondan
     if (trainer) {courses = courses.filter((course) => course.trainer.name === trainer)}
 
@@ -37,7 +44,9 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
 
       return Result.success(courses, HttpStatus.OK);
     } else {
-      return Result.fail(new Error("No se encontraron Cursos"), HttpStatus.BAD_REQUEST, "No se encontraron Cursos");
+      return Result.fail(new Error(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`), 
+      HttpStatus.BAD_REQUEST, 
+      `No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`);
     }
   }
 
@@ -58,7 +67,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
       const course = CourseMapper.toDomain(result);
       return Result.success(course, HttpStatus.OK);
     } else {
-      return Result.fail(new Error("No se encontró el Curso"), HttpStatus.BAD_REQUEST, "No se encontró el Curso");
+      return Result.fail(new Error(`No se encontró el Curso con el id: ${courseId}`), HttpStatus.BAD_REQUEST, `No se encontró el Curso con el id: ${courseId}`);
     }
   }
 
@@ -80,7 +89,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
 
       return Result.success(courses, HttpStatus.OK);
     } else {
-      return Result.fail(new Error("No se encontró el curso"), HttpStatus.BAD_REQUEST, "No se encontró el curso");
+      return Result.fail(new Error(`No se encontraron cursos con Tag: ${tag}`), HttpStatus.BAD_REQUEST, `No se encontraron cursos con Tag: ${tag}`);
     }
   }
 
@@ -94,6 +103,30 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
         }
       }
     }
-    return Result.fail(new Error("No se encontró el curso"), HttpStatus.BAD_REQUEST, "No se encontró el curso");
+    return Result.fail(new Error(`No se encontró el curso dado la lección: ${lessonId}`), HttpStatus.BAD_REQUEST, `No se encontró el curso dado la lección: ${lessonId}`);
+  }
+
+  async getAllCourses(page?: number, perpage?: number): Promise<Result<Course[]>> {
+    let result = await this.find({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true,
+      }
+    });
+
+    if (perpage) { 
+      if (!page) {page = 0};
+
+      result = result.slice(page, ((perpage) + page));
+    }
+
+    if (result.length >= 0) {
+      const courses = CourseMapper.arrayToDomain(result);
+      return Result.success(courses, HttpStatus.OK);
+    } else {
+      return Result.fail(new Error(`No se encontraron cursos`), HttpStatus.BAD_REQUEST, `No se encontraron cursos`);
+    }
   }
 }
