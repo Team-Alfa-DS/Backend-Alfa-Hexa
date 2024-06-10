@@ -1,7 +1,13 @@
 // import { Blog } from "src/blog/infraestructure/entities/blog.entity";
+import { Blog } from "src/blog/domain/Blog";
+import { ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";
 
-export class SearchResponseDto {
-    blogs: any;  //TODO: Cambiar a blogs
-    courses: Course;
+export class SearchResponseDto implements ServiceResponseDto{
+    blogs: Blog[]; 
+    courses: Course[];
+
+    dataToString(): string {
+        return `SearchResponse: { Blogs: ${JSON.stringify(this.blogs)} | Courses: ${JSON.stringify(this.courses)} }`;
+    }
 }
