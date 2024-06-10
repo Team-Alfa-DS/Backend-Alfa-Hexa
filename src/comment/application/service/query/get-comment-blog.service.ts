@@ -1,11 +1,11 @@
 import { IApplicationService } from "src/common/application-service.interface/aplication-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { GetBlogCommentsServiceDto } from "../../dto/blog/blog-comment.response.dto";
+import { GetBlogCommentsServiceRequestDto } from "../../dto/blog/blog-comment.response.dto";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Comment } from "src/comment/domain/Comment";
 
-export class GetCommentBlogService implements IApplicationService<GetBlogCommentsServiceDto,any>{
+export class GetCommentBlogService implements IApplicationService<GetBlogCommentsServiceRequestDto,any>{
     
     private readonly commentRepository: ICommentRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -21,7 +21,7 @@ export class GetCommentBlogService implements IApplicationService<GetBlogComment
         //this.encryptor = encryptor;
     }
     
-    async execute(data : GetBlogCommentsServiceDto): Promise<Result<Comment[]>> {
+    async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<Comment[]>> {
         if (!data.pagination.page) data.pagination.page = 0;
         
         const comments = await this.commentRepository.findAllCommentsByBlogId(

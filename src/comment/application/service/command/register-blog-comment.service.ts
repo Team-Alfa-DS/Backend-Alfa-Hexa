@@ -1,5 +1,4 @@
-import { IApplicationService } from "src/common/application-service.interface/aplication-service.interface";
-import { AddCommentToServiceDto } from "../../dto/blog/add-comment-to-service.dto";
+import { AddCommentToServiceRequestDto, AddCommentToServiceResponseDto } from "../../dto/blog/add-comment-to-service.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
@@ -8,16 +7,16 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IService } from "src/common/application/interfaces/IService";
 
 
-export class RegisterBlogCommentServices implements IApplicationService<AddCommentToServiceDto,Comment>{
+export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
     
     private readonly commentRepository: ICommentRepository;
     private readonly userRepository: IUserRepository;
     private readonly blogRepository: IBlogRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen
-    //private readonly encryptor: IEncryptor;
 
     constructor(
         commentRepository: ICommentRepository,
@@ -25,26 +24,25 @@ export class RegisterBlogCommentServices implements IApplicationService<AddComme
         blogRepository: IBlogRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
-        //encryptor: IEncryptor
     ){
+        super()
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.blogRepository = blogRepository;
         this.transactionHandler = transactionHandler;
         this.idGenerator = idGenerator;
-        //this.encryptor = encryptor;
     }
     
-    async execute( data: AddCommentToServiceDto ): Promise<Result<Comment>> {
+    async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
         const commentID = await this.idGenerator.genId();
 
         let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
 
-        if ( !user.isSuccess ) return Result.fail<Comment>( user.Error, user.StatusCode,user.Message  );
+        if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
 
         let blog = await this.blogRepository.getBlogById( data.targetId );
 
-        if ( !blog.isSuccess ) return Result.fail<Comment>( blog.Error, blog.StatusCode,blog.Message  );
+        if ( !blog.isSuccess ) return Result.fail( blog.Error, blog.StatusCode,blog.Message  );
 
         const comment: Comment = Comment.create(
         commentID,
@@ -60,11 +58,11 @@ export class RegisterBlogCommentServices implements IApplicationService<AddComme
 
         const result = await this.commentRepository.saveComment( comment, this.transactionHandler )
         
-        if ( !result.isSuccess ) return Result.fail<Comment>( result.Error, result.StatusCode,result.Message  );
+        if ( !result.isSuccess ) return Result.fail( result.Error, result.StatusCode,result.Message  );
         
+        const response = new AddCommentToServiceResponseDto(comment.Id, comment.UserId, comment.Body, comment.CountLikes, comment.CountDislikes, comment.UserLiked, comment.UserDisliked, comment.DDate)
 
-
-        return Result.success<Comment>( comment, 200 )
+        return Result.success<AddCommentToServiceResponseDto>( response, 200 );
     }
     
 }

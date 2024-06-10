@@ -1,14 +1,19 @@
+import { ServiceRequestDto } from "src/common/application/interfaces/IService";
 
 
-export class GetBlogCommentsServiceDto {
+export class GetBlogCommentsServiceRequestDto implements ServiceRequestDto {
 
-    blogId: string;
+    constructor(
+        readonly blogId: string,
+        readonly pagination: {
+            page?: number,
+            perPage?: number
+        },
+        readonly userId?: string
+    ) {}
 
-    pagination: {
-        page?: number,
-        perPage?: number
-    };
-
-    userId?: string; //Token del ususario, pero por los momentos se utiliza el Id
+    dataToString(): string {
+        return `GetBlogOrLessonCommentReq: { blogId: ${this.blogId} | userId: ${this.userId} | pagination: ${JSON.stringify(this.pagination)} }`
+    }
     
 }

@@ -8,20 +8,23 @@ import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-use
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
-import { GetBlogCommentsServiceDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
+import { GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { GetLessonCommentsServiceDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
 import { DataSourceSingleton } from "src/common/infraestructure/database/config";
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
 import { GetCommentLessonService } from "src/comment/application/service/query/get-comment-lesson.service";
 import { AddCommentEntryDto } from "../dto/entry/add-commet.dto";
-import { AddCommentToServiceDto } from "src/comment/application/dto/blog/add-comment-to-service.dto";
+import { AddCommentToServiceRequestDto, AddCommentToServiceResponseDto } from "src/comment/application/dto/blog/add-comment-to-service.dto";
 import { RegisterLessonCommentServices } from "src/comment/application/service/command/register-lesson-comment.service";
 import { RegisterBlogCommentServices } from "src/comment/application/service/command/register-blog-comment.service";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
 import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
 import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog.repository";
+import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { IService } from "src/common/application/interfaces/IService";
+import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 
 
 @ApiTags( 'Comments' )
@@ -60,14 +63,17 @@ export class CommentController{
         DataSourceSingleton.getInstance().createQueryRunner()
     );
 
+    private readonly auditRepository = new OrmAuditRepository(
+        DataSourceSingleton.getInstance()
+    );
 
     //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
     private readonly getCommentBlogService: GetCommentBlogService;
     private readonly getCommentLessonService: GetCommentLessonService;
-    private readonly registerLessonCommentService: RegisterLessonCommentServices;
-    private readonly registerBlogCommentService:RegisterBlogCommentServices;
+    private readonly registerLessonCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
+    private readonly registerBlogCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
     
     constructor() {
 
@@ -81,21 +87,27 @@ export class CommentController{
             this.transactionHandler,
             //this.encryptor
         );
-        this.registerLessonCommentService = new RegisterLessonCommentServices(
-            this.commentRepository,
-            this.userRepository,
-            this.courseRepository,
-            this.transactionHandler,
-            this.idGenerator,
-            //this.encryptor
+        this.registerLessonCommentService = new ServiceDBLoggerDecorator(
+            new RegisterLessonCommentServices(
+                this.commentRepository,
+                this.userRepository,
+                this.courseRepository,
+                this.transactionHandler,
+                this.idGenerator,
+                //this.encryptor
+            ),
+            this.auditRepository
         );
-        this.registerBlogCommentService = new RegisterBlogCommentServices(
-            this.commentRepository,
-            this.userRepository,
-            this.blogRepository,
-            this.transactionHandler,
-            this.idGenerator,
-            //this.encryptor
+        this.registerBlogCommentService = new ServiceDBLoggerDecorator(
+            new RegisterBlogCommentServices(
+                this.commentRepository,
+                this.userRepository,
+                this.blogRepository,
+                this.transactionHandler,
+                this.idGenerator,
+                //this.encryptor
+            ),
+            this.auditRepository
         );
 
     
@@ -105,11 +117,7 @@ export class CommentController{
     async getCommets (@Request() req: JwtRequest,
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
-            const data: GetBlogCommentsServiceDto = {
-                blogId: commentsQueryParams.blog,
-                pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
-                userId: req.user.tokenUser.id
-            }
+            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
 
             if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
@@ -134,12 +142,7 @@ export class CommentController{
     @Post( '/release' )
     async addComment(@Request() req: JwtRequest, 
     @Body() addCommentEntryDto: AddCommentEntryDto){
-        const data: AddCommentToServiceDto = {
-            targetId: addCommentEntryDto.target,
-            body: addCommentEntryDto.body,
-            userId: req.user.tokenUser.id
-        } 
-
+        const data = new AddCommentToServiceRequestDto(addCommentEntryDto.target, req.user.tokenUser.id, addCommentEntryDto.body); 
 
         if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
 

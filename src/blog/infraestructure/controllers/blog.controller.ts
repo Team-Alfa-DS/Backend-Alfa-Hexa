@@ -11,21 +11,34 @@ import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-categ
 import { Result } from "src/common/domain/result-handler/result";
 import { GetAllBlogsResponseDTO } from "src/blog/application/interfaces/getAllBlogsResponseDTO.interface";
 import { GetBlogByIdRequestDTO, GetBlogByIdResponseDTO } from "src/blog/application/interfaces/getBlogByIdDTOS.interface";
+import { IService } from "src/common/application/interfaces/IService";
+import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlogsRequestDTO.interface";
+import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
+import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 
 
 
 @ApiTags('Blog') 
 @Controller('blog')
 export class BlogController {
-    private readonly getAllBlogService: GetAllBlogService;
-    private readonly getBlogByIdService: GetBlogByIdService;
+    private readonly getAllBlogService: IService<GetAllBlogsRequestDTO, GetAllBlogsResponseDTO>;
+    private readonly getBlogByIdService: IService<GetBlogByIdRequestDTO, GetBlogByIdResponseDTO>;
 
     constructor() {
         const blogRepositoryInstance = new OrmBlogRepository(DatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), DatabaseSingleton.getInstance());
-        const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance())
-        this.getAllBlogService = new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance);
-        this.getBlogByIdService = new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance);
+        const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance());
+        const auditRepositoryInstance = new OrmAuditRepository(
+            DatabaseSingleton.getInstance()
+        );
+        this.getAllBlogService = new ServiceDBLoggerDecorator(
+            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+            auditRepositoryInstance
+        );
+        this.getBlogByIdService = new ServiceDBLoggerDecorator(
+            new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+            auditRepositoryInstance
+        );
 
 
     }
@@ -40,7 +53,7 @@ export class BlogController {
 
     @Get('many')
     async  getAllBlogs() {
-        const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute();
+        const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(new GetAllBlogsRequestDTO());
         if (result.Value)
             return result.Value.blogs
         return result.Error
