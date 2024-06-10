@@ -7,4 +7,6 @@ export interface IBlogRepository {
     getAllBLogs(): Promise<Result<Blog[]>>;
 
     getBlogById(id: string): Promise<Result<Blog>>;
+
+    getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>>;
 }
