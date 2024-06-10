@@ -10,6 +10,24 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
     constructor(dataBase: DataSource) {
         super(BlogEntity, dataBase.manager);
     }
+    async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
+        try {
+            const resp = await this.createQueryBuilder('blog')
+            .leftJoinAndSelect('blog.trainer', 'trainer')
+            .leftJoinAndSelect('blog.category', 'category')
+            .leftJoinAndSelect('blog.tags', 'tags')
+            .leftJoinAndSelect('blog.images', 'images')
+            .leftJoinAndSelect('blog.comments', 'comments')
+            .where('LOWER(tags.name) IN (:...tagsName)', { tagsName: tagsName.map(tag => tag.toLowerCase()) })	
+            .getMany();
+            const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
+            return Result.success(domainBlogs, 200);   
+        } catch (error) {
+            console.log(error);
+            return Result.fail(error, 404, `Blogs with tags: ${tagsName} not found`);
+            
+        }
+    }
 
 
     async getAllBLogs(): Promise<Result<Blog[]>> {
@@ -25,8 +43,8 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
         return Result.success(domainBlogs, 200);
 
        } catch (error) {
-        console.log(error);
-        return Result.fail(error, 404, 'Blogs not found'); 
+            console.log(error);
+            return Result.fail(error, 404, 'Blogs not found'); 
        }
     }
 
@@ -44,8 +62,8 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog, 200);
            } catch (error) {
-            console.log(error);
-            return Result.fail(error, 404, `Blog with id= ${id} not found`); 
+                console.log(error);
+                return Result.fail(error, 404, `Blog with id= ${id} not found`); 
            }
     }
 }

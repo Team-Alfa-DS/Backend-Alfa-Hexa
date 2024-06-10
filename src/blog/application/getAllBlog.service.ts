@@ -15,9 +15,14 @@ export class GetAllBlogService implements IService<null, GetAllBlogsResponseDTO>
     ){
 
     }
+    get name(): string {
+        return this.constructor.name;
+    }
        
 
     async execute(): Promise<Result<GetAllBlogsResponseDTO>>{
+        const prueba = await this.blogRepository.getBlogsTagsNames([ 'Yoga']);
+        console.log(prueba.Value);
         const domainBlogsResult =  await this.blogRepository.getAllBLogs();
         if (domainBlogsResult.Error) 
             return Result.fail(domainBlogsResult.Error, domainBlogsResult.StatusCode, domainBlogsResult.Message);
