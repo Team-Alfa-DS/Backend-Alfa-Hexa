@@ -1,3 +1,4 @@
+import { Result } from "src/common/domain/result-handler/result";
 import { IService, ServiceRequestDto, ServiceResponseDto} from "./IService";
 
 export abstract class IServiceDecorator<I extends ServiceRequestDto, O extends ServiceResponseDto> implements IService<I, O> {
@@ -8,7 +9,7 @@ export abstract class IServiceDecorator<I extends ServiceRequestDto, O extends S
   }
 
   get name() {
-    return this.decoratee.constructor.name;
+    return this.decoratee.name;
   }
-  abstract execute(input: I): Promise<O>;
+  abstract execute(input: I): Promise<Result<O>>;
 }

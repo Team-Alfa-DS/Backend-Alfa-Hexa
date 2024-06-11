@@ -1,10 +1,8 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BlogModule } from './blog/infraestructure/blog.module';
 import { NotifyModule } from './notify/notify/notify.module';
-import { CommentModule } from './comment/infraestructure/comment.module';
-import { TrainerModule } from './trainer/infraestructure/trainer.module';
-import { CategoryModule } from './category/infraestructure/category.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/infraestructure/strategies/jwt.strategy';
@@ -14,6 +12,12 @@ import { AuthController } from './auth/infraestructure/controller/auth.controlle
 import { ProgressController } from './progress/infraestructure/controller/progress.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CourseController } from './course/infraestructure/controllers/course.controller';
+import { MailjetModule } from 'nest-mailjet';
+import { CloudinaryProvider } from './common/infraestructure/providers/cloudinary.provider';
+import { TrainerController } from './trainer/infraestructure/controller/trainer.controller';
+import { CategoryController } from './category/infraestructure/controller/category.controller';
+import { SearchController } from './search/infraestructure/controller/search.controller';
+import { CommentController } from './comment/infraestructure/controller/comment.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -36,36 +40,28 @@ import { CourseController } from './course/infraestructure/controllers/course.co
         signOptions: {expiresIn: '10d'}
       })
     }),
-    MailerModule.forRootAsync({
+    MailjetModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        transport: {
-          service: 'gmail',
-          auth: {
-            type: 'OAuth2',
-            user: configService.getOrThrow('EMAIL_USERNAME'),
-            pass: configService.getOrThrow('EMAIL_PASSWORD'),
-            clientId: configService.getOrThrow('OAUTH_CLIENT_ID'),
-            clientSecret: configService.getOrThrow('OAUTH_CLIENT_SECRET'),
-            refreshToken: configService.getOrThrow('OAUTH_REFRESH_TOKEN'),
-          }
-        }
+        apiKey: configService.getOrThrow('MAILJET_API_KEY'),
+        apiSecret: configService.getOrThrow('MAILJET_API_SECRET'),
       })
     })
     ,
     BlogModule, 
     NotifyModule, 
-    CommentModule, 
-    TrainerModule, 
-    CategoryModule
   ],
   controllers: [
     UserController,
     AuthController,
     ProgressController,
-    CourseController
+    CourseController,
+    SearchController,
+    CommentController,
+    CategoryController,
+    TrainerController
   ],
-  providers: [JwtStrategy],
+  providers: [JwtStrategy, CloudinaryProvider],
 })
 export class AppModule {}

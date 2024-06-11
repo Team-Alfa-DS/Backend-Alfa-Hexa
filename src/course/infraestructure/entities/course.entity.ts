@@ -1,44 +1,44 @@
 import { Tag } from "src/blog/infraestructure/entities/tag.entity";
-import { Category } from "src/category/infraestructure/entities/category.entity";
-import { Trainer } from "src/trainer/infraestructure/entities/trainer.entity";
+import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
+import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { LessonEntity } from "./lesson.entity";
 
 @Entity('course')
 export class CourseEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @Column()
-    publication_date: Date;
+  @Column()
+  publication_date: Date;
 
-    @Column()
-    minutes: number;
+  @Column()
+  minutes: number;
 
-    @Column()
-    weeks: number;
+  @Column()
+  weeks: number;
 
-    @Column()
-    image: string;
+  @Column()
+  image: string;
 
-    @OneToMany(() => LessonEntity, lesson => lesson.course)
-    lessons: LessonEntity[];
+  @OneToMany(() => LessonEntity, (lesson) => lesson.course)
+  lessons: LessonEntity[];
 
-    @ManyToOne(() => Category, category => category.blogs)
+    @ManyToOne(() => CategoryEntity, category => category.blogs)
     @JoinColumn({name: 'category_id'})
-    category: Category;
+    category: CategoryEntity;
 
-    @ManyToOne(() => Trainer, trainer => trainer.blogs)
-    @JoinColumn({name: 'trainer_id'})
-    trainer: Trainer;
+  @ManyToOne(() => OrmTrainer, (trainer) => trainer.blogs)
+  @JoinColumn({ name: 'trainer_id' })
+  trainer: OrmTrainer;
 
-    @ManyToMany(() => Tag, tag => tag.courses)
-    @JoinTable({name: 'course_tag'})
-    tags: Tag[];
+  @ManyToMany(() => Tag, (tag) => tag.courses)
+  @JoinTable({ name: 'course_tag' })
+  tags: Tag[];
 }

@@ -1,13 +1,20 @@
 import { Course } from "src/course/domain/Course";
 import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
+import { Result } from "src/common/domain/result-handler/result";
 
-export class GetCourseByIdService implements IService<GetCourseByIdRequest, GetCourseByIdResponse> {
-  constructor(private readonly courseRepository: ICourseRepository){}
+export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
+  constructor(private readonly courseRepository: ICourseRepository) {super();}
 
-  async execute(service: GetCourseByIdRequest): Promise<GetCourseByIdResponse> {
+  async execute(service: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
     const r = await this.courseRepository.getCourseById(service.courseId);
-    return new GetCourseByIdResponse(r);
+
+    if (r.isSuccess) {
+      return Result.success(new GetCourseByIdResponse(r.Value), r.StatusCode);
+    } else {
+      return Result.fail(r.Error, r.StatusCode, r.Message);
+    }
+    
   }
 }
 
@@ -15,7 +22,7 @@ export class GetCourseByIdRequest implements ServiceRequestDto{
   constructor(readonly courseId: string) {}
 
   dataToString(): string {
-    return this.courseId; 
+    return `GetCourseByIdRequest: {id: ${this.courseId} }`; 
   }
 }
 
@@ -23,6 +30,6 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
   constructor(readonly course: Course) {};
 
   dataToString(): string {
-    return "" + this.course;
+    return `GetCourseByIdResponse: ${JSON.stringify(this.course)}`;
   }
 }
