@@ -10,7 +10,6 @@ import { ICommentRepository } from "src/comment/domain/repositories/comment-repo
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
-import { DataSourceSingleton } from "src/common/infraestructure/database/config";
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
 import { GetCommentLessonService } from "src/comment/application/service/query/get-comment-lesson.service";
 import { AddCommentEntryDto } from "../dto/entry/add-commet.dto";
@@ -25,6 +24,7 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { IService } from "src/common/application/interfaces/IService";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 
 
 @ApiTags( 'Comments' )
@@ -42,29 +42,29 @@ export class CommentController{
     //* Repositorios
     private readonly commentRepository: ICommentRepository = new OrmCommentRepository(
         this.commentMapper,
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
         this.userMapper,
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     private readonly blogRepository = new OrmBlogRepository(
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     //*transactionHandler
     private readonly transactionHandler = new TransactionHandler(
-        DataSourceSingleton.getInstance().createQueryRunner()
+        DatabaseSingleton.getInstance().createQueryRunner()
     );
 
     private readonly auditRepository = new OrmAuditRepository(
-        DataSourceSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     //private readonly encryptor: IEncryptor = new BcryptEncryptor();

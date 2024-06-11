@@ -2,8 +2,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BlogModule } from './blog/infraestructure/blog.module';
-import { NotifyModule } from './notify/infraestructure/notify.module';
-import { CommentModule } from './comment/infraestructure/comment.module';
+import { NotifyModule } from './notify/notify/notify.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './auth/infraestructure/strategies/jwt.strategy';
@@ -18,6 +17,7 @@ import { CloudinaryProvider } from './common/infraestructure/providers/cloudinar
 import { TrainerController } from './trainer/infraestructure/controller/trainer.controller';
 import { CategoryController } from './category/infraestructure/controller/category.controller';
 import { SearchController } from './search/infraestructure/controller/search.controller';
+import { CommentController } from './comment/infraestructure/controller/comment.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -47,17 +47,20 @@ import { SearchController } from './search/infraestructure/controller/search.con
         apiKey: configService.getOrThrow('MAILJET_API_KEY'),
         apiSecret: configService.getOrThrow('MAILJET_API_SECRET'),
       })
-    }),
+    })
+    ,
     BlogModule, 
     NotifyModule, 
-    CommentModule
   ],
   controllers: [
     UserController,
     AuthController,
     ProgressController,
     CourseController,
-    SearchController
+    SearchController,
+    CommentController,
+    CategoryController,
+    TrainerController
   ],
   providers: [JwtStrategy, CloudinaryProvider],
 })
