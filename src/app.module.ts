@@ -17,6 +17,7 @@ import { MailjetModule } from 'nest-mailjet';
 import { CloudinaryProvider } from './common/infraestructure/providers/cloudinary.provider';
 import { TrainerController } from './trainer/infraestructure/controller/trainer.controller';
 import { CategoryController } from './category/infraestructure/controller/category.controller';
+import { SearchController } from './search/infraestructure/controller/search.controller';
 
 @Module({
   imports: [ConfigModule.forRoot(), 
@@ -56,9 +57,7 @@ import { CategoryController } from './category/infraestructure/controller/catego
     AuthController,
     ProgressController,
     CourseController,
-    TrainerController,
-    CourseController,
-    CategoryController
+    SearchController
   ],
   providers: [JwtStrategy, CloudinaryProvider],
 })

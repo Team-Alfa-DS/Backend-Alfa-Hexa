@@ -8,7 +8,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     const r = await this.courseRepository.getManyCourses(
-      request.filter,
+      [request.filter],
       request.category,
       request.trainer,
       request.page,
