@@ -5,22 +5,23 @@ import { GeneralBlogDTO, GetAllBlogsResponseDTO } from './interfaces/getAllBlogs
 import { Result } from 'src/common/domain/result-handler/result';
 import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
+import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
 
 
-export class GetAllBlogService implements IService<null, GetAllBlogsResponseDTO>{
+export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlogsResponseDTO>{
     constructor(
         private readonly blogRepository: IBlogRepository,
         private readonly trainerRepository: ITrainerRepository,
         private readonly categoryRepository: ICategoryRepository
     ){
-
+        super()
     }
     get name(): string {
         return this.constructor.name;
     }
        
 
-    async execute(): Promise<Result<GetAllBlogsResponseDTO>>{
+    async execute(value: GetAllBlogsRequestDTO): Promise<Result<GetAllBlogsResponseDTO>>{
         const prueba = await this.blogRepository.getBlogsTagsNames([ 'Yoga']);
         console.log(prueba.Value);
         const domainBlogsResult =  await this.blogRepository.getAllBLogs();

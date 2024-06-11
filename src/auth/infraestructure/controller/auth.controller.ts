@@ -181,5 +181,4 @@ export class AuthController {
         if (response.isSuccess) return response.Value;
         throw new HttpException(response.Message, response.StatusCode);
     }
-
 }
