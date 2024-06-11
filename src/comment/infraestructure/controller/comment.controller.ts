@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, Post, Query, Request } from "@nestjs/common";
+import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
@@ -25,8 +25,9 @@ import { IService } from "src/common/application/interfaces/IService";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 
-
+@UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
 @Controller( 'Comments' )
 export class CommentController{
