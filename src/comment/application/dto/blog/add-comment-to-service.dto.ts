@@ -16,19 +16,10 @@ export class AddCommentToServiceRequestDto implements ServiceRequestDto {
 
 export class AddCommentToServiceResponseDto implements ServiceResponseDto {
 
-    constructor(
-    readonly id: string,
-    readonly user: string,
-    readonly body: string,
-    readonly countLikes: number,
-    readonly countDislikes: number,
-    readonly userLiked: boolean,
-    readonly userDisliked: boolean,
-    readonly date: Date
-    ) {}
+    constructor() {}
 
     dataToString(): string {
-        return `RegisterBlogOrLessonCommentRes: { id: ${this.id} | userId: ${this.user} | body: ${this.body} | countLikes: ${this.countLikes} | countDislikes: ${this.countDislikes} | userLiked: ${this.userLiked} | userDisliked: ${this.userDisliked} | date: ${this.date} }`
+        return `RegisterBlogOrLessonCommentRes: { }`
     }
 
 }

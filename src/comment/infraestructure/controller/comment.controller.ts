@@ -8,8 +8,7 @@ import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-use
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
-import { GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
-import { GetLessonCommentsServiceDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
+import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
 import { DataSourceSingleton } from "src/common/infraestructure/database/config";
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
@@ -25,6 +24,7 @@ import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
+import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 
 
 @ApiTags( 'Comments' )
@@ -70,22 +70,28 @@ export class CommentController{
     //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
-    private readonly getCommentBlogService: GetCommentBlogService;
-    private readonly getCommentLessonService: GetCommentLessonService;
+    private readonly getCommentBlogService: IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>;
+    private readonly getCommentLessonService: IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>;
     private readonly registerLessonCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
     private readonly registerBlogCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
     
     constructor() {
 
-        this.getCommentBlogService = new GetCommentBlogService(
-            this.commentRepository,
-            this.transactionHandler,
-            //this.encryptor
+        this.getCommentBlogService = new ServiceDBLoggerDecorator(
+            new GetCommentBlogService(
+                this.commentRepository,
+                this.transactionHandler,
+                //this.encryptor
+            ),
+            this.auditRepository
         );
-        this.getCommentLessonService = new GetCommentLessonService(
-            this.commentRepository,
-            this.transactionHandler,
-            //this.encryptor
+        this.getCommentLessonService = new ServiceDBLoggerDecorator(
+            new GetCommentLessonService(
+                this.commentRepository,
+                this.transactionHandler,
+                //this.encryptor
+            ),
+            this.auditRepository
         );
         this.registerLessonCommentService = new ServiceDBLoggerDecorator(
             new RegisterLessonCommentServices(
@@ -125,11 +131,7 @@ export class CommentController{
             return result.Value;
 
         }else {
-            const data: GetLessonCommentsServiceDto = {
-                lessonId: commentsQueryParams.lesson,
-                pagination: {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage} ,
-                userId: req.user.tokenUser.id
-            }
+            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
 

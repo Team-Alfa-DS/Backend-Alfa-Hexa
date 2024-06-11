@@ -62,7 +62,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
         
         if ( !result.isSuccess ) return Result.fail( result.Error, result.StatusCode,result.Message  );
         
-        const response = new AddCommentToServiceResponseDto(comment.Id, comment.UserId, comment.Body, comment.CountLikes, comment.CountDislikes, comment.UserLiked, comment.UserDisliked, comment.DDate)
+        const response = new AddCommentToServiceResponseDto();
 
         return Result.success<AddCommentToServiceResponseDto>( response, 200 )
     }
