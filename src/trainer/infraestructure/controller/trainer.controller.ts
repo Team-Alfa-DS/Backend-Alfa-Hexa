@@ -4,7 +4,8 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,6 +17,8 @@ import { FindOneTrainerService } from 'src/trainer/application/service/findOneTr
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { OrmTrainerRepository } from '../repositories/orm-trainer.repositorie';
 import { FollowTrainerService } from 'src/trainer/application/service/followTrainer.service';
+import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -58,21 +61,19 @@ export class TrainerController {
     return oneTrainer.Value;
   }
 
-  @Post('/toggle/follow')
+  @Post('/toggle/follow/:id')
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({
     description: 'Acceso no autorizado, no se pudo encontrar el token',
   })
+  @UseGuards(JwtAuthGuard)
   async followTrainer(
-    @Query('trainer', ParseUUIDPipe) idTrainer: string,
-    @Query('user', ParseUUIDPipe) idUser: string,
+    @Request() req: JwtRequest,
+    @Param('id', ParseUUIDPipe) idTrainer: string,
   ) {
-    /*if ((idTrainer || idUser) === undefined) {
-      return Result.fail(new Error('Try Again'), 404, 'Try Again');
-    }*/
     const data = {
       idTrainer: idTrainer,
-      idUser: idUser,
+      idUser: req.user.tokenUser.id,
     };
     const follow = await this.followTrainerService.execute(data);
     if (!follow.isSuccess) {
