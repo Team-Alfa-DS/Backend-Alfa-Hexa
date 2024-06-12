@@ -38,7 +38,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
 
         if (value.term) {
             courses = courses.filter((course) => (
-                (course.name.search(new RegExp(value.term, "i")) != -1) ||
+                (course.title.search(new RegExp(value.term, "i")) != -1) ||
                 (course.description.search(new RegExp(value.term, "i")) != -1) 
             ));
 
