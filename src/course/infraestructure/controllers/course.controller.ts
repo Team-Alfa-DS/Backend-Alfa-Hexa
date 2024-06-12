@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Get, Inject, Param, UseGuards, Query, HttpException } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
@@ -11,6 +12,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { CourseEntity } from "../entities/course.entity";
 
 @ApiTags('Course')
 @ApiBearerAuth('token')
@@ -32,6 +34,13 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get('one/:id')
+  @ApiCreatedResponse({
+    description: 'se encontro el curso correctamente',
+    type: CourseEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se encontro el curso. Intente con otra Id'
+  })
   async getCourseById(@Param('id') courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
     const result = await this.getCourseByIdService.execute(request);
@@ -46,6 +55,13 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get("many")
+  @ApiCreatedResponse({
+    description: 'se retorno la totalidad de cursos',
+    type: CourseEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se encontraron cursos.'
+  })
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
   async getAllCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {
