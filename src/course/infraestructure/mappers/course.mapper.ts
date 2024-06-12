@@ -22,6 +22,7 @@ export class CourseMapper {
       entity.publication_date,
       entity.minutes,
       entity.weeks,
+      entity.level,
       domainLessons,
       domainTags,
       entity.category.name,
