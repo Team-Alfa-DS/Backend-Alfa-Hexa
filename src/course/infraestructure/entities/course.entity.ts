@@ -24,15 +24,18 @@ export class CourseEntity {
   @Column()
   weeks: number;
 
+  @Column({ nullable: true })
+  level: number;
+
   @Column()
   image: string;
 
   @OneToMany(() => LessonEntity, (lesson) => lesson.course)
   lessons: LessonEntity[];
 
-    @ManyToOne(() => CategoryEntity, category => category.blogs)
-    @JoinColumn({name: 'category_id'})
-    category: CategoryEntity;
+  @ManyToOne(() => CategoryEntity, category => category.blogs)
+  @JoinColumn({name: 'category_id'})
+  category: CategoryEntity;
 
   @ManyToOne(() => OrmTrainer, (trainer) => trainer.blogs)
   @JoinColumn({ name: 'trainer_id' })
