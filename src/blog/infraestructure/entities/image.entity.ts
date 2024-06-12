@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Blog } from "./blog.entity";
+import { BlogEntity } from './blog.entity';
 
 @Entity('image')
 export class Image {
@@ -9,7 +9,7 @@ export class Image {
     @Column()
     url: string;
 
-    @ManyToOne(() => Blog, blog => blog.images)
+    @ManyToOne(() => BlogEntity, blog => blog.images)
     @JoinColumn({name: 'blog_id'})
-    blog: Blog;
+    blog: BlogEntity;
 }
