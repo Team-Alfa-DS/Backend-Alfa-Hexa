@@ -5,7 +5,8 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
-  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -24,6 +25,8 @@ import { FollowTrainerRequest } from 'src/trainer/application/dto/request/follow
 import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
 import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
 import { FollowTrainerResponse } from 'src/trainer/application/dto/response/follow-trainer.response';
+import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -76,19 +79,17 @@ export class TrainerController {
     return oneTrainer.Value;
   }
 
-  @Post('/toggle/follow')
+  @Post('/toggle/follow/:id')
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({
     description: 'Acceso no autorizado, no se pudo encontrar el token',
   })
+  @UseGuards(JwtAuthGuard)
   async followTrainer(
-    @Query('trainer', ParseUUIDPipe) idTrainer: string,
-    @Query('user', ParseUUIDPipe) idUser: string,
+    @Request() req: JwtRequest,
+    @Param('id', ParseUUIDPipe) idTrainer: string,
   ) {
-    /*if ((idTrainer || idUser) === undefined) {
-      return Result.fail(new Error('Try Again'), 404, 'Try Again');
-    }*/
-    const request = new FollowTrainerRequest(idTrainer, idUser);
+    const request = new FollowTrainerRequest(idTrainer, req.user.tokenUser.id);
     const follow = await this.followTrainerService.execute(request);
     if (!follow.isSuccess) {
       throw new HttpException(follow.Message, follow.StatusCode);
