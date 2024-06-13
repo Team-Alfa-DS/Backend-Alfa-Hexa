@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Get, HttpException, Param, ParseIntPipe, Query } from "@nestjs/common";
+import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
@@ -62,7 +62,7 @@ export class CategoryController {
     @Get("/:id")
     @ApiBearerAuth('token')
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
-    async getCategoryById(@Param('id') idCategory: string): Promise<Category> {
+    async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<Category> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       if (response.isSuccess) return response.Value

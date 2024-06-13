@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, ParseUUIDPipe } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { GetAllBlogService } from "src/blog/application/getAllBlog.service";
 import { GetBlogByIdService } from "src/blog/application/getBlogById.service";
@@ -44,7 +44,7 @@ export class BlogController {
     }
 
     @Get('one/:id')
-    async getBlogById(@Param('id') blogId: string) {
+    async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
         if (result.Value)
             return result.Value

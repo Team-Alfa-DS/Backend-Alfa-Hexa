@@ -1,4 +1,4 @@
-import { Controller, Get, Inject, Param, UseGuards, Query, HttpException } from "@nestjs/common";
+import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
@@ -32,7 +32,7 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get('one/:id')
-  async getCourseById(@Param('id') courseId: string) {
+  async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
     const result = await this.getCourseByIdService.execute(request);
     
