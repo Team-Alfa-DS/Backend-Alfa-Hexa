@@ -6,6 +6,7 @@ import { Progress } from "src/progress/domain/progress";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { Lesson } from "src/course/domain/Lesson";
+import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
@@ -15,6 +16,21 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
     constructor(ormProgressMapper: IMapper<Progress, ProgressEntity>, dataSource: DataSource) {
         super(ProgressEntity, dataSource.manager);
         this.ormProgressMapper = ormProgressMapper;
+    }
+
+    async findProgressByUser(userId: string, runner: TransactionHandler): Promise<Result<Progress[]>> {
+        const runnerTransaction = runner.getRunner(); 
+        try {
+            const progressUser = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId});
+            let progressDomainList: Progress[] = [];
+
+            for (const progress of progressUser) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
+            return Result.success(progressDomainList, 200);
+        } catch (err) {
+            return Result.fail(new Error(err.message), err.code, err.message);
+        }
     }
     
     async findLastProgressByUser(userId: string, runner: TransactionHandler): Promise<Result<Progress>> {
