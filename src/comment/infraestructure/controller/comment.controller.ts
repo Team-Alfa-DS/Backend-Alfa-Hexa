@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
 import { CourseMapper } from "src/course/infraestructure/mappers/course.mapper";
@@ -26,6 +26,7 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
+import { CommentEntity } from "../entities/comment.entity";
 
 @UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
@@ -121,6 +122,15 @@ export class CommentController{
     }
     
     @Get(':many')
+    @ApiCreatedResponse({
+        description: 'se retorno todos los comentarios correctamente',
+        type: CommentEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No existen comentarios.'
+    })
+    @ApiQuery({name:'blog', required: false})
+    @ApiQuery({name:'lesson', required: false})
     async getCommets (@Request() req: JwtRequest,
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
@@ -143,6 +153,13 @@ export class CommentController{
     }
 
     @Post( '/release' )
+    @ApiCreatedResponse({
+        description: 'se agrego el comentario correctamente',
+        type: CommentEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo agregar el  comentario.'
+    })
     async addComment(@Request() req: JwtRequest, 
     @Body() addCommentEntryDto: AddCommentEntryDto){
         const data = new AddCommentToServiceRequestDto(addCommentEntryDto.target, req.user.tokenUser.id, addCommentEntryDto.body); 

@@ -2,27 +2,61 @@ import { BlogEntity } from "src/blog/infraestructure/entities/blog.entity";
 import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { LessonEntity } from "src/course/infraestructure/entities/lesson.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ApiProperty } from "@nestjs/swagger";
 
 @Entity('comment')
 export class CommentEntity {
+    @ApiProperty({
+        description: 'Id del comentario',
+        example: '75645sd342sdafsfssaf'
+      })
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+
+    @ApiProperty({
+        description: 'Fecha de publicacion del comentario',
+        example: '03/04/2024'
+      })
     @Column()
     publication_date: Date;
 
+
+    @ApiProperty({
+        description: 'Cantidad de likes que posee el comentario',
+        example: '324'
+      })
     @Column({nullable: true})
     count_likes?: number;
 
+
+    @ApiProperty({
+        description: 'cantidad de dislikes que posee el comentario',
+        example: '15'
+      })
     @Column({nullable: true})
     count_dislikes?: number;
     
+
+    @ApiProperty({
+        description: 'Confirma si le gusta el comentario al usuario que lo esta viendo',
+        example: 'True'
+      })
     @Column({nullable: true})
     userLiked?: boolean;
 
+
+    @ApiProperty({
+        description: 'Confirma si no le gusta el comentario al usuario que lo esta viendo',
+        example: 'False'
+      })
     @Column({nullable: true})
     userDisliked?: boolean;
 
+    @ApiProperty({
+        description: 'contenido del comentario',
+        example: 'Me gusto mucho este blog'
+      })
     @Column()
     body: string;
 
