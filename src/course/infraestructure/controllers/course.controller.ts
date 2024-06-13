@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Get, Inject, Param, UseGuards, Query, HttpException } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
@@ -55,6 +55,9 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get("many")
+  @ApiQuery({name: 'filter', required:false})
+  @ApiQuery({name: 'category', required:false})
+  @ApiQuery({name: 'trainer', required:false})
   @ApiCreatedResponse({
     description: 'se retorno la totalidad de cursos',
     type: CourseEntity,

@@ -31,7 +31,7 @@ export class GetManyCoursesQueryDto {
 
 
   @ApiProperty({
-    description: 'nombre del usuario',
+    description: 'Cantidad de cursos que deseas recibir ',
     example: '1'
   })
   @IsOptional()
@@ -40,8 +40,8 @@ export class GetManyCoursesQueryDto {
   page?: number;
 
   @ApiProperty({
-    description: 'nombre del usuario',
-    example: 'Miguel Sanchez'
+    description: 'Desde donde se empiezan a contar los cursos',
+    example: '1'
   })
   @IsNumber()
   @IsOptional()
