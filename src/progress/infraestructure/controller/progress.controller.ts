@@ -129,7 +129,7 @@ export class ProgressController {
     }
 
     @Get('courses')
-    async progressCourses(@Request() req: JwtRequest, @Query('page', ParseIntPipe) page?: number, @Query('perpage', ParseIntPipe) perpage?: number) {
+    async progressCourses(@Request() req: JwtRequest, @Query('page') page?: number, @Query('perpage') perpage?: number) {
         const request = new CoursesProgressRequest(req.user.tokenUser.id, page, perpage);
         const response = await this.coursesProgressService.execute(request);
 
