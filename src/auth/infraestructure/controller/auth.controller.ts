@@ -25,7 +25,7 @@ import { UserCode } from '../types/user-code.type';
 import { ValidateUserCodeService } from 'src/auth/application/services/validate-user-code.service';
 import { ChangeUserPasswordDto } from '../dtos/change-user-password.dto';
 import { ChangeUserPasswordService } from 'src/auth/application/services/change-user-password.service';
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { IService } from 'src/common/application/interfaces/IService';
 import { RegisterUserRequest } from 'src/auth/application/dtos/request/register-user.request';
@@ -45,6 +45,7 @@ import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/val
 import { MailjetService } from 'nest-mailjet';
 import { MailJet } from 'src/common/infraestructure/mailer/mailjet';
 import { IMailer } from 'src/common/application/mailer/mailer.interface';
+import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -104,6 +105,13 @@ export class AuthController {
     }
 
     @Post('register')
+    @ApiCreatedResponse({
+        description: 'se registro al usuario correctamente',
+        type: UserEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo registrar al usuario. Intente de nuevo'
+    })
     async registerUser(@Body() newUser: RegisterUserDto) {
         const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
 
@@ -113,6 +121,13 @@ export class AuthController {
     }
 
     @Post('login')
+    @ApiCreatedResponse({
+        description: 'A iniciado sesion de manera exitosa',
+        //type: UserEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'Las credenciales son incorrectas. Intente de nuevo'
+    })
     async loginUser(@Body() user: LoginUserDto) {
         const request = new LoginUserRequest(user.email, user.password);
 
@@ -125,6 +140,12 @@ export class AuthController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
     @UseGuards(JwtAuthGuard)
     @Get('current')
+    @ApiCreatedResponse({
+        description: 'Recibe el token y permite saber los datos del usuario',
+    })
+    @ApiBadRequestResponse({
+        description: 'El token es incorrecto. Intente de nuevo'
+    })
     async currentUser(@Request() req: JwtRequest) {
         const request = new CurrentUserRequest(req.user.tokenUser.id);
 
@@ -134,6 +155,13 @@ export class AuthController {
     }
 
     @Post('forget/password')
+    @ApiCreatedResponse({
+        description: 'Se ha enviado un codigo de verifiacion al correo ingresado',
+        //type: UserEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'El correo ingresado no coincide con algun usuario. Intente de nuevo'
+    })
     async forgetUserPassword(@Body() user: ForgetUserPasswordDto) {
         const code = this.codeGenerator.genCode();
         const indexUser = this.userCodeList.findIndex(userCode => userCode.email == user.email);
@@ -151,6 +179,12 @@ export class AuthController {
     }
 
     @Post('code/validate')
+    @ApiCreatedResponse({
+        description: 'se actualizo al usuario correctamente',
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo actualizar al usuario. Intente de nuevo'
+    })
     async validateCode(@Body() validate: ValidateUserCodeDto) {
         const userCode = this.userCodeList.find(userCode => userCode.email == validate.email);
         if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);
@@ -163,6 +197,13 @@ export class AuthController {
     }
 
     @Put('change/password')
+    @ApiCreatedResponse({
+        description: 'se cambio la contraseña de manera exitosa',
+        type: UserEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo cambiar la contraseña. Intente de nuevo'
+    })
     async changePassword(@Body() newPassword: ChangeUserPasswordDto) {
         const userCode = this.userCodeList.find(userCode => userCode.email == newPassword.email);
         if (!userCode) throw new HttpException('no se encontro el codigo', HttpStatus.BAD_REQUEST);

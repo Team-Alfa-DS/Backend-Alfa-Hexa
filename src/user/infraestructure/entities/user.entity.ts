@@ -65,7 +65,7 @@ export class UserEntity {
 
   @ApiProperty({
     description: 'Imagen de perfil del usuario',
-    example: '7url:'
+    example: 'url:'
   })
   @Column('bytea', { nullable: true })
   image: string;
