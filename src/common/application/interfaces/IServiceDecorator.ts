@@ -9,7 +9,7 @@ export abstract class IServiceDecorator<I extends ServiceRequestDto, O extends S
   }
 
   get name() {
-    return this.decoratee.constructor.name;
+    return this.decoratee.name;
   }
   abstract execute(input: I): Promise<Result<O>>;
 }

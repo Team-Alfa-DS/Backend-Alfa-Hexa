@@ -10,6 +10,7 @@ import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLo
 import { IService } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 
 @ApiTags('Course')
 @ApiBearerAuth('token')
@@ -21,8 +22,12 @@ export class CourseController {
 
   constructor() {
     const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-    this.getManyCoursesService = new ServiceLoggerDecorator(new GetManyCoursesService(repositoryInstance), new FsPromiseLogger("serviceUse.log"));
-    this.getCourseByIdService = new ServiceLoggerDecorator(new GetCourseByIdService(repositoryInstance), new FsPromiseLogger("serviceUse.log"));
+    this.getManyCoursesService = new ExceptionLoggerDecorator(
+      new ServiceLoggerDecorator(
+        new GetManyCoursesService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
+    this.getCourseByIdService = new ExceptionLoggerDecorator(
+      new ServiceLoggerDecorator(
+        new GetCourseByIdService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -32,11 +37,11 @@ export class CourseController {
     const result = await this.getCourseByIdService.execute(request);
     
     if (result.isSuccess)
-      {
-        return result.Value;
-      } else {
-        return new HttpException(result.Message, result.StatusCode);
-      }
+    {
+      return result.Value;
+    } else {
+      throw new HttpException(result.Message, result.StatusCode);
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -57,7 +62,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      return new HttpException(result.Message, result.StatusCode);
+      throw new HttpException(result.Message, result.StatusCode);
     }
     
   }

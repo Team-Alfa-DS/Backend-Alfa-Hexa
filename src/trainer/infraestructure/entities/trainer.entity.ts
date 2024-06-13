@@ -1,14 +1,8 @@
-import { Blog } from 'src/blog/infraestructure/entities/blog.entity';
-import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
-import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BlogEntity } from "src/blog/infraestructure/entities/blog.entity";
+import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
+import { UserEntity } from "src/user/infraestructure/entities/user.entity";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+
 
 @Entity('trainer')
 export class OrmTrainer {
@@ -19,25 +13,25 @@ export class OrmTrainer {
   name: string;
 
   @Column()
-  followers: number;
+  followers?: number;
 
   @Column()
-  userFollow: boolean;
+  userFollow?: boolean;
 
   @Column()
-  location: string;
+  location?: string;
 
-  @OneToMany(() => Blog, (blog) => blog.trainer)
-  blogs: Blog[];
+  @OneToMany(() => BlogEntity, (blog) => blog.trainer)
+  blogs: BlogEntity[];
 
   @OneToMany(() => CourseEntity, (course) => course.trainer)
-  courses: CourseEntity[];
+  courses?: CourseEntity[];
 
   @ManyToMany(() => UserEntity, (UserEntity) => UserEntity.trainers, {
     cascade: true,
   })
   @JoinTable()
-  users: UserEntity[];
+  users?: UserEntity[];
 
   static create(
     id: string,

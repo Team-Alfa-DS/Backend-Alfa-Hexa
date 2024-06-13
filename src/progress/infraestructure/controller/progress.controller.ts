@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param, ParseUUIDPipe, Post, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { MarkEndProgressDto } from '../dtos/mark-end-progress.dto';
 import { OrmProgressMapper } from '../mappers/orm-progress.mapper';
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
-import { LessonMapper } from 'src/course/infraestructure/mappers/lesson.mapper';
 import { OrmProgressRepository } from '../repositories/orm-progress.repository';
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
@@ -15,6 +14,15 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { GetOneProgressService } from 'src/progress/application/services/get-one-progress.service';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { TrendingProgressService } from 'src/progress/application/services/trending-progress.service';
+import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-audit.repository';
+import { IService } from 'src/common/application/interfaces/IService';
+import { MarkEndProgressRequest } from 'src/progress/application/dtos/request/mark-end-progress.request.dto';
+import { MarkEndProgressResponse } from 'src/progress/application/dtos/response/mark-end-progress.response';
+import { GetOneProgressRequest } from 'src/progress/application/dtos/request/get-one-progress.request.dto';
+import { GetOneProgressResponse } from 'src/progress/application/dtos/response/get-one-progress.response';
+import { TrendingProgressRequest } from 'src/progress/application/dtos/request/trending-progress.request.dto';
+import { TrendingProgressResponse } from 'src/progress/application/dtos/response/trending-progress.response.dto';
+import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('token')
@@ -42,43 +50,68 @@ export class ProgressController {
         this.userMapper, DatabaseSingleton.getInstance()
     );
 
-    private markEndProgressService: MarkEndProgressService;
-    private getOneProgressService: GetOneProgressService;
-    private trendingProgressService: TrendingProgressService;
+    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
+        DatabaseSingleton.getInstance()
+    );
+
+    private markEndProgressService: IService<MarkEndProgressRequest, MarkEndProgressResponse>;
+    private getOneProgressService: IService<GetOneProgressRequest, GetOneProgressResponse>;
+    private trendingProgressService: IService<TrendingProgressRequest, TrendingProgressResponse>;
 
     constructor() {
-        this.markEndProgressService = new MarkEndProgressService(
-            this.progressRepository,
-            this.courseRepository,
-            this.userRepository,
-            this.transactionHandler
+        this.markEndProgressService = new ServiceDBLoggerDecorator(
+            new MarkEndProgressService(
+                this.progressRepository,
+                this.courseRepository,
+                this.userRepository,
+                this.transactionHandler
+            ),
+            this.auditRepository
         );
-        this.getOneProgressService = new GetOneProgressService(
-            this.userRepository,
-            this.progressRepository,
-            this.courseRepository,
-            this.transactionHandler
+        this.getOneProgressService = new ServiceDBLoggerDecorator(
+            new GetOneProgressService(
+                this.userRepository,
+                this.progressRepository,
+                this.courseRepository,
+                this.transactionHandler
+            ),
+            this.auditRepository
         );
-        this.trendingProgressService = new TrendingProgressService(
-            this.userRepository,
-            this.progressRepository,
-            this.courseRepository,
-            this.transactionHandler
-        )
+        this.trendingProgressService = new ServiceDBLoggerDecorator(
+            new TrendingProgressService(
+                this.userRepository,
+                this.progressRepository,
+                this.courseRepository,
+                this.transactionHandler
+            ),
+            this.auditRepository
+        );
     }
 
     @Post('mark/end')
     async markEnd(@Body() value: MarkEndProgressDto, @Request() req: JwtRequest) {
-        return (await this.markEndProgressService.execute({...value, userId: req.user.tokenUser.id}))
+        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time);
+        const response = await this.markEndProgressService.execute(request);
+        
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Get('one/:courseId')
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
-        return (await this.getOneProgressService.execute({courseId, userId: req.user.tokenUser.id}))
+        const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
+        const response = await this.getOneProgressService.execute(request);
+
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode); 
     }
     
     @Get('trending')
     async progressTrending(@Request() req: JwtRequest) {
-        return (await this.trendingProgressService.execute({userId: req.user.tokenUser.id}))
+        const request = new TrendingProgressRequest(req.user.tokenUser.id);
+        const response = await this.trendingProgressService.execute(request);
+
+        if (response.isSuccess) return response.Value;
+        throw new HttpException(response.Message, response.StatusCode);
     }
 }

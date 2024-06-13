@@ -1,5 +1,4 @@
-import { IApplicationService } from "src/common/application/application-service/application-service.interface";
-import { TrendingProgressDto } from "../dtos/request/trending-progress.request.dto";
+import { TrendingProgressRequest } from "../dtos/request/trending-progress.request.dto";
 import { TrendingProgressResponse } from "../dtos/response/trending-progress.response.dto";
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
@@ -7,8 +6,9 @@ import { IProgressRepository } from "src/progress/domain/repositories/progress-r
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
+import { IService } from "src/common/application/interfaces/IService";
 
-export class TrendingProgressService implements IApplicationService<TrendingProgressDto, TrendingProgressResponse> {
+export class TrendingProgressService extends IService<TrendingProgressRequest, TrendingProgressResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly progressRepository: IProgressRepository;
@@ -22,6 +22,7 @@ export class TrendingProgressService implements IApplicationService<TrendingProg
         courseRepository: ICourseRepository, 
         transactionHandler: ITransactionHandler
     ) {
+        super();
         this.userRepository = userRepository;
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
@@ -29,7 +30,7 @@ export class TrendingProgressService implements IApplicationService<TrendingProg
         this.calcPercentService = new CalcPercentService();
     }
 
-    async execute(value: TrendingProgressDto): Promise<Result<TrendingProgressResponse>> {
+    async execute(value: TrendingProgressRequest): Promise<Result<TrendingProgressResponse>> {
         const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
@@ -44,17 +45,11 @@ export class TrendingProgressService implements IApplicationService<TrendingProg
 
         const result = this.calcPercentService.execute(course.Value.lessons, totalProgress.Value);
 
-        const response: TrendingProgressResponse = {
-            percent: result.percent,
-            courseTitle: course.Value.name,
-            courseId: course.Value.id,
-            lastTime: progress.Value.LastTime
-        } 
-
+        const response = new TrendingProgressResponse(result.percent, course.Value.title, course.Value.id, progress.Value.LastTime);
         return Result.success(response, 200);
     }
-    get name(): string {
-        return this.constructor.name;
-    }
+    // get name(): string {
+    //     return this.constructor.name;
+    // }
 
 }
