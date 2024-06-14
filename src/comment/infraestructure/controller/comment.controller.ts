@@ -31,9 +31,9 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { CommentEntity } from "../entities/comment.entity";
 
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth('token')
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
+@UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
 @Controller( 'Comments' )
 export class CommentController{
