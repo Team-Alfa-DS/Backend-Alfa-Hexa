@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpException, Param, ParseUUIDPipe, Post, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { MarkEndProgressDto } from '../dtos/mark-end-progress.dto';
 import { OrmProgressMapper } from '../mappers/orm-progress.mapper';
@@ -23,6 +23,8 @@ import { GetOneProgressResponse } from 'src/progress/application/dtos/response/g
 import { TrendingProgressRequest } from 'src/progress/application/dtos/request/trending-progress.request.dto';
 import { TrendingProgressResponse } from 'src/progress/application/dtos/response/trending-progress.response.dto';
 import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/serviceDBLoggerDecorator';
+import { ProgressEntity } from '../entities/progress.entity';
+import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('token')
@@ -89,6 +91,13 @@ export class ProgressController {
     }
 
     @Post('mark/end')
+    @ApiCreatedResponse({
+        description: 'se guardo el progreso correctamente',
+        type: ProgressEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo guardar el progreso. Intente de nuevo'
+    })
     async markEnd(@Body() value: MarkEndProgressDto, @Request() req: JwtRequest) {
         const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time);
         const response = await this.markEndProgressService.execute(request);
@@ -98,6 +107,13 @@ export class ProgressController {
     }
 
     @Get('one/:courseId')
+    @ApiCreatedResponse({
+        description: 'se retorno el curso correctamente',
+        type: CourseEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo encontrar un curso con esa id. Intente de nuevo'
+    })
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.getOneProgressService.execute(request);
@@ -107,6 +123,13 @@ export class ProgressController {
     }
     
     @Get('trending')
+    @ApiCreatedResponse({
+        description: 'se retorno el ultimo curso correctamente',
+        
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo retornar el ultimo curso. Intente de nuevo'
+    })
     async progressTrending(@Request() req: JwtRequest) {
         const request = new TrendingProgressRequest(req.user.tokenUser.id);
         const response = await this.trendingProgressService.execute(request);
