@@ -1,7 +1,6 @@
-/* eslint-disable prettier/prettier */
 
 import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Query } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmCategoryRepository } from "../repositories/orm-category.repository";
@@ -21,6 +20,7 @@ import { GetCategoryResponse } from "src/category/application/dtos/response/get-
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { CategoryEntity } from "../entities/category.entity";
 
 
 @ApiTags('Category')
@@ -50,6 +50,13 @@ export class CategoryController {
     }
     
     @Get("many")
+    @ApiCreatedResponse({
+      description: 'se retornaron todas las categorias de manera exitosa',
+      type: CategoryEntity,
+  })
+  @ApiBadRequestResponse({
+      description: 'No existen categorias. Agregue'
+  })
     @ApiBearerAuth('token')
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
@@ -60,6 +67,13 @@ export class CategoryController {
     }
 
     @Get("/:id")
+    @ApiCreatedResponse({
+      description: 'se retorno la categoria de manera exitosa',
+      type: CategoryEntity,
+    })
+    @ApiBadRequestResponse({
+      description: 'No existe una categoria con esa id'
+    })
     @ApiBearerAuth('token')
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<Category> {

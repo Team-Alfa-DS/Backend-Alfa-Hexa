@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseUUIDPipe } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 import { GetAllBlogService } from "src/blog/application/getAllBlog.service";
 import { GetBlogByIdService } from "src/blog/application/getBlogById.service";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
@@ -15,6 +15,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlogsRequestDTO.interface";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { BlogEntity } from "../entities/blog.entity";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 
@@ -44,6 +45,13 @@ export class BlogController {
     }
 
     @Get('one/:id')
+    @ApiCreatedResponse({
+        description: 'se encontro un blog con esa id',
+        type: BlogEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se encontro un blog con esa id. Intente de nuevo'
+    })
     async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
         if (result.Value)
@@ -52,6 +60,13 @@ export class BlogController {
     }
 
     @Get('many')
+    @ApiCreatedResponse({
+        description: 'se retorno todos los blog',
+        type: BlogEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se encontraron blogs. Agregue algunos'
+    })
     async  getAllBlogs() {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(new GetAllBlogsRequestDTO());
         if (result.Value)

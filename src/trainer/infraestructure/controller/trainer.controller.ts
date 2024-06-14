@@ -12,6 +12,10 @@ import {
   ApiTags,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiQuery,
+  ApiParam,
 } from '@nestjs/swagger';
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { FindOneTrainerService } from 'src/trainer/application/service/findOneTrainer.service';
@@ -30,6 +34,7 @@ import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { OrmTrainer } from '../entities/trainer.entity';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -73,6 +78,13 @@ export class TrainerController {
   }
 
   @Get('one/:id')
+  @ApiCreatedResponse({
+    description: 'se encontro un entrenador con esa id',
+    type: OrmTrainer,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se pudo encontrar un entrenador con esa id. Intente de nuevo'
+  })
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({
     description: 'Acceso no autorizado, no se pudo encontrar el token',
@@ -87,6 +99,14 @@ export class TrainerController {
   }
 
   @Post('/toggle/follow/:id')
+  @ApiCreatedResponse({
+    description: 'Ahora sigues a este entrenador',
+    type: OrmTrainer,
+  })
+  @ApiBadRequestResponse({
+    description: 'No puedes seguir a este entrenador. Intente de nuevo'
+  })
+  @ApiParam({name:'trainer', required: true})
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({
     description: 'Acceso no autorizado, no se pudo encontrar el token',

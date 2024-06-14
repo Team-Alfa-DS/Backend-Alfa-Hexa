@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Body, Controller, FileTypeValidator, HttpException, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
@@ -8,7 +9,7 @@ import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { IEncryptor } from "src/auth/application/encryptor/encryptor.interface";
 import { BcryptEncryptor } from "src/auth/infraestructure/encryptor/bcrypt";
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { JwtRequest } from "src/common/infraestructure/types/jwt-request.type";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { IService } from "src/common/application/interfaces/IService";
@@ -19,6 +20,7 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
 
 @ApiTags('User')
 @ApiBearerAuth('token')
@@ -58,6 +60,13 @@ export class UserController {
 
     @UseGuards(JwtAuthGuard)
     @Put('update')
+    @ApiCreatedResponse({
+        description: 'se actualizo al usuario correctamente',
+        type: UpdateUserResponseDto,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo actualizar al usuario. Intente de nuevo'
+    })
     async updateUser(@Request() req: JwtRequest, @Body() data: UpdateUserDto) {
         const dataUser = new UpdateUserRequest(
             req.user.tokenUser.id,

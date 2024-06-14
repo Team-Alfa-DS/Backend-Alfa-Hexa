@@ -4,13 +4,17 @@ import { IsNumber, IsOptional } from "class-validator";
 
 export class CoursesProgressDto {
 
-    @ApiProperty()
+    @ApiProperty({
+        required: false
+    })
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
     page?: number;
 
-    @ApiProperty()
+    @ApiProperty({
+        required: false
+    })
     @IsOptional()
     @IsNumber()
     @Type(() => Number)

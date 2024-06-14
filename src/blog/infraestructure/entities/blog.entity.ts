@@ -4,18 +4,32 @@ import { Image } from "./image.entity";
 import { Tag } from "./tag.entity";
 import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
+import { ApiProperty } from "@nestjs/swagger";
 
 @Entity('blog')
 export class BlogEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({
+    description: 'Titulo del Blog',
+    example: 'Mejoramiento de la salud a traves de ejercicio'
+  })
     @Column()
     title: string;
 
+    @ApiProperty({
+      description: 'Descripción del blog',
+      example: 'En este blog encontraras toda la inforamcion necesario para hacer ejercicios que mejores la salud'
+    })
     @Column()
     description: string;
 
+
+    @ApiProperty({
+      description: 'Fecha de publicación del blog',
+      example: '03/04/2024'
+    })
     @Column()
     publication_date: Date
 

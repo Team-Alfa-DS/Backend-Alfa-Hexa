@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Controller, Get, HttpException, ParseArrayPipe, ParseIntPipe, Query, Request, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { OrmBlogRepository } from 'src/blog/infraestructure/repositories/ormBlog.repository';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
@@ -12,6 +13,7 @@ import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TO
 import { SearchRequestDto } from 'src/search/application/dtos/request/search-request.dto';
 import { SearchResponseDto } from 'src/search/application/dtos/response/search-response.dto';
 import { SearchService } from 'src/search/application/services/search.service';
+
 
 @ApiTags('Search')
 @ApiBearerAuth('token')
@@ -34,9 +36,17 @@ export class SearchController {
 
 
     @Get()
+    @ApiCreatedResponse({
+        description: 'se realizo la busqueda correctamente',
+    })
+    @ApiBadRequestResponse({
+        description: 'No se pudo realizar la busqueda'
+    })
+    @ApiQuery({name: 'term', required:false})
+    @ApiQuery({name: 'tag', required:false})
     async search(
         @Request() req, 
-        @Query('page', ParseIntPipe) page: number,
+        @Query('page', ParseIntPipe,) page: number,
         @Query('perpage', ParseIntPipe) perpage: number,
         @Query('term') term?: string, 
         @Query('tag', new ParseArrayPipe({items: String, separator: ',', optional: true})) tag?: string[]
