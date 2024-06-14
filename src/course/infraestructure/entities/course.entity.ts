@@ -25,7 +25,7 @@ export class CourseEntity {
   weeks: number;
 
   @Column({ nullable: true })
-  level: number;
+  level: string;
 
   @Column()
   image: string;
