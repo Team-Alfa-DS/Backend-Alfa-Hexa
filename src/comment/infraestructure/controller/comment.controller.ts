@@ -26,6 +26,9 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { ILogger } from "src/common/application/logger/logger.interface";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { CommentEntity } from "../entities/comment.entity";
 
 @UseGuards(JwtAuthGuard)
@@ -68,7 +71,7 @@ export class CommentController{
     private readonly auditRepository = new OrmAuditRepository(
         DatabaseSingleton.getInstance()
     );
-
+    private readonly logger: ILogger = new NestLogger();
     //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
@@ -79,43 +82,49 @@ export class CommentController{
     
     constructor() {
 
-        this.getCommentBlogService = new ServiceDBLoggerDecorator(
+        this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
                 this.commentRepository,
                 this.transactionHandler,
                 //this.encryptor
             ),
-            this.auditRepository
+            this.logger
         );
-        this.getCommentLessonService = new ServiceDBLoggerDecorator(
+        this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
                 this.commentRepository,
                 this.transactionHandler,
                 //this.encryptor
             ),
-            this.auditRepository
+            this.logger
         );
-        this.registerLessonCommentService = new ServiceDBLoggerDecorator(
-            new RegisterLessonCommentServices(
-                this.commentRepository,
-                this.userRepository,
-                this.courseRepository,
-                this.transactionHandler,
-                this.idGenerator,
-                //this.encryptor
+        this.registerLessonCommentService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new RegisterLessonCommentServices(
+                    this.commentRepository,
+                    this.userRepository,
+                    this.courseRepository,
+                    this.transactionHandler,
+                    this.idGenerator,
+                    //this.encryptor
+                ),
+                this.auditRepository
             ),
-            this.auditRepository
+            this.logger
         );
-        this.registerBlogCommentService = new ServiceDBLoggerDecorator(
-            new RegisterBlogCommentServices(
-                this.commentRepository,
-                this.userRepository,
-                this.blogRepository,
-                this.transactionHandler,
-                this.idGenerator,
-                //this.encryptor
+        this.registerBlogCommentService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new RegisterBlogCommentServices(
+                    this.commentRepository,
+                    this.userRepository,
+                    this.blogRepository,
+                    this.transactionHandler,
+                    this.idGenerator,
+                    //this.encryptor
+                ),
+                this.auditRepository
             ),
-            this.auditRepository
+            this.logger
         );
 
     

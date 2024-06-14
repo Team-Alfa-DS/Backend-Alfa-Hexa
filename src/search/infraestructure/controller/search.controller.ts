@@ -8,6 +8,7 @@ import { ServiceLoggerDecorator } from 'src/common/application/aspects/serviceLo
 import { IService } from 'src/common/application/interfaces/IService';
 import { FsPromiseLogger } from 'src/common/infraestructure/adapters/FsPromiseLogger';
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
 import { SearchRequestDto } from 'src/search/application/dtos/request/search-request.dto';
 import { SearchResponseDto } from 'src/search/application/dtos/response/search-response.dto';
@@ -25,10 +26,12 @@ export class SearchController {
     constructor() {
         const courseRepo = new TOrmCourseRepository(DatabaseSingleton.getInstance());
         const blogRepo = new OrmBlogRepository(DatabaseSingleton.getInstance());
+        const logger = new NestLogger();
 
         this.searchService =  new ExceptionLoggerDecorator(
-            new ServiceLoggerDecorator(
-              new SearchService(courseRepo, blogRepo), new FsPromiseLogger("serviceUse.log")));
+            new SearchService(courseRepo, blogRepo),
+            logger
+        );
     }
 
 

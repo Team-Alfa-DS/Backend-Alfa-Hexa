@@ -17,6 +17,9 @@ import { UpdateUserRequest } from "src/user/application/dtos/request/update-user
 import { UpdateUserResponse } from "src/user/application/dtos/response/update-user.response";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { ILogger } from "src/common/application/logger/logger.interface";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { User } from "src/user/domain/user";
 import { UserEntity } from "../entities/user.entity";
 
@@ -39,17 +42,21 @@ export class UserController {
     private transactionHandler = new TransactionHandler(
         DatabaseSingleton.getInstance().createQueryRunner()
     );
+    private readonly logger: ILogger = new NestLogger();
     private updateUserService: IService<UpdateUserRequest, UpdateUserResponse>;
     
     constructor() {
-        this.updateUserService = new ServiceDBLoggerDecorator(
-            new UpdateUserService(
-                this.userRepository,
-                this.transactionHandler,
-                this.encryptor
+        this.updateUserService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new UpdateUserService(
+                    this.userRepository,
+                    this.transactionHandler,
+                    this.encryptor
+                ),
+                this.auditRepository
             ),
-            this.auditRepository
-        )
+            this.logger
+        );
     }
 
     @UseGuards(JwtAuthGuard)

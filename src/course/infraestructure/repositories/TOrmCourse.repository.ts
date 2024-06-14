@@ -94,7 +94,14 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
   }
 
   async getCourseByLessonId(lessonId: string): Promise<Result<Course>> {
-    const result = await this.find();
+    const result = await this.find({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true
+      }
+    });
 
     for (let course of result) {
       for (let lesson of course.lessons) {
