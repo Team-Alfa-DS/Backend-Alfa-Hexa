@@ -24,7 +24,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (perpage) { 
       if (!page) {page = 0};
 
-      result = result.slice(page, ((perpage) + page));
+      result = result.slice((page*perpage), ((perpage) + page*perpage));
     }
 
     let courses = CourseMapper.arrayToDomain(result);
@@ -119,7 +119,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (perpage) { 
       if (!page) {page = 0};
 
-      result = result.slice(page, ((perpage) + page));
+      result = result.slice((page*perpage), ((perpage) + page*perpage));
     }
 
     if (result.length >= 0) {

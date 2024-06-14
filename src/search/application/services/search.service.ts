@@ -20,13 +20,13 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
         let courses: Course[] = []; let blogs: Blog[] = [];
 
         if (value.tags) {
-            courseResult = await this.courseRepository.getManyCourses(value.tags, undefined, undefined, value.page, value.perpage);
+            courseResult = await this.courseRepository.getManyCourses(value.tags);
             if (!courseResult.isSuccess) {return Result.fail(courseResult.Error, courseResult.StatusCode, courseResult.Message);};
             blogsResult = await this.blogRepository.getBlogsTagsNames(value.tags);
             if (!blogsResult.isSuccess) {return Result.fail(blogsResult.Error, blogsResult.StatusCode, blogsResult.Message);};
 
         } else {
-            courseResult = await this.courseRepository.getAllCourses(value.page, value.perpage);
+            courseResult = await this.courseRepository.getAllCourses();
             if (!courseResult.isSuccess) {return Result.fail(courseResult.Error, courseResult.StatusCode, courseResult.Message);};
             blogsResult = await this.blogRepository.getAllBLogs();
             if (!blogsResult.isSuccess) {return Result.fail(blogsResult.Error, blogsResult.StatusCode, blogsResult.Message);};
@@ -47,8 +47,18 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
                 (blog.content.search(new RegExp(value.term, "i")) != -1) 
             ));
         }
+
         //TODO: añadir sorting (creo que se puede directamente con array.sort(funcion de ordenado))
-        //TODO: Arreglar la paginación (it goes here)
+
+        if (value.perpage) {
+            let page = value.page;
+            if (!page) {page = 0}
+
+            courses = courses.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
+            blogs = blogs.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
+        }
+        
+
         const response = new SearchResponseDto(blogs, courses);
         return Result.success(response, 200);
     }
