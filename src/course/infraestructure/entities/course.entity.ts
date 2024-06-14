@@ -60,7 +60,7 @@ export class CourseEntity {
     example: '1'
   })
   @Column({ nullable: true })
-  level: number;
+  level: string;
 
 
   @ApiProperty({
