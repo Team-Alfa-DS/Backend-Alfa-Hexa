@@ -20,8 +20,7 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
-import { User } from "src/user/domain/user";
-import { UserEntity } from "../entities/user.entity";
+import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
 
 @ApiTags('User')
 @ApiBearerAuth('token')
@@ -63,7 +62,7 @@ export class UserController {
     @Put('update')
     @ApiCreatedResponse({
         description: 'se actualizo al usuario correctamente',
-        type: UserEntity,
+        type: UpdateUserResponseDto,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo actualizar al usuario. Intente de nuevo'

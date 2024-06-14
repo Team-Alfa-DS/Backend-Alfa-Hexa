@@ -49,6 +49,7 @@ import { ExceptionLoggerDecorator } from 'src/common/application/aspects/excepti
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
+import { RegisterUserResponseDto } from '../dtos/register-user.response';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -117,7 +118,7 @@ export class AuthController {
     @Post('register')
     @ApiCreatedResponse({
         description: 'se registro al usuario correctamente',
-        type: UserEntity,
+        type: RegisterUserResponseDto,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo registrar al usuario. Intente de nuevo'

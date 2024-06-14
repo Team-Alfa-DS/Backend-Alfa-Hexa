@@ -115,7 +115,7 @@ export class ProgressController {
     @Post('mark/end')
     @ApiCreatedResponse({
         description: 'se guardo el progreso correctamente',
-        type: ProgressEntity,
+        // type: ProgressEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo guardar el progreso. Intente de nuevo'
@@ -131,7 +131,7 @@ export class ProgressController {
     @Get('one/:courseId')
     @ApiCreatedResponse({
         description: 'se retorno el curso correctamente',
-        type: CourseEntity,
+        // type: CourseEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo encontrar un curso con esa id. Intente de nuevo'
