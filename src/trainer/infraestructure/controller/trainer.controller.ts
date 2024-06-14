@@ -27,6 +27,9 @@ import { OrmAuditRepository } from 'src/common/infraestructure/repository/orm-au
 import { FollowTrainerResponse } from 'src/trainer/application/dto/response/follow-trainer.response';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
+import { ILogger } from 'src/common/application/logger/logger.interface';
+import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
+import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 
 @ApiTags('Trainer')
 @ApiBearerAuth('token')
@@ -44,24 +47,28 @@ export class TrainerController {
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
       DatabaseSingleton.getInstance()
     );
+    private readonly logger: ILogger = new NestLogger();
 
   private findOneTrainerService: IService<FindOneTrainerRequest, FindOneTrainerResponse>;
   private followTrainerService: IService<FollowTrainerRequest, FollowTrainerResponse>;
 
   constructor() {
-    this.findOneTrainerService = new ServiceDBLoggerDecorator(
+    this.findOneTrainerService = new ExceptionLoggerDecorator(
       new FindOneTrainerService(
         this.trainerRepository,
         //this.transactionHandler
       ),
-      this.auditRepository
+      this.logger
     );
-    this.followTrainerService = new ServiceDBLoggerDecorator(
-      new FollowTrainerService(
-        this.trainerRepository,
-        //this.transactionHandler
+    this.followTrainerService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new FollowTrainerService(
+          this.trainerRepository,
+          //this.transactionHandler
+        ),
+        this.auditRepository
       ),
-      this.auditRepository
+      this.logger
     );
   }
 

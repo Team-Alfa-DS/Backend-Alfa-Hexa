@@ -26,6 +26,10 @@ import { ServiceDBLoggerDecorator } from 'src/common/application/aspects/service
 import { CoursesProgressRequest } from 'src/progress/application/dtos/request/courses-progress.request';
 import { CoursesProgressResponse } from 'src/progress/application/dtos/response/courses-progress.response';
 import { CoursesProgressService } from 'src/progress/application/services/courses-progress.service';
+import { CoursesProgressDto } from '../dtos/courses-progress.dto';
+import { ILogger } from 'src/common/application/logger/logger.interface';
+import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
+import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('token')
@@ -57,47 +61,52 @@ export class ProgressController {
         DatabaseSingleton.getInstance()
     );
 
+    private readonly logger: ILogger = new NestLogger();
+
     private markEndProgressService: IService<MarkEndProgressRequest, MarkEndProgressResponse>;
     private getOneProgressService: IService<GetOneProgressRequest, GetOneProgressResponse>;
     private trendingProgressService: IService<TrendingProgressRequest, TrendingProgressResponse>;
     private coursesProgressService: IService<CoursesProgressRequest, CoursesProgressResponse>;
 
     constructor() {
-        this.markEndProgressService = new ServiceDBLoggerDecorator(
-            new MarkEndProgressService(
-                this.progressRepository,
-                this.courseRepository,
-                this.userRepository,
-                this.transactionHandler
+        this.markEndProgressService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new MarkEndProgressService(
+                    this.progressRepository,
+                    this.courseRepository,
+                    this.userRepository,
+                    this.transactionHandler
+                ),
+                this.auditRepository
             ),
-            this.auditRepository
+            this.logger
         );
-        this.getOneProgressService = new ServiceDBLoggerDecorator(
+        this.getOneProgressService = new ExceptionLoggerDecorator(
             new GetOneProgressService(
                 this.userRepository,
                 this.progressRepository,
                 this.courseRepository,
                 this.transactionHandler
             ),
-            this.auditRepository
+            this.logger
         );
-        this.trendingProgressService = new ServiceDBLoggerDecorator(
+        this.trendingProgressService = new ExceptionLoggerDecorator(
             new TrendingProgressService(
                 this.userRepository,
                 this.progressRepository,
                 this.courseRepository,
                 this.transactionHandler
             ),
-            this.auditRepository
+            this.logger
         );
-        this.coursesProgressService = new ServiceDBLoggerDecorator(
+        this.coursesProgressService = new ExceptionLoggerDecorator(
             new CoursesProgressService(
                 this.progressRepository,
                 this.courseRepository,
                 this.userRepository,
                 this.transactionHandler
             ),
-            this.auditRepository
+            this.logger
         );
     }
 
@@ -129,8 +138,8 @@ export class ProgressController {
     }
 
     @Get('courses')
-    async progressCourses(@Request() req: JwtRequest, @Query('page') page?: number, @Query('perpage') perpage?: number) {
-        const request = new CoursesProgressRequest(req.user.tokenUser.id, page, perpage);
+    async progressCourses(@Query() queryDto: CoursesProgressDto, @Request() req: JwtRequest) {
+        const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
         const response = await this.coursesProgressService.execute(request);
 
         if (response.isSuccess) return response.Value.courseProgress;

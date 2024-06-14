@@ -18,6 +18,9 @@ import { GetAllCategoriesRequest } from "src/category/application/dtos/request/g
 import { GetAllCategoriesResponse } from "src/category/application/dtos/response/get-all-categories.response";
 import { GetCategoryRequest } from "src/category/application/dtos/request/get-category.request";
 import { GetCategoryResponse } from "src/category/application/dtos/response/get-category.response";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { ILogger } from "src/common/application/logger/logger.interface";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 
 
 @ApiTags('Category')
@@ -33,19 +36,16 @@ export class CategoryController {
         this.categoryMapper,
         DatabaseSingleton.getInstance()
     );
-
-    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-      DatabaseSingleton.getInstance()
-    );
+    private readonly logger: ILogger = new NestLogger();
 
     constructor() {
-      this.getAllCategorysService = new ServiceDBLoggerDecorator(
+      this.getAllCategorysService = new ExceptionLoggerDecorator(
         new GetAllCategorysService(this.categoryRepository),
-        this.auditRepository
+        this.logger
       );
-      this.getCategoryByIdService = new ServiceDBLoggerDecorator(
+      this.getCategoryByIdService = new ExceptionLoggerDecorator(
         new GetCategoryByIdService(this.categoryRepository),
-        this.auditRepository
+        this.logger
       );
     }
     
