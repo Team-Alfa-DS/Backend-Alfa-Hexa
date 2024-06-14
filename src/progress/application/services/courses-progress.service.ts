@@ -47,7 +47,12 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
             if (courses.findIndex(c => c.id == course.Value.id) == -1) courses.push(course.Value);
         }
 
-        courses = courses.slice(value.perpage | 0, value.page | courses.length);
+        if (value.perpage) {
+            let page = 0;
+            if (value.page) {page = value.page}
+
+            courses = courses.slice((page*value.perpage), value.perpage + (page*value.perpage));
+        }
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
