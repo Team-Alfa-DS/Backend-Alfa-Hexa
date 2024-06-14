@@ -1,5 +1,5 @@
 import { Controller, Get, Param, ParseUUIDPipe } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetAllBlogService } from "src/blog/application/getAllBlog.service";
 import { GetBlogByIdService } from "src/blog/application/getBlogById.service";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
@@ -20,7 +20,8 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 
 
-
+@ApiBearerAuth('token')
+@ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @ApiTags('Blog') 
 @Controller('blog')
 export class BlogController {

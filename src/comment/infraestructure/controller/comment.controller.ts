@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
 import { CourseMapper } from "src/course/infraestructure/mappers/course.mapper";
@@ -32,6 +32,8 @@ import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { CommentEntity } from "../entities/comment.entity";
 
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth('token')
+@ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @ApiTags( 'Comments' )
 @Controller( 'Comments' )
 export class CommentController{
