@@ -16,7 +16,7 @@ import { SearchService } from 'src/search/application/services/search.service';
 
 
 @ApiTags('Search')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
 @Controller('search')

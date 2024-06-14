@@ -24,7 +24,7 @@ import { CategoryEntity } from "../entities/category.entity";
 
 
 @ApiTags('Category')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @Controller('category')
 export class CategoryController {
@@ -57,8 +57,6 @@ export class CategoryController {
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
   })
-    @ApiBearerAuth('token')
-    @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
       const request = new GetAllCategoriesRequest(page, perpage);
       const response = await this.getAllCategorysService.execute(request);
@@ -74,8 +72,6 @@ export class CategoryController {
     @ApiBadRequestResponse({
       description: 'No existe una categoria con esa id'
     })
-    @ApiBearerAuth('token')
-    @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<Category> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);

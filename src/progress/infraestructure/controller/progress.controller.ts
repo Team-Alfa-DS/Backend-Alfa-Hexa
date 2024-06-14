@@ -34,7 +34,7 @@ import { ProgressEntity } from '../entities/progress.entity';
 import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
 
 @UseGuards(JwtAuthGuard)
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @ApiTags('Progress')
 @Controller('progress')

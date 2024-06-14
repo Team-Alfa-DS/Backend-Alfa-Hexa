@@ -23,7 +23,7 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
 
 @ApiTags('User')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @Controller('user')
 export class UserController {

@@ -20,7 +20,7 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
 @ApiTags('Blog') 

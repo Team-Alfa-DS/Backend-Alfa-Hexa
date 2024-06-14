@@ -37,7 +37,7 @@ import { ExceptionLoggerDecorator } from 'src/common/application/aspects/excepti
 import { OrmTrainer } from '../entities/trainer.entity';
 
 @ApiTags('Trainer')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({
   description: 'Acceso no autorizado, no se pudo encontrar el Token',
 })
