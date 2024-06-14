@@ -48,7 +48,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
             ));
         }
         //TODO: añadir sorting (creo que se puede directamente con array.sort(funcion de ordenado))
-
+        //TODO: Arreglar la paginación (it goes here)
         const response = new SearchResponseDto(blogs, courses);
         return Result.success(response, 200);
     }
