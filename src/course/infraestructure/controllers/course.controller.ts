@@ -11,6 +11,9 @@ import { IService } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
+import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 
 @ApiTags('Course')
 @ApiBearerAuth('token')
@@ -22,12 +25,16 @@ export class CourseController {
 
   constructor() {
     const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-    this.getManyCoursesService = new ExceptionLoggerDecorator(
-      new ServiceLoggerDecorator(
-        new GetManyCoursesService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
+    const logger = new NestLogger();
+
+    this.getManyCoursesService = new ExceptionLoggerDecorator( 
+      new GetManyCoursesService(repositoryInstance), 
+      logger
+    );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new ServiceLoggerDecorator(
-        new GetCourseByIdService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
+      new GetCourseByIdService(repositoryInstance), 
+      logger
+    );
   }
 
   @UseGuards(JwtAuthGuard)

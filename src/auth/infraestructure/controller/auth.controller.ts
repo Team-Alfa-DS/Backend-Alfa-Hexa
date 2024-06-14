@@ -45,6 +45,9 @@ import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/val
 import { MailjetService } from 'nest-mailjet';
 import { MailJet } from 'src/common/infraestructure/mailer/mailjet';
 import { IMailer } from 'src/common/application/mailer/mailer.interface';
+import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { ILogger } from 'src/common/application/logger/logger.interface';
+import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -64,6 +67,7 @@ export class AuthController {
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: IMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
+    private readonly logger: ILogger = new NestLogger();
     private userCodeList: UserCode[] = [];
 
     private registerUserService: IService<RegisterUserRequest, RegisterUserResponse>;
@@ -77,29 +81,35 @@ export class AuthController {
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
 
-        this.registerUserService = new ServiceDBLoggerDecorator(
-            new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
-            this.auditRepository
-        )
-        this.loginUserService = new ServiceDBLoggerDecorator(
+        this.registerUserService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
+                this.auditRepository
+            ),
+            this.logger
+        );
+        this.loginUserService = new ExceptionLoggerDecorator(
             new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
-            this.auditRepository
+            this.logger
         );
-        this.currentUserService = new ServiceDBLoggerDecorator(
+        this.currentUserService = new ExceptionLoggerDecorator(
             new CurrentUserService(this.userRepository, this.transactionHandler),
-            this.auditRepository
+            this.logger
         );
-        this.forgetUserPasswordService = new ServiceDBLoggerDecorator(
+        this.forgetUserPasswordService = new ExceptionLoggerDecorator(
             new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer),
-            this.auditRepository
+            this.logger
         );
-        this.validateUserCodeService = new ServiceDBLoggerDecorator(
+        this.validateUserCodeService = new ExceptionLoggerDecorator(
             new ValidateUserCodeService(this.userRepository, this.transactionHandler),
-            this.auditRepository
+            this.logger
         );
-        this.changeUserPasswordService = new ServiceDBLoggerDecorator(
-            new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor),
-            this.auditRepository
+        this.changeUserPasswordService = new ExceptionLoggerDecorator(
+            new ServiceDBLoggerDecorator(
+                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor),
+                this.auditRepository
+            ),
+            this.logger
         );
     }
 

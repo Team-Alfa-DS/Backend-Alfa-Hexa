@@ -15,6 +15,8 @@ import { IService } from "src/common/application/interfaces/IService";
 import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlogsRequestDTO.interface";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 
 
 
@@ -28,16 +30,14 @@ export class BlogController {
         const blogRepositoryInstance = new OrmBlogRepository(DatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), DatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance());
-        const auditRepositoryInstance = new OrmAuditRepository(
-            DatabaseSingleton.getInstance()
-        );
-        this.getAllBlogService = new ServiceDBLoggerDecorator(
+        const logger = new NestLogger();
+        this.getAllBlogService = new ExceptionLoggerDecorator(
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            auditRepositoryInstance
+            logger
         );
-        this.getBlogByIdService = new ServiceDBLoggerDecorator(
+        this.getBlogByIdService = new ExceptionLoggerDecorator(
             new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            auditRepositoryInstance
+            logger
         );
 
 
