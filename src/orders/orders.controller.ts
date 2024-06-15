@@ -7,7 +7,7 @@ import { PlaceOrderDto } from './dto/placeOrder.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post('place-order')
+  @Post('order-placed')
   placeOrder(@Body() order:PlaceOrderDto){
     return this.ordersService.placeOrder(order);
     
