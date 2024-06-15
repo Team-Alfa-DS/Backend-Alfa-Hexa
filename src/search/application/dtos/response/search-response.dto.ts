@@ -1,7 +1,7 @@
 // import { Blog } from "src/blog/infraestructure/entities/blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { ServiceResponseDto } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/Course";
+import { Course } from "src/course/domain/entities/Course";
 
 export class SearchResponseDto implements ServiceResponseDto{
     constructor(

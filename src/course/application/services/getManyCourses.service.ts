@@ -1,4 +1,4 @@
-import { Course } from "src/course/domain/Course";
+import { Course } from "src/course/domain/entities/Course";
 import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";

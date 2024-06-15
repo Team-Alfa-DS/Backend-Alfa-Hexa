@@ -1,4 +1,4 @@
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 import { Progress } from "../progress";
 import { CalcPercentProgressResponse, LessonProgress } from "../response/calc-percent-progress.response";
 

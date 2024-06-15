@@ -1,4 +1,4 @@
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 import { LessonEntity } from "../entities/lesson.entity";
 
 export class LessonMapper {

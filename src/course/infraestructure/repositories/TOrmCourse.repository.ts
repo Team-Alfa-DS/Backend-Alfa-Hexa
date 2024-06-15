@@ -1,5 +1,5 @@
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
-import { Course } from "src/course/domain/Course";
+import { Course } from "src/course/domain/entities/Course";
 import { DataSource, Repository } from "typeorm";
 import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";

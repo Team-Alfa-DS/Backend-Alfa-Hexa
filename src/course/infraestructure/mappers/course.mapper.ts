@@ -1,7 +1,7 @@
-import { Course } from "src/course/domain/Course";
+import { Course } from "src/course/domain/entities/Course";
 import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {

@@ -5,7 +5,7 @@ import { Result } from "src/common/domain/result-handler/result";
 import { Progress } from "src/progress/domain/progress";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
