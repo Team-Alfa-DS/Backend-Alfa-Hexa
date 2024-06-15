@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { PlaceOrderDto } from './dto/placeOrder.dto';
 
@@ -11,5 +11,10 @@ export class OrdersController {
   placeOrder(@Body() order:PlaceOrderDto){
     return this.ordersService.placeOrder(order);
     
+  }
+
+  @Get()
+  getOrders(){
+    return this.ordersService.getOrders();
   }
 }
