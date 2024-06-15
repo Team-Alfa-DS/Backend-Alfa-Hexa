@@ -74,11 +74,12 @@ getAllNotify(@Request() req){
 countNotReaded(@Request() req){
     return this.notifycountnotreaded.execute();
 }
-/*@Post('create')
-CreateNotify(@Request() req,  @Body() data: createNotificaciondto) {
-    return this.createNotify.execute(data);*/
-//}
-
+/*
+@Post('place-notify')
+CreateNotify(@Request() req,  @Body() notify: createNotificaciondto) {
+    return this.createNotify.execute(notify);
+}
+*/
 
 @UseGuards(JwtAuthGuard)
 @Post('savetoken')

@@ -1,4 +1,5 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -18,9 +19,25 @@ import { SearchController } from './search/infraestructure/controller/search.con
 import { CommentController } from './comment/infraestructure/controller/comment.controller';
 import { BlogController } from './blog/infraestructure/controllers/blog.controller';
 import { notifycontroller } from './notify/notify/Infraestructure/controller/notify.controller';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), 
+  imports: [
+    ClientsModule.register([
+      {
+        name: 'ORDERS_SERVICE',
+        transport: Transport.RMQ,
+        options:
+        {
+          urls:['amqp://localhost:5672'],
+          queue:'orders-queue'
+        }
+      }
+    ]),
+    
+    
+    ConfigModule.forRoot(), 
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -48,6 +65,7 @@ import { notifycontroller } from './notify/notify/Infraestructure/controller/not
         apiSecret: configService.getOrThrow('MAILJET_API_SECRET'),
       })
     }),
+    OrdersModule,
   ],
   controllers: [
     UserController,
