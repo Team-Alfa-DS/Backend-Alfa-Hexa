@@ -138,12 +138,11 @@ export class CommentController{
             targetId: addCommentEntryDto.target,
             body: addCommentEntryDto.body,
             userId: req.user.tokenUser.id
-        } 
-
+        }
 
         if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
 
-        if(addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
+        if (addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
         
     }
 
