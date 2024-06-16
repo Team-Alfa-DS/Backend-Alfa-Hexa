@@ -1,5 +1,6 @@
-import { Controller, Get, Inject, Param, UseGuards, Query, HttpException } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe } from "@nestjs/common";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
@@ -11,9 +12,13 @@ import { IService } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/entities/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
+import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { CourseEntity } from "../entities/course.entity";
 
 @ApiTags('Course')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @Controller('course')
 export class CourseController {
@@ -22,17 +27,28 @@ export class CourseController {
 
   constructor() {
     const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-    this.getManyCoursesService = new ExceptionLoggerDecorator(
-      new ServiceLoggerDecorator(
-        new GetManyCoursesService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
+    const logger = new NestLogger();
+
+    this.getManyCoursesService = new ExceptionLoggerDecorator( 
+      new GetManyCoursesService(repositoryInstance), 
+      logger
+    );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new ServiceLoggerDecorator(
-        new GetCourseByIdService(repositoryInstance), new FsPromiseLogger("serviceUse.log")));
+      new GetCourseByIdService(repositoryInstance), 
+      logger
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('one/:id')
-  async getCourseById(@Param('id') courseId: string) {
+  @ApiCreatedResponse({
+    description: 'se encontro el curso correctamente',
+    type: CourseEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se encontro el curso. Intente con otra Id'
+  })
+  async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
     const result = await this.getCourseByIdService.execute(request);
     
@@ -46,6 +62,16 @@ export class CourseController {
 
   @UseGuards(JwtAuthGuard)
   @Get("many")
+  @ApiQuery({name: 'filter', required:false})
+  @ApiQuery({name: 'category', required:false})
+  @ApiQuery({name: 'trainer', required:false})
+  @ApiCreatedResponse({
+    description: 'se retorno la totalidad de cursos',
+    type: CourseEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se encontraron cursos.'
+  })
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
   async getAllCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {

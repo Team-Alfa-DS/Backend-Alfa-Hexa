@@ -19,6 +19,11 @@ Crear el archivo ".env" usando las variables de ".env.template" y llenar las var
 - OAUTH_REFRESH_TOKEN
 - EMAIL_USERNAME
 - EMAIL_PASSWORD
+- MAILJET_API_KEY
+- MAILJET_API_SECRET
+- FIREBASE_PROJECT_ID
+- FIREBASE_PRIVATE_KEY
+- FIREBASE_CLIENT_EMAIL
 
 ## Installation
 
@@ -42,10 +47,10 @@ $ npm run start:prod
 ## Documentation
 ```bash
 #local
-localhost:<PORT>/doc
+localhost:<PORT>/documentation
 
 #production
-...
+https://backend-alfa-hexa-production.up.railway.app/documentation
 ```
 
 ## Test

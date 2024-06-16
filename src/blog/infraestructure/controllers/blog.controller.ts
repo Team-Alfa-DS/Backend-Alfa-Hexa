@@ -1,5 +1,5 @@
-import { Controller, Get, Param } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Controller, Get, Param, ParseUUIDPipe, UseGuards } from "@nestjs/common";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetAllBlogService } from "src/blog/application/getAllBlog.service";
 import { GetBlogByIdService } from "src/blog/application/getBlogById.service";
 import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
@@ -15,9 +15,14 @@ import { IService } from "src/common/application/interfaces/IService";
 import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlogsRequestDTO.interface";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
+import { BlogEntity } from "../entities/blog.entity";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 
-
-
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
+@UseGuards(JwtAuthGuard)
 @ApiTags('Blog') 
 @Controller('blog')
 export class BlogController {
@@ -28,23 +33,28 @@ export class BlogController {
         const blogRepositoryInstance = new OrmBlogRepository(DatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), DatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance());
-        const auditRepositoryInstance = new OrmAuditRepository(
-            DatabaseSingleton.getInstance()
-        );
-        this.getAllBlogService = new ServiceDBLoggerDecorator(
+        const logger = new NestLogger();
+        this.getAllBlogService = new ExceptionLoggerDecorator(
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            auditRepositoryInstance
+            logger
         );
-        this.getBlogByIdService = new ServiceDBLoggerDecorator(
+        this.getBlogByIdService = new ExceptionLoggerDecorator(
             new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            auditRepositoryInstance
+            logger
         );
 
 
     }
 
     @Get('one/:id')
-    async getBlogById(@Param('id') blogId: string) {
+    @ApiCreatedResponse({
+        description: 'se encontro un blog con esa id',
+        type: BlogEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se encontro un blog con esa id. Intente de nuevo'
+    })
+    async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
         if (result.Value)
             return result.Value
@@ -52,6 +62,13 @@ export class BlogController {
     }
 
     @Get('many')
+    @ApiCreatedResponse({
+        description: 'se retorno todos los blog',
+        type: BlogEntity,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se encontraron blogs. Agregue algunos'
+    })
     async  getAllBlogs() {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(new GetAllBlogsRequestDTO());
         if (result.Value)

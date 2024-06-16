@@ -24,7 +24,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (perpage) { 
       if (!page) {page = 0};
 
-      result = result.slice(page, ((perpage) + page));
+      result = result.slice((page*perpage), ((perpage) + page*perpage));
     }
 
     let courses = CourseMapper.arrayToDomain(result);
@@ -94,7 +94,14 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
   }
 
   async getCourseByLessonId(lessonId: string): Promise<Result<Course>> {
-    const result = await this.find();
+    const result = await this.find({
+      relations: {
+        category: true,
+        lessons: true,
+        trainer: true,
+        tags: true
+      }
+    });
 
     for (let course of result) {
       for (let lesson of course.lessons) {
@@ -119,7 +126,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (perpage) { 
       if (!page) {page = 0};
 
-      result = result.slice(page, ((perpage) + page));
+      result = result.slice((page*perpage), ((perpage) + page*perpage));
     }
 
     if (result.length >= 0) {

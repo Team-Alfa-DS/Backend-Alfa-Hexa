@@ -33,14 +33,16 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
 
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
-        if (course.Value.lessons.findIndex(lesson => lesson.id == value.lessonId) == -1) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion')
+
+        const lesson = course.Value.lessons.find(lesson => lesson.id == value.lessonId) 
+        if (!lesson) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion');
 
         await this.progressRepository.saveProgress(
             Progress.create(
                 value.userId, 
                 value.lessonId, 
                 value.markAsCompleted, 
-                value.time,
+                value.time > lesson.seconds ? lesson.seconds : value.time,
                 new Date()
             ),
             this.transactionHandler

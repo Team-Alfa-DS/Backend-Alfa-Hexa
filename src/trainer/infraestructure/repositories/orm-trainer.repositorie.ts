@@ -8,6 +8,7 @@ import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-use
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
+import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainer>
@@ -46,10 +47,7 @@ export class OrmTrainerRepository
     return oneTrainer;
   }
 
-  async followTrainer(data: {
-    idTrainer: string;
-    idUser: string;
-  }): Promise<Result<Trainer>> {
+  async followTrainer(data: FollowTrainerDto): Promise<Result<Trainer>> {
     try {
       const trainer = await this.findTrainerById(data.idTrainer);
       if (!trainer.isSuccess) {
