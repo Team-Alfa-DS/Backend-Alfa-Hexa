@@ -20,8 +20,8 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
         return this.constructor.name;
     }
 
-    async execute({Id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
-        const domainBlogResult = await this.blogRepository.getBlogById(Id);
+    async execute({id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
+        const domainBlogResult = await this.blogRepository.getBlogById(id);
         if (domainBlogResult.Error)
             return Result.fail(domainBlogResult.Error, domainBlogResult.StatusCode, domainBlogResult.Message);
         const domainBlog = domainBlogResult.Value;
@@ -32,7 +32,7 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
             domainBlog.content.value,
             categoryResult.Value ? categoryResult.Value.name : null,    
             domainBlog.images.map(image => image.value),
-            trainerResult.Value ? {Id: trainerResult.Value.Id, Name: trainerResult.Value.Name} : {Id: null, Name: null},
+            trainerResult.Value ? {id: trainerResult.Value.Id, name: trainerResult.Value.Name} : {id: null, name: null},
             domainBlog.tags.map(tag => tag.value),
             domainBlog.publication_date.value
         )
