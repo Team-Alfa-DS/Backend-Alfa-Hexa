@@ -1,5 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
-import { InvalidCommentIdException } from "../exceptions/invalid-comment-id-exception";
+import { InvalidCommentIdException } from "../exceptions/empty-id-exception";
 
 export class CommentId extends ValueObject<CommentId> {
     private readonly id: string;
@@ -16,7 +16,7 @@ export class CommentId extends ValueObject<CommentId> {
         this.id = Object.freeze(id); //*Esto funciona para que no pueda ser modificado el id
     }
 
-    get Id(): string {
+    get commentId(): string {
         return this.id;
     }
     

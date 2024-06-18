@@ -9,7 +9,6 @@ export class CommentBody extends ValueObject<CommentBody> {
         super();
         
         if ( !body ) throw new InvalidBodyException( "El cuerpo del comentario no existe" );
-        if ( body.length === 0 ) throw new InvalidBodyException( "El cuerpo del comentario esta vacio" );
         
         this.body = Object.freeze(body); //*Esto funciona para que no pueda ser modificado 
     }
