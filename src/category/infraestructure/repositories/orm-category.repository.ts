@@ -7,6 +7,7 @@ import { Category } from "src/category/domain/Category";
 import { IMapper } from "src/category/application/mapper/mapper.interface";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { Result } from "src/common/domain/result-handler/result";
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 //import { InjectRepository } from "@nestjs/typeorm";
 
 export class OrmCategoryRepository extends Repository<CategoryEntity> implements ICategoryRepository {
@@ -39,9 +40,9 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
         }
       }
 
-      async getCategoryById(idCategory: string): Promise<Result<Category>> {
+      async getCategoryById(idCategory: CategoryId): Promise<Result<Category>> {
         try {
-          const result = await this.findOne({where: {id: idCategory}
+          const result = await this.findOne({where: {id: idCategory.value}
           });
           return Result.success<Category>(result, 200);
         } catch (error) {

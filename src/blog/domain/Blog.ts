@@ -1,3 +1,10 @@
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { BlogContent } from "./valueObjects/blogContent";
+import { BlogId } from "./valueObjects/blogId";
+import { BlogPublicationDate } from "./valueObjects/blogPublicationDate";
+import { BlogTitle } from "./valueObjects/blogTitle";
+import { BlogTag } from "./valueObjects/blogTag";
+import { BlogImage } from "./valueObjects/blogImage";
 
 interface Tag{
     id: string;
@@ -12,15 +19,15 @@ interface Image{
 
 export class Blog {
 constructor(
-    public id: string,
-    public title: string,
-    public content: string,
-    public publication_date: Date,
+    public id: BlogId,
+    public title: BlogTitle,
+    public content: BlogContent,
+    public publication_date: BlogPublicationDate,
     public comments: string[],              
-    public category: string,
+    public category: CategoryId,
     public trainer: string, 
-    public tags: Tag[],
-    public images: Image[],
+    public tags: BlogTag[],
+    public images: BlogImage[],
 ){}
     
 }

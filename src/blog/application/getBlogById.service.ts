@@ -28,13 +28,13 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
         const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.trainer);
         const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.category)
         const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
-            domainBlog.title,
-            domainBlog.content,
+            domainBlog.title.value,
+            domainBlog.content.value,
             categoryResult.Value ? categoryResult.Value.name : null,    
-            domainBlog.images.map(image => image.url),
+            domainBlog.images.map(image => image.value),
             trainerResult.Value ? {Id: trainerResult.Value.Id, Name: trainerResult.Value.Name} : {Id: null, Name: null},
-            domainBlog.tags.map(tag => tag.name),
-            domainBlog.publication_date
+            domainBlog.tags.map(tag => tag.value),
+            domainBlog.publication_date.value
         )
         return Result.success(blogResponse, 200);
         

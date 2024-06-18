@@ -1,7 +1,7 @@
 import { ValueObject } from "src/common/domain/value-object";
 
 
-export class Category extends ValueObject<Category> {
+export class CategoryId extends ValueObject<CategoryId> {
     private constructor(public value: string) {
         super();
         if (!this.isValid(value)) {
@@ -11,12 +11,12 @@ export class Category extends ValueObject<Category> {
         this.value = value;
     }
 
-    equals(categoryId: Category): boolean {
+    equals(categoryId: CategoryId): boolean {
         return this.value === categoryId.value;
     }
 
-    public static create(categoryId: string): Category {
-        return new Category(categoryId);
+    public static create(categoryId: string): CategoryId {
+        return new CategoryId(categoryId);
     }
 
     private isValid(value: string): boolean {

@@ -33,10 +33,10 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
             const trainerResult = await this.trainerRepository.findTrainerById(blog.trainer);
             const categoryResult = await this.categoryRepository.getCategoryById(blog.category)
             return {
-                Id: blog.id,
-                Name: blog.title,
-                Image: blog.images[0].url,
-                Date: blog.publication_date,
+                Id: blog.id.value,
+                Name: blog.title.value,
+                Image: blog.images[0].value,
+                Date: blog.publication_date.value,
                 Category: categoryResult.Value ? categoryResult.Value.name : null,
                 Trainer: trainerResult.Value ? trainerResult.Value.Name : null
             }
