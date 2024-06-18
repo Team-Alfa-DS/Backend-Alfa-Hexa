@@ -6,6 +6,7 @@ import { IJwtGen } from "../jwt-gen/jwt-gen.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { LoginUserRequest } from "../dtos/request/login-user.request";
 import { LoginUserResponse } from "../dtos/response/login-user.response";
+import { IUserApplicationRepository } from "src/user/application/repository/application-user.repository";
 
 export class LoginUserService extends IService<LoginUserRequest, LoginUserResponse> {
 
@@ -13,13 +14,15 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
     private readonly jwtGen: IJwtGen<string>;
+    private readonly userAppRepository: IUserApplicationRepository;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, jwtGen: IJwtGen<string>) {
+    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, jwtGen: IJwtGen<string>, userAppRepository: IUserApplicationRepository) {
         super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
         this.jwtGen = jwtGen;
+        this.userAppRepository = userAppRepository;
     }
 
     async execute(userLogin: LoginUserRequest): Promise<Result<LoginUserResponse>> {
@@ -28,13 +31,24 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
         if (!userFound.isSuccess) {
             return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
         }
-        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password);
+
+        const userPassword = await this.userAppRepository.getUserPasswordById(userFound.Value.Id);
+        if (!userPassword.isSuccess) {
+            return Result.fail(userPassword.Error, userPassword.StatusCode, userPassword.Message);
+        }
+
+        const isMatch = await this.encryptor.comparePassword(userLogin.password, userPassword.Value);
 
         if (!isMatch) {
             return Result.fail(new Error('La contraseña es incorrecta'), 400, 'La contraseña es incorrecta')
         }
 
-        const response = new LoginUserResponse({id: userFound.Value.Id, email: userFound.Value.Email, name: userFound.Value.Name, phone: userFound.Value.Phone}, await this.jwtGen.genJwt(userFound.Value.Id), userFound.Value.Type);
+        const userType = await this.userAppRepository.getUserTypeById(userFound.Value.Id);
+        if (!userType.isSuccess) {
+            return Result.fail(userType.Error, userType.StatusCode, userType.Message);
+        }
+
+        const response = new LoginUserResponse({id: userFound.Value.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, await this.jwtGen.genJwt(userFound.Value.Id), userType.Value);
 
         return Result.success(response, 200);
     }

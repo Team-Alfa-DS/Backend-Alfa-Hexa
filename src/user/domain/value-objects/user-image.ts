@@ -7,10 +7,8 @@ export class UserImage extends ValueObject<UserImage> {
     private constructor(image: string) {
         super();
         let valid: boolean = true;
-        
-        if (!image) valid = false;
 
-        if (!valid) throw new InvalidUserImageException(`No existe la imagen`);
+        if (!valid) throw new InvalidUserImageException(`La imagen no es valida`);
 
         this.image = image;
     }
