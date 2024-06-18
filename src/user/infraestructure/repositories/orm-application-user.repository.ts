@@ -17,7 +17,7 @@ export class OrmUserApplicationRepository extends Repository<UserEntity> impleme
             return Result.success(user.type, 200)
         }
         catch (err) {
-            return Result.fail(new Error(err.message), err.code, err.message)
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
 
@@ -27,7 +27,7 @@ export class OrmUserApplicationRepository extends Repository<UserEntity> impleme
             return Result.success(user.password, 200)
         }
         catch (err) {
-            return Result.fail(new Error(err.message), err.code, err.message)
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
 
@@ -39,7 +39,7 @@ export class OrmUserApplicationRepository extends Repository<UserEntity> impleme
             return Result.success(ormUser, 200);
 
         } catch (err) {
-            return Result.fail(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
 
