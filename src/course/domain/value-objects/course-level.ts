@@ -1,4 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object"
+import { NullCourseLevelException } from "../exceptions/nullCourseLevel";
 
 export class CourseLevel extends ValueObject<CourseLevel> {
   private readonly level: string;
@@ -6,7 +7,7 @@ export class CourseLevel extends ValueObject<CourseLevel> {
   constructor(value: string) {
     super()
 
-    if(!value) {/* throw DomainException NullLevelException */}
+    if(!value) { throw new NullCourseLevelException('No se proporcionó un nivel para el curso') /* throw DomainException NullLevelException */}
 
     this.level = value
   }

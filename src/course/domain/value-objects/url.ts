@@ -1,4 +1,7 @@
+import { throws } from "assert";
 import { ValueObject } from "src/common/domain/value-object";
+import { NullUrlException } from "../exceptions/nullUrl";
+import { InvalidUrlException } from "../exceptions/invalidUrl";
 
 export class Url extends ValueObject<Url> {
   private readonly url: string;
@@ -6,9 +9,9 @@ export class Url extends ValueObject<Url> {
   constructor(value: string) {
     super();
 
-    if (!value) { /* throw DomainException NullUrlException */};
+    if (!value) { throw new NullUrlException('No se proporcionó un Url') /* throw DomainException NullUrlException */};
 
-    if (!value.includes('.')) { /* throw DomainException InvalidUrlException */}
+    if (!value.includes('.')) { throw new InvalidUrlException(`No se proporcionó un Url válido: ${value}`)/* throw DomainException InvalidUrlException */}
 
     this.url = value;
   }

@@ -1,4 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { NullLessonTitleException } from "../exceptions/nullLessonTitle";
 
 export class LessonTitle extends ValueObject<LessonTitle> {
   private readonly title: string;
@@ -6,7 +7,7 @@ export class LessonTitle extends ValueObject<LessonTitle> {
   constructor(value: string) {
     super();
 
-    if (!value) {/* throw DomainException */}
+    if (!value) { throw new NullLessonTitleException('No se proporcionó un título para la lección') /* throw DomainException */}
   
     this.title = value;
   }

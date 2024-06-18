@@ -1,4 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { NullCourseDescriptionException } from "../exceptions/nullCourseDescription";
 
 export class CourseDescription extends ValueObject<CourseDescription> {
   private readonly description: string;
@@ -6,7 +7,7 @@ export class CourseDescription extends ValueObject<CourseDescription> {
   constructor(value: string) {
     super();
 
-    if (!value) {/* throw DomainException NullCourseDescription*/}
+    if (!value) { throw new NullCourseDescriptionException('No se proporcionó una descripción para el curso') /* throw DomainException NullCourseDescription*/}
 
     this.description = value;
   }

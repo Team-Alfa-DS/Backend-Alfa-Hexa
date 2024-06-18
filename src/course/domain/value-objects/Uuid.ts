@@ -3,10 +3,10 @@ import { ValueObject } from "src/common/domain/value-object";
 export class Uuid extends ValueObject<Uuid> {
   private readonly id: string;
 
-   private constructor(value: string) {
+  constructor(value: string) {
     super();
 
-    if (!value) {/* throw DomainException NullUuidException */}
+    if (!value) {/* throw DomainException NullUuidException */} //TODO: si vamos a usar esto faltan las excepciones de dominio
 
     if (!this.checkUuidValidity(value)) {/* throw DomainException InvalidUuidException*/}
 
