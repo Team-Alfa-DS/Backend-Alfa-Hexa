@@ -10,18 +10,68 @@ import { Url } from "../value-objects/url";
 export class Course {
   
   constructor(
-    private readonly id: Uuid,
-    private readonly title: CourseTitle,
-    private readonly description: CourseDescription,
-    private readonly image: Url,
-    private readonly date: Date,
-    private readonly durationMinutes: CourseDurationMinutes,
-    private readonly durationWeeks: CourseDurationWeeks,
-    private readonly level: CourseLevel,
-    private readonly lessons: Lesson[],
-    private readonly tags: string[],
-    private readonly category: string,
-    private readonly trainer: {id: string, name: string}
+    private id: Uuid,
+    private title: CourseTitle,
+    private description: CourseDescription,
+    private image: Url,
+    private date: Date,
+    private durationMinutes: CourseDurationMinutes,
+    private durationWeeks: CourseDurationWeeks,
+    private level: CourseLevel,
+    private lessons: Lesson[],
+    private tags: string[], //entity?
+    private category: string, //entity?
+    private trainer: {id: string, name: string} //entity?
   ) {}  
-              
+  
+  
+  get Id(): Uuid {
+    return new Uuid(this.id.value);
+  }
+
+  get Title(): CourseTitle {
+    return new CourseTitle(this.title.value)
+  }
+
+  get Description(): CourseDescription {
+    return new CourseDescription(this.description.value)
+  }
+
+  get Image(): Url {
+    return new Url(this.image.url)
+  }
+
+  get Date(): Date {
+    return new Date(this.date)
+  }
+
+  get DurationMinutes(): CourseDurationMinutes {
+    return new CourseDurationMinutes(this.durationMinutes.value)
+  }
+
+  get DurationWeeks(): CourseDurationWeeks {
+    return new CourseDurationWeeks(this.durationWeeks.value)
+  }
+
+  get Level(): CourseLevel {
+    return new CourseLevel(this.level.value)
+  }
+
+  get Lessons(): Lesson[] {
+    return this.lessons;
+  }
+
+  get Tags(): string[] {
+    return this.tags;
+  } 
+
+  get Category(): string {
+    return this.category;
+  }
+
+  get Trainer(): {id: string, name: string} {
+    const id = this.trainer.id;
+    const name = this.trainer.name;
+    return {id, name};
+  }
 }

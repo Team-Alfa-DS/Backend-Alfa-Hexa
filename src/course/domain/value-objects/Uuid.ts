@@ -1,20 +1,22 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { NullUuidException } from "../exceptions/nullUuid";
+import { InvalidUuidException } from "../exceptions/invalidUuid";
 
 export class Uuid extends ValueObject<Uuid> {
-  private readonly id: string;
+  readonly value: string;
 
   constructor(value: string) {
     super();
 
-    if (!value) {/* throw DomainException NullUuidException */} //TODO: si vamos a usar esto faltan las excepciones de dominio
+    if (!value) { throw new NullUuidException('No se proporcionó un Uuid') /* throw DomainException NullUuidException */} //TODO: si vamos a usar esto faltan las excepciones de dominio
 
-    if (!this.checkUuidValidity(value)) {/* throw DomainException InvalidUuidException*/}
+    if (!this.checkUuidValidity(value)) { throw new InvalidUuidException(`No se proporcionó un Uuid válido: ${value}`) /* throw DomainException InvalidUuidException*/}
 
-    this.id = value;
+    this.value = value;
   }
 
   equals(object: Uuid): boolean {
-    return this.id === object.id;
+    return this.value === object.value;
   }
 
   private checkUuidValidity(uuid: string): boolean {

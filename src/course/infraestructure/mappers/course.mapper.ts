@@ -1,7 +1,14 @@
-import { Course } from "src/course/domain/entities/Course";
+import { Course } from "src/course/domain/aggregates/Course";
 import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
+import { Uuid } from "src/course/domain/value-objects/Uuid";
+import { CourseTitle } from "src/course/domain/value-objects/course-title";
+import { CourseDescription } from "src/course/domain/value-objects/course-description";
+import { Url } from "src/course/domain/value-objects/url";
+import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
+import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
+import { CourseLevel } from "src/course/domain/value-objects/course-level";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {
@@ -15,14 +22,14 @@ export class CourseMapper {
       domainTags.push(tag.name);
     }
     const course = new Course(
-      entity.id,
-      entity.name,
-      entity.description,
-      entity.image,
+      new Uuid(entity.id),
+      new CourseTitle(entity.name),
+      new CourseDescription(entity.description),
+      new Url(entity.image),
       entity.publication_date,
-      entity.minutes,
-      entity.weeks,
-      entity.level,
+      new CourseDurationMinutes(entity.minutes),
+      new CourseDurationWeeks(entity.weeks),
+      new CourseLevel(entity.level),
       domainLessons,
       domainTags,
       entity.category.name,

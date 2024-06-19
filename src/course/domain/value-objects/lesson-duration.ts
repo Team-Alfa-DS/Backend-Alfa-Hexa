@@ -3,20 +3,20 @@ import { NullLessonSecondsException } from "../exceptions/nullLessonSeconds";
 import { NegativeLessonSecondsException } from "../exceptions/negativeLessonSeconds";
 
 export class LessonDuration extends ValueObject<LessonDuration> {
-  private readonly seconds: number;
+  readonly value: number;
 
-  private constructor(value: number) {
+  constructor(value: number) {
     super();
 
     if (!value) { throw new NullLessonSecondsException('No se proporcionó duración para la lección') /* throw DomainException NullLessonDurationException */}
 
     if (value <= 0) { throw new NegativeLessonSecondsException(`La lección no puede tener duración negativa: ${value}`) /* throw DomainException NegativeLessonDurationException */}
 
-    this.seconds = value;
+    this.value = value;
   }
 
   equals(obj: LessonDuration): boolean {
-    return this.seconds === obj.seconds;
+    return this.value === obj.value;
   }
   
 }

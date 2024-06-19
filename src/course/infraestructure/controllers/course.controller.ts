@@ -9,7 +9,7 @@ import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ServiceLoggerDecorator } from "src/common/application/aspects/serviceLoggerDecorator";
 import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLogger";
 import { IService } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/entities/Course";
+import { Course } from "src/course/domain/aggregates/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";

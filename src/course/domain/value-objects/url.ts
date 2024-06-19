@@ -4,7 +4,7 @@ import { NullUrlException } from "../exceptions/nullUrl";
 import { InvalidUrlException } from "../exceptions/invalidUrl";
 
 export class Url extends ValueObject<Url> {
-  private readonly url: string;
+  readonly url: string;
 
   constructor(value: string) {
     super();

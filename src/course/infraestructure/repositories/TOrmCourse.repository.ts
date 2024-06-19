@@ -1,5 +1,5 @@
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
-import { Course } from "src/course/domain/entities/Course";
+import { Course } from "src/course/domain/aggregates/Course";
 import { DataSource, Repository } from "typeorm";
 import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
@@ -32,13 +32,13 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (filter) {
       for (let tag of filter) {
         if (tag) {
-          courses = courses.filter((course) => course.tags.includes(tag));
+          courses = courses.filter((course) => course.Tags.includes(tag));
         } 
       }
       // courses = courses.filter((course) => course.tags.includes(filter))
     }
-    if (category) {courses = courses.filter((course) => course.category === category)} //Aplicar los filtros que correspondan
-    if (trainer) {courses = courses.filter((course) => course.trainer.name === trainer)}
+    if (category) {courses = courses.filter((course) => course.Category === category)} //Aplicar los filtros que correspondan
+    if (trainer) {courses = courses.filter((course) => course.Trainer.name === trainer)}
 
     if (courses.length > 0) {
 
@@ -83,7 +83,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     });
 
     let courses = CourseMapper.arrayToDomain(result);
-    courses = courses.filter((course) => course.tags.includes(tag));
+    courses = courses.filter((course) => course.Tags.includes(tag));
 
     if (courses.length > 0) {
 
