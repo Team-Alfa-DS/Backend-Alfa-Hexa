@@ -1,6 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 
-export class CommentUserId extends ValueObject<CommentUserId> {
+export class CommentBlogUserId extends ValueObject<CommentBlogUserId> {
     private readonly userId: string;
     
     private constructor(userId: string) {
@@ -12,11 +12,11 @@ export class CommentUserId extends ValueObject<CommentUserId> {
         return this.userId;
     }
     
-    equals(obj: CommentUserId): boolean {
+    equals(obj: CommentBlogUserId): boolean {
         return this.userId === obj.userId;
     }
 
-    public static create(userId: string): CommentUserId {
-        return new CommentUserId(userId);
+    public static create(userId: string): CommentBlogUserId {
+        return new CommentBlogUserId(userId);
     }
 }

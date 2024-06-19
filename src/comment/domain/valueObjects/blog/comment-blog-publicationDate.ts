@@ -1,7 +1,8 @@
 import { ValueObject } from "src/common/domain/value-object";
-import { InvalidCommentPublicationDateException } from "../exceptions/invalid-commeny-publicationDate-exception";
+import { InvalidCommentBlogPublicationDateException } from "../../exceptions/blog/invalid-blog-comment-publicationDate-exception";
 
-export class CommentpublicationDate extends ValueObject<CommentpublicationDate> {
+
+export class CommentBlogPublicationDate extends ValueObject<CommentBlogPublicationDate> {
     private readonly publicationDate: Date;
     
     
@@ -12,7 +13,7 @@ export class CommentpublicationDate extends ValueObject<CommentpublicationDate> 
         
         if (!publicationDate ) valid = false;
         if (publicationDate > new Date() || publicationDate < new Date()) valid = false;
-        if (!valid) throw new InvalidCommentPublicationDateException(`La fecha ${publicationDate} no es valida`);
+        if (!valid) throw new InvalidCommentBlogPublicationDateException(`La fecha ${publicationDate} no es valida`);
 
         this.publicationDate = Object.freeze(publicationDate); //*Esto funciona para que no pueda ser modificado el id
     }
@@ -21,11 +22,11 @@ export class CommentpublicationDate extends ValueObject<CommentpublicationDate> 
         return this.date;
     }
     
-    equals(obj: CommentpublicationDate): boolean {
+    equals(obj: CommentBlogPublicationDate): boolean {
         return this.publicationDate === obj.date;
     }
 
-    static create(date: Date): CommentpublicationDate {
-        return new CommentpublicationDate(date);
+    static create(date: Date): CommentBlogPublicationDate {
+        return new CommentBlogPublicationDate(date);
     }
 }

@@ -1,4 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { InvalidCommentLessonIdException } from "../../exceptions/lesson/empty-blog-lessonid-exception";
 
 export class CommentLessonId extends ValueObject<CommentLessonId> {
     private readonly lessonId: string;
@@ -6,6 +7,9 @@ export class CommentLessonId extends ValueObject<CommentLessonId> {
     
     private constructor(lessonId: string) {
         super();
+
+        if (!lessonId) throw new InvalidCommentLessonIdException( "El ID de la leccion no puede estar vacio" );
+
         this.lessonId = Object.freeze(lessonId); //*Esto funciona para que no pueda ser modificado
     }
 

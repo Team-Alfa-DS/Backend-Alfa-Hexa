@@ -2,7 +2,7 @@ import { Entity } from "src/common/domain/entity";
 
 
 export class Comment extends Entity<string> {
-    private Date: Date;
+    private publicationDate: Date;
     private body: string;
     private userId: string; //se necesita la entity de user
     private blogId?: string; //se necesita la entity de blog
@@ -14,7 +14,7 @@ export class Comment extends Entity<string> {
     
     protected constructor(
         id: string,
-        Date: Date,
+        publicationDate: Date,
         body: string,
         userId: string,
         blogId?: string,
@@ -25,7 +25,7 @@ export class Comment extends Entity<string> {
         userDisliked?: boolean,
     ){
         super(id),
-        this.Date = Date,
+        this.publicationDate = publicationDate,
         this.body = body
         this.userId = userId;
         this.blogId = blogId;
@@ -39,7 +39,7 @@ export class Comment extends Entity<string> {
 
     static create (
         id: string,
-        Date: Date,
+        publicationDate: Date,
         body: string,
         userId: string,
         blogId?: string,
@@ -51,7 +51,7 @@ export class Comment extends Entity<string> {
     ){
         return new Comment(
             id,
-            Date,
+            publicationDate,
             body,
             userId,
             blogId,
@@ -63,8 +63,8 @@ export class Comment extends Entity<string> {
         );        
     }
 
-    get DDate(): Date {
-        return this.Date;
+    get PublicationDate(): Date {
+        return this.publicationDate;
     }
 
     get CountLikes(): number | undefined {

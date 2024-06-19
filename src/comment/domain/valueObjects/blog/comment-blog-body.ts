@@ -1,8 +1,9 @@
 import { ValueObject } from "src/common/domain/value-object";
-import { InvalidBodyException } from "../exceptions/invalid-comment-body-exception";
+import { InvalidBodyException } from "../../exceptions/lesson/invalid-comment-lesson-body-exception";
 
 
-export class CommentBody extends ValueObject<CommentBody> {
+
+export class CommentBlogBody extends ValueObject<CommentBlogBody> {
     private readonly body: string;
     
     private constructor(body: string) {
@@ -17,11 +18,11 @@ export class CommentBody extends ValueObject<CommentBody> {
         return this.body;
     }
     
-    equals(obj: CommentBody): boolean {
+    equals(obj: CommentBlogBody): boolean {
         return this.body === obj.body;
     }
 
-    public static create(body: string): CommentBody {
-        return new CommentBody(body);
+    public static create(body: string): CommentBlogBody {
+        return new CommentBlogBody(body);
     }
 }

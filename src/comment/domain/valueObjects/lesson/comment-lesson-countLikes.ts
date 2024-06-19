@@ -1,6 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 
-export class CommentCountLike extends ValueObject<CommentCountLike> {
+export class CommentLessonCountLike extends ValueObject<CommentLessonCountLike> {
     private readonly countLike: number;
     
     
@@ -13,11 +13,11 @@ export class CommentCountLike extends ValueObject<CommentCountLike> {
         return this.countLike;
     }
     
-    equals(obj: CommentCountLike): boolean {
+    equals(obj: CommentLessonCountLike): boolean {
         return this.countLike === obj.countLike;
     }
 
-    public static create(countLike: number): CommentCountLike {
-        return new CommentCountLike(countLike);
+    public static create(countLike: number): CommentLessonCountLike {
+        return new CommentLessonCountLike(countLike);
     }
 }

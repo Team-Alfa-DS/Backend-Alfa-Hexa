@@ -8,7 +8,7 @@ export class OrmCommentMapper implements IMapper<Comment,CommentEntity> {
     async toOrm(DomainEntity: Comment): Promise<CommentEntity> {
         const ormComment = CommentEntity.create(
             DomainEntity.Id,
-            DomainEntity.DDate,
+            DomainEntity.PublicationDate,
             DomainEntity.Body,
             DomainEntity.UserId,
             DomainEntity.BlogId,

@@ -1,4 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { InvalidCommentBlogIdException } from "../../exceptions/blog/empty-blog-blogid-exception";
 
 export class CommentBlogId extends ValueObject<CommentBlogId> {
     private readonly blogId: string;
@@ -6,6 +7,9 @@ export class CommentBlogId extends ValueObject<CommentBlogId> {
     
     private constructor(blogId: string) {
         super();
+        
+        if (!blogId) throw new InvalidCommentBlogIdException( "El ID del blog no puede estar vacio" );
+
         this.blogId = Object.freeze(blogId); //*Esto funciona para que no pueda ser modificado
     }
 
