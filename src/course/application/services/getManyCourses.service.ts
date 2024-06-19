@@ -56,9 +56,29 @@ export class GetManyCoursesRequest implements ServiceRequestDto {
 }
 
 export class GetManyCoursesResponse implements ServiceResponseDto {
-  constructor(readonly courses: Course[]) {}
+  readonly courses: {
+    id: string;
+    title: string;
+    image: string;
+    date: Date;
+    category: string
+    trainer: string;
+  }[] = []
+  
+  constructor(courses: Course[]) {
+    for (let course of courses) {
+      this.courses.push({
+        id: course.Id.value,
+        title: course.Title.value,
+        image: course.Image.url,
+        date: course.Date,
+        category: course.Category,
+        trainer: course.Trainer.name
+      })
+    }
+  }
 
   dataToString(): string {
-    return `GetManyCoursesResponse: ${JSON.stringify(this.courses)}`;
+    return `GetManyCoursesResponse: ${JSON.stringify(this)}`;
   }
 }
