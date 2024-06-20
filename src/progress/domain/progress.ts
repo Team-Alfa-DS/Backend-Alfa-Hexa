@@ -1,30 +1,19 @@
+import { AggregateRoot } from "src/common/domain/aggregate-root";
 import { ProgressLastTime } from "./value-objects/progress-lastTime";
-import { ProgressLessonId } from "./value-objects/progress-lessonId";
 import { ProgressMarkAsCompleted } from "./value-objects/progress-markAsCompleted";
 import { ProgressTime } from "./value-objects/progress-time";
-import { ProgressUserId } from "./value-objects/progress-userId";
+import { ProgressId } from "./value-objects/progress-Id";
 
-export class Progress {
-    private userId: ProgressUserId;
-    private lessonId: ProgressLessonId;
+export class Progress extends AggregateRoot<ProgressId>{
     private markAsCompleted: ProgressMarkAsCompleted;
     private time?: ProgressTime;
     private lastTime?: ProgressLastTime;
 
-    private constructor(userId: ProgressUserId, lessonId: ProgressLessonId, markAsCompleted: ProgressMarkAsCompleted, time: ProgressTime, lastTime: ProgressLastTime) {
-        this.userId = userId;
-        this.lessonId = lessonId;
+    private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, time: ProgressTime, lastTime: ProgressLastTime) {
+        super(id);
         this.markAsCompleted = markAsCompleted;
         this.time = time;
         this.lastTime = lastTime;
-    }
-
-    get UserId(): ProgressUserId {
-        return this.userId;
-    }
-
-    get LessonId(): ProgressLessonId {
-        return this.lessonId;
     }
 
     get MarkAsCompleted(): ProgressMarkAsCompleted {
@@ -39,8 +28,8 @@ export class Progress {
         return this.lastTime;
     }
 
-    static create(userId: ProgressUserId, lessonId: ProgressLessonId, markAsCompleted: ProgressMarkAsCompleted, time?: ProgressTime, lastTime?: ProgressLastTime) {
-        return new Progress(userId, lessonId, markAsCompleted, time, lastTime);
+    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, time?: ProgressTime, lastTime?: ProgressLastTime) {
+        return new Progress(id, markAsCompleted, time, lastTime);
     }
 
     UpdateMarkAsCompleted(markAsCompleted: ProgressMarkAsCompleted): void {

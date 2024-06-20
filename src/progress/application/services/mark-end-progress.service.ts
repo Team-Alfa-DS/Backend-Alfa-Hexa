@@ -10,8 +10,7 @@ import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.reques
 import { ProgressMarkAsCompleted } from "src/progress/domain/value-objects/progress-markAsCompleted";
 import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
-import { ProgressUserId } from "src/progress/domain/value-objects/progress-userId";
-import { ProgressLessonId } from "src/progress/domain/value-objects/progress-lessonId";
+import { ProgressId } from "src/progress/domain/value-objects/progress-Id";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
@@ -44,8 +43,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
 
         await this.progressRepository.saveProgress(
             Progress.create(
-                ProgressUserId.create(value.userId),
-                ProgressLessonId.create(value.lessonId),
+                ProgressId.create(value.userId, value.lessonId),
                 ProgressMarkAsCompleted.create(value.markAsCompleted), 
                 value.time > lesson.seconds ? ProgressTime.create(lesson.seconds) : ProgressTime.create(value.time),
                 ProgressLastTime.create(new Date())
