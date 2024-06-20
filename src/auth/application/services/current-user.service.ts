@@ -25,10 +25,10 @@ export class CurrentUserService extends IService<CurrentUserRequest, CurrentUser
 
         const response = new CurrentUserResponse(
             userFound.Value.Id,
-            userFound.Value.Email.Email,
-            userFound.Value.Name.Name,
-            userFound.Value.Phone.Phone,
-            userFound.Value.Image.Image
+            userFound.Value.Email,
+            userFound.Value.Name,
+            userFound.Value.Phone,
+            userFound.Value.Image
         );
 
         return Result.success(response, 200);

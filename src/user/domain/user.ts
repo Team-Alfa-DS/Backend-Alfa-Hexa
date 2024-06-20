@@ -1,40 +1,48 @@
 import { Entity } from "src/common/domain/entity";
 import { UserRole } from "./enums/role-user.type";
 import { Progress } from "src/progress/domain/progress";
-import { UserEmail } from "./value-objects/user-email";
-import { UserName } from "./value-objects/user-name";
-import { UserPhone } from "./value-objects/user-phone";
-import { UserImage } from "./value-objects/user-image";
 
 export class User extends Entity<string> {
-    private email: UserEmail;
-    private name: UserName;
-    private phone: UserPhone;
-    private image?: UserImage;
+    private email: string;
+    private name: string;
+    private password: string;
+    private phone: string;
+    private type: UserRole;
+    private image?: string;
     // private comments?: string se necesita crear la entity de comentarios
     private progress?: Progress[]
     
-    private constructor (id: string, email: UserEmail, name: UserName, phone: UserPhone, image: UserImage) {
+    private constructor (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
         super(id);
         this.email = email;
         this.name = name;
+        this.password = password;
         this.phone = phone;
+        this.type = type;
         this.image = image;
     }
 
-    get Email(): UserEmail {
+    get Email(): string {
         return this.email;
     }
 
-    get Name(): UserName {
+    get Name(): string {
         return this.name;
     }
 
-    get Phone(): UserPhone {
+    get Password(): string {
+        return this.password;
+    }
+
+    get Phone(): string {
         return this.phone;
     }
 
-    get Image(): UserImage {
+    get Type(): UserRole {
+        return this.type;
+    }
+
+    get Image(): string {
         return this.image;
     }
 
@@ -42,23 +50,31 @@ export class User extends Entity<string> {
         return this.progress;
     }
 
-    static Create(id: string, email: UserEmail, name: UserName, phone: UserPhone, image: UserImage) {
-        return new User(id, email, name, phone, image)
+    static Create(id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
+        return new User(id, email, name, password, phone, type, image)
     }
 
-    UpdateEmail(email: UserEmail): void {
+    UpdateEmail(email: string): void {
         this.email = email;
     }
 
-    UpdateName(name: UserName): void {
+    UpdateName(name: string): void {
         this.name = name;
     }
 
-    UpdatePhone(phone: UserPhone): void {
+    UpdatePassword(password: string): void {
+        this.password = password;
+    }
+
+    UpdatePhone(phone: string): void {
         this.phone = phone;
     }
 
-    UpdateImage(image: UserImage): void {
+    UpdateType(type: UserRole): void {
+        this.type = type;
+    }
+
+    UpdateImage(image: string): void {
         this.image = image;
     }
 }

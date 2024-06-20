@@ -21,7 +21,6 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
-import { OrmUserApplicationRepository } from "../repositories/orm-application-user.repository";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -35,9 +34,6 @@ export class UserController {
         DatabaseSingleton.getInstance()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
-    );
-    private readonly userAppRepository: OrmUserApplicationRepository = new OrmUserApplicationRepository(
         DatabaseSingleton.getInstance()
     );
 
@@ -54,8 +50,7 @@ export class UserController {
                 new UpdateUserService(
                     this.userRepository,
                     this.transactionHandler,
-                    this.encryptor,
-                    this.userAppRepository
+                    this.encryptor
                 ),
                 this.auditRepository
             ),

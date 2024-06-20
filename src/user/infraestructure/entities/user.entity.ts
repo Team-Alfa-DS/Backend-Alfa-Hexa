@@ -52,14 +52,18 @@ export class UserEntity {
     id: string,
     email: string,
     name: string,
+    password: string,
     phone: string,
+    type: UserRole,
     image?: string,
   ) {
     const user = new UserEntity();
     user.id = id;
     user.email = email;
     user.name = name;
+    user.password = password;
     user.phone = phone;
+    user.type = type;
     user.image = image;
     return user;
   }

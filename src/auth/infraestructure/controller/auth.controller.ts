@@ -50,7 +50,6 @@ import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
-import { OrmUserApplicationRepository } from 'src/user/infraestructure/repositories/orm-application-user.repository';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -64,9 +63,6 @@ export class AuthController {
         DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
-    );
-    private readonly userAppRepository: OrmUserApplicationRepository = new OrmUserApplicationRepository(
         DatabaseSingleton.getInstance()
     );
     private readonly idGenerator: IIdGen = new UuidGen();
@@ -89,13 +85,13 @@ export class AuthController {
 
         this.registerUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.userAppRepository),
+                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
                 this.auditRepository
             ),
             this.logger
         );
         this.loginUserService = new ExceptionLoggerDecorator(
-            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen, this.userAppRepository),
+            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
             this.logger
         );
         this.currentUserService = new ExceptionLoggerDecorator(
