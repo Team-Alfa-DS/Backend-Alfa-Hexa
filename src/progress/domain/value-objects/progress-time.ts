@@ -9,6 +9,7 @@ export class ProgressTime extends ValueObject<ProgressTime> {
         let valid: boolean = true;
 
         if (!Number.isInteger(time)) valid = false;
+        if (time < 0) valid = false;
 
         if (!valid) {
             throw new InvalidProgressTimeException(`El time ${time} no es valido`);
