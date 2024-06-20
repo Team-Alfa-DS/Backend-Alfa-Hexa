@@ -32,6 +32,9 @@ import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 import { ProgressEntity } from '../entities/progress.entity';
 import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
+import { ProfileProgressRequest } from 'src/progress/application/dtos/request/profile-progress.request';
+import { ProfileProgressResponse } from 'src/progress/application/dtos/response/profile-progress.response';
+import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
 import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
 
 @UseGuards(JwtAuthGuard)
@@ -70,6 +73,7 @@ export class ProgressController {
     private getOneProgressService: IService<GetOneProgressRequest, GetOneProgressResponse>;
     private trendingProgressService: IService<TrendingProgressRequest, TrendingProgressResponse>;
     private coursesProgressService: IService<CoursesProgressRequest, CoursesProgressResponse>;
+    private profileProgressService: IService<ProfileProgressRequest, ProfileProgressResponse>;
 
     constructor() {
         this.markEndProgressService = new ExceptionLoggerDecorator(
@@ -104,6 +108,15 @@ export class ProgressController {
         );
         this.coursesProgressService = new ExceptionLoggerDecorator(
             new CoursesProgressService(
+                this.progressRepository,
+                this.courseRepository,
+                this.userRepository,
+                this.transactionHandler
+            ),
+            this.logger
+        );
+        this.profileProgressService = new ExceptionLoggerDecorator(
+            new ProfileProgressService(
                 this.progressRepository,
                 this.courseRepository,
                 this.userRepository,
@@ -167,6 +180,15 @@ export class ProgressController {
         const response = await this.coursesProgressService.execute(request);
 
         if (response.isSuccess) return response.Value.courseProgress;
+        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+    }
+
+    @Get('profile')
+    async progressProfile(@Request() req: JwtRequest) {
+        const request = new ProfileProgressRequest(req.user.tokenUser.id);
+        const response = await this.profileProgressService.execute(request);
+
+        if (response.isSuccess) return response.Value;
         HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
     }
 }
