@@ -28,13 +28,13 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
         if (!userFound.isSuccess) {
             return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
         }
-        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password);
+        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password.Password);
 
         if (!isMatch) {
             return Result.fail(new Error('La contraseña es incorrecta'), 400, 'La contraseña es incorrecta')
         }
 
-        const response = new LoginUserResponse({id: userFound.Value.Id, email: userFound.Value.Email, name: userFound.Value.Name, phone: userFound.Value.Phone}, await this.jwtGen.genJwt(userFound.Value.Id), userFound.Value.Type);
+        const response = new LoginUserResponse({id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, await this.jwtGen.genJwt(userFound.Value.Id.Id), userFound.Value.Type);
 
         return Result.success(response, 200);
     }

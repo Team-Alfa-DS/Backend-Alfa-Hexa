@@ -32,6 +32,7 @@ import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 import { ProgressEntity } from '../entities/progress.entity';
 import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
+import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -125,7 +126,7 @@ export class ProgressController {
         const response = await this.markEndProgressService.execute(request);
         
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
     }
 
     @Get('one/:courseId')
@@ -141,7 +142,7 @@ export class ProgressController {
         const response = await this.getOneProgressService.execute(request);
 
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode); 
+        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
     }
     
     @Get('trending')
@@ -157,7 +158,7 @@ export class ProgressController {
         const response = await this.trendingProgressService.execute(request);
 
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
     }
 
     @Get('courses')
@@ -166,6 +167,6 @@ export class ProgressController {
         const response = await this.coursesProgressService.execute(request);
 
         if (response.isSuccess) return response.Value.courseProgress;
-        throw new HttpException(response.Message, response.StatusCode);
+        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
     }
 }

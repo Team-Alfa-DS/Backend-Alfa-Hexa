@@ -5,6 +5,11 @@ import { IEncryptor } from "src/auth/application/encryptor/encryptor.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { UpdateUserRequest } from "../dtos/request/update-user.request";
 import { UpdateUserResponse } from "../dtos/response/update-user.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserName } from "src/user/domain/value-objects/user-name";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { UserPhone } from "src/user/domain/value-objects/user-phone";
+import { UserImage } from "src/user/domain/value-objects/user-image";
 
 export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserResponse> {
 
@@ -30,15 +35,15 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
         if(data.email) {
             const userEmailCheck = await this.userRepository.findUserByEmail(data.email, this.transactionHandler)
             if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'), 400, 'Ya existe un usuario con este email');
-            newUser.UpdateEmail(data.email);
+            newUser.UpdateEmail(UserEmail.create(data.email));
         }
-        if(data.name) newUser.UpdateName(data.name);
+        if(data.name) newUser.UpdateName(UserName.create(data.name));
         if(data.password) {
             const hashPassword = await this.encryptor.hash(data.password); 
-            newUser.UpdatePassword(hashPassword);
+            newUser.UpdatePassword(UserPassword.create(hashPassword));
         }
-        if(data.phone) newUser.UpdatePhone(data.phone);
-        if(data.image) newUser.UpdateImage(data.image);
+        if(data.phone) newUser.UpdatePhone(UserPhone.create(data.phone));
+        if(data.image) newUser.UpdateImage(UserImage.create(data.image));
 
         const updatedUser = await this.userRepository.saveUser(newUser, this.transactionHandler);
 
@@ -46,7 +51,7 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
             return Result.fail(updatedUser.Error, updatedUser.StatusCode, updatedUser.Message)
         }
         // await this.transactionHandler.commitTransaction();
-        const response = new UpdateUserResponse(updatedUser.Value.Id);
+        const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
         
         return Result.success(response, 200);
     }

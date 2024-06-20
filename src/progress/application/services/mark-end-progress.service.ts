@@ -7,6 +7,11 @@ import { Progress } from "src/progress/domain/progress";
 import { IService } from "src/common/application/interfaces/IService";
 import { MarkEndProgressResponse } from "../dtos/response/mark-end-progress.response";
 import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.request.dto";
+import { ProgressMarkAsCompleted } from "src/progress/domain/value-objects/progress-markAsCompleted";
+import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
+import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
+import { ProgressUserId } from "src/progress/domain/value-objects/progress-userId";
+import { ProgressLessonId } from "src/progress/domain/value-objects/progress-lessonId";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
@@ -39,11 +44,11 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
 
         await this.progressRepository.saveProgress(
             Progress.create(
-                value.userId, 
-                value.lessonId, 
-                value.markAsCompleted, 
-                value.time > lesson.seconds ? lesson.seconds : value.time,
-                new Date()
+                ProgressUserId.create(value.userId),
+                ProgressLessonId.create(value.lessonId),
+                ProgressMarkAsCompleted.create(value.markAsCompleted), 
+                value.time > lesson.seconds ? ProgressTime.create(lesson.seconds) : ProgressTime.create(value.time),
+                ProgressLastTime.create(new Date())
             ),
             this.transactionHandler
         );
