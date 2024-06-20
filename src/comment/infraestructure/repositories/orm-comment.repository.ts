@@ -4,8 +4,7 @@ import { ICommentRepository } from "src/comment/domain/repositories/comment-repo
 import { Result } from "src/common/domain/result-handler/result";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { Comment } from "src/comment/domain/Comment";
-
+import { Comment } from "src/comment/domain/comment";
 
 export class OrmCommentRepository extends Repository<CommentEntity> implements ICommentRepository{
     

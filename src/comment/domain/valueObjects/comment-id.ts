@@ -1,7 +1,7 @@
 import { ValueObject } from "src/common/domain/value-object";
-import { InvalidCommentIdLessonException } from "../../exceptions/lesson/empty-lesson-id-exception";
+import { InvalidCommentIdException } from "../exceptions/empty-comment-id-exception";
 
-export class CommentIdLesson extends ValueObject<CommentIdLesson> {
+export class CommentId extends ValueObject<CommentId> {
     private readonly id: string;
     
     
@@ -11,7 +11,7 @@ export class CommentIdLesson extends ValueObject<CommentIdLesson> {
         let valid: boolean = true;
         
         if (!id ) valid = false;
-        if (!valid) throw new InvalidCommentIdLessonException("El id no existe");
+        if (!valid) throw new InvalidCommentIdException("El id del comentario no existe");
         
         this.id = Object.freeze(id); //*Esto funciona para que no pueda ser modificado el id
     }
@@ -20,11 +20,11 @@ export class CommentIdLesson extends ValueObject<CommentIdLesson> {
         return this.id;
     }
     
-    equals(obj: CommentIdLesson): boolean {
+    equals(obj: CommentId): boolean {
         return this.id === obj.id;
     }
 
-    public static create(id: string): CommentIdLesson {
-        return new CommentIdLesson(id);
+    public static create(id: string): CommentId {
+        return new CommentId(id);
     }
 }

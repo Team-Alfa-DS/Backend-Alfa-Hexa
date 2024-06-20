@@ -1,6 +1,6 @@
 import { DomainException } from "src/common/domain/domain-exception";
 
-export class InvalidCommentBlogBodyException extends DomainException {
+export class InvalidCommentBodyException extends DomainException {
     constructor(msg: string) {
         super(msg);
     }

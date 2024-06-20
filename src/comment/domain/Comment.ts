@@ -1,28 +1,38 @@
 import { Entity } from "src/common/domain/entity";
+import { CommentId } from "./valueObjects/comment-id";
+import { CommentBlogId } from "./valueObjects/comment-blogId";
+import { CommentBody } from "./valueObjects/comment-body";
+import { CommentCountLike } from "./valueObjects/comment-countLikes";
+import { CommentPublicationDate } from "./valueObjects/comment-publicationDate";
+import { CommentUserDisliked } from "./valueObjects/comment-userDisliked";
+import { CommentUserId } from "./valueObjects/comment-userId";
+import { CommentUserLiked } from "./valueObjects/comment-userLiked";
+import { CommentLessonId } from "./valueObjects/comment-lessonId";
+import { CommentCountDislike } from "./valueObjects/comment-countDislikes";
 
 
-export class Comment extends Entity<string> {
-    private publicationDate: Date;
-    private body: string;
-    private userId: string; //se necesita la entity de user
-    private blogId?: string; //se necesita la entity de blog
-    private lessonId?: string;
-    private countLikes?: number;
-    private countDislikes?: number;
-    private userLiked?: boolean;
-    private userDisliked?: boolean;
+export class Comment extends Entity<CommentId> {
+    private publicationDate: CommentPublicationDate;
+    private body: CommentBody;
+    private userId: CommentUserId;
+    private blogId?: CommentBlogId;
+    private lessonId?: CommentLessonId; 
+    private countLikes?: CommentCountLike;
+    private countDislikes?: CommentCountDislike;
+    private userLiked?: CommentUserLiked;
+    private userDisliked?: CommentUserDisliked;
     
     protected constructor(
-        id: string,
-        publicationDate: Date,
-        body: string,
-        userId: string,
-        blogId?: string,
-        lessonId?:string,
-        countLikes?: number,
-        countDislikes?: number,
-        userLiked?: boolean,
-        userDisliked?: boolean,
+        id: CommentId,
+        publicationDate: CommentPublicationDate,
+        body: CommentBody,
+        userId: CommentUserId,
+        blogId: CommentBlogId,
+        lessonId: CommentLessonId,
+        countLikes?: CommentCountLike,
+        countDislikes?: CommentCountDislike,
+        userLiked?: CommentUserLiked,
+        userDisliked?: CommentUserDisliked,
     ){
         super(id),
         this.publicationDate = publicationDate,
@@ -36,18 +46,53 @@ export class Comment extends Entity<string> {
         this.userLiked = userLiked;
     }
 
+    get PublicationDate(): CommentPublicationDate {
+        return this.publicationDate;
+    }
+
+    get CountLikes(): CommentCountLike | undefined {
+        return this.countLikes;
+    }
+
+    get CountDislikes(): CommentCountDislike | undefined {
+        return this.countDislikes;
+    }
+
+    get UserLiked(): CommentUserLiked | undefined {
+        return this.userLiked;
+    }
+
+    get UserDisliked(): CommentUserDisliked | undefined {
+        return this.userDisliked;
+    }
+
+    get Body(): CommentBody {
+        return this.body;
+    }
+
+    get UserId(): CommentUserId {
+        return this.userId;
+    }
+
+    get LessonId(): CommentLessonId {
+        return this.lessonId;
+    }
+
+    get BlogId(): CommentBlogId {
+        return this.blogId;
+    }
 
     static create (
-        id: string,
-        publicationDate: Date,
-        body: string,
-        userId: string,
-        blogId?: string,
-        lessonId?:string,
-        countLikes?: number,
-        countDislikes?: number,
-        userLiked?: boolean,
-        userDisliked?: boolean,
+        id: CommentId,
+        publicationDate: CommentPublicationDate,
+        body: CommentBody,
+        userId: CommentUserId,
+        blogId?: CommentBlogId,
+        lessonId?: CommentLessonId,
+        countLikes?: CommentCountLike,
+        countDislikes?: CommentCountDislike,
+        userLiked?: CommentUserLiked,
+        userDisliked?: CommentUserDisliked,
     ){
         return new Comment(
             id,
@@ -63,39 +108,5 @@ export class Comment extends Entity<string> {
         );        
     }
 
-    get PublicationDate(): Date {
-        return this.publicationDate;
-    }
 
-    get CountLikes(): number | undefined {
-        return this.countLikes;
-    }
-
-    get CountDislikes(): number | undefined {
-        return this.countDislikes;
-    }
-
-    get UserLiked(): boolean | undefined {
-        return this.userLiked;
-    }
-
-    get UserDisliked(): boolean | undefined {
-        return this.userDisliked;
-    }
-
-    get Body(): string {
-        return this.body;
-    }
-
-    get UserId(): string {
-        return this.userId;
-    }
-
-    get BlogId(): string {
-        return this.blogId;
-    }
-
-    get LessonId(): string {
-        return this.lessonId;
-    }
 }
