@@ -21,6 +21,7 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
+import { HttpResponseHandler } from "src/common/infraestructure/handlers/http-response.handler";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -78,6 +79,6 @@ export class UserController {
         )
         const result = await this.updateUserService.execute(dataUser);
         if (result.isSuccess) return result.Value;
-        throw new HttpException(result.Message, result.StatusCode);
+        HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
     }
 }
