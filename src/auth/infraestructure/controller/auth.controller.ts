@@ -147,7 +147,7 @@ export class AuthController {
         throw new HttpException(response.Message, response.StatusCode);
     }
 
-    @ApiBearerAuth('token')
+    @ApiBearerAuth()
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
     @UseGuards(JwtAuthGuard)
     @Get('current')

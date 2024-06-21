@@ -68,7 +68,7 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
             return Result.success<User>(user, 200);
 
         } catch (err) {
-            return Result.fail<User>(new Error(err.message), err.code, err.message);
+            return Result.fail<User>(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
 

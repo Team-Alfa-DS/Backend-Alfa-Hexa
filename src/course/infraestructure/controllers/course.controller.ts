@@ -18,7 +18,7 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { CourseEntity } from "../entities/course.entity";
 
 @ApiTags('Course')
-@ApiBearerAuth('token')
+@ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @Controller('course')
 export class CourseController {

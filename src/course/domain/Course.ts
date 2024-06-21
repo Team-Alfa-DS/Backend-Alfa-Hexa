@@ -10,7 +10,7 @@ export class Course {
     readonly date: Date,
     readonly DurationMinutes: number,
     readonly DurationWeeks: number,
-    readonly level: number,
+    readonly level: string,
     readonly lessons: Lesson[],
     readonly tags: string[],
     readonly category: string,

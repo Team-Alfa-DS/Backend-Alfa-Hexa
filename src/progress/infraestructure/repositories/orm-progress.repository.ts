@@ -29,7 +29,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
             }
             return Result.success(progressDomainList, 200);
         } catch (err) {
-            return Result.fail(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
     
@@ -44,7 +44,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
             return Result.success(progressDomain, 200);
         } catch (err) {
-            return Result.fail<Progress>(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
 
@@ -55,7 +55,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
             await runnerTransaction.manager.save(ProgressEntity, ormProgress);
             return Result.success<Progress>(progress, 200)
         } catch(err) {
-            return Result.fail<Progress>(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
     }
     
@@ -72,7 +72,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
 
             return Result.success(progressDomainList, 200)
         } catch(err) {
-            return Result.fail<Progress[]>(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
         }
 
     }
