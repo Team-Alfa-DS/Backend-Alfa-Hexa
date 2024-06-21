@@ -7,6 +7,7 @@ import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { Lesson } from "src/course/domain/Lesson";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
@@ -18,10 +19,10 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         this.ormProgressMapper = ormProgressMapper;
     }
 
-    async findProgressByUser(userId: string, runner: TransactionHandler): Promise<Result<Progress[]>> {
+    async findProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner(); 
         try {
-            const progressUser = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId});
+            const progressUser = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
             let progressDomainList: Progress[] = [];
 
             for (const progress of progressUser) {
@@ -33,12 +34,12 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         }
     }
     
-    async findLastProgressByUser(userId: string, runner: TransactionHandler): Promise<Result<Progress>> {
+    async findLastProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress>> {
         const runnerTransaction = runner.getRunner();
         try {
             const progress = await runnerTransaction.manager
             .createQueryBuilder(ProgressEntity, "progress")
-            .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId})
+            .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId: userId.Id})
             .getOne();
             
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
@@ -59,10 +60,10 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         }
     }
     
-    async findProgressByUserCourse(userId: string, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
+    async findProgressByUserCourse(userId: UserId, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId});
+            const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id == pro.lesson_id) != -1);
             const progressDomainList: Progress[] = [];
             

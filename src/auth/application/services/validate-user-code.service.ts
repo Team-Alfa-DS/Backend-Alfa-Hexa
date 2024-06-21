@@ -4,6 +4,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IService } from "src/common/application/interfaces/IService";
 import { ValidateUserCodeRequest } from "../dtos/request/validate-user-code.request";
 import { ValidateUserCodeResponse } from "../dtos/response/validate-user-code.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
 
 export class ValidateUserCodeService extends IService<ValidateUserCodeRequest, ValidateUserCodeResponse> {
 
@@ -17,7 +18,7 @@ export class ValidateUserCodeService extends IService<ValidateUserCodeRequest, V
     }
 
     async execute(value: ValidateUserCodeRequest): Promise<Result<ValidateUserCodeResponse>> {
-        const user = await this.userRepository.findUserByEmail(value.email, this.transactionHandler);
+        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email), this.transactionHandler);
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }

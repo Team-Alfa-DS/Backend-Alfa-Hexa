@@ -10,6 +10,7 @@ import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserImage } from "src/user/domain/value-objects/user-image";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserResponse> {
 
@@ -26,14 +27,14 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
 
     async execute(data: UpdateUserRequest): Promise<Result<UpdateUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const user = await this.userRepository.findUserById(data.id, this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(data.id), this.transactionHandler);
 
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }
         const newUser = user.Value;
         if(data.email) {
-            const userEmailCheck = await this.userRepository.findUserByEmail(data.email, this.transactionHandler)
+            const userEmailCheck = await this.userRepository.findUserByEmail(UserEmail.create(data.email), this.transactionHandler)
             if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'), 400, 'Ya existe un usuario con este email');
             newUser.UpdateEmail(UserEmail.create(data.email));
         }

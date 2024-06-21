@@ -11,6 +11,7 @@ import { ProgressMarkAsCompleted } from "src/progress/domain/value-objects/progr
 import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
 import { ProgressId } from "src/progress/domain/value-objects/progress-Id";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
@@ -33,7 +34,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
 
     async execute(value: MarkEndProgressRequest): Promise<Result<MarkEndProgressResponse>> {
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
-        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler)
+        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler)
 
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
@@ -44,7 +45,8 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
         await this.progressRepository.saveProgress(
             Progress.create(
                 ProgressId.create(value.userId, value.lessonId),
-                ProgressMarkAsCompleted.create(value.markAsCompleted), 
+                ProgressMarkAsCompleted.create(value.markAsCompleted),
+                UserId.create(value.userId),
                 value.time > lesson.seconds ? ProgressTime.create(lesson.seconds) : ProgressTime.create(value.time),
                 ProgressLastTime.create(new Date())
             ),

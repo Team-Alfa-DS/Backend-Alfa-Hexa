@@ -18,7 +18,7 @@ export class OrmUserMapper implements IMapper<User, UserEntity> {
             domainEntity.Password.Password,
             domainEntity.Phone.Phone,
             domainEntity.Type,
-            domainEntity.Image.Image
+            domainEntity.Image?.Image
         )
         return ormUser;
     }
@@ -31,7 +31,7 @@ export class OrmUserMapper implements IMapper<User, UserEntity> {
             UserPassword.create(ormEntity.password),
             UserPhone.create(ormEntity.phone),
             ormEntity.type,
-            UserImage.create(ormEntity.image)
+            ormEntity.image ? UserImage.create(ormEntity.image) : null
         )
         return domainUser;
     }
