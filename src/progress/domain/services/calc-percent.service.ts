@@ -15,7 +15,9 @@ export class CalcPercentService {
             }
             
             const lesson = lessonsCourse.find(lesson => lesson.id == pro.Id.LessonId);
-            percent = pro.Time.Time / lesson.seconds * 100
+            if (pro.Time) {
+                percent = pro.Time.Time / lesson.seconds * 100
+            }
             lessonList.push({lessonId: pro.Id.LessonId, percent});
         }
 

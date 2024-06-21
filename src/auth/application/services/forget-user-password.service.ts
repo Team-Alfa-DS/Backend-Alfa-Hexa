@@ -5,6 +5,7 @@ import { IMailer } from "src/common/application/mailer/mailer.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { ForgetUserPasswordRequest } from "../dtos/request/forget-user-password.request";
 import { ForgetUserPasswordResponse } from "../dtos/response/forget-user-password.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
 
 export class ForgetUserPasswordService extends IService<ForgetUserPasswordRequest, ForgetUserPasswordResponse> {
 
@@ -20,7 +21,7 @@ export class ForgetUserPasswordService extends IService<ForgetUserPasswordReques
     }
 
     async execute(value: ForgetUserPasswordRequest): Promise<Result<ForgetUserPasswordResponse>> {
-        const user = await this.userRepository.findUserByEmail(value.email, this.transactionHandler);
+        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email), this.transactionHandler);
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }

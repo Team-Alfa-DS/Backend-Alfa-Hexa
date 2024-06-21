@@ -7,6 +7,7 @@ import { Comment } from "src/comment/domain/Comment";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
+import { UserId } from "src/user/domain/value-objects/user-id";
 import { CommentBody } from "src/comment/domain/valueObjects/comment-body";
 import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
 import { CommentPublicationDate } from "src/comment/domain/valueObjects/comment-publicationDate";
@@ -43,7 +44,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
         const commentID = CommentId.create(await this.idGenerator.genId());
 
-        let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
+        let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
         if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
 

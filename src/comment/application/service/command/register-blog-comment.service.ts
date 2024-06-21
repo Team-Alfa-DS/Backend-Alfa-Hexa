@@ -12,6 +12,7 @@ import { CommentPublicationDate } from "src/comment/domain/valueObjects/comment-
 import { CommentBody } from "src/comment/domain/valueObjects/comment-body";
 import { CommentUserId } from "src/comment/domain/valueObjects/comment-userId";
 import { CommentBlogId } from "src/comment/domain/valueObjects/comment-blogId";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -40,7 +41,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
         let commentID = CommentId.create(await this.idGenerator.genId());
 
-        let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
+        let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
         if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
 

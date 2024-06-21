@@ -59,7 +59,7 @@ export class OrmTrainerRepository
       }
 
       const user = await this.userRepository.findUserById(
-        data.idUser,
+        UserId.create(data.idUser),
         this.transactionHandler,
       );
 

@@ -30,7 +30,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
 
     async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const userFound = await this.userRepository.findUserByEmail(newUser.email, this.transactionHandler);
+        const userFound = await this.userRepository.findUserByEmail(UserEmail.create(newUser.email), this.transactionHandler);
 
         if (userFound.isSuccess) {
             return Result.fail(new Error('El usuario ya existe'), 500, 'El usuario ya existe');
