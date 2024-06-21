@@ -27,8 +27,8 @@ export class Comment extends Entity<CommentId> {
         publicationDate: CommentPublicationDate,
         body: CommentBody,
         userId: CommentUserId,
-        blogId: CommentBlogId,
-        lessonId: CommentLessonId,
+        blogId?: CommentBlogId,
+        lessonId?: CommentLessonId,
         countLikes?: CommentCountLike,
         countDislikes?: CommentCountDislike,
         userLiked?: CommentUserLiked,
@@ -74,11 +74,11 @@ export class Comment extends Entity<CommentId> {
         return this.userId;
     }
 
-    get LessonId(): CommentLessonId {
+    get LessonId(): CommentLessonId | undefined {
         return this.lessonId;
     }
 
-    get BlogId(): CommentBlogId {
+    get BlogId(): CommentBlogId | undefined {
         return this.blogId;
     }
 

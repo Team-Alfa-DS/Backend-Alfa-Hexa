@@ -1,17 +1,22 @@
 import { Entity } from '../../common/domain/entity';
+import { TrainerFollower } from './valueObjects/trainer-followers';
+import { TrainerId } from './valueObjects/trainer-id';
+import { TrainerLocation } from './valueObjects/trainer-location';
+import { TrainerName } from './valueObjects/trainer-name';
+import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 
-export class Trainer extends Entity<string> {
-  private name: string;
-  private followers: number;
-  private userFollow: boolean;
-  private location: string;
+export class Trainer extends Entity<TrainerId> {
+  private name: TrainerName;
+  private followers: TrainerFollower;
+  private userFollow: TrainerUserFollow;
+  private location: TrainerLocation;
 
   constructor(
-    id: string,
-    name: string,
-    followers: number,
-    userFollow: boolean,
-    location: string,
+    id: TrainerId,
+    name: TrainerName,
+    followers: TrainerFollower,
+    userFollow: TrainerUserFollow,
+    location: TrainerLocation,
   ) {
     super(id);
     this.name = name;
@@ -21,41 +26,26 @@ export class Trainer extends Entity<string> {
   }
 
   static create(
-    id: string,
-    name: string,
-    followers: number,
-    userFollow: boolean,
-    location: string,
+    id: TrainerId,
+    name: TrainerName,
+    followers: TrainerFollower,
+    userFollow: TrainerUserFollow,
+    location: TrainerLocation,
   ): Trainer {
     return new Trainer(id, name, followers, userFollow, location);
   }
 
-  get Name(): string {
+  get Name(): TrainerName {
     return this.name;
   }
-  get Followers(): number {
+  get Followers(): TrainerFollower {
     return this.followers;
   }
-  get UserFollow(): boolean {
+  get UserFollow(): TrainerUserFollow {
     return this.userFollow;
   }
-  get Location(): string {
+  get Location(): TrainerLocation {
     return this.location;
   }
 
-  updateName(name: string) {
-    this.name = name;
-  }
-
-  updateFollowers(followers: number) {
-    this.followers = followers;
-  }
-
-  updateUserFollow(userFollow: boolean) {
-    this.userFollow = userFollow;
-  }
-
-  updateLocation(location: string) {
-    this.location = location;
-  }
 }

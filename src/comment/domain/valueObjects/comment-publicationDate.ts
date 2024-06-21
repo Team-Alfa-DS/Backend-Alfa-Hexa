@@ -19,12 +19,12 @@ export class CommentPublicationDate extends ValueObject<CommentPublicationDate> 
         this.publicationDate = Object.freeze(publicationDate); //*Esto funciona para que no pueda ser modificado el id
     }
 
-    get date(): Date {
-        return this.date;
+    get PublicationDate(): Date {
+        return this.publicationDate;
     }
     
     equals(obj: CommentPublicationDate): boolean {
-        return this.publicationDate === obj.date;
+        return this.publicationDate === obj.publicationDate;
     }
 
     static create(date: Date): CommentPublicationDate {
