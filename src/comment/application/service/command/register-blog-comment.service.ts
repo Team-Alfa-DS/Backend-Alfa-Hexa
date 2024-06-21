@@ -2,12 +2,16 @@ import { AddCommentToServiceRequestDto, AddCommentToServiceResponseDto } from ".
 import { Result } from "src/common/domain/result-handler/result";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { IService } from "src/common/application/interfaces/IService";
+import { CommentId } from "src/comment/domain/valueObjects/comment-id";
+import { CommentPublicationDate } from "src/comment/domain/valueObjects/comment-publicationDate";
+import { CommentBody } from "src/comment/domain/valueObjects/comment-body";
+import { CommentUserId } from "src/comment/domain/valueObjects/comment-userId";
+import { CommentBlogId } from "src/comment/domain/valueObjects/comment-blogId";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -34,7 +38,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
-        const commentID = await this.idGenerator.genId();
+        let commentID = CommentId.create(await this.idGenerator.genId());
 
         let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
 
@@ -44,12 +48,17 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
 
         if ( !blog.isSuccess ) return Result.fail( blog.Error, blog.StatusCode,blog.Message  );
 
+        let publicationDate = CommentPublicationDate.create( new Date() );
+        let body = CommentBody.create( data.body );
+        let userId = CommentUserId.create( data.userId );
+        let target = CommentBlogId.create( data.targetId );
+
         const comment: Comment = Comment.create(
         commentID,
-        new Date(),
-        data.body,
-        data.userId,
-        data.targetId,
+        publicationDate,
+        body,
+        userId,
+        target,
         null,
         null,
         null,

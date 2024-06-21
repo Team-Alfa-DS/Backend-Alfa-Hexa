@@ -9,9 +9,10 @@ import { CommentUserId } from "./valueObjects/comment-userId";
 import { CommentUserLiked } from "./valueObjects/comment-userLiked";
 import { CommentLessonId } from "./valueObjects/comment-lessonId";
 import { CommentCountDislike } from "./valueObjects/comment-countDislikes";
+import { AggregateRoot } from "src/common/domain/aggregate-root";
 
 
-export class Comment extends Entity<CommentId> {
+export class Comment extends AggregateRoot<CommentId> {
     private publicationDate: CommentPublicationDate;
     private body: CommentBody;
     private userId: CommentUserId;

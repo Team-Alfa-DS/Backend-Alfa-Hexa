@@ -5,6 +5,8 @@ import { Result } from "src/common/domain/result-handler/result";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { Comment } from "src/comment/domain/comment";
+import { CommentBlogId } from "src/comment/domain/valueObjects/comment-blogId";
+import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
 
 export class OrmCommentRepository extends Repository<CommentEntity> implements ICommentRepository{
     
@@ -15,12 +17,18 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         this.ormCommentMapper = ormCommentMapper;
     }
     
-    async findAllCommentsByBlogId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
+    async findAllCommentsByBlogId(id: CommentBlogId, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
-            take: page,
-            skip: perPage,});
+        const commentsFound = await runnerTransaction.manager.createQueryBuilder(CommentEntity, "comment")
+           .where("comment.lesson_id = :id", { id })
+           .take(page)
+           .skip(perPage)
+           .getMany();
+
+        // const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
+        //     take: page,
+        //     skip: perPage,});
 
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
@@ -33,18 +41,24 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         return Result.success<Comment[]>(ListMapper,200);
     }
 
-    async findAllCommentsByLessonId(id: string, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
+    async findAllCommentsByLessonId(id: CommentLessonId, page: number, perPage: number, runner: TransactionHandler): Promise<Result<Comment[]>> {
         const runnerTransaction = runner.getRunner();
-        //const commentsFound = await runnerTransaction.manager.createQueryBuilder(CommentEntity, "comment")
-        //    .where("comment.lesson_id = :id", { id })
-        //    .take(page)
-        //    .skip(perPage)
-        //    .getMany();
-        const commentsFound = await runnerTransaction.manager.find(CommentEntity, { where: { lesson_id: id }, 
-            take: page, 
-            skip: perPage 
-        });
-        if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
+        
+        
+        const commentsFound = await runnerTransaction.manager.createQueryBuilder(CommentEntity, "comment")
+           .where("comment.lesson_id = :id", { id })
+           .take(page)
+           .skip(perPage)
+           .getMany();
+
+
+        // const commentsFound = await runnerTransaction.manager.find(CommentEntity, { where: { lesson_id: id }, 
+        //     take: page, 
+        //     skip: perPage 
+        // });
+
+        if (!commentsFound) return Result.fail<Comment[]>(new Error( 
+            `Ha ocurrido un error al encontrar los coemtarios por id` ), 404, 'Comments not found');
 
         const ListMapper = []
         commentsFound.forEach(async e => {

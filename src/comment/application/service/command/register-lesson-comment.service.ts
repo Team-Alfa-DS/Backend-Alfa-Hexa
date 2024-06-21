@@ -7,6 +7,11 @@ import { Comment } from "src/comment/domain/Comment";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
+import { CommentBody } from "src/comment/domain/valueObjects/comment-body";
+import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
+import { CommentPublicationDate } from "src/comment/domain/valueObjects/comment-publicationDate";
+import { CommentUserId } from "src/comment/domain/valueObjects/comment-userId";
+import { CommentId } from "src/comment/domain/valueObjects/comment-id";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -36,7 +41,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
-        const commentID = await this.idGenerator.genId();
+        const commentID = CommentId.create(await this.idGenerator.genId());
 
         let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
 
@@ -46,17 +51,23 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         if ( !course.isSuccess ) return Result.fail( course.Error, course.StatusCode,course.Message  );
 
+        let publicationDate = CommentPublicationDate.create( new Date() );
+        let body = CommentBody.create( data.body );
+        let userId = CommentUserId.create( data.userId );
+        let target = CommentLessonId.create( data.targetId );
+
         const comment: Comment = Comment.create(
-        commentID,
-        new Date(),
-        data.body,
-        data.userId,
-        null,
-        data.targetId,
-        null,
-        null,
-        null,
-        null,)
+            commentID,
+            publicationDate,
+            body,
+            userId,
+            null,
+            target,
+            null,
+            null,
+            null,
+            null,
+        );
 
         const result = await this.commentRepository.saveComment( comment, this.transactionHandler )
         

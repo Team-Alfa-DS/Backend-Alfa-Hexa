@@ -4,6 +4,7 @@ import { ICommentRepository } from "src/comment/domain/repositories/comment-repo
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Comment } from "src/comment/domain/Comment";
 import { IService } from "src/common/application/interfaces/IService";
+import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
@@ -25,9 +26,12 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
 
         if (!data.pagination.page) data.pagination.page = 0;
-                
+          
+        let lessonId = CommentLessonId.create( data.lessonId );
+
+
         const comments = await this.commentRepository.findAllCommentsByLessonId(
-            data.lessonId, 
+            lessonId, 
             data.pagination.page, 
             data.pagination.perPage, 
             this.transactionHandler
@@ -37,7 +41,15 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
 
         let commentsRes: LessonComment[] = [];
         for (const comment of comments.Value) {
-            commentsRes.push({id: comment.Id, user: comment.UserId, body: comment.Body, countLikes: comment.CountLikes, countDislikes: comment.CountDislikes, userLiked: comment.UserLiked, userDisliked: comment.UserDisliked, date: comment.DDate})
+            commentsRes.push({
+                id: comment.Id, 
+                user: comment.UserId, 
+                body: comment.Body, 
+                countLikes: comment.CountLikes, 
+                countDislikes: comment.CountDislikes, 
+                userLiked: comment.UserLiked, 
+                userDisliked: comment.UserDisliked, 
+                date: comment.PublicationDate})
         };
 
         const response = new GetLessonCommentServiceResponseDto(commentsRes)

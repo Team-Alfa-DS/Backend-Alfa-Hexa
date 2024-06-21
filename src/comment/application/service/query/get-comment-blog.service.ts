@@ -5,38 +5,47 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { Comment } from "src/comment/domain/Comment";
 import { IService } from "src/common/application/interfaces/IService";
 import { response } from "express";
+import { CommentBlogId } from "src/comment/domain/valueObjects/comment-blogId";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
     private readonly commentRepository: ICommentRepository;
     private readonly transactionHandler: ITransactionHandler;
-    //private readonly encryptor: IEncryptor;
 
     constructor(
         commentRepository: ICommentRepository,
         transactionHandler: ITransactionHandler,
-        //encryptor: IEncryptor
     ){
         super();
         this.commentRepository = commentRepository;
         this.transactionHandler = transactionHandler;
-        //this.encryptor = encryptor;
     }
     
     async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<GetBlogCommentServiceResponseDto>> {
         if (!data.pagination.page) data.pagination.page = 0;
         
+        const blogId = CommentBlogId.create( data.blogId );
+
         const comments = await this.commentRepository.findAllCommentsByBlogId(
-            data.blogId, 
+            blogId, 
             data.pagination.page, 
             data.pagination.perPage, 
-            this.transactionHandler);
+            this.transactionHandler
+        );
 
                 
         if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
         let commentsRes: BlogComment[] = [];
         for (const comment of comments.Value) {
-            commentsRes.push({id: comment.Id, user: comment.UserId, body: comment.Body, countLikes: comment.CountLikes, countDislikes: comment.CountDislikes, userLiked: comment.UserLiked, userDisliked: comment.UserDisliked, date: comment.DDate})
+            commentsRes.push({
+                id: comment.Id, 
+                user: comment.UserId, 
+                body: comment.Body, 
+                countLikes: comment.CountLikes, 
+                countDislikes: comment.CountDislikes, 
+                userLiked: comment.UserLiked, 
+                userDisliked: comment.UserDisliked, 
+                date: comment.PublicationDate})
         };
 
         const response = new GetBlogCommentServiceResponseDto(commentsRes)

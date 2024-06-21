@@ -1,11 +1,11 @@
-import { Entity } from '../../common/domain/entity';
+import { AggregateRoot } from 'src/common/domain/aggregate-root';
 import { TrainerFollower } from './valueObjects/trainer-followers';
 import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
 import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 
-export class Trainer extends Entity<TrainerId> {
+export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
   private followers: TrainerFollower;
   private userFollow: TrainerUserFollow;

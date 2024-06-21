@@ -44,7 +44,6 @@ export class CommentController{
     //*Mappers
     private commentMapper: OrmCommentMapper = new OrmCommentMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
-    private courseMapper: CourseMapper = new CourseMapper();
 
     //* Repositorios
     private readonly commentRepository: ICommentRepository = new OrmCommentRepository(
@@ -74,7 +73,6 @@ export class CommentController{
         DatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
-    //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
     private readonly getCommentBlogService: IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>;
@@ -87,16 +85,14 @@ export class CommentController{
         this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
                 this.commentRepository,
-                this.transactionHandler,
-                //this.encryptor
+                this.transactionHandler
             ),
             this.logger
         );
         this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
                 this.commentRepository,
-                this.transactionHandler,
-                //this.encryptor
+                this.transactionHandler
             ),
             this.logger
         );
@@ -107,8 +103,7 @@ export class CommentController{
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,
-                    this.idGenerator,
-                    //this.encryptor
+                    this.idGenerator
                 ),
                 this.auditRepository
             ),
@@ -121,8 +116,7 @@ export class CommentController{
                     this.userRepository,
                     this.blogRepository,
                     this.transactionHandler,
-                    this.idGenerator,
-                    //this.encryptor
+                    this.idGenerator
                 ),
                 this.auditRepository
             ),
@@ -174,7 +168,6 @@ export class CommentController{
     async addComment(@Request() req: JwtRequest, 
     @Body() addCommentEntryDto: AddCommentEntryDto){
         const data = new AddCommentToServiceRequestDto(addCommentEntryDto.target, req.user.tokenUser.id, addCommentEntryDto.body); 
-        
 
         if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
 
