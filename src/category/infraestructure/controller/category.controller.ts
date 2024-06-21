@@ -1,7 +1,6 @@
-/* eslint-disable prettier/prettier */
 
-import { Controller, Get, HttpException, Param, ParseIntPipe, Query } from "@nestjs/common";
-import { ApiBearerAuth, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Query } from "@nestjs/common";
+import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmCategoryRepository } from "../repositories/orm-category.repository";
@@ -18,6 +17,10 @@ import { GetAllCategoriesRequest } from "src/category/application/dtos/request/g
 import { GetAllCategoriesResponse } from "src/category/application/dtos/response/get-all-categories.response";
 import { GetCategoryRequest } from "src/category/application/dtos/request/get-category.request";
 import { GetCategoryResponse } from "src/category/application/dtos/response/get-category.response";
+import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { ILogger } from "src/common/application/logger/logger.interface";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { CategoryEntity } from "../entities/category.entity";
 
 
 @ApiTags('Category')
@@ -33,23 +36,27 @@ export class CategoryController {
         this.categoryMapper,
         DatabaseSingleton.getInstance()
     );
-
-    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-      DatabaseSingleton.getInstance()
-    );
+    private readonly logger: ILogger = new NestLogger();
 
     constructor() {
-      this.getAllCategorysService = new ServiceDBLoggerDecorator(
+      this.getAllCategorysService = new ExceptionLoggerDecorator(
         new GetAllCategorysService(this.categoryRepository),
-        this.auditRepository
+        this.logger
       );
-      this.getCategoryByIdService = new ServiceDBLoggerDecorator(
+      this.getCategoryByIdService = new ExceptionLoggerDecorator(
         new GetCategoryByIdService(this.categoryRepository),
-        this.auditRepository
+        this.logger
       );
     }
     
     @Get("many")
+    @ApiCreatedResponse({
+      description: 'se retornaron todas las categorias de manera exitosa',
+      type: CategoryEntity,
+  })
+  @ApiBadRequestResponse({
+      description: 'No existen categorias. Agregue'
+  })
     @ApiBearerAuth('token')
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
@@ -60,9 +67,16 @@ export class CategoryController {
     }
 
     @Get("/:id")
+    @ApiCreatedResponse({
+      description: 'se retorno la categoria de manera exitosa',
+      type: CategoryEntity,
+    })
+    @ApiBadRequestResponse({
+      description: 'No existe una categoria con esa id'
+    })
     @ApiBearerAuth('token')
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
-    async getCategoryById(@Param('id') idCategory: string): Promise<Category> {
+    async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<Category> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       if (response.isSuccess) return response.Value

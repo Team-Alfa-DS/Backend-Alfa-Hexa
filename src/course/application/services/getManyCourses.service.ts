@@ -3,12 +3,12 @@ import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 
-export class GetManyCoursesService implements IService<GetManyCoursesRequest, GetManyCoursesResponse> {
-  constructor(private readonly courseRepository: ICourseRepository){}
+export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
+  constructor(private readonly courseRepository: ICourseRepository){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     const r = await this.courseRepository.getManyCourses(
-      request.filter,
+      [request.filter],
       request.category,
       request.trainer,
       request.page,
@@ -51,11 +51,7 @@ export class GetManyCoursesRequest implements ServiceRequestDto {
   }
 
   dataToString(): string {
-    return "Query: { filter: " + this.filter + 
-                    "| category: " + this.category +
-                    "| trainer: " + this.trainer +
-                    "| page: " + this.page +
-                    "| perpage: " + this.perpage + " }";
+    return `Query: { filter: ${this.filter} | category: ${this.category} | trainer: ${this.trainer} | page: ${this.page} | perpage: ${this.perpage} }`;
   }
 }
 
@@ -63,6 +59,6 @@ export class GetManyCoursesResponse implements ServiceResponseDto {
   constructor(readonly courses: Course[]) {}
 
   dataToString(): string {
-    return this.courses.toString();
+    return `GetManyCoursesResponse: ${JSON.stringify(this.courses)}`;
   }
 }

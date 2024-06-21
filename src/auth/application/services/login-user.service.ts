@@ -7,7 +7,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { LoginUserRequest } from "../dtos/request/login-user.request";
 import { LoginUserResponse } from "../dtos/response/login-user.response";
 
-export class LoginUserService implements IService<LoginUserRequest, LoginUserResponse> {
+export class LoginUserService extends IService<LoginUserRequest, LoginUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -15,6 +15,7 @@ export class LoginUserService implements IService<LoginUserRequest, LoginUserRes
     private readonly jwtGen: IJwtGen<string>;
 
     constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, jwtGen: IJwtGen<string>) {
+        super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;

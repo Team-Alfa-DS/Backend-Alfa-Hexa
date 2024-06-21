@@ -8,12 +8,17 @@ import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repo
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 
 
-export class GetBlogByIdService implements IService<GetBlogByIdRequestDTO,  GetBlogByIdResponseDTO >{
+export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlogByIdResponseDTO >{
     constructor(
         private readonly blogRepository: IBlogRepository,
         private readonly trainerRepository: ITrainerRepository,
         private readonly categoryRepository: ICategoryRepository
-    ) {}
+    ) {
+        super();
+    }
+    get name(): string {
+        return this.constructor.name;
+    }
 
     async execute({Id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
         const domainBlogResult = await this.blogRepository.getBlogById(Id);

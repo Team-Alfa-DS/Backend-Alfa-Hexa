@@ -4,14 +4,16 @@ import { IService } from 'src/common/application/interfaces/IService';
 import { FollowTrainerRequest } from '../dto/request/follow-trainer.request';
 import { FollowTrainerResponse } from '../dto/response/follow-trainer.response';
 
-export class FollowTrainerService implements IService<FollowTrainerRequest, FollowTrainerResponse>
+export class FollowTrainerService extends IService<FollowTrainerRequest, FollowTrainerResponse>
 {
+  /*{ idTrainer: string; idUser: string }*/
   constructor(private readonly trainerRepository: ITrainerRepository) {
+    super();
     this.trainerRepository = trainerRepository;
   }
 
   async execute(data: FollowTrainerRequest): Promise<Result<FollowTrainerResponse>> {
-    const trainer = await this.trainerRepository.followTrainer(data);
+    const trainer = await this.trainerRepository.followTrainer({idTrainer: data.idTrainer, idUser: data.idUser});
     if (!trainer.isSuccess) {
       return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message);
     }

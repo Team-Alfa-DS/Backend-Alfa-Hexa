@@ -8,7 +8,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { IService } from "src/common/application/interfaces/IService";
 
-export class TrendingProgressService implements IService<TrendingProgressRequest, TrendingProgressResponse> {
+export class TrendingProgressService extends IService<TrendingProgressRequest, TrendingProgressResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly progressRepository: IProgressRepository;
@@ -22,6 +22,7 @@ export class TrendingProgressService implements IService<TrendingProgressRequest
         courseRepository: ICourseRepository, 
         transactionHandler: ITransactionHandler
     ) {
+        super();
         this.userRepository = userRepository;
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
@@ -44,11 +45,11 @@ export class TrendingProgressService implements IService<TrendingProgressRequest
 
         const result = this.calcPercentService.execute(course.Value.lessons, totalProgress.Value);
 
-        const response = new TrendingProgressResponse(result.percent, course.Value.name, course.Value.id, progress.Value.LastTime);
+        const response = new TrendingProgressResponse(result.percent, course.Value.title, course.Value.id, progress.Value.LastTime);
         return Result.success(response, 200);
     }
-    get name(): string {
-        return this.constructor.name;
-    }
+    // get name(): string {
+    //     return this.constructor.name;
+    // }
 
 }

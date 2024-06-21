@@ -9,9 +9,12 @@ import { CommentEntity } from 'src/comment/infraestructure/entities/comment.enti
 import { UserRole } from 'src/user/domain/enums/role-user.type';
 import { ProgressEntity } from 'src/progress/infraestructure/entities/progress.entity';
 import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
+import { NotifyEntity } from 'src/notify/notify/Infraestructure/entities/notify.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('user')
 export class UserEntity {
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -41,6 +44,9 @@ export class UserEntity {
 
   @ManyToMany(() => OrmTrainer, (OrmTrainer) => OrmTrainer.users)
   trainers: OrmTrainer[];
+
+  @OneToMany(() => NotifyEntity, notify => notify.user)
+  notify: NotifyEntity[];
 
   static create(
     id: string,

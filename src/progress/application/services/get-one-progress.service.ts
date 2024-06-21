@@ -8,7 +8,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { GetOneProgressResponse } from "../dtos/response/get-one-progress.response";
 import { GetOneProgressRequest } from "../dtos/request/get-one-progress.request.dto";
 
-export class GetOneProgressService implements IService<GetOneProgressRequest, GetOneProgressResponse> {
+export class GetOneProgressService extends IService<GetOneProgressRequest, GetOneProgressResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly progressRepository: IProgressRepository;
@@ -22,6 +22,7 @@ export class GetOneProgressService implements IService<GetOneProgressRequest, Ge
         courseRepository: ICourseRepository, 
         transactionHandler: ITransactionHandler
     ) {
+        super();
         this.userRepository = userRepository;
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
@@ -45,8 +46,8 @@ export class GetOneProgressService implements IService<GetOneProgressRequest, Ge
         return Result.success(response, 200);
     }
 
-    get name(): string {
-        return this.constructor.name;
-    }
+    // get name(): string {
+    //     return this.constructor.name;
+    // }
 
 }
