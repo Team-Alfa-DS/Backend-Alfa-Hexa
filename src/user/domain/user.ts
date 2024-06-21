@@ -1,6 +1,4 @@
-import { Entity } from "src/common/domain/entity";
 import { UserRole } from "./enums/role-user.type";
-import { Progress } from "src/progress/domain/progress";
 import { UserEmail } from "./value-objects/user-email";
 import { UserName } from "./value-objects/user-name";
 import { UserPassword } from "./value-objects/user-password";
@@ -16,8 +14,6 @@ export class User extends AggregateRoot<UserId> {
     private phone: UserPhone;
     private type: UserRole;
     private image?: UserImage;
-    // private comments?: string se necesita crear la entity de comentarios
-    private progress?: Progress[]
     
     private constructor (id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserRole, image: UserImage) {
         super(id);
@@ -51,10 +47,6 @@ export class User extends AggregateRoot<UserId> {
 
     get Image(): UserImage {
         return this.image;
-    }
-
-    get Progress(): Progress[] {
-        return this.progress;
     }
 
     static Create(id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserRole, image: UserImage) {

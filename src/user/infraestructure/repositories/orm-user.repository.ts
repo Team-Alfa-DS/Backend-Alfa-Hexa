@@ -5,6 +5,9 @@ import { Result } from "src/common/domain/result-handler/result";
 import { User } from "src/user/domain/user";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class OrmUserRepository extends Repository<UserEntity> implements IUserRepository {
 
@@ -15,21 +18,21 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
         this.ormUserMapper = ormUserMapper;
     }
 
-    async updatePassword(email: string, password: string, runner: TransactionHandler): Promise<Result<User>> {
+    async updatePassword(email: UserEmail, password: UserPassword, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
-        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email});
+        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email: email.Email});
         if (!userfound) {
             return Result.fail(new Error('User not found'), 404, 'User not found');
         }
-        const userUpdated = await runnerTransaction.manager.save(UserEntity, {...userfound, password});
+        const userUpdated = await runnerTransaction.manager.save(UserEntity, {...userfound, password: password.Password});
         const domainUser = await this.ormUserMapper.toDomain(userUpdated);
         return Result.success<User>(domainUser, 200);
     }
 
-    async findUserById(id: string, runner: TransactionHandler): Promise<Result<User>> {
+    async findUserById(id: UserId, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
 
-        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {id});
+        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {id: id.Id});
 
         if (!userfound) {
             return Result.fail<User>(new Error('User not found'), 404, 'User not found');
@@ -43,9 +46,9 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
         return Result.success<User>(domainUser, 200);
     }
 
-    async findUserByEmail(email: string, runner: TransactionHandler): Promise<Result<User>> {
+    async findUserByEmail(email: UserEmail, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
-        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email});
+        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email: email.Email});
 
         if (!userfound) {
             return Result.fail<User>(new Error('User not found'), 404, 'User not found');

@@ -9,6 +9,7 @@ import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper'
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
+import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainer>
@@ -55,7 +56,7 @@ export class OrmTrainerRepository
       }
 
       const user = await this.userRepository.findUserById(
-        data.idUser,
+        UserId.create(data.idUser),
         this.transactionHandler,
       );
 

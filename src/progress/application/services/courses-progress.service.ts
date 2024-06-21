@@ -9,6 +9,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { Course } from "src/course/domain/Course";
 import { Progress } from "src/progress/domain/progress";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class CoursesProgressService extends IService<CoursesProgressRequest, CoursesProgressResponse> {
 
@@ -33,11 +34,11 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
     }
 
     async execute(value: CoursesProgressRequest): Promise<Result<CoursesProgressResponse>> {
-        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
 
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
-        const progressUser = await this.progressRepository.findProgressByUser(value.userId, this.transactionHandler);
+        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId), this.transactionHandler);
 
         if (!progressUser.isSuccess) return Result.fail(progressUser.Error, progressUser.StatusCode, progressUser.Message);
 
@@ -51,7 +52,7 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.lessons, this.transactionHandler);
             progressUserList.push(progress.Value);
         }
 

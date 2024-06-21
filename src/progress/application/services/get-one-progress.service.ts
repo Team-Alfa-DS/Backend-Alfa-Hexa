@@ -7,6 +7,7 @@ import { CalcPercentService } from "src/progress/domain/services/calc-percent.se
 import { IService } from "src/common/application/interfaces/IService";
 import { GetOneProgressResponse } from "../dtos/response/get-one-progress.response";
 import { GetOneProgressRequest } from "../dtos/request/get-one-progress.request.dto";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class GetOneProgressService extends IService<GetOneProgressRequest, GetOneProgressResponse> {
 
@@ -31,13 +32,13 @@ export class GetOneProgressService extends IService<GetOneProgressRequest, GetOn
     }
 
     async execute(value: GetOneProgressRequest): Promise<Result<GetOneProgressResponse>> {
-        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
 
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
 
-        const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.Value.lessons, this.transactionHandler);
+        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.lessons, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
 
         const calc = this.calcPercentService.execute(course.Value.lessons, progress.Value);
