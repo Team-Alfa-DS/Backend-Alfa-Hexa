@@ -1,5 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 import { InvalidTrainerFollowersException } from "../exceptions/invalid-trainer-followers-exception";
+import { EmptyTrainerFollowerException } from "../exceptions/empty-trainer-follower-exception";
 
 
 export class TrainerFollower extends ValueObject<TrainerFollower> {
@@ -9,9 +10,8 @@ export class TrainerFollower extends ValueObject<TrainerFollower> {
     private constructor(followers: number) {
         super();
         
-        let valid: boolean = true;
-        if (isNaN(followers)) valid = false;
-        if (!valid) throw new InvalidTrainerFollowersException( "El valor que esta entrando no es un numero" );
+        if (!followers) throw new EmptyTrainerFollowerException( "El valor de los seguidores no puede estar vacio" );
+        if (isNaN(followers)) throw new InvalidTrainerFollowersException( "El valor que esta entrando no es un numero" );
         
         this.followers = Object.freeze(followers); //*Esto funciona para que no pueda ser modificado
     }
