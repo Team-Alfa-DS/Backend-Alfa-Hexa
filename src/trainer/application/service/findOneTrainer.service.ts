@@ -3,6 +3,7 @@ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repo
 import { IService } from 'src/common/application/interfaces/IService';
 import { FindOneTrainerRequest } from '../dto/request/find-one-trainer.request';
 import { FindOneTrainerResponse } from '../dto/response/find-one-trainer.response';
+import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 
 export class FindOneTrainerService extends IService<FindOneTrainerRequest, FindOneTrainerResponse> {
   constructor(private readonly trainerRepository: ITrainerRepository) {
@@ -11,7 +12,12 @@ export class FindOneTrainerService extends IService<FindOneTrainerRequest, FindO
   }
 
   async execute(data: FindOneTrainerRequest): Promise<Result<FindOneTrainerResponse>> {
-    const trainer = await this.trainerRepository.findTrainerById(data.id);
+    let trainerId = TrainerId.create(data.id);
+    
+
+    
+    const trainer = await this.trainerRepository.findTrainerById(trainerId);
+
     if (!trainer.isSuccess) {
       return Result.fail(
         new Error('Trainer not found'),
@@ -19,6 +25,7 @@ export class FindOneTrainerService extends IService<FindOneTrainerRequest, FindO
         'Trainer not found',
       );
     }
+
     const response = new FindOneTrainerResponse(trainer.Value);
     return Result.success(response, 202);
   }

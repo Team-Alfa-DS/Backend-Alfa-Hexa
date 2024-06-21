@@ -2,7 +2,6 @@ import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto,
 import { Result } from "src/common/domain/result-handler/result";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
-import { Comment } from "src/comment/domain/Comment";
 import { IService } from "src/common/application/interfaces/IService";
 import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
 
@@ -10,17 +9,14 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
     
     private readonly commentRepository: ICommentRepository;
     private readonly transactionHandler: ITransactionHandler;
-    //private readonly encryptor: IEncryptor;
 
     constructor(
         commentRepository: ICommentRepository,
         transactionHandler: ITransactionHandler,
-        //encryptor: IEncryptor
     ){
         super();
         this.commentRepository = commentRepository;
         this.transactionHandler = transactionHandler;
-        //this.encryptor = encryptor;
     }
     
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
@@ -28,7 +24,6 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
         if (!data.pagination.page) data.pagination.page = 0;
           
         let lessonId = CommentLessonId.create( data.lessonId );
-
 
         const comments = await this.commentRepository.findAllCommentsByLessonId(
             lessonId, 
@@ -42,14 +37,14 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
         let commentsRes: LessonComment[] = [];
         for (const comment of comments.Value) {
             commentsRes.push({
-                id: comment.Id, 
-                user: comment.UserId, 
-                body: comment.Body, 
-                countLikes: comment.CountLikes, 
-                countDislikes: comment.CountDislikes, 
-                userLiked: comment.UserLiked, 
-                userDisliked: comment.UserDisliked, 
-                date: comment.PublicationDate})
+                id: comment.Id.commentId, 
+                user: comment.UserId.UserId, 
+                body: comment.Body.Body, 
+                countLikes: comment.CountLikes.CountLike, 
+                countDislikes: comment.CountDislikes.CountDislike, 
+                userLiked: comment.UserLiked.UserLiked, 
+                userDisliked: comment.UserDisliked.UserDisliked, 
+                date: comment.PublicationDate.PublicationDate})
         };
 
         const response = new GetLessonCommentServiceResponseDto(commentsRes)
