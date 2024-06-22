@@ -6,6 +6,15 @@ import { UserPhone } from "./value-objects/user-phone";
 import { UserImage } from "./value-objects/user-image";
 import { AggregateRoot } from "src/common/domain/aggregate-root";
 import { UserId } from "./value-objects/user-id";
+import { UserCreated } from "./events/user-created.event";
+import { DomainEvent } from "src/common/domain/domain-event";
+import { InvalidUserException } from "./exceptions/invalid-user.exception";
+import { UserEmailUpdated } from "./events/user-email-updated.event";
+import { UserNameUpdated } from "./events/user-name-updated.event";
+import { UserPasswordUpdated } from "./events/user-password-updated.event";
+import { UserPhoneUpdated } from "./events/user-phone-updated.event";
+import { UserTypeUpdated } from "./events/user-type-updated.event";
+import { UserImageUpdated } from "./events/user-image-updated.event";
 
 export class User extends AggregateRoot<UserId> {
     private email: UserEmail;
@@ -16,13 +25,47 @@ export class User extends AggregateRoot<UserId> {
     private image?: UserImage;
     
     private constructor (id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserRole, image: UserImage) {
-        super(id);
-        this.email = email;
-        this.name = name;
-        this.password = password;
-        this.phone = phone;
-        this.type = type;
-        this.image = image;
+        const userCreated = UserCreated.create(id, email, name, password, phone, type, image)
+        super(id, userCreated);
+    }
+
+    protected when(event: DomainEvent): void {
+        if (event instanceof UserCreated) {
+            this.email = event.email;
+            this.name = event.name;
+            this.password = event.password;
+            this.phone = event.phone;
+            this.type = event.type;
+            this.image = event.image;
+        }
+
+        if (event instanceof UserEmailUpdated) {
+            this.email = event.email;
+        }
+
+        if (event instanceof UserNameUpdated) {
+            this.name = event.name;
+        }
+
+        if (event instanceof UserPasswordUpdated) {
+            this.password = event.password;
+        }
+
+        if (event instanceof UserPhoneUpdated) {
+            this.phone = event.phone;
+        }
+
+        if (event instanceof UserTypeUpdated) {
+            this.type = event.type;
+        }
+
+        if (event instanceof UserImageUpdated) {
+            this.image = event.image;
+        }
+    }
+
+    protected validateState(): void {
+        if (!this.email || !this.name || !this.password || !this.phone || !this.type) throw new InvalidUserException('El usuario no es valido');
     }
 
     get Email(): UserEmail {

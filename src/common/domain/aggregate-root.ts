@@ -6,18 +6,18 @@ export abstract class AggregateRoot<T extends ValueObject<T>> extends Entity<T> 
 
     protected events: DomainEvent[] = [];
 
-    // protected abstract when(event: DomainEvent): void;
-    // protected abstract validateState(): void;
+    protected abstract when(event: DomainEvent): void;
+    protected abstract validateState(): void;
 
-    // protected apply(event: DomainEvent): void {
-    //     this.when(event);
-    //     this.validateState();
-    //     this.events.push(event);
-    // }
+    protected apply(event: DomainEvent): void {
+        this.when(event);
+        this.validateState();
+        this.events.push(event);
+    }
 
-    protected constructor(id: T) {  // event: DomainEvent (debe recibir el parametro de tipo DomainEvent)
+    protected constructor(id: T, event: DomainEvent) {  // event: DomainEvent (debe recibir el parametro de tipo DomainEvent)
         super(id);
-        // this.apply(event);
+        this.apply(event);
     }
 
     pullDomainEvents(): DomainEvent[] {

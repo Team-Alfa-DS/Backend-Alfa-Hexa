@@ -13,7 +13,11 @@ export class ProgressId extends ValueObject<ProgressId> {
 
         if (!userId) throw new InvalidProgressUserIdException(`El userId: ${userId} es invalido`);
 
+        if (!this.checkUuidValidity(userId)) throw new InvalidProgressUserIdException(`El userId: ${userId} es invalido`);
+
         if (!lessonId) throw new InvalidProgressLessonIdException(`El lessonId: ${lessonId} es invalido`);
+
+        if (!this.checkUuidValidity(lessonId)) throw new InvalidProgressLessonIdException(`El lessonId: ${lessonId} es invalido`);
 
         if (!valid) {
             throw new InvalidProgressIdException(`El userId: ${userId} y/o el lessonId: ${lessonId} son invalidos`);
@@ -21,6 +25,14 @@ export class ProgressId extends ValueObject<ProgressId> {
 
         this.userId = userId;
         this.lessonId = lessonId;
+    }
+
+    private checkUuidValidity(uuid: string): boolean {
+        if (uuid.length != 36) return false;
+        
+        if (uuid.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i) == null) return false;
+    
+        return true;
     }
 
     get UserId() {

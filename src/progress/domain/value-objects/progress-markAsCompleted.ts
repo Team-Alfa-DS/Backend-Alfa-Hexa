@@ -1,5 +1,5 @@
 import { ValueObject } from "src/common/domain/value-object";
-import { InvalidProgressMaekAsCompletedException } from "../exceptions/invalid-progress-markAsCompleted.exception";
+import { InvalidProgressMarkAsCompletedException } from "../exceptions/invalid-progress-markAsCompleted.exception";
 
 export class ProgressMarkAsCompleted extends ValueObject<ProgressMarkAsCompleted> {
     private readonly markAsCompleted: boolean;
@@ -9,7 +9,7 @@ export class ProgressMarkAsCompleted extends ValueObject<ProgressMarkAsCompleted
         let valid: boolean = true
 
         if (!valid) {
-            throw new InvalidProgressMaekAsCompletedException(`El markAsCompleted no es valido`);
+            throw new InvalidProgressMarkAsCompletedException(`El markAsCompleted no es valido`);
         }
 
         this.markAsCompleted = markAsCompleted;
