@@ -12,6 +12,7 @@ import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { UserType } from "src/user/domain/value-objects/user-type";
 
 export class RegisterUserService extends IService<RegisterUserRequest, RegisterUserResponse> {
 
@@ -45,7 +46,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
                 UserName.create(newUser.name),
                 UserPassword.create(hashPassword),
                 UserPhone.create(newUser.phone),
-                newUser.type,
+                UserType.create(newUser.type),
                 null
             ),
             this.transactionHandler

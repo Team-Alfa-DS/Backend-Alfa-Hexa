@@ -68,14 +68,14 @@ export class Progress extends AggregateRoot<ProgressId>{
     }
 
     UpdateMarkAsCompleted(markAsCompleted: ProgressMarkAsCompleted): void {
-        this.markAsCompleted = markAsCompleted;
+        this.apply(ProgressMarkAsCompletedUpdated.create(this.Id, markAsCompleted));
     }
 
     UpdateTime(time: ProgressTime): void {
-        this.time = time;
+        this.apply(ProgressTimeUpdated.create(this.Id, time));
     }
 
     UpdateLastTime(lastTime: ProgressLastTime): void {
-        this.lastTime = lastTime;
+        this.apply(ProgressLastTimeUpdated.create(this.Id, lastTime));
     }
 }
