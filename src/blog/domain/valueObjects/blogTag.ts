@@ -1,10 +1,11 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { InvalidBlogTag } from "../exceptions/invalidBlogTag";
 
 export class BlogTag extends ValueObject<BlogTag>{
     private constructor(public value: string) {
         super();
         if (!this.isValid(value)) {
-            throw new Error(`BlogTag ${value} is invalid`);
+            throw new InvalidBlogTag(`BlogTag ${value} is invalid`);
         } 
 
         this.value = value;

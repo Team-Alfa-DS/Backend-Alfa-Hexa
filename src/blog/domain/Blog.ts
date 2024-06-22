@@ -5,29 +5,65 @@ import { BlogPublicationDate } from "./valueObjects/blogPublicationDate";
 import { BlogTitle } from "./valueObjects/blogTitle";
 import { BlogTag } from "./valueObjects/blogTag";
 import { BlogImage } from "./valueObjects/blogImage";
-
-interface Tag{
-    id: string;
-    name: string;
-}
-
-interface Image{
-    id: string;
-    url: string;
-}
+import { AggregateRoot } from "src/common/domain/aggregate-root";
 
 
-export class Blog {
+
+export class Blog extends AggregateRoot<BlogId>{
+
+    // private id: BlogId
+    private title: BlogTitle
+    private content: BlogContent
+    private publication_date: BlogPublicationDate
+    private comments: string[]              
+    private category: CategoryId
+    private trainer: string 
+    private tags: BlogTag[]
+    private images: BlogImage[]
 constructor(
-    public id: BlogId,
-    public title: BlogTitle,
-    public content: BlogContent,
-    public publication_date: BlogPublicationDate,
-    public comments: string[],              
-    public category: CategoryId,
-    public trainer: string, 
-    public tags: BlogTag[],
-    public images: BlogImage[],
-){}
+     id: BlogId,
+     title: BlogTitle,
+     content: BlogContent,
+     publication_date: BlogPublicationDate,
+     comments: string[],              
+     category: CategoryId,
+     trainer: string, 
+     tags: BlogTag[],
+     images: BlogImage[],
+    ){
+        super(id);
+        this.title = title
+        this.content = content
+        this.publication_date = publication_date
+        this.comments = comments
+        this.category = category
+        this.trainer = trainer
+        this.tags = tags
+        this.images =images
+    }
     
+    get Title(): BlogTitle{
+        return this.title;
+    }
+    get Content(): BlogContent{
+        return this.content;
+    }
+    get Publication_date(): BlogPublicationDate{
+        return this.publication_date;
+    }
+    get Comments(): string[]{
+        return this.comments;
+    }
+    get Category(): CategoryId{
+        return this.category;
+    }
+    get Trainer(): string{
+        return this.trainer;
+    }
+    get Tags(): BlogTag[]{
+        return this.tags;
+    }
+    get Images(): BlogImage[]{
+        return this.images;
+    }
 }
