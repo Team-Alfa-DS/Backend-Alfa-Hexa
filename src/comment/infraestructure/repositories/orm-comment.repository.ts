@@ -21,8 +21,8 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         const runnerTransaction = runner.getRunner();
 
         const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
-            take: page,
-            skip: perPage,});
+            take: perPage,
+            skip: page,});
 
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
@@ -43,8 +43,8 @@ export class OrmCommentRepository extends Repository<CommentEntity> implements I
         //    .skip(perPage)
         //    .getMany();
         const commentsFound = await runnerTransaction.manager.find(CommentEntity, { where: { lesson_id: id }, 
-            take: page, 
-            skip: perPage 
+            take: perPage, 
+            skip: page 
         });
         if (!commentsFound) return Result.fail<Comment[]>(new Error('Comments not found'), 404, 'Comments not found');
 
