@@ -53,19 +53,15 @@ export class OrmTrainerRepository
 
   async followTrainer(idTrainer: TrainerId, idUser: UserId): Promise<Result<Trainer>> {
     try {
-      const trainer = await this.findTrainerById(data.idTrainer);  
-      if (!trainer.isSuccess) {
-        return trainer;
-      }
+      const trainer = await this.findTrainerById(idTrainer);  
+      if (!trainer.isSuccess) return trainer;
 
       const user = await this.userRepository.findUserById(
-        UserId.create(data.idUser),
+        idUser,
         this.transactionHandler,
       );
 
-      if (!user.isSuccess) {
-        return Result.fail(new Error('User not found'), 404, 'User not found');
-      }
+      if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
       const ormTrainer = await this.ormTrainerMapper.toOrm(trainer.Value);
 
@@ -97,6 +93,7 @@ export class OrmTrainerRepository
       ormTrainer.users = array;
       await this.save(ormTrainer);
       return Result.success<Trainer>(trainer.Value, 200);
+      
     } catch (err) {
       return Result.fail<Trainer>(
         new Error(err.message),

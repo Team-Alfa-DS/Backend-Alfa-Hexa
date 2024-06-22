@@ -22,13 +22,11 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
 
         if (!data.pagination.page) data.pagination.page = 0;
-          
+        
         let lessonId = CommentLessonId.create( data.lessonId );
 
         const comments = await this.commentRepository.findAllCommentsByLessonId(
-            lessonId, 
-            data.pagination.page, 
-            data.pagination.perPage, 
+            lessonId,
             this.transactionHandler
         );
         
@@ -46,6 +44,13 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
                 userDisliked: comment.UserDisliked.UserDisliked, 
                 date: comment.PublicationDate.PublicationDate})
         };
+
+        if (data.pagination.perPage) {
+            let page = data.pagination.page;
+            if (!page) {page = 0}
+
+            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+        }
 
         const response = new GetLessonCommentServiceResponseDto(commentsRes)
         return Result.success<GetLessonCommentServiceResponseDto>(response, comments.StatusCode);

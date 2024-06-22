@@ -34,8 +34,8 @@ import { CommentEntity } from "../entities/comment.entity";
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
-@ApiTags( 'Comments' )
-@Controller( 'Comments' )
+@ApiTags( 'comments' )
+@Controller( 'comments' )
 export class CommentController{
 
 
@@ -138,6 +138,12 @@ export class CommentController{
     @ApiQuery({name:'lesson', required: false})
     async getCommets (@Request() req: JwtRequest,
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
+        
+        if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
+            (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
+            throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
+        }
+        
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );

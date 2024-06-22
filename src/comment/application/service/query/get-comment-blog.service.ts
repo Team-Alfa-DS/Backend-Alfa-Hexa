@@ -26,8 +26,6 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
 
         const comments = await this.commentRepository.findAllCommentsByBlogId(
             blogId, 
-            data.pagination.page, 
-            data.pagination.perPage, 
             this.transactionHandler
         );
                 
@@ -44,6 +42,13 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
                 userDisliked: comment.UserDisliked.UserDisliked, 
                 date: comment.PublicationDate.PublicationDate})
         };
+
+        if (data.pagination.perPage) {
+            let page = data.pagination.page;
+            if (!page) {page = 0}
+
+            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+        }
 
         const response = new GetBlogCommentServiceResponseDto(commentsRes)
         return Result.success<GetBlogCommentServiceResponseDto>(response, comments.StatusCode);

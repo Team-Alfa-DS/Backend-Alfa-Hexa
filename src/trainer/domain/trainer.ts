@@ -4,13 +4,14 @@ import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
 import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
+import { DomainEvent } from 'src/common/domain/domain-event';
 
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
   private followers: TrainerFollower;
   private userFollow: TrainerUserFollow;
   private location: TrainerLocation;
-
+  
   constructor(
     id: TrainerId,
     name: TrainerName,
@@ -24,7 +25,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
     this.userFollow = userFollow;
     this.location = location;
   }
-
+  
   static create(
     id: TrainerId,
     name: TrainerName,
@@ -34,7 +35,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   ): Trainer {
     return new Trainer(id, name, followers, userFollow, location);
   }
-
+  
   get Name(): TrainerName {
     return this.name;
   }
@@ -47,5 +48,11 @@ export class Trainer extends AggregateRoot<TrainerId> {
   get Location(): TrainerLocation {
     return this.location;
   }
-
+  
+  protected when(event: DomainEvent): void {
+    throw new Error('Method not implemented.');
+  }
+  protected validateState(): void {
+    throw new Error('Method not implemented.');
+  }
 }

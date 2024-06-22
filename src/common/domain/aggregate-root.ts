@@ -15,9 +15,11 @@ export abstract class AggregateRoot<T extends ValueObject<T>> extends Entity<T> 
         this.events.push(event);
     }
 
-    protected constructor(id: T, event: DomainEvent) {
+    protected constructor(id: T, 
+        //event: DomainEvent
+    ) {
         super(id);
-        this.apply(event);
+        //this.apply(event);
     }
 
     pullDomainEvents(): DomainEvent[] {

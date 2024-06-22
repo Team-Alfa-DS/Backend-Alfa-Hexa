@@ -10,6 +10,7 @@ import { CommentUserLiked } from "./valueObjects/comment-userLiked";
 import { CommentLessonId } from "./valueObjects/comment-lessonId";
 import { CommentCountDislike } from "./valueObjects/comment-countDislikes";
 import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { DomainEvent } from "src/common/domain/domain-event";
 
 
 export class Comment extends AggregateRoot<CommentId> {
@@ -46,43 +47,43 @@ export class Comment extends AggregateRoot<CommentId> {
         this.userDisliked = userDisliked;
         this.userLiked = userLiked;
     }
-
+    
     get PublicationDate(): CommentPublicationDate {
         return this.publicationDate;
     }
-
+    
     get CountLikes(): CommentCountLike | undefined {
         return this.countLikes;
     }
-
+    
     get CountDislikes(): CommentCountDislike | undefined {
         return this.countDislikes;
     }
-
+    
     get UserLiked(): CommentUserLiked | undefined {
         return this.userLiked;
     }
-
+    
     get UserDisliked(): CommentUserDisliked | undefined {
         return this.userDisliked;
     }
-
+    
     get Body(): CommentBody {
         return this.body;
     }
-
+    
     get UserId(): CommentUserId {
         return this.userId;
     }
-
+    
     get LessonId(): CommentLessonId | undefined {
         return this.lessonId;
     }
-
+    
     get BlogId(): CommentBlogId | undefined {
         return this.blogId;
     }
-
+    
     static create (
         id: CommentId,
         publicationDate: CommentPublicationDate,
@@ -108,6 +109,12 @@ export class Comment extends AggregateRoot<CommentId> {
             userDisliked
         );        
     }
-
+    
+    protected when(event: DomainEvent): void {
+        throw new Error("Method not implemented.");
+    }
+    protected validateState(): void {
+        throw new Error("Method not implemented.");
+    }
 
 }
