@@ -1,51 +1,53 @@
-export class Progress {
-    private userId: string;
-    private lessonId: string;
-    private markAsCompleted: boolean;
-    private time?: number;
-    private lastTime?: Date;
+import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { ProgressLastTime } from "./value-objects/progress-lastTime";
+import { ProgressMarkAsCompleted } from "./value-objects/progress-markAsCompleted";
+import { ProgressTime } from "./value-objects/progress-time";
+import { ProgressId } from "./value-objects/progress-Id";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
-    private constructor(userId: string, lessonId: string, markAsCompleted: boolean, time: number, lastTime: Date) {
-        this.userId = userId;
-        this.lessonId = lessonId;
+export class Progress extends AggregateRoot<ProgressId>{
+    private markAsCompleted: ProgressMarkAsCompleted;
+    private time?: ProgressTime;
+    private lastTime?: ProgressLastTime;
+    private user: UserId;
+
+    private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
+        super(id);
         this.markAsCompleted = markAsCompleted;
         this.time = time;
         this.lastTime = lastTime;
+        this.user = user;
     }
 
-    get UserId(): string {
-        return this.userId;
-    }
-
-    get LessonId(): string {
-        return this.lessonId;
-    }
-
-    get MarkAsCompleted(): boolean {
+    get MarkAsCompleted(): ProgressMarkAsCompleted {
         return this.markAsCompleted;
     }
 
-    get Time(): number {
+    get Time(): ProgressTime {
         return this.time;
     }
 
-    get LastTime(): Date {
+    get LastTime(): ProgressLastTime {
         return this.lastTime;
     }
 
-    static create(userId: string, lessonId: string, markAsCompleted: boolean, time?: number, lastTime?: Date) {
-        return new Progress(userId, lessonId, markAsCompleted, time, lastTime);
+    get User(): UserId {
+        return this.user;
     }
 
-    UpdateMarkAsCompleted(markAsCompleted: boolean): void {
+    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time?: ProgressTime, lastTime?: ProgressLastTime) {
+        return new Progress(id, markAsCompleted, user, time, lastTime);
+    }
+
+    UpdateMarkAsCompleted(markAsCompleted: ProgressMarkAsCompleted): void {
         this.markAsCompleted = markAsCompleted;
     }
 
-    UpdateTime(time: number): void {
+    UpdateTime(time: ProgressTime): void {
         this.time = time;
     }
 
-    UpdateLastTime(lastTime: Date): void {
+    UpdateLastTime(lastTime: ProgressLastTime): void {
         this.lastTime = lastTime;
     }
 }

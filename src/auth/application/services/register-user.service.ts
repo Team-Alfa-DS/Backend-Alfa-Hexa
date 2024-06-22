@@ -7,6 +7,11 @@ import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { RegisterUserRequest } from "../dtos/request/register-user.request";
 import { RegisterUserResponse } from "../dtos/response/register-user.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserName } from "src/user/domain/value-objects/user-name";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { UserPhone } from "src/user/domain/value-objects/user-phone";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class RegisterUserService extends IService<RegisterUserRequest, RegisterUserResponse> {
 
@@ -25,7 +30,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
 
     async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const userFound = await this.userRepository.findUserByEmail(newUser.email, this.transactionHandler);
+        const userFound = await this.userRepository.findUserByEmail(UserEmail.create(newUser.email), this.transactionHandler);
 
         if (userFound.isSuccess) {
             return Result.fail(new Error('El usuario ya existe'), 500, 'El usuario ya existe');
@@ -35,11 +40,11 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
         const id = await this.idGenerator.genId();
         const userCreate = await this.userRepository.saveUser(
             User.Create(
-                id,
-                newUser.email,
-                newUser.name,
-                hashPassword,
-                newUser.phone,
+                UserId.create(id),
+                UserEmail.create(newUser.email),
+                UserName.create(newUser.name),
+                UserPassword.create(hashPassword),
+                UserPhone.create(newUser.phone),
                 newUser.type,
                 null
             ),

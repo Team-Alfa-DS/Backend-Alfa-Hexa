@@ -5,6 +5,8 @@ import { IEncryptor } from "../encryptor/encryptor.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { ChangeUserPasswordRequest } from "../dtos/request/change-user-password.request";
 import { ChangeUserPasswordResponse } from "../dtos/response/change-user-password.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
 
 export class ChangeUserPasswordService extends IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
@@ -23,7 +25,7 @@ export class ChangeUserPasswordService extends IService<ChangeUserPasswordReques
 
         const hashPassword = await this.encryptor.hash(value.password);
 
-        const user = await this.userRepository.updatePassword(value.email, hashPassword, this.transactionHandler);
+        const user = await this.userRepository.updatePassword(UserEmail.create(value.email), UserPassword.create(hashPassword), this.transactionHandler);
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message);
         }

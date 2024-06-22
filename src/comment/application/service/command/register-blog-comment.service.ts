@@ -8,6 +8,7 @@ import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { Comment } from "src/comment/domain/Comment";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { IService } from "src/common/application/interfaces/IService";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -36,7 +37,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
         const commentID = await this.idGenerator.genId();
 
-        let user = await this.userRepository.findUserById( data.userId, this.transactionHandler );
+        let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
         if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
 
