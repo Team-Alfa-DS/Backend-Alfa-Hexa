@@ -79,6 +79,7 @@ export class SearchController {
         }
     }
 
+    @Get( ":popular/tags" )
     async searchPopularTags(
         @Request() req,
         @Query('page', ParseIntPipe,) page: number,
