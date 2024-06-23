@@ -1,7 +1,7 @@
 import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Image } from "./image.entity";
-import { Tag } from "./tag.entity";
+import { Tag } from "../../../tag/infraestructure/entities/tag.entity";
 import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { ApiProperty } from "@nestjs/swagger";
