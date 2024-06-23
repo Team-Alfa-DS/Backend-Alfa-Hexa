@@ -4,6 +4,12 @@ import { ProgressMarkAsCompleted } from "./value-objects/progress-markAsComplete
 import { ProgressTime } from "./value-objects/progress-time";
 import { ProgressId } from "./value-objects/progress-Id";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { DomainEvent } from "src/common/domain/domain-event";
+import { ProgressCreated } from "./events/progress-created.event";
+import { InvalidProgressException } from "./exceptions/invalid-progress.exception";
+import { ProgressMarkAsCompletedUpdated } from "./events/progress-markAsCompleted-updated.event";
+import { ProgressTimeUpdated } from "./events/progress-time-updated.event";
+import { ProgressLastTimeUpdated } from "./events/progress-lastTime-updated.event";
 
 export class Progress extends AggregateRoot<ProgressId>{
     private markAsCompleted: ProgressMarkAsCompleted;
@@ -12,11 +18,33 @@ export class Progress extends AggregateRoot<ProgressId>{
     private user: UserId;
 
     private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
-        super(id);
-        this.markAsCompleted = markAsCompleted;
-        this.time = time;
-        this.lastTime = lastTime;
-        this.user = user;
+        const progressCreated = ProgressCreated.create(id, markAsCompleted, user, time, lastTime);
+        super(id, progressCreated);
+    }
+
+    protected when(event: DomainEvent): void {
+        if (event instanceof ProgressCreated) {
+            this.markAsCompleted = event.markAsCompleted;
+            this.time = event.time;
+            this.lastTime = event.lastTime;
+            this.user = event.user;
+        }
+
+        if (event instanceof ProgressMarkAsCompletedUpdated) {
+            this.markAsCompleted = event.markAsCompleted;
+        }
+
+        if (event instanceof ProgressTimeUpdated) {
+            this.time = event.time;
+        }
+
+        if (event instanceof ProgressLastTimeUpdated) {
+            this.lastTime = event.lastTime;
+        }
+    }
+
+    protected validateState(): void {
+        if (!this.markAsCompleted || !this.user) throw new InvalidProgressException('El progreso no es valido');
     }
 
     get MarkAsCompleted(): ProgressMarkAsCompleted {

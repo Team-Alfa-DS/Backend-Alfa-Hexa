@@ -1,6 +1,7 @@
 import { DomainException } from "src/common/domain/domain-exception";
 
-export class InvalidProgressMarkAsCompletedException extends DomainException {
+
+export class InvalidBlogTag extends DomainException {
     constructor(msg: string) {
         super(msg);
     }
