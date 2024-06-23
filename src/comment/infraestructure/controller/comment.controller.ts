@@ -35,7 +35,7 @@ import { CommentEntity } from "../entities/comment.entity";
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
-@Controller( 'Comments' )
+@Controller( 'comments' )
 export class CommentController{
 
 
