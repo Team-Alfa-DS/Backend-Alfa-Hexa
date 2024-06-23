@@ -44,7 +44,7 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
         try {
           const result = await this.findOne({where: {id: idCategory.value}
           });
-          return Result.success<Category>(result, 200);
+          return Result.success<Category>(await this.ormCategoryMapper.toDomain(result), 200);
         } catch (error) {
           return Result.fail<Category>(new Error(error.message), error.code, error.message);
         }

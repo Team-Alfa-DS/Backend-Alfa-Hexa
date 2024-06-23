@@ -37,7 +37,7 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
                 name: blog.Title.value,
                 image: blog.Images[0].value,
                 date: blog.Publication_date.value,
-                category: categoryResult.Value ? categoryResult.Value.name : null,
+                category: categoryResult.Value ? categoryResult.Value.Name.value : null,
                 trainer: trainerResult.Value ? trainerResult.Value.Name : null
             }
         }

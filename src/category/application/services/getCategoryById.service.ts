@@ -16,7 +16,7 @@ export class GetCategoryByIdService extends IService<GetCategoryRequest, GetCate
         const result = await this.categoryRepository.getCategoryById(CategoryId.create(value.categoryId));
         if (!result.isSuccess) return Result.fail(result.Error, result.StatusCode, result.Message);
 
-        const response = new GetCategoryResponse(result.Value.icon, result.Value.id, result.Value.name);
+        const response = new GetCategoryResponse(result.Value.Icon.value, result.Value.Id.value, result.Value.Name.value);
         return Result.success(response, 200);
     }
 }

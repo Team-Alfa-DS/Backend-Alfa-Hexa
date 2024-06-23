@@ -30,7 +30,7 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
         const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
             domainBlog.Title.value,
             domainBlog.Content.value,
-            categoryResult.Value ? categoryResult.Value.name : null,    
+            categoryResult.Value ? categoryResult.Value.Name.value : null,    
             domainBlog.Images.map(image => image.value),
             trainerResult.Value ? {id: trainerResult.Value.Id, name: trainerResult.Value.Name} : {id: null, name: null},
             domainBlog.Tags.map(tag => tag.value),
