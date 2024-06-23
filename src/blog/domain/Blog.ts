@@ -6,10 +6,31 @@ import { BlogTitle } from "./valueObjects/blogTitle";
 import { BlogTag } from "./valueObjects/blogTag";
 import { BlogImage } from "./valueObjects/blogImage";
 import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { DomainEvent } from "src/common/domain/domain-event";
+import { BlogCreated } from './events/blogCreated.event';
+import { InvalidBlogException } from "./exceptions/invalidBlogException";
 
 
 
 export class Blog extends AggregateRoot<BlogId>{
+    protected when(event: DomainEvent): void {
+        if(event instanceof BlogCreated){
+            this.title = event.title;
+            this.content = event.content;
+            this.publication_date = event.publication_date;
+            this.comments = event.comments;
+            this.category = event.category;
+            this.trainer = event.trainer;
+            this.tags = event.tags;
+            this.images = event.images;
+        }
+
+    }
+    protected validateState(): void {
+        if(!this.title || !this.content || !this.publication_date || !this.comments || !this.category || !this.trainer || !this.tags || !this.images){ 
+            throw new InvalidBlogException('Blog is invalid')
+        }
+    }
 
     // private id: BlogId
     private title: BlogTitle
@@ -31,7 +52,7 @@ constructor(
      tags: BlogTag[],
      images: BlogImage[],
     ){
-        super(id);
+        super(id, BlogCreated.create(id, title, content, publication_date, comments, category, trainer, tags, images));
         this.title = title
         this.content = content
         this.publication_date = publication_date
