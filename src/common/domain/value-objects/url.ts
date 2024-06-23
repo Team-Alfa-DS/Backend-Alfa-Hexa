@@ -1,7 +1,6 @@
-import { throws } from "assert";
 import { ValueObject } from "src/common/domain/value-object";
-import { NullUrlException } from "../exceptions/nullUrl";
-import { InvalidUrlException } from "../exceptions/invalidUrl";
+import { NullUrlException } from "../../../course/domain/exceptions/nullUrl";
+import { InvalidUrlException } from "../../../course/domain/exceptions/invalidUrl";
 
 export class Url extends ValueObject<Url> {
   readonly url: string;

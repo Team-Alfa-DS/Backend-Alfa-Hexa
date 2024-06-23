@@ -13,6 +13,6 @@ export class CourseLevel extends ValueObject<CourseLevel> {
   }
 
   equals(obj: CourseLevel): boolean {
-      return this.value === obj.value;
+    return this.value === obj.value;
   }
 }

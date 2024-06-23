@@ -35,7 +35,7 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
   readonly level: string;
   readonly durationWeeks: number;
   readonly durationMinutes: number;
-  readonly tags: string[];
+  readonly tags: string[] = [];
   readonly date: Date;
   readonly lessons: {
     id: string,
@@ -48,13 +48,16 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
   constructor(course: Course) {
     this.title = course.Title.value;
     this.description = course.Description.value;
-    this.category = course.Category //.value;
+    this.category = course.Category.name //.value;
     this.image = course.Image.url;
-    this.trainer = course.Trainer //.value;
+    // this.trainer = {course.Trainer.Id} //.value;
+    this.trainer.id = course.Trainer.id.value;
+    this.trainer.name = course.Trainer.name;
     this.level = course.Level.value;
     this.durationWeeks = course.DurationWeeks.value;
     this.durationMinutes = course.DurationMinutes.value;
-    this.tags = course.Tags //.value;
+    // this.tags = course.Tags //.value;
+      
 
     for (let lesson of course.Lessons) {
       let videoUrl: string, imageUrl: string;
@@ -68,7 +71,11 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
         image: imageUrl
       })
     }
-  };
+
+    for (let tag of course.Tags) {
+      this.tags.push(tag.name);
+    }
+  }
 
   dataToString(): string {
     return `GetCourseByIdResponse: ${JSON.stringify(this)}`;

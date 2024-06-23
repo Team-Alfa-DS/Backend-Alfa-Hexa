@@ -8,7 +8,7 @@ import { TransactionHandler } from "src/common/infraestructure/database/transact
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { UserId } from "src/user/domain/value-objects/user-id";
-import { Uuid } from "src/course/domain/value-objects/Uuid";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {

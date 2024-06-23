@@ -1,8 +1,8 @@
-import { Uuid } from "../value-objects/Uuid";
+import { Uuid } from "../../../common/domain/value-objects/Uuid";
 import { LessonContent } from "../value-objects/lesson-content";
 import { LessonDuration } from "../value-objects/lesson-duration";
 import { LessonTitle } from "../value-objects/lesson-title";
-import { Url } from "../value-objects/url";
+import { Url } from "../../../common/domain/value-objects/url";
 
 export class Lesson {
   readonly id: Uuid;

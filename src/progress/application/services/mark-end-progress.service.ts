@@ -7,7 +7,7 @@ import { Progress } from "src/progress/domain/progress";
 import { IService } from "src/common/application/interfaces/IService";
 import { MarkEndProgressResponse } from "../dtos/response/mark-end-progress.response";
 import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.request.dto";
-import { Uuid } from "src/course/domain/value-objects/Uuid";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { ProgressMarkAsCompleted } from "src/progress/domain/value-objects/progress-markAsCompleted";
 import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";

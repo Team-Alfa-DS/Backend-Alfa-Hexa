@@ -1,11 +1,14 @@
 import { Lesson } from "../entities/Lesson";
-import { Uuid } from "../value-objects/Uuid";
+import { Uuid } from "../../../common/domain/value-objects/Uuid";
+import { CourseCategory } from "../value-objects/course-category";
 import { CourseDescription } from "../value-objects/course-description";
 import { CourseDurationMinutes } from "../value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "../value-objects/course-durationWeeks";
 import { CourseLevel } from "../value-objects/course-level";
+import { CourseTag } from "../value-objects/course-tag";
 import { CourseTitle } from "../value-objects/course-title";
-import { Url } from "../value-objects/url";
+import { CourseTrainer } from "../value-objects/course-trainer";
+import { Url } from "../../../common/domain/value-objects/url";
 
 export class Course {
   
@@ -19,9 +22,9 @@ export class Course {
     private durationWeeks: CourseDurationWeeks,
     private level: CourseLevel,
     private lessons: Lesson[],
-    private tags: string[], //entity?
-    private category: string, //entity?
-    private trainer: {id: string, name: string} //entity?
+    private tags: CourseTag[], //entity?
+    private category: CourseCategory, //entity?
+    private trainer: CourseTrainer //entity?
   ) {}  
   
   
@@ -61,17 +64,28 @@ export class Course {
     return this.lessons;
   }
 
-  get Tags(): string[] {
-    return this.tags;
-  } 
-
-  get Category(): string {
-    return this.category;
+  getLesson(id: Uuid): Lesson {
+    return this.lessons.find(lesson => lesson.id.equals(id));
   }
 
-  get Trainer(): {id: string, name: string} {
-    const id = this.trainer.id;
-    const name = this.trainer.name;
-    return {id, name};
+  get Tags(): CourseTag[] {
+    const tags:CourseTag[] = [];
+    for (let tag of this.tags) {
+      tags.push(new CourseTag(tag.name));
+    }
+
+    return tags;
+  }
+
+  containsTag(tag: string): boolean {
+    return this.tags.includes(new CourseTag(tag));
+  }
+
+  get Category(): CourseCategory {
+    return new CourseCategory(this.category.name);
+  }
+
+  get Trainer(): CourseTrainer {
+    return new CourseTrainer(this.trainer.id.value, this.trainer.name);
   }
 }

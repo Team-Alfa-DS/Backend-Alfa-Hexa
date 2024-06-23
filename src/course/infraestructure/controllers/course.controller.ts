@@ -16,6 +16,8 @@ import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 import { CourseEntity } from "../entities/course.entity";
+import { GetCourseCountQueryDto } from "../dtos/getCourseCountQuery.dto";
+import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } from "src/course/application/services/getCourseCount.service";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -24,6 +26,7 @@ import { CourseEntity } from "../entities/course.entity";
 export class CourseController {
   private readonly getManyCoursesService: IService<GetManyCoursesRequest, GetManyCoursesResponse>;
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
+  private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
 
   constructor() {
     const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
@@ -37,6 +40,10 @@ export class CourseController {
       new GetCourseByIdService(repositoryInstance), 
       logger
     );
+    this.getCourseCountService = new ExceptionLoggerDecorator(
+      new GetCourseCountService(repositoryInstance),
+      logger
+    )
   }
 
   @UseGuards(JwtAuthGuard)
@@ -91,5 +98,23 @@ export class CourseController {
       throw new HttpException(result.Message, result.StatusCode);
     }
     
+  }
+
+  @Get('/count')
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async getCourseCount(@Query() courseCountQueryDto: GetCourseCountQueryDto) {
+    const request = new GetCourseCountRequest(
+      courseCountQueryDto.category,
+      courseCountQueryDto.trainer
+    )
+
+    const result = await this.getCourseCountService.execute(request);
+
+    if (result.isSuccess) {
+      return result.Value;
+    } else {
+      throw new HttpException(result.Message, result.StatusCode)
+    }
   }
 }

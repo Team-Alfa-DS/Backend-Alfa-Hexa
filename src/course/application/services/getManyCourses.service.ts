@@ -72,7 +72,7 @@ export class GetManyCoursesResponse implements ServiceResponseDto {
         title: course.Title.value,
         image: course.Image.url,
         date: course.Date,
-        category: course.Category,
+        category: course.Category.name,
         trainer: course.Trainer.name
       })
     }

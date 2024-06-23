@@ -2,13 +2,16 @@ import { Course } from "src/course/domain/aggregates/Course";
 import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
-import { Uuid } from "src/course/domain/value-objects/Uuid";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { CourseTitle } from "src/course/domain/value-objects/course-title";
 import { CourseDescription } from "src/course/domain/value-objects/course-description";
-import { Url } from "src/course/domain/value-objects/url";
+import { Url } from "src/common/domain/value-objects/url";
 import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
 import { CourseLevel } from "src/course/domain/value-objects/course-level";
+import { CourseTag } from "src/course/domain/value-objects/course-tag";
+import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {
@@ -17,9 +20,9 @@ export class CourseMapper {
       
       domainLessons.push(LessonMapper.toDomain(lesson));
     }
-    const domainTags: string[] = [];
+    const domainTags: CourseTag[] = [];
     for (let tag of entity.tags) {
-      domainTags.push(tag.name);
+      domainTags.push(new CourseTag(tag.name));
     }
     const course = new Course(
       new Uuid(entity.id),
@@ -32,8 +35,8 @@ export class CourseMapper {
       new CourseLevel(entity.level),
       domainLessons,
       domainTags,
-      entity.category.name,
-      {id: entity.trainer.id, name: entity.trainer.name}
+      new CourseCategory(entity.category.name),
+      new CourseTrainer(entity.trainer.id, entity.trainer.name)
     );
 
     return course;

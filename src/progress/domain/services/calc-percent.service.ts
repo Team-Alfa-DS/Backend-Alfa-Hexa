@@ -1,7 +1,7 @@
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { Progress } from "../progress";
 import { CalcPercentProgressResponse, LessonProgress } from "../response/calc-percent-progress.response";
-import { Uuid } from "src/course/domain/value-objects/Uuid";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 
 export class CalcPercentService {
 
