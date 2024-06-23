@@ -43,8 +43,8 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
             ));
 
             blogs = blogs.filter((blog) => (
-                (blog.title.search(new RegExp(value.term, "i")) != -1) ||
-                (blog.content.search(new RegExp(value.term, "i")) != -1) 
+                (blog.Title.value.search(new RegExp(value.term, "i")) != -1) ||
+                (blog.Content.value.search(new RegExp(value.term, "i")) != -1) 
             ));
         }
 

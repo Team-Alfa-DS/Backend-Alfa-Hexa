@@ -20,21 +20,21 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
         return this.constructor.name;
     }
 
-    async execute({Id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
-        const domainBlogResult = await this.blogRepository.getBlogById(Id);
+    async execute({id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
+        const domainBlogResult = await this.blogRepository.getBlogById(id);
         if (domainBlogResult.Error)
             return Result.fail(domainBlogResult.Error, domainBlogResult.StatusCode, domainBlogResult.Message);
         const domainBlog = domainBlogResult.Value;
-        const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.trainer);
-        const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.category)
+        const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.Trainer);
+        const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.Category)
         const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
-            domainBlog.title,
-            domainBlog.content,
-            categoryResult.Value ? categoryResult.Value.name : null,    
-            domainBlog.images.map(image => image.url),
-            trainerResult.Value ? {Id: trainerResult.Value.Id, Name: trainerResult.Value.Name} : {Id: null, Name: null},
-            domainBlog.tags.map(tag => tag.name),
-            domainBlog.publication_date
+            domainBlog.Title.value,
+            domainBlog.Content.value,
+            categoryResult.Value ? categoryResult.Value.Name.value : null,    
+            domainBlog.Images.map(image => image.value),
+            trainerResult.Value ? {id: trainerResult.Value.Id, name: trainerResult.Value.Name} : {id: null, name: null},
+            domainBlog.Tags.map(tag => tag.value),
+            domainBlog.Publication_date.value
         )
         return Result.success(blogResponse, 200);
         
