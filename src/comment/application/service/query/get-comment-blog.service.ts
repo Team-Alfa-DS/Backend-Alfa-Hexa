@@ -1,4 +1,3 @@
-import { IApplicationService } from "src/common/application-service.interface/aplication-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { BlogComment, GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "../../dto/blog/blog-comment.response.dto";
 import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";

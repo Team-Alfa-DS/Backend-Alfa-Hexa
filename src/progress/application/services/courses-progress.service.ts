@@ -9,6 +9,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { Course } from "src/course/domain/aggregates/Course";
 import { Progress } from "src/progress/domain/progress";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class CoursesProgressService extends IService<CoursesProgressRequest, CoursesProgressResponse> {
 
@@ -33,25 +34,30 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
     }
 
     async execute(value: CoursesProgressRequest): Promise<Result<CoursesProgressResponse>> {
-        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
 
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
-        const progressUser = await this.progressRepository.findProgressByUser(value.userId, this.transactionHandler);
+        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId), this.transactionHandler);
 
         if (!progressUser.isSuccess) return Result.fail(progressUser.Error, progressUser.StatusCode, progressUser.Message);
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(pro.LessonId);
+            const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
             if (courses.findIndex(c => c.Id.equals(course.Value.Id) ) == -1) courses.push(course.Value);
         }
 
-        courses = courses.slice(value.perpage | 0, value.page | courses.length);
+        if (value.perpage) {
+            let page = 0;
+            if (value.page) {page = value.page}
+
+            courses = courses.slice((page*value.perpage), value.perpage + (page*value.perpage));
+        }
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.Lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
             progressUserList.push(progress.Value);
         }
 
