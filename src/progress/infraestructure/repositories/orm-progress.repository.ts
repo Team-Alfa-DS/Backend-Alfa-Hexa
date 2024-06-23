@@ -41,6 +41,8 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
             .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId})
             .getOne();
             
+            if (!progress) return Result.fail(new Error('El usuario no posee progreso'), 404, 'El usuario no posee progreso');
+
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
             return Result.success(progressDomain, 200);
         } catch (err) {
