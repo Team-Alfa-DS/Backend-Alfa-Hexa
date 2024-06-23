@@ -6,10 +6,17 @@ import { BlogTitle } from "./valueObjects/blogTitle";
 import { BlogTag } from "./valueObjects/blogTag";
 import { BlogImage } from "./valueObjects/blogImage";
 import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { DomainEvent } from "src/common/domain/domain-event";
 
 
 
 export class Blog extends AggregateRoot<BlogId>{
+    protected when(event: DomainEvent): void {
+        throw new Error("Method not implemented.");
+    }
+    protected validateState(): void {
+        throw new Error("Method not implemented.");
+    }
 
     // private id: BlogId
     private title: BlogTitle
