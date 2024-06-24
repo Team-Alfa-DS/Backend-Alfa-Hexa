@@ -4,6 +4,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IService } from "src/common/application/interfaces/IService";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { BlogId } from "src/blog/domain/valueObjects/blogId";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
@@ -20,9 +21,7 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
     }
     
     async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<GetBlogCommentServiceResponseDto>> {
-        if (!data.pagination.page) data.pagination.page = 0;
-        
-        const blogId = BlogCommentBlogId.create( data.blogId );
+        const blogId = BlogCommentBlogId.create( BlogId.create(data.blogId) );
 
         const comments = await this.commentBlogRepository.findAllCommentsByBlogId(
             blogId, 

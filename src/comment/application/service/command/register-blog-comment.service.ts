@@ -13,6 +13,7 @@ import { CommentBlogBody } from "src/comment/domain/valueObjects/blog/comment-bl
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { CommentBlog } from "src/comment/domain/comment-blog";
+import { BlogId } from "src/blog/domain/valueObjects/blogId";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -52,7 +53,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         let publicationDate = CommentBlogPublicationDate.create( new Date() );
         let body = CommentBlogBody.create( data.body );
         let userId = CommentBlogUserId.create( data.userId );
-        let target = BlogCommentBlogId.create( data.targetId );
+        let target = BlogCommentBlogId.create( BlogId.create(data.targetId) );
 
         const comment: CommentBlog = CommentBlog.create(
         commentID,
