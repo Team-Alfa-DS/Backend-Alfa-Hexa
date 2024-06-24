@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { BlogEntity } from "./blog.entity";
+import { BlogEntity } from "../../../blog/infraestructure/entities/blog.entity";
 import { CourseEntity } from "src/course/infraestructure/entities/course.entity";
 
 @Entity('tag')
