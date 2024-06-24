@@ -10,6 +10,7 @@ import { CommentBlogUserDisliked } from "src/comment/domain/valueObjects/blog/co
 import { CommentBlogUserLiked } from "src/comment/domain/valueObjects/blog/comment-blog-userLiked";
 import { CommentBlogCountLike } from "src/comment/domain/valueObjects/blog/comment-blog-countLikes";
 import { CommentBlogCountDislike } from "src/comment/domain/valueObjects/blog/comment-blog-countDislikes";
+import { BlogId } from "src/blog/domain/valueObjects/blogId";
 
 
 export class OrmBlogCommentMapper implements IMapper<CommentBlog,BlogCommentEntity> {
@@ -20,7 +21,7 @@ export class OrmBlogCommentMapper implements IMapper<CommentBlog,BlogCommentEnti
             DomainEntity.PublicationDate.PublicationDate,
             DomainEntity.Body.Body,
             DomainEntity.UserId.UserId,
-            DomainEntity.BlogId.BlogId,
+            DomainEntity.BlogId.BlogId.value,
             DomainEntity.CountLikes.CountLike,
             DomainEntity.CountDislikes.CountDislike,
             DomainEntity.UserLiked.UserLiked,
@@ -35,7 +36,7 @@ export class OrmBlogCommentMapper implements IMapper<CommentBlog,BlogCommentEnti
             CommentBlogPublicationDate.create(OrmEntity.PublicationDate),
             CommentBlogBody.create(OrmEntity.Body),
             CommentBlogUserId.create(OrmEntity.UserId),
-            BlogCommentBlogId.create(OrmEntity.BlogId),
+            BlogCommentBlogId.create(BlogId.create(OrmEntity.BlogId)),
             CommentBlogCountLike.create(OrmEntity.CountLikes),
             CommentBlogCountDislike.create(OrmEntity.CountDislikes),
             CommentBlogUserLiked.create(OrmEntity.UserLiked),
