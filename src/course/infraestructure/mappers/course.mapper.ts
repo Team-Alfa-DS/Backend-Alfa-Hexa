@@ -12,6 +12,7 @@ import { CourseLevel } from "src/course/domain/value-objects/course-level";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {
@@ -25,7 +26,7 @@ export class CourseMapper {
       domainTags.push(new CourseTag(tag.name));
     }
     const course = new Course(
-      new Uuid(entity.id),
+      new CourseId(entity.id),
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
       new Url(entity.image),
@@ -36,7 +37,7 @@ export class CourseMapper {
       domainLessons,
       domainTags,
       new CourseCategory(entity.category.name),
-      new CourseTrainer(entity.trainer.id, entity.trainer.name)
+      new CourseTrainer(entity.trainer.id)
     );
 
     return course;

@@ -2,7 +2,7 @@ import { ValueObject } from "src/common/domain/value-object";
 import { NullCourseCategoryException } from "../exceptions/nullCourseCategory";
 
 export class CourseCategory extends ValueObject<CourseCategory> {
-  readonly name: string;
+  readonly name: string; 
   
   constructor(name: string) {
     super();

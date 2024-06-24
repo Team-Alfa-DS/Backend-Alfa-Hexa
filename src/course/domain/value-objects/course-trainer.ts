@@ -3,16 +3,12 @@ import { Uuid } from "../../../common/domain/value-objects/Uuid";
 import { NullCourseTrainerNameException } from "../exceptions/nullCourseTrainerName";
 
 export class CourseTrainer extends ValueObject<CourseTrainer> {
-  readonly id: Uuid;
-  readonly name: string;
+  readonly id: Uuid; //FIXME: Esto debería ser TrainerId
 
-  constructor(id: string, name: string) {
+  constructor(id: string) {
     super();
 
-    if (!name) { throw new NullCourseTrainerNameException('No se proporcionó un nombre para el entrenador')}
-
     this.id = new Uuid(id);
-    this.name = name;
   }
 
   equals(obj: CourseTrainer): boolean {

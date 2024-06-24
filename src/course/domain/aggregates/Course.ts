@@ -9,11 +9,13 @@ import { CourseTag } from "../value-objects/course-tag";
 import { CourseTitle } from "../value-objects/course-title";
 import { CourseTrainer } from "../value-objects/course-trainer";
 import { Url } from "../../../common/domain/value-objects/url";
+import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { CourseId } from "../value-objects/course-id";
 
-export class Course {
+export class Course extends AggregateRoot<CourseId>{
   
   constructor(
-    private id: Uuid,
+    private id: CourseId,
     private title: CourseTitle,
     private description: CourseDescription,
     private image: Url,
@@ -22,14 +24,14 @@ export class Course {
     private durationWeeks: CourseDurationWeeks,
     private level: CourseLevel,
     private lessons: Lesson[],
-    private tags: CourseTag[], //entity?
+    private tags: CourseTag[], //entity? //FIXME: Hay que meterle comportamiento de búsqueda por Ids a esto
     private category: CourseCategory, //entity?
     private trainer: CourseTrainer //entity?
-  ) {}  
+  ) {super(id)}  
   
   
-  get Id(): Uuid {
-    return new Uuid(this.id.value);
+  get Id(): CourseId {
+    return new CourseId(this.id.value.value);
   }
 
   get Title(): CourseTitle {
@@ -86,6 +88,6 @@ export class Course {
   }
 
   get Trainer(): CourseTrainer {
-    return new CourseTrainer(this.trainer.id.value, this.trainer.name);
+    return new CourseTrainer(this.trainer.id.value);
   }
 }
