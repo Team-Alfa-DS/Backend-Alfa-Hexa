@@ -3,7 +3,7 @@ import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
-@Entity('comment')
+@Entity('blog_comment')
 export class BlogCommentEntity {
     @ApiProperty({
         description: 'Id del comentario',

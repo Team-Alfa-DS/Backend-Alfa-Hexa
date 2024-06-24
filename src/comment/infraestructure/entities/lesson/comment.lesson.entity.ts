@@ -3,7 +3,7 @@ import { LessonEntity } from "src/course/infraestructure/entities/lesson.entity"
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
-@Entity('comment')
+@Entity('lesson_comment')
 export class LessonCommentEntity {
     @ApiProperty({
         description: 'Id del comentario',
