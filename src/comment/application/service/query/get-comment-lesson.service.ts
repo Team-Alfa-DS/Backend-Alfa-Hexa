@@ -1,21 +1,21 @@
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto, LessonComment } from "../../dto/lesson/lesson-comment.response.dto";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
-import { CommentLessonId } from "src/comment/domain/valueObjects/comment-lessonId";
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
+import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
-    private readonly commentRepository: ICommentRepository;
+    private readonly commentLessonRepository: ILessonCommentRepository;
     private readonly transactionHandler: ITransactionHandler;
 
     constructor(
-        commentRepository: ICommentRepository,
+        commentLessonRepository: ILessonCommentRepository,
         transactionHandler: ITransactionHandler,
     ){
         super();
-        this.commentRepository = commentRepository;
+        this.commentLessonRepository = commentLessonRepository;
         this.transactionHandler = transactionHandler;
     }
     
@@ -23,9 +23,9 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
 
         if (!data.pagination.page) data.pagination.page = 0;
         
-        let lessonId = CommentLessonId.create( data.lessonId );
+        let lessonId = LessonCommentLessonId.create( data.lessonId );
 
-        const comments = await this.commentRepository.findAllCommentsByLessonId(
+        const comments = await this.commentLessonRepository.findAllCommentsByLessonId(
             lessonId,
             this.transactionHandler
         );

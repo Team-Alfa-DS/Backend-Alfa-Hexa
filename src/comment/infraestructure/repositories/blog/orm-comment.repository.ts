@@ -5,7 +5,7 @@ import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { BlogCommentEntity } from "../../entities/blog/comment.blog.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
-import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-repository.interface";
+import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 
 export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> implements IBlogCommentRepository{
     

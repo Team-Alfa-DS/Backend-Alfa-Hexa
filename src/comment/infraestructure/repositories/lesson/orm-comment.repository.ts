@@ -2,10 +2,10 @@ import { DataSource, Repository } from "typeorm";
 import { Result } from "src/common/domain/result-handler/result";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-repository.interface";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { LessonCommentEntity } from "../../entities/lesson/comment.lesson.entity";
+import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 
 export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> implements ILessonCommentRepository{
     

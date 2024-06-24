@@ -1,11 +1,10 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
-import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
+import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment-blog.mapper";
+import { OrmLessonCommentMapper } from "../mapper/lesson/orm-comment-lesson.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
-import { OrmCommentRepository } from "../repositories/orm-comment.repository";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
-import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
@@ -28,7 +27,17 @@ import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
-import { CommentEntity } from "../entities/comment.entity";
+import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
+import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
+import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
+import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
+import { BlogCommentEntity } from "../entities/blog/comment.blog.entity";
+import { LessonCommentEntity } from "../entities/lesson/comment.lesson.entity";
+
+
+
+
+
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -41,12 +50,18 @@ export class CommentController{
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
-    private commentMapper: OrmCommentMapper = new OrmCommentMapper();
+    private commentBlogMapper: OrmBlogCommentMapper = new OrmBlogCommentMapper();
+    private commentLessonMapper: OrmLessonCommentMapper = new OrmLessonCommentMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
 
     //* Repositorios
-    private readonly commentRepository: ICommentRepository = new OrmCommentRepository(
-        this.commentMapper,
+    private readonly commentBlogRepository: IBlogCommentRepository = new OrmBlogCommentRepository(
+        this.commentBlogMapper,
+        DatabaseSingleton.getInstance()
+    );
+
+    private readonly commentLessonRepository: ILessonCommentRepository = new OrmLessonCommentRepository(
+        this.commentLessonMapper,
         DatabaseSingleton.getInstance()
     );
 
@@ -83,14 +98,14 @@ export class CommentController{
 
         this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
-                this.commentRepository,
+                this.commentBlogRepository,
                 this.transactionHandler
             ),
             this.logger
         );
         this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
-                this.commentRepository,
+                this.commentLessonRepository,
                 this.transactionHandler
             ),
             this.logger
@@ -98,7 +113,7 @@ export class CommentController{
         this.registerLessonCommentService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterLessonCommentServices(
-                    this.commentRepository,
+                    this.commentLessonRepository,
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,
@@ -111,7 +126,7 @@ export class CommentController{
         this.registerBlogCommentService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterBlogCommentServices(
-                    this.commentRepository,
+                    this.commentBlogRepository,
                     this.userRepository,
                     this.blogRepository,
                     this.transactionHandler,
@@ -128,7 +143,7 @@ export class CommentController{
     @Get(':many')
     @ApiCreatedResponse({
         description: 'se retorno todos los comentarios correctamente',
-        type: CommentEntity,
+        type: BlogCommentEntity, 
     })
     @ApiBadRequestResponse({
         description: 'No existen comentarios.'
@@ -165,7 +180,7 @@ export class CommentController{
     @Post( '/release' )
     @ApiCreatedResponse({
         description: 'se agrego el comentario correctamente',
-        type: CommentEntity,
+        type: BlogCommentEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo agregar el  comentario.'
