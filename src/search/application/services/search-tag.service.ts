@@ -24,7 +24,7 @@ export class SearchTagService extends IService<SearchRequestDto, SearchTagRespon
         
         let result = await this.tagRepository.getAllTags(this.transactionHandler);
         
-        if (!result) return Result.fail(result.Error, result.StatusCode, result.Message);
+        if (!result) return Result.fail(result.Error, result.StatusCode, result.Message); 
         
         tagNames = result.Value;
 

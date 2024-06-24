@@ -1,30 +1,30 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { BlogComment, GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "../../dto/blog/blog-comment.response.dto";
-import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
-import { CommentBlogId } from "src/comment/domain/valueObjects/comment-blogId";
+import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
-    private readonly commentRepository: ICommentRepository;
+    private readonly commentBlogRepository: IBlogCommentRepository;
     private readonly transactionHandler: ITransactionHandler;
 
     constructor(
-        commentRepository: ICommentRepository,
+        commentBlogRepository: IBlogCommentRepository,
         transactionHandler: ITransactionHandler,
     ){
         super();
-        this.commentRepository = commentRepository;
+        this.commentBlogRepository = commentBlogRepository;
         this.transactionHandler = transactionHandler;
     }
     
     async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<GetBlogCommentServiceResponseDto>> {
         if (!data.pagination.page) data.pagination.page = 0;
         
-        const blogId = CommentBlogId.create( data.blogId );
+        const blogId = BlogCommentBlogId.create( data.blogId );
 
-        const comments = await this.commentRepository.findAllCommentsByBlogId(
+        const comments = await this.commentBlogRepository.findAllCommentsByBlogId(
             blogId, 
             this.transactionHandler
         );

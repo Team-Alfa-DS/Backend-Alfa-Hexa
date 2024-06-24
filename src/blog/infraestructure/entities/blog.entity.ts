@@ -1,10 +1,10 @@
-import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Image } from "./image.entity";
 import { Tag } from "../../../tag/infraestructure/entities/tag.entity";
 import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { BlogCommentEntity } from "src/comment/infraestructure/entities/blog/comment.blog.entity";
 
 @Entity('blog')
 export class BlogEntity {
@@ -33,8 +33,8 @@ export class BlogEntity {
     @Column()
     publication_date: Date
 
-    @OneToMany(() => CommentEntity, comment => comment.blog)
-    comments: CommentEntity[];
+    @OneToMany(() => BlogCommentEntity, comment => comment.blog)
+    comments: BlogCommentEntity[];
 
     @OneToMany(() => Image, image => image.blog)
     images: Image[];

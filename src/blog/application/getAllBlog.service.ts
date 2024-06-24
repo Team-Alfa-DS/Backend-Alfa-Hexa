@@ -20,7 +20,7 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
     get name(): string {
         return this.constructor.name;
     }
-       
+    
 
     async execute(value: GetAllBlogsRequestDTO): Promise<Result<GetAllBlogsResponseDTO>>{
         const prueba = await this.blogRepository.getBlogsTagsNames([ 'Yoga']);

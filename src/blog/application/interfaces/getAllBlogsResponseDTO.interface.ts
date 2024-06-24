@@ -1,6 +1,6 @@
 import { ServiceResponseDto } from "src/common/application/interfaces/IService";
 
- export interface GeneralBlogDTO {
+export interface GeneralBlogDTO {
     id: string,
     name: string,
     image: string,
