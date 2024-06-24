@@ -59,7 +59,7 @@ export class BlogCommentEntity {
     @Column()
     body: string;
 
-    @ManyToOne(() => UserEntity, user => user.comments)
+    @ManyToOne(() => UserEntity, user => user.blogComments)
     @JoinColumn({name: 'user_id'})
     user: string;
 
