@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { CourseEntity } from "./course.entity";
 import { ProgressEntity } from "src/progress/infraestructure/entities/progress.entity";
-import { CommentEntity } from "src/comment/infraestructure/entities/comment.entity";
+import { LessonCommentEntity } from "src/comment/infraestructure/entities/lesson/comment.lesson.entity";
 
 @Entity('lesson')
 export class LessonEntity {
@@ -30,7 +30,7 @@ export class LessonEntity {
     @OneToMany(() => ProgressEntity, progress => progress.lesson)
     progress: ProgressEntity[];
 
-    @OneToMany(() => CommentEntity, comment => comment.lesson)
-    comments: CommentEntity[];
+    @OneToMany(() => LessonCommentEntity, comment => comment.lesson)
+    comments: LessonCommentEntity[];
 
 }
