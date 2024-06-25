@@ -36,6 +36,7 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }
         const newUser = user.Value;
+        newUser.pullDomainEvents();
         if(data.email) {
             const userEmailCheck = await this.userRepository.findUserByEmail(UserEmail.create(data.email), this.transactionHandler)
             if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'), 400, 'Ya existe un usuario con este email');
