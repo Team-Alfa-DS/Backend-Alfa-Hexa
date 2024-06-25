@@ -47,7 +47,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
                 ProgressId.create(value.userId, value.lessonId),
                 ProgressMarkAsCompleted.create(value.markAsCompleted),
                 UserId.create(value.userId),
-                value.time > lesson.seconds ? ProgressTime.create(lesson.seconds) : ProgressTime.create(value.time),
+                value.time > value.totalTime ? ProgressTime.create(value.totalTime) : ProgressTime.create(value.time),
                 ProgressLastTime.create(new Date())
             ),
             this.transactionHandler

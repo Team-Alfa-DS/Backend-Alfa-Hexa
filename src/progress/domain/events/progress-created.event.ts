@@ -11,8 +11,8 @@ export class ProgressCreated extends DomainEvent {
         public id: ProgressId, 
         public markAsCompleted: ProgressMarkAsCompleted, 
         public user: UserId, 
-        public time?: ProgressTime, 
-        public lastTime?: ProgressLastTime
+        public time: ProgressTime, 
+        public lastTime: ProgressLastTime
     ) {
         super();
     }
@@ -21,8 +21,8 @@ export class ProgressCreated extends DomainEvent {
         id: ProgressId, 
         markAsCompleted: ProgressMarkAsCompleted, 
         user: UserId, 
-        time?: ProgressTime, 
-        lastTime?: ProgressLastTime
+        time: ProgressTime, 
+        lastTime: ProgressLastTime
     ): ProgressCreated {
         return new ProgressCreated(id, markAsCompleted, user, time, lastTime);
     }

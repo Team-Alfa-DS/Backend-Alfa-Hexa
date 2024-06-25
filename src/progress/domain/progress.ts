@@ -13,8 +13,8 @@ import { ProgressLastTimeUpdated } from "./events/progress-lastTime-updated.even
 
 export class Progress extends AggregateRoot<ProgressId>{
     private markAsCompleted: ProgressMarkAsCompleted;
-    private time?: ProgressTime;
-    private lastTime?: ProgressLastTime;
+    private time: ProgressTime;
+    private lastTime: ProgressLastTime;
     private user: UserId;
 
     private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
@@ -63,7 +63,7 @@ export class Progress extends AggregateRoot<ProgressId>{
         return this.user;
     }
 
-    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time?: ProgressTime, lastTime?: ProgressLastTime) {
+    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
         return new Progress(id, markAsCompleted, user, time, lastTime);
     }
 
