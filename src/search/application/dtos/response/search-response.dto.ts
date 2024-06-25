@@ -9,32 +9,34 @@ export class SearchResponseDto implements ServiceResponseDto {
   readonly blogs: BlogResponseDto[];
   readonly courses: CourseResponseDto[];
 
-  constructor(blogs: Blog[], courses: Course[]) {
-    for (let blog of blogs) {
-      this.blogs.push(
-        new BlogResponseDto(
-          blog.id,
-          blog.title,
-          blog.images[0].url,
-          blog.publication_date,
-          blog.category,
-          blog.category
-        )
-      )
-    }
+  constructor(blogs: BlogResponseDto[], courses: CourseResponseDto[]) {
+    this.blogs = blogs;
+    this.courses = courses;
+    // for (let blog of blogs) {
+    //   this.blogs.push(
+    //     new BlogResponseDto(
+    //       blog.Id.value,
+    //       blog.Title.value,
+    //       blog.Images[0].value,
+    //       blog.Publication_date.,
+    //       blog.Category.value,
+          
+    //     )
+    //   )
+    // }
 
-    for (let course of courses) {
-      this.courses.push(
-        new CourseResponseDto(
-          course.Id.Value,
-          course.Title.value,
-          course.Image.Value,
-          course.Date,
-          course.Category.name,
-          course.Trainer.id.value //FIXME: Hay que adaptar la búsqueda de entrenadores por ID
-        )
-      );
-    }
+    // for (let course of courses) {
+    //   this.courses.push(
+    //     new CourseResponseDto(
+    //       course.Id.Value,
+    //       course.Title.value,
+    //       course.Image.Value,
+    //       course.Date,
+    //       course.Category.name,
+    //       course.Trainer.id.value //FIXME: Hay que adaptar la búsqueda de entrenadores por ID
+    //     )
+    //   );
+    // }
   }
 
   dataToString(): string {
