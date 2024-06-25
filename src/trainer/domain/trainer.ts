@@ -7,12 +7,14 @@ import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 import { DomainEvent } from 'src/common/domain/domain-event';
 import { TrainerCreated } from './events/trainer-created.events';
 import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';
+import { Course } from 'src/course/domain/Course';
 
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
   private followers: TrainerFollower;
   private userFollow: TrainerUserFollow;
   private location: TrainerLocation;
+
   
   constructor(
     id: TrainerId,
