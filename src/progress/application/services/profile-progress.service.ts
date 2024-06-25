@@ -50,18 +50,18 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
             const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
-            if (courses.findIndex(c => c.id == course.Value.id) == -1) courses.push(course.Value);
+            if (courses.findIndex(c => c.Id.equals(course.Value.Id) /*c.id == course.Value.id*/) == -1) courses.push(course.Value);
         }
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
             progressUserList.push(progress.Value);
         }
 
         let progressCourseUser: CalcPercentProgressResponse[] = [];
         for (let i=0; i < progressUserList.length; i++) {
-            const calc = this.calcPercent.execute(courses[i].lessons, progressUserList[i]);
+            const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
             progressCourseUser.push(calc);
         }
         const totalCoursesPercent = this.calcTotalCoursesPercent.execute(progressCourseUser);
