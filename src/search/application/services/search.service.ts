@@ -6,7 +6,7 @@ import { ICourseRepository } from "src/course/application/repositories/ICourse.r
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { Blog } from "src/blog/domain/Blog";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 
 export class SearchService extends IService<SearchRequestDto, SearchResponseDto> {
 

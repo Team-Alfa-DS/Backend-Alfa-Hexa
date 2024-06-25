@@ -1,4 +1,4 @@
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
@@ -13,6 +13,7 @@ import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { CourseId } from "src/course/domain/value-objects/course-id";
+import { CourseImage } from "src/course/domain/value-objects/course-image";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {
@@ -29,7 +30,7 @@ export class CourseMapper {
       new CourseId(entity.id),
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
-      new Url(entity.image),
+      new CourseImage(entity.image),
       entity.publication_date,
       new CourseDurationMinutes(entity.minutes),
       new CourseDurationWeeks(entity.weeks),

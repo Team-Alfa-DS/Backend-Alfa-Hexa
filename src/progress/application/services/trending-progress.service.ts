@@ -46,7 +46,7 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
 
         const result = this.calcPercentService.execute(course.Value.Lessons, totalProgress.Value);
 
-        const response = new TrendingProgressResponse(result.percent, course.Value.Title.value, course.Value.Id.value, progress.Value.LastTime?.LastTime);
+        const response = new TrendingProgressResponse(result.percent, course.Value.Title.value, course.Value.Id.Value, progress.Value.LastTime?.LastTime);
         return Result.success(response, 200);
     }
     // get name(): string {

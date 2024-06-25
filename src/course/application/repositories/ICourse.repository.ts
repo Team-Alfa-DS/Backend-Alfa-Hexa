@@ -1,5 +1,5 @@
 import { Result } from "src/common/domain/result-handler/result";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 
 export interface ICourseRepository {
   getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>>;

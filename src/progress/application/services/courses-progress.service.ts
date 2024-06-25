@@ -6,7 +6,7 @@ import { IProgressRepository } from "src/progress/domain/repositories/progress-r
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { Progress } from "src/progress/domain/progress";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { UserId } from "src/user/domain/value-objects/user-id";
@@ -65,12 +65,12 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
         for (let i=0; i < progressUserList.length; i++) {
             const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
             progressCourseUser.push({
-                id: courses[i].Id.value,
+                id: courses[i].Id.Value,
                 title: courses[i].Title.value,
-                image: courses[i].Image.url,
+                image: courses[i].Image.Value,
                 date: courses[i].Date,
-                category: courses[i].Category,
-                trainer: courses[i].Trainer.name,
+                category: courses[i].Category.name,
+                trainer: courses[i].Trainer.id.value, //FIXME: !Trainer en curso es un Id de trainer
                 percent: calc.percent
             })
         }

@@ -9,7 +9,7 @@ import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ServiceLoggerDecorator } from "src/common/application/aspects/serviceLoggerDecorator";
 import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLogger";
 import { IService } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
@@ -18,6 +18,8 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { CourseEntity } from "../entities/course.entity";
 import { GetCourseCountQueryDto } from "../dtos/getCourseCountQuery.dto";
 import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } from "src/course/application/services/getCourseCount.service";
+import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/orm-trainer.repositorie";
+import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -29,19 +31,20 @@ export class CourseController {
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
 
   constructor() {
-    const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
+    const courseRepositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
+    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,DatabaseSingleton.getInstance());
     const logger = new NestLogger();
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(repositoryInstance), 
+      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance), 
       logger
     );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(repositoryInstance), 
+      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance), 
       logger
     );
     this.getCourseCountService = new ExceptionLoggerDecorator(
-      new GetCourseCountService(repositoryInstance),
+      new GetCourseCountService(courseRepositoryInstance),
       logger
     )
   }

@@ -1,4 +1,4 @@
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
@@ -33,9 +33,9 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.id.value);
         if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
         responseCourses.push({
-          id: course.Id.value.value,
+          id: course.Id.Value,
           title: course.Title.value,
-          image: course.Image.url,
+          image: course.Image.Value,
           date: course.Date,
           category: course.Category.name,
           trainer: trainer.Value.Name

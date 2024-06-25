@@ -1,5 +1,5 @@
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { DataSource, Repository } from "typeorm";
 import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
@@ -42,7 +42,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
       // courses = courses.filter((course) => course.tags.includes(filter))
     }
     if (category) {courses = courses.filter((course) => course.Category.equals(new CourseCategory(category)))} //Aplicar los filtros que correspondan
-    if (trainer) {courses = courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainer, '')))}
+    if (trainer) {courses = courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainer)))}
 
     if (courses.length > 0) {
 

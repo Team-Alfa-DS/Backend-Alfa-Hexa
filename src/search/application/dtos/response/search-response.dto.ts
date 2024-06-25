@@ -1,7 +1,7 @@
 // import { Blog } from "src/blog/infraestructure/entities/blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { ServiceResponseDto } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/aggregates/Course";
+import { Course } from "src/course/domain/Course";
 import { BlogResponseDto } from "./search-blogResponse.dto";
 import { CourseResponseDto } from "./search-courseResponse.dto";
 
@@ -26,12 +26,12 @@ export class SearchResponseDto implements ServiceResponseDto {
     for (let course of courses) {
       this.courses.push(
         new CourseResponseDto(
-          course.Id.value,
+          course.Id.Value,
           course.Title.value,
-          course.Image.url,
+          course.Image.Value,
           course.Date,
-          course.Category,
-          course.Trainer.name
+          course.Category.name,
+          course.Trainer.id.value //FIXME: Hay que adaptar la búsqueda de entrenadores por ID
         )
       );
     }

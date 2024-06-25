@@ -1,6 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 import { NullUuidException } from "../../../course/domain/exceptions/nullUuid";
-import { InvalidUuidException } from "../../../course/domain/exceptions/invalidUuid";
+import { InvalidUuidException } from "../exceptions/invalidUuid";
 
 export class Uuid extends ValueObject<Uuid> {
   readonly value: string;

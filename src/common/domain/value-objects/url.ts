@@ -1,6 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 import { NullUrlException } from "../../../course/domain/exceptions/nullUrl";
-import { InvalidUrlException } from "../../../course/domain/exceptions/invalidUrl";
+import { InvalidUrlException } from "../exceptions/invalidUrl";
 
 export class Url extends ValueObject<Url> {
   readonly url: string;
