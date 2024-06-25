@@ -22,6 +22,12 @@ import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
 import { HttpResponseHandler } from "src/common/infraestructure/handlers/http-response.handler";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { EventBus } from "src/common/infraestructure/events/event-bus";
+import { IMailer } from "src/common/application/mailer/mailer.interface";
+import { MailjetService } from "nest-mailjet";
+import { MailJet } from "src/common/infraestructure/mailer/mailjet";
+import { UpdatedUserPasswordNotify } from "src/user/application/events/updated-user-password-notify.event";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -43,15 +49,21 @@ export class UserController {
         DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly logger: ILogger = new NestLogger();
+    private readonly eventPublisher: IEventPublisher = new EventBus();
+    private readonly mailer: IMailer;
     private updateUserService: IService<UpdateUserRequest, UpdateUserResponse>;
     
-    constructor() {
+    constructor(private mailerService: MailjetService) {
+        this.mailer = new MailJet(mailerService);
+        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
+
         this.updateUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new UpdateUserService(
                     this.userRepository,
                     this.transactionHandler,
-                    this.encryptor
+                    this.encryptor,
+                    this.eventPublisher
                 ),
                 this.auditRepository
             ),
