@@ -22,8 +22,8 @@ export class GetManyCoursesQueryDto {
 
 
   @ApiProperty({
-    description: 'Entrenador asignado al curso',
-    example: 'Ana Montilla'
+    description: 'Id del entrenador de los cursos a buscar',
+    example: '3fcfac6c-53d1-47f1-ae9a-2351a86c5d0d'
   })
   @IsOptional()
   @IsString()
@@ -31,16 +31,16 @@ export class GetManyCoursesQueryDto {
 
 
   @ApiProperty({
-    description: 'Cantidad de cursos que deseas recibir ',
+    description: 'Desde donde se empiezan a contar los cursos',
     example: '1'
   })
   @IsOptional()
   @IsNumber()
   @Type(() => Number)
   page?: number;
-
+  
   @ApiProperty({
-    description: 'Desde donde se empiezan a contar los cursos',
+    description: 'Cantidad de cursos que deseas recibir ',
     example: '1'
   })
   @IsNumber()

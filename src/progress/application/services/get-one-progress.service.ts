@@ -38,10 +38,10 @@ export class GetOneProgressService extends IService<GetOneProgressRequest, GetOn
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
 
-        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.lessons, this.transactionHandler);
+        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.Lessons, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
 
-        const calc = this.calcPercentService.execute(course.Value.lessons, progress.Value);
+        const calc = this.calcPercentService.execute(course.Value.Lessons, progress.Value);
         const response = new GetOneProgressResponse(calc.percent, calc.lessons);
 
         return Result.success(response, 200);

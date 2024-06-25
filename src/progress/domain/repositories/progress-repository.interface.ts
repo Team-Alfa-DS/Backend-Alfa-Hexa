@@ -1,7 +1,7 @@
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Progress } from "../progress";
 import { Result } from "src/common/domain/result-handler/result";
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 import { UserId } from "src/user/domain/value-objects/user-id";
 
 export interface IProgressRepository {
