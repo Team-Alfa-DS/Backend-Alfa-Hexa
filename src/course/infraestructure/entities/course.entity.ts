@@ -1,9 +1,10 @@
-import { Tag } from "src/blog/infraestructure/entities/tag.entity";
+
 import { CategoryEntity } from "src/category/infraestructure/entities/category.entity";
 import { OrmTrainer } from "src/trainer/infraestructure/entities/trainer.entity";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { LessonEntity } from "./lesson.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { Tag } from "src/tag/infraestructure/entities/tag.entity";
 
 @Entity('course')
 export class CourseEntity {

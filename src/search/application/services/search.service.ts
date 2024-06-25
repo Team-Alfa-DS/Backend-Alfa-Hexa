@@ -36,11 +36,19 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     courses = courseResult.Value;
     blogs = blogsResult.Value;
 
+<<<<<<< feature-Courses
     if (value.term) {
       courses = courses.filter((course) => (
         (course.Title.value.search(new RegExp(value.term, "i")) != -1) ||
         (course.Description.value.search(new RegExp(value.term, "i")) != -1)
       ));
+=======
+            blogs = blogs.filter((blog) => (
+                (blog.Title.value.search(new RegExp(value.term, "i")) != -1) ||
+                (blog.Content.value.search(new RegExp(value.term, "i")) != -1) 
+            ));
+        }
+>>>>>>> develop
 
       blogs = blogs.filter((blog) => (
         (blog.title.search(new RegExp(value.term, "i")) != -1) ||
