@@ -79,4 +79,13 @@ export class Trainer extends AggregateRoot<TrainerId> {
   get Location(): TrainerLocation {
     return this.location;
   }
+  get Courses(): TrainerCourseId[] {
+    return this.courses;
+  }
+  get Blogs(): TrainerBlogId[] {
+    return this.blogs;
+  }
+  get Users(): TrainerFollowerUserId[] {
+    return this.users;
+  }
 }
