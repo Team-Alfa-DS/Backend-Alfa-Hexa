@@ -32,6 +32,6 @@ export class UpdatedUserPasswordNotify implements IEventSubscriber {
             data: {}
         }
 
-        Result.success(response, user.StatusCode);
+        return Result.success(response, user.StatusCode);
     }
 }
