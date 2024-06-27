@@ -19,6 +19,10 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { OrmTagRepository } from 'src/tag/infraestructure/repositories/orm-tag-repository';
 import { SearchTagResponseDto } from 'src/search/application/dtos/response/search-tag-response.dto';
 import { ITagRepository } from 'src/tag/application/ITagRepository';
+import { OrmCategoryRepository } from 'src/category/infraestructure/repositories/orm-category.repository';
+import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-category.mapper';
+import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
+import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 
 
 @ApiTags('Search')
@@ -35,6 +39,8 @@ export class SearchController {
         const courseRepo = new TOrmCourseRepository(DatabaseSingleton.getInstance());
         const blogRepo = new OrmBlogRepository(DatabaseSingleton.getInstance());
         const tagRepo: ITagRepository = new OrmTagRepository(DatabaseSingleton.getInstance());
+        const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), DatabaseSingleton.getInstance());
+        const trainerRepo = new OrmTrainerRepository( new OrmTrainerMapper(), DatabaseSingleton.getInstance());
         const logger = new NestLogger();
 
         this.transacctionHandler = new TransactionHandler(
@@ -42,7 +48,7 @@ export class SearchController {
         );
 
         this.searchService =  new ExceptionLoggerDecorator(
-            new SearchService(courseRepo, blogRepo),
+            new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
             logger
         );
 
@@ -53,7 +59,7 @@ export class SearchController {
     }
 
 
-    @Get( ":all" )
+    @Get( "/all" )
     @ApiCreatedResponse({
         description: 'se realizo la busqueda correctamente',
     })
@@ -79,7 +85,7 @@ export class SearchController {
         }
     }
 
-    @Get( ":popular/tags" )
+    @Get( "/popular/tags" )
     async searchPopularTags(
         @Request() req,
         @Query('page', ParseIntPipe,) page: number,

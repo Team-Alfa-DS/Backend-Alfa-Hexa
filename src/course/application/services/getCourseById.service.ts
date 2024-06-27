@@ -4,6 +4,7 @@ import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/appl
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
@@ -15,7 +16,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     const r = await this.courseRepository.getCourseById(service.courseId);
 
     if (r.isSuccess) {
-      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.id.value);
+      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(TrainerId.create(r.Value.Trainer.id.value));
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)};
       const lessons: {
         id: string,
@@ -38,7 +39,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
         r.Value.Description.value,
         r.Value.Category.name,
         r.Value.Image.Value,
-        {id: trainer.Value.Id, name: trainer.Value.Name},
+        {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
         // trainer.Value.Id,
         // trainer.Value.Name,
         r.Value.Level.value,
