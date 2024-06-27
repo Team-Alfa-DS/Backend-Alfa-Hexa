@@ -1,19 +1,19 @@
 import { DomainEvent } from "src/common/domain/domain-event";
 import { UserId } from "../value-objects/user-id";
-import { UserRole } from "../enums/role-user.type";
+import { UserType } from "../value-objects/user-type";
 
 export class UserTypeUpdated extends DomainEvent {
 
     protected constructor(
         public id: UserId,
-        public type: UserRole
+        public type: UserType
     ) {
         super();
     }
 
     static create(
         id: UserId,
-        type: UserRole
+        type: UserType
     ): UserTypeUpdated {
         return new UserTypeUpdated(id, type);
     }

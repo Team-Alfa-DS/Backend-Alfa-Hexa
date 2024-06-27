@@ -15,16 +15,17 @@ import { UserPasswordUpdated } from "./events/user-password-updated.event";
 import { UserPhoneUpdated } from "./events/user-phone-updated.event";
 import { UserTypeUpdated } from "./events/user-type-updated.event";
 import { UserImageUpdated } from "./events/user-image-updated.event";
+import { UserType } from "./value-objects/user-type";
 
 export class User extends AggregateRoot<UserId> {
     private email: UserEmail;
     private name: UserName;
     private password: UserPassword;
     private phone: UserPhone;
-    private type: UserRole;
+    private type: UserType;
     private image?: UserImage;
     
-    private constructor (id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserRole, image: UserImage) {
+    private constructor (id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserType, image: UserImage) {
         const userCreated = UserCreated.create(id, email, name, password, phone, type, image)
         super(id, userCreated);
     }
@@ -84,7 +85,7 @@ export class User extends AggregateRoot<UserId> {
         return this.phone;
     }
 
-    get Type(): UserRole {
+    get Type(): UserType {
         return this.type;
     }
 
@@ -92,31 +93,31 @@ export class User extends AggregateRoot<UserId> {
         return this.image;
     }
 
-    static Create(id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserRole, image: UserImage) {
+    static Create(id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserType, image: UserImage) {
         return new User(id, email, name, password, phone, type, image)
     }
 
     UpdateEmail(email: UserEmail): void {
-        this.email = email;
+        this.apply(UserEmailUpdated.create(this.Id, email));
     }
 
     UpdateName(name: UserName): void {
-        this.name = name;
+        this.apply(UserNameUpdated.create(this.Id, name));
     }
 
     UpdatePassword(password: UserPassword): void {
-        this.password = password;
+        this.apply(UserPasswordUpdated.create(this.Id, password));
     }
 
     UpdatePhone(phone: UserPhone): void {
-        this.phone = phone;
+        this.apply(UserPhoneUpdated.create(this.Id, phone));
     }
 
-    UpdateType(type: UserRole): void {
-        this.type = type;
+    UpdateType(type: UserType): void {
+        this.apply(UserTypeUpdated.create(this.Id, type));
     }
 
     UpdateImage(image: UserImage): void {
-        this.image = image;
+        this.apply(UserImageUpdated.create(this.Id, image));
     }
 }

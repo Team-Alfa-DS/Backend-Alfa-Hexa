@@ -50,6 +50,11 @@ import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
+import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
+import { EventBus } from 'src/common/infraestructure/events/event-bus';
+import { CreatedUserNotify } from 'src/user/application/events/created-user-notify.event';
+import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
+import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -70,6 +75,7 @@ export class AuthController {
     private readonly mailer: IMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
     private readonly logger: ILogger = new NestLogger();
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private userCodeList: UserCode[] = [];
 
     private registerUserService: IService<RegisterUserRequest, RegisterUserResponse>;
@@ -82,10 +88,12 @@ export class AuthController {
     constructor(private jwtService: JwtService, private mailerService: MailjetService) {
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
+        this.eventPublisher.subscribe('UserCreated', [new CreatedUserNotify(this.mailer, this.userRepository, this.transactionHandler)]);
+        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.registerUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
+                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger
@@ -108,7 +116,7 @@ export class AuthController {
         );
         this.changeUserPasswordService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor),
+                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger

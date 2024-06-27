@@ -135,7 +135,7 @@ export class ProgressController {
         description: 'No se pudo guardar el progreso. Intente de nuevo'
     })
     async markEnd(@Body() value: MarkEndProgressDto, @Request() req: JwtRequest) {
-        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time);
+        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
         if (response.isSuccess) return response.Value;

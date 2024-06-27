@@ -15,11 +15,11 @@ export class CalcPercentService {
                 contCompleted++;
             }
             
-            const lesson = lessonsCourse.find(lesson => lesson.id.equals(new Uuid(pro.Id.LessonId)) );
+            const lesson = lessonsCourse.find(lesson => lesson.id.equals(new Uuid(pro.Id.LessonId)));
             if (pro.Time) {
                 percent = pro.Time.Time / lesson.seconds.value * 100
             }
-            lessonList.push({lessonId: pro.Id.LessonId, percent});
+            lessonList.push({lessonId: pro.Id.LessonId, percent, time: pro.Time.Time});
         }
 
         const totalProgress = contCompleted / lessonsCourse.length * 100;

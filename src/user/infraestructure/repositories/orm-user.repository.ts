@@ -18,17 +18,6 @@ export class OrmUserRepository extends Repository<UserEntity> implements IUserRe
         this.ormUserMapper = ormUserMapper;
     }
 
-    async updatePassword(email: UserEmail, password: UserPassword, runner: TransactionHandler): Promise<Result<User>> {
-        const runnerTransaction = runner.getRunner();
-        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email: email.Email});
-        if (!userfound) {
-            return Result.fail(new Error('User not found'), 404, 'User not found');
-        }
-        const userUpdated = await runnerTransaction.manager.save(UserEntity, {...userfound, password: password.Password});
-        const domainUser = await this.ormUserMapper.toDomain(userUpdated);
-        return Result.success<User>(domainUser, 200);
-    }
-
     async findUserById(id: UserId, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
 
