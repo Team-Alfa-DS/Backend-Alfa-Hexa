@@ -45,27 +45,32 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
             const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
-            if (courses.findIndex(c => c.id == course.Value.id) == -1) courses.push(course.Value);
+            if (courses.findIndex(c => c.Id.equals(course.Value.Id) ) == -1) courses.push(course.Value);
         }
 
-        courses = courses.slice(value.perpage | 0, value.page | courses.length);
+        if (value.perpage) {
+            let page = 0;
+            if (value.page) {page = value.page}
+
+            courses = courses.slice((page*value.perpage), value.perpage + (page*value.perpage));
+        }
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
             progressUserList.push(progress.Value);
         }
 
         let progressCourseUser: CourseProgress[] = [];
         for (let i=0; i < progressUserList.length; i++) {
-            const calc = this.calcPercent.execute(courses[i].lessons, progressUserList[i]);
+            const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
             progressCourseUser.push({
-                id: courses[i].id,
-                title: courses[i].title,
-                image: courses[i].image,
-                date: courses[i].date,
-                category: courses[i].category,
-                trainer: courses[i].trainer.name,
+                id: courses[i].Id.Value,
+                title: courses[i].Title.value,
+                image: courses[i].Image.Value,
+                date: courses[i].Date,
+                category: courses[i].Category.name,
+                trainer: courses[i].Trainer.id.value, //FIXME: !Trainer en curso es un Id de trainer
                 percent: calc.percent
             })
         }

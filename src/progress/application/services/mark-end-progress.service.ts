@@ -7,6 +7,7 @@ import { Progress } from "src/progress/domain/progress";
 import { IService } from "src/common/application/interfaces/IService";
 import { MarkEndProgressResponse } from "../dtos/response/mark-end-progress.response";
 import { MarkEndProgressRequest } from "../dtos/request/mark-end-progress.request.dto";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { ProgressMarkAsCompleted } from "src/progress/domain/value-objects/progress-markAsCompleted";
 import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
@@ -39,7 +40,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
-        const lesson = course.Value.lessons.find(lesson => lesson.id == value.lessonId) 
+        const lesson = course.Value.Lessons.find(lesson => lesson.id.equals(new Uuid(value.lessonId)) ) 
         if (!lesson) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion');
 
         await this.progressRepository.saveProgress(

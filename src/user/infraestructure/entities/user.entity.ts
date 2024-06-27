@@ -5,12 +5,13 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { CommentEntity } from 'src/comment/infraestructure/entities/comment.entity';
 import { UserRole } from 'src/user/domain/enums/role-user.type';
 import { ProgressEntity } from 'src/progress/infraestructure/entities/progress.entity';
 import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
 import { NotifyEntity } from 'src/notify/notify/Infraestructure/entities/notify.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { BlogCommentEntity } from 'src/comment/infraestructure/entities/blog/comment.blog.entity';
+import { LessonCommentEntity } from 'src/comment/infraestructure/entities/lesson/comment.lesson.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -36,8 +37,11 @@ export class UserEntity {
   @Column('bytea', { nullable: true })
   image: string;
 
-  @OneToMany(() => CommentEntity, (comment) => comment.user)
-  comments: CommentEntity[];
+  @OneToMany(() => BlogCommentEntity, (comment) => comment.user)
+  blogComments: BlogCommentEntity[];
+
+  @OneToMany(() => LessonCommentEntity, (comment) => comment.user)
+  lessonComments: LessonCommentEntity[];
 
   @OneToMany(() => ProgressEntity, (progress) => progress.user)
   progress: ProgressEntity[];

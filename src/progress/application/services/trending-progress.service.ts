@@ -41,12 +41,12 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
         const course = await this.courseRepository.getCourseByLessonId(progress.Value.Id.LessonId);
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
 
-        const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.lessons, this.transactionHandler);
+        const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.Lessons, this.transactionHandler);
         if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error, totalProgress.StatusCode, totalProgress.Message);
 
-        const result = this.calcPercentService.execute(course.Value.lessons, totalProgress.Value);
+        const result = this.calcPercentService.execute(course.Value.Lessons, totalProgress.Value);
 
-        const response = new TrendingProgressResponse(result.percent, course.Value.title, course.Value.id, progress.Value.LastTime?.LastTime);
+        const response = new TrendingProgressResponse(result.percent, course.Value.Title.value, course.Value.Id.Value, progress.Value.LastTime?.LastTime);
         return Result.success(response, 200);
     }
     // get name(): string {
