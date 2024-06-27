@@ -135,6 +135,6 @@ export class Course extends AggregateRoot<CourseId>{
   }
 
   get Trainer(): CourseTrainer {
-    return new CourseTrainer(this.trainer.Value);
+    return new CourseTrainer(this.trainer.value.trainerId);
   }
 }

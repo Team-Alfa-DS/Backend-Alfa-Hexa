@@ -16,7 +16,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     const r = await this.courseRepository.getCourseById(service.courseId);
 
     if (r.isSuccess) {
-      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(TrainerId.create(r.Value.Trainer.Value));
+      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)};
       const lessons: {
         id: string,
