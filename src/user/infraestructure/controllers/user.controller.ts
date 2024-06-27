@@ -28,6 +28,7 @@ import { IMailer } from "src/common/application/mailer/mailer.interface";
 import { MailjetService } from "nest-mailjet";
 import { MailJet } from "src/common/infraestructure/mailer/mailjet";
 import { UpdatedUserPasswordNotify } from "src/user/application/events/updated-user-password-notify.event";
+import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -49,7 +50,7 @@ export class UserController {
         DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly logger: ILogger = new NestLogger();
-    private readonly eventPublisher: IEventPublisher = new EventBus();
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private readonly mailer: IMailer;
     private updateUserService: IService<UpdateUserRequest, UpdateUserResponse>;
     

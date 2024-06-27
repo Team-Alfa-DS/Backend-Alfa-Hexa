@@ -54,6 +54,7 @@ import { IEventPublisher } from 'src/common/application/events/event-publisher.a
 import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { CreatedUserNotify } from 'src/user/application/events/created-user-notify.event';
 import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
+import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -74,7 +75,7 @@ export class AuthController {
     private readonly mailer: IMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
     private readonly logger: ILogger = new NestLogger();
-    private readonly eventPublisher: IEventPublisher = new EventBus();
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private userCodeList: UserCode[] = [];
 
     private registerUserService: IService<RegisterUserRequest, RegisterUserResponse>;
