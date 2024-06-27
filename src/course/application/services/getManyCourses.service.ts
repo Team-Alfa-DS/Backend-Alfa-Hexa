@@ -38,7 +38,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       for (let course of r.Value) {
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
         if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
-        category = await this.categoryRepository.getCategoryById(CategoryId.create(course.Category.Value));
+        category = await this.categoryRepository.getCategoryById(course.Category.value);
         if (!category.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
 
         responseCourses.push({

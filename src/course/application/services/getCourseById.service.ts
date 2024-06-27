@@ -22,7 +22,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     if (r.isSuccess) {
       const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)};
-      const category: Result<Category> = await this.categoryRepository.getCategoryById(CategoryId.create(r.Value.Category.Value))
+      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Value.Category.value);
       if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
 
       const lessons: {

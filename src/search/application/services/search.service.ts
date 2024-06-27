@@ -74,15 +74,17 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     let category: Result<Category>;
     let image: string;
     for (let course of courses) {
-      trainer = await this.trainerRepository.findTrainerById(TrainerId.create(course.Trainer.id.value));
+      trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+      category = await this.categoryRepository.getCategoryById(course.Category.value);
+      if(!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
 
       coursesDto.push(new CourseResponseDto(
         course.Id.Value,
         course.Title.value,
         course.Image.Value,
         course.Date,
-        course.Category.name,
+        course.Category.value.value,
         trainer.Value.Name.trainerName
       ));
     }
