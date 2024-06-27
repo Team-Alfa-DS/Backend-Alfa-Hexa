@@ -60,7 +60,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
             return Result.fail(userCreate.Error, userCreate.StatusCode, userCreate.Message);
         }
         // await this.transactionHandler.commitTransaction();
-        // console.log(userDomain.pullDomainEvents());
+        userDomain.Register(userDomain.Id, userDomain.Email, userDomain.Name);
         this.eventPublisher.publish(userDomain.pullDomainEvents());
 
         const response = new RegisterUserResponse(id);

@@ -52,7 +52,7 @@ import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventBus } from 'src/common/infraestructure/events/event-bus';
-import { CreatedUserNotify } from 'src/user/application/events/created-user-notify.event';
+import { RegisterUserNotify } from 'src/user/application/events/register-user-notify.event';
 import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 
@@ -88,7 +88,7 @@ export class AuthController {
     constructor(private jwtService: JwtService, private mailerService: MailjetService) {
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
-        this.eventPublisher.subscribe('UserCreated', [new CreatedUserNotify(this.mailer, this.userRepository, this.transactionHandler)]);
+        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.registerUserService = new ExceptionLoggerDecorator(
