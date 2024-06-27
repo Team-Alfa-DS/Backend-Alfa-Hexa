@@ -72,6 +72,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     const blogsDto: BlogResponseDto[] = [];
     let trainer: Result<Trainer>;
     let category: Result<Category>;
+    let image: string;
     for (let course of courses) {
       trainer = await this.trainerRepository.findTrainerById(TrainerId.create(course.Trainer.id.value));
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
@@ -92,11 +93,14 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
       
       category = await this.categoryRepository.getCategoryById(CategoryId.create(blog.Category.value));
       if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
-
+      
+      console.log(blog.Images);
+      if (blog.Images[0]) { image = blog.Images[0].value} else { image = ''}
+      
       blogsDto.push(new BlogResponseDto(
         blog.Id.value,
         blog.Title.value,
-        blog.Images[0].value,
+        image,
         blog.Publication_date.value,
         category.Value.Name.value,
         trainer.Value.Name.trainerName

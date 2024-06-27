@@ -10,7 +10,7 @@ export class TrainerFollower extends ValueObject<TrainerFollower> {
     private constructor(followers: number) {
         super();
         
-        if (!followers) throw new EmptyTrainerFollowerException( "El valor de los seguidores no puede estar vacio" );
+        if ((followers === undefined) || (followers === null)) throw new EmptyTrainerFollowerException( "El valor de los seguidores no puede estar vacio" );
         if (isNaN(followers)) throw new InvalidTrainerFollowersException( "El valor que esta entrando no es un numero" );
         
         this.followers = Object.freeze(followers); //*Esto funciona para que no pueda ser modificado

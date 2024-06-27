@@ -31,7 +31,7 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
 
   async toDomain(ormEntity: OrmTrainer): Promise<Trainer> {
     if (ormEntity) {
-
+      
       let courses: TrainerCourseId[] = ormEntity.courses?.map(course => TrainerCourseId.create([new CourseId(course.id)])) || [];
       let blogs: TrainerBlogId[] = ormEntity.blogs?.map(blog => TrainerBlogId.create([BlogId.create(blog.id)])) || [];
       let users: TrainerFollowerUserId[] = ormEntity.users?.map(user => TrainerFollowerUserId.create([UserId.create(user.id)])) || [];
