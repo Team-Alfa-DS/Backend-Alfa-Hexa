@@ -9,6 +9,7 @@ import { Lesson } from "src/course/domain/entities/Lesson";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
 export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
@@ -67,7 +68,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
         const runnerTransaction = runner.getRunner();
         try {
             const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
-            const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new Uuid(pro.lesson_id))) != -1);
+            const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             
             // for (const progress of progressCourse) {

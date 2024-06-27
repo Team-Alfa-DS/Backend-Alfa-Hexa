@@ -41,7 +41,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
         if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
-        const lesson = course.Value.Lessons.find(lesson => lesson.id.equals(new Uuid(value.lessonId)) ) 
+        const lesson = course.Value.Lessons.find(lesson => lesson.id.equals(new LessonId(value.lessonId)) ) 
         if (!lesson) return Result.fail(new Error('No existe la leccion'), 404, 'No existe la leccion');
 
         await this.progressRepository.saveProgress(
