@@ -7,6 +7,8 @@ import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserImage } from "src/user/domain/value-objects/user-image";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { UserType } from "src/user/domain/value-objects/user-type";
+import { UserRole } from "src/user/domain/enums/role-user.type";
 
 export class OrmUserMapper implements IMapper<User, UserEntity> {
 
@@ -17,7 +19,7 @@ export class OrmUserMapper implements IMapper<User, UserEntity> {
             domainEntity.Name.Name,
             domainEntity.Password.Password,
             domainEntity.Phone.Phone,
-            domainEntity.Type,
+            domainEntity.Type.Type as UserRole,
             domainEntity.Image?.Image
         )
         return ormUser;
@@ -30,7 +32,7 @@ export class OrmUserMapper implements IMapper<User, UserEntity> {
             UserName.create(ormEntity.name),
             UserPassword.create(ormEntity.password),
             UserPhone.create(ormEntity.phone),
-            ormEntity.type,
+            UserType.create(ormEntity.type),
             ormEntity.image ? UserImage.create(ormEntity.image) : null
         )
         return domainUser;

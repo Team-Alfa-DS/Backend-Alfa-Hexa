@@ -13,7 +13,7 @@ import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
 import { ProgressId } from "src/progress/domain/value-objects/progress-Id";
 import { UserId } from "src/user/domain/value-objects/user-id";
-import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
@@ -49,7 +49,8 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
                 ProgressId.create(value.userId, value.lessonId),
                 ProgressMarkAsCompleted.create(value.markAsCompleted),
                 UserId.create(value.userId),
-                value.time > lesson.seconds.value ? ProgressTime.create(lesson.seconds.value) : ProgressTime.create(value.time),
+                new CourseId(value.courseId),
+                value.time > value.totalTime ? ProgressTime.create(value.totalTime) : ProgressTime.create(value.time),
                 ProgressLastTime.create(new Date())
             ),
             this.transactionHandler

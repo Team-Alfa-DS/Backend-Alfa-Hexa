@@ -1,6 +1,6 @@
 export interface LessonProgress {
     lessonId: string;
-    time?: number;
+    time: number;
     percent: number;
 }
 

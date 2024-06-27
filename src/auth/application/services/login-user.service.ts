@@ -35,7 +35,11 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
             return Result.fail(new Error('La contraseña es incorrecta'), 400, 'La contraseña es incorrecta')
         }
 
-        const response = new LoginUserResponse({id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, await this.jwtGen.genJwt(userFound.Value.Id.Id), userFound.Value.Type);
+        const response = new LoginUserResponse(
+            {id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, 
+            await this.jwtGen.genJwt(userFound.Value.Id.Id), 
+            userFound.Value.Type.Type
+        );
 
         return Result.success(response, 200);
     }

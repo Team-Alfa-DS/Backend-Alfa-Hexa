@@ -11,18 +11,21 @@ import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserImage } from "src/user/domain/value-objects/user-image";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
 export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
+    private readonly eventPublisher: IEventPublisher
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor) {
+    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
         super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
+        this.eventPublisher = eventPublisher;
     }
 
     async execute(data: UpdateUserRequest): Promise<Result<UpdateUserResponse>> {
@@ -52,6 +55,7 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
             return Result.fail(updatedUser.Error, updatedUser.StatusCode, updatedUser.Message)
         }
         // await this.transactionHandler.commitTransaction();
+        if (data.password) this.eventPublisher.publish(newUser.pullDomainEvents())
         const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
         
         return Result.success(response, 200);
