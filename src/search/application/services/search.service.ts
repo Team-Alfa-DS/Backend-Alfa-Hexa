@@ -84,7 +84,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
         course.Title.value,
         course.Image.Value,
         course.Date,
-        course.Category.value.value,
+        category.Value.Name.value,
         trainer.Value.Name.trainerName
       ));
     }
