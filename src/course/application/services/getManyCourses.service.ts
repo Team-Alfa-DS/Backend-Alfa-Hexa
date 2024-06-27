@@ -5,11 +5,15 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { Category } from "src/category/domain/Category";
+import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
     private readonly courseRepository: ICourseRepository,
-    private readonly trainerRepository: ITrainerRepository
+    private readonly trainerRepository: ITrainerRepository,
+    private readonly categoryRepository: ICategoryRepository,
   ){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
@@ -30,15 +34,19 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
         trainer: string;
       }[] = []
       let trainer: Result<Trainer>;
+      let category: Result<Category>;
       for (let course of r.Value) {
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
         if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+        category = await this.categoryRepository.getCategoryById(CategoryId.create(course.Category.Value));
+        if (!category.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+
         responseCourses.push({
           id: course.Id.Value,
           title: course.Title.value,
           image: course.Image.Value,
           date: course.Date,
-          category: course.Category.name,
+          category: category.Value.Name.value,
           trainer: trainer.Value.Name.trainerName
         })
       }

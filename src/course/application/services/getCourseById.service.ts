@@ -5,11 +5,15 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { Category } from "src/category/domain/Category";
+import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
     private readonly courseRepository: ICourseRepository,
-    private readonly trainerRepository: ITrainerRepository
+    private readonly trainerRepository: ITrainerRepository,
+    private readonly categoryRepository: ICategoryRepository,
   ) {super();}
 
   async execute(service: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
@@ -18,6 +22,9 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     if (r.isSuccess) {
       const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)};
+      const category: Result<Category> = await this.categoryRepository.getCategoryById(CategoryId.create(r.Value.Category.Value))
+      if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
+
       const lessons: {
         id: string,
         title: string,
@@ -32,16 +39,14 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
           video: lesson.video.Value
         });
       }
-      console.log(trainer.Value);
+
       return Result.success(new GetCourseByIdResponse(
         r.Value.Id.Value,
         r.Value.Title.value,
         r.Value.Description.value,
-        r.Value.Category.name,
+        category.Value.Name.value,
         r.Value.Image.Value,
         {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-        // trainer.Value.Id,
-        // trainer.Value.Name,
         r.Value.Level.value,
         r.Value.DurationWeeks.value,
         r.Value.DurationMinutes.value,
@@ -90,8 +95,6 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
     category: string,
     image: string,
     trainer: {id: string, name: string},
-    // trainerId: string,
-    // trainerName: string,
     level: string,
     durationWeeks: number,
     durationMinutes: number,
@@ -105,31 +108,12 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
     this.category = category; //.value;
     this.image = image;
     this.trainer = {id: trainer.id, name: trainer.name};
-    // this.trainer.id = trainerId;
-    // this.trainer.name = trainerName; //.value;
     this.level = level;
     this.durationWeeks = durationWeeks;
     this.durationMinutes = durationMinutes;
     this.tags = tags;
     this.date = date; //.value;
     this.lessons = lessons;
-      
-    // for (let lesson of course.Lessons) {
-    //   let videoUrl: string, imageUrl: string;
-    //   if (lesson.video) {videoUrl = lesson.video.url;}
-    //   if (lesson.image) {imageUrl = lesson.image.url;}
-    //   this.lessons.push({
-    //     id: lesson.id.value,
-    //     title: lesson.title.value,
-    //     content: lesson.content.value,
-    //     video: videoUrl,
-    //     image: imageUrl
-    //   })
-    // }
-
-    // for (let tag of course.Tags) {
-    //   this.tags.push(tag.name);
-    // }
   }
 
   dataToString(): string {

@@ -148,7 +148,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
         trainer: true
       }
     })
-    if (result.length >= 0) {return Result.success(0, 200)}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
+    if (result.length == 0) {return Result.success(0, 200)}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
     const courses = CourseMapper.arrayToDomain(result);
     
     courses.filter((course) => course.Category.equals(new CourseCategory(category)))

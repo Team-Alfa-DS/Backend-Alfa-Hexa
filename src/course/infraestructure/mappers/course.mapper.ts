@@ -37,7 +37,7 @@ export class CourseMapper {
       new CourseLevel(entity.level),
       domainLessons,
       domainTags,
-      new CourseCategory(entity.category.name),
+      new CourseCategory(entity.category.id),
       new CourseTrainer(entity.trainer.id)
     );
 
