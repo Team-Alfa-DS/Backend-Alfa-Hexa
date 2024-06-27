@@ -4,13 +4,15 @@ import { ProgressMarkAsCompleted } from "../value-objects/progress-markAsComplet
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { ProgressTime } from "../value-objects/progress-time";
 import { ProgressLastTime } from "../value-objects/progress-lastTime";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class ProgressCreated extends DomainEvent {
 
     protected constructor(
         public id: ProgressId, 
         public markAsCompleted: ProgressMarkAsCompleted, 
-        public user: UserId, 
+        public user: UserId,
+        public course: CourseId,
         public time: ProgressTime, 
         public lastTime: ProgressLastTime
     ) {
@@ -20,10 +22,11 @@ export class ProgressCreated extends DomainEvent {
     static create(
         id: ProgressId, 
         markAsCompleted: ProgressMarkAsCompleted, 
-        user: UserId, 
+        user: UserId,
+        course: CourseId,
         time: ProgressTime, 
         lastTime: ProgressLastTime
     ): ProgressCreated {
-        return new ProgressCreated(id, markAsCompleted, user, time, lastTime);
+        return new ProgressCreated(id, markAsCompleted, user, course, time, lastTime);
     }
 }

@@ -10,15 +10,17 @@ import { InvalidProgressException } from "./exceptions/invalid-progress.exceptio
 import { ProgressMarkAsCompletedUpdated } from "./events/progress-markAsCompleted-updated.event";
 import { ProgressTimeUpdated } from "./events/progress-time-updated.event";
 import { ProgressLastTimeUpdated } from "./events/progress-lastTime-updated.event";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class Progress extends AggregateRoot<ProgressId>{
     private markAsCompleted: ProgressMarkAsCompleted;
     private time: ProgressTime;
     private lastTime: ProgressLastTime;
     private user: UserId;
+    private course: CourseId;
 
-    private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
-        const progressCreated = ProgressCreated.create(id, markAsCompleted, user, time, lastTime);
+    private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, course: CourseId, time: ProgressTime, lastTime: ProgressLastTime) {
+        const progressCreated = ProgressCreated.create(id, markAsCompleted, user, course, time, lastTime);
         super(id, progressCreated);
     }
 
@@ -44,7 +46,7 @@ export class Progress extends AggregateRoot<ProgressId>{
     }
 
     protected validateState(): void {
-        if (!this.markAsCompleted || !this.user) throw new InvalidProgressException('El progreso no es valido');
+        if (!this.course || !this.user) throw new InvalidProgressException('El progreso no es valido');
     }
 
     get MarkAsCompleted(): ProgressMarkAsCompleted {
@@ -63,8 +65,12 @@ export class Progress extends AggregateRoot<ProgressId>{
         return this.user;
     }
 
-    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, time: ProgressTime, lastTime: ProgressLastTime) {
-        return new Progress(id, markAsCompleted, user, time, lastTime);
+    get Course(): CourseId {
+        return this.course;
+    }
+
+    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, course: CourseId, time: ProgressTime, lastTime: ProgressLastTime) {
+        return new Progress(id, markAsCompleted, user, course, time, lastTime);
     }
 
     UpdateMarkAsCompleted(markAsCompleted: ProgressMarkAsCompleted): void {

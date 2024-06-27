@@ -6,6 +6,7 @@ import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
 import { ProgressId } from "src/progress/domain/value-objects/progress-Id";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class OrmProgressMapper implements IMapper<Progress, ProgressEntity> {
 
@@ -25,8 +26,9 @@ export class OrmProgressMapper implements IMapper<Progress, ProgressEntity> {
             ProgressId.create(ormEntity.user_id, ormEntity.lesson_id),
             ProgressMarkAsCompleted.create(ormEntity.markAsCompleted),
             UserId.create(ormEntity.user_id),
-            ormEntity.time ? ProgressTime.create(ormEntity.time) : null,
-            ormEntity.lastTime ? ProgressLastTime.create(ormEntity.lastTime) : null
+            new CourseId(ormEntity.lesson.course.id),
+            ProgressTime.create(ormEntity.time),
+            ProgressLastTime.create(ormEntity.lastTime)
         );
         return domainProgress;
     }
