@@ -15,6 +15,7 @@ import { CourseImage } from "./value-objects/course-image";
 import { CourseCreated } from "./events/course-created.event";
 import { DomainEvent } from "src/common/domain/domain-event";
 import { InvalidCourseException } from "./exceptions/invalidCourseException";
+import { LessonId } from "./value-objects/lesson-id";
 
 export class Course extends AggregateRoot<CourseId>{
   // private id: CourseId;
@@ -26,9 +27,9 @@ export class Course extends AggregateRoot<CourseId>{
   private durationWeeks: CourseDurationWeeks;
   private level: CourseLevel;
   private lessons: Lesson[];
-  private tags: CourseTag[]; //entity? //FIXME: Hay que meterle comportamiento de búsqueda por Ids a esto
-  private category: CourseCategory; //entity?
-  private trainer: CourseTrainer; //entity?
+  private tags: CourseTag[];
+  private category: CourseCategory; 
+  private trainer: CourseTrainer; 
 
   constructor(
     id: CourseId,
@@ -40,9 +41,9 @@ export class Course extends AggregateRoot<CourseId>{
     durationWeeks: CourseDurationWeeks,
     level: CourseLevel,
     lessons: Lesson[],
-    tags: CourseTag[], //entity? //FIXME: Hay que meterle comportamiento de búsqueda por Ids a esto
-    category: CourseCategory, //entity?
-    trainer: CourseTrainer //entity?
+    tags: CourseTag[],
+    category: CourseCategory, 
+    trainer: CourseTrainer 
   ) {
     const courseCreated = new CourseCreated(id, title, description, image, date, durationMinutes, durationWeeks, level, lessons, tags, category, trainer);
     super(id, courseCreated);
@@ -107,7 +108,7 @@ export class Course extends AggregateRoot<CourseId>{
     return this.lessons;
   }
 
-  getLesson(id: Uuid): Lesson {
+  getLesson(id: LessonId): Lesson {
     return this.lessons.find(lesson => lesson.id.equals(id));
   }
 
@@ -120,8 +121,13 @@ export class Course extends AggregateRoot<CourseId>{
     return tags;
   }
 
-  containsTag(tag: string): boolean {
-    return this.tags.includes(new CourseTag(tag));
+  containsTag(searchedTag: string): boolean {
+    for (let tag of this.tags) {
+      if (tag.equals(new CourseTag(searchedTag))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   get Category(): CourseCategory {
@@ -129,6 +135,6 @@ export class Course extends AggregateRoot<CourseId>{
   }
 
   get Trainer(): CourseTrainer {
-    return new CourseTrainer(this.trainer.id.value);
+    return new CourseTrainer(this.trainer.Value);
   }
 }

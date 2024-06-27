@@ -152,7 +152,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     const courses = CourseMapper.arrayToDomain(result);
     
     courses.filter((course) => course.Category.equals(new CourseCategory(category)))
-    courses.filter((course) => course.Trainer.id.equals(new Uuid(trainerId)))
+    courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainerId)))
     
     return Result.success(courses.length, 200)
   }

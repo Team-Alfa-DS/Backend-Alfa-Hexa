@@ -3,7 +3,7 @@ import { Uuid } from "../../../common/domain/value-objects/Uuid";
 import { NullCourseTrainerNameException } from "../exceptions/nullCourseTrainerName";
 
 export class CourseTrainer extends ValueObject<CourseTrainer> {
-  readonly id: Uuid; //FIXME: Esto debería ser TrainerId
+  private id: Uuid; //FIXME: Esto debería ser TrainerId
 
   constructor(id: string) {
     super();
@@ -13,5 +13,9 @@ export class CourseTrainer extends ValueObject<CourseTrainer> {
 
   equals(obj: CourseTrainer): boolean {
     return this.id.equals(obj.id);
+  }
+
+  get Value(): string {
+    return this.id.value;
   }
 }

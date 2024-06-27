@@ -4,6 +4,7 @@ import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/appl
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
@@ -30,7 +31,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       }[] = []
       let trainer: Result<Trainer>;
       for (let course of r.Value) {
-        trainer = await this.trainerRepository.findTrainerById(course.Trainer.id.value);
+        trainer = await this.trainerRepository.findTrainerById(TrainerId.create(course.Trainer.Value));
         if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
         responseCourses.push({
           id: course.Id.Value,
@@ -38,7 +39,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
           image: course.Image.Value,
           date: course.Date,
           category: course.Category.name,
-          trainer: trainer.Value.Name
+          trainer: trainer.Value.Name.trainerName
         })
       }
       return Result.success(new GetManyCoursesResponse(responseCourses), r.StatusCode);
