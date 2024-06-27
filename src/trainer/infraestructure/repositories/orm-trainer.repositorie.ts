@@ -37,7 +37,15 @@ export class OrmTrainerRepository
   async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
     let trainerId = id.trainerId;
 
-    const trainer = await this.findOneBy({ id: trainerId });
+    const trainer = await this.findOne({
+      relations: {
+        courses: true,
+        blogs: true,
+        users: true,
+    },
+  where: {
+    id: trainerId,
+  }});
     if (!trainer) {
       return Result.fail<Trainer>(
         new Error('Trainer not found'),

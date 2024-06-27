@@ -20,5 +20,4 @@ export class CourseId extends ValueObject<CourseId> {
   get Value() {
     return this.value.value;
   }
-
 }
