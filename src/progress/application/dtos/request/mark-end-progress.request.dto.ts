@@ -6,11 +6,10 @@ export class MarkEndProgressRequest implements ServiceRequestDto {
         readonly lessonId: string,
         readonly userId: string,
         readonly markAsCompleted: boolean,
-        readonly time: number, //segundos
-        readonly totalTime: number
+        readonly time?: number //segundos
     ) {}
 
     dataToString(): string {
-        return `MarkEndProgressReq: { courseId: ${this.courseId} | lessonId: ${this.lessonId} | userId: ${this.userId} | markAsCompleted: ${this.markAsCompleted} | time: ${this.time} | totalTime: ${this.totalTime}}`
+        return `MarkEndProgressReq: { courseId: ${this.courseId} | lessonId: ${this.lessonId} | userId: ${this.userId} | markAsCompleted: ${this.markAsCompleted} | time: ${this.time} }`
     }
 }

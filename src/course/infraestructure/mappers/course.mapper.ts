@@ -1,19 +1,7 @@
 import { Course } from "src/course/domain/Course";
 import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
-import { Lesson } from "src/course/domain/entities/Lesson";
-import { Uuid } from "src/common/domain/value-objects/Uuid";
-import { CourseTitle } from "src/course/domain/value-objects/course-title";
-import { CourseDescription } from "src/course/domain/value-objects/course-description";
-import { Url } from "src/common/domain/value-objects/url";
-import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
-import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
-import { CourseLevel } from "src/course/domain/value-objects/course-level";
-import { CourseTag } from "src/course/domain/value-objects/course-tag";
-import { CourseCategory } from "src/course/domain/value-objects/course-category";
-import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
-import { CourseId } from "src/course/domain/value-objects/course-id";
-import { CourseImage } from "src/course/domain/value-objects/course-image";
+import { Lesson } from "src/course/domain/Lesson";
 
 export class CourseMapper {
   static toDomain(entity: CourseEntity): Course {
@@ -22,23 +10,23 @@ export class CourseMapper {
       
       domainLessons.push(LessonMapper.toDomain(lesson));
     }
-    const domainTags: CourseTag[] = [];
+    const domainTags: string[] = [];
     for (let tag of entity.tags) {
-      domainTags.push(new CourseTag(tag.name));
+      domainTags.push(tag.name);
     }
     const course = new Course(
-      new CourseId(entity.id),
-      new CourseTitle(entity.name),
-      new CourseDescription(entity.description),
-      new CourseImage(entity.image),
+      entity.id,
+      entity.name,
+      entity.description,
+      entity.image,
       entity.publication_date,
-      new CourseDurationMinutes(entity.minutes),
-      new CourseDurationWeeks(entity.weeks),
-      new CourseLevel(entity.level),
+      entity.minutes,
+      entity.weeks,
+      entity.level,
       domainLessons,
       domainTags,
-      new CourseCategory(entity.category.id),
-      new CourseTrainer(entity.trainer.id)
+      entity.category.name,
+      {id: entity.trainer.id, name: entity.trainer.name}
     );
 
     return course;

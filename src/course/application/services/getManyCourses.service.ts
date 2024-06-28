@@ -2,19 +2,9 @@ import { Course } from "src/course/domain/Course";
 import { ICourseRepository } from "../repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
-import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
-import { Trainer } from "src/trainer/domain/trainer";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
-import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
-  constructor(
-    private readonly courseRepository: ICourseRepository,
-    private readonly trainerRepository: ITrainerRepository,
-    private readonly categoryRepository: ICategoryRepository,
-  ){super()}
+  constructor(private readonly courseRepository: ICourseRepository){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     const r = await this.courseRepository.getManyCourses(
@@ -25,32 +15,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       request.perpage
     ); 
     if (r.isSuccess) {
-      const responseCourses: {
-        id: string;
-        title: string;
-        image: string;
-        date: Date;
-        category: string;
-        trainer: string;
-      }[] = []
-      let trainer: Result<Trainer>;
-      let category: Result<Category>;
-      for (let course of r.Value) {
-        trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
-        if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
-        category = await this.categoryRepository.getCategoryById(course.Category.value);
-        if (!category.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
-
-        responseCourses.push({
-          id: course.Id.Value,
-          title: course.Title.value,
-          image: course.Image.Value,
-          date: course.Date,
-          category: category.Value.Name.value,
-          trainer: trainer.Value.Name.trainerName
-        })
-      }
-      return Result.success(new GetManyCoursesResponse(responseCourses), r.StatusCode);
+      return Result.success(new GetManyCoursesResponse(r.Value), r.StatusCode);
     } else {
       return Result.fail(r.Error, r.StatusCode, r.Message);
     }
@@ -91,27 +56,9 @@ export class GetManyCoursesRequest implements ServiceRequestDto {
 }
 
 export class GetManyCoursesResponse implements ServiceResponseDto {
-  readonly courses: {
-    id: string;
-    title: string;
-    image: string;
-    date: Date;
-    category: string
-    trainer: string;
-  }[] = []
-  
-  constructor(courses: {
-    id: string;
-    title: string;
-    image: string;
-    date: Date;
-    category: string;
-    trainer: string;
-  }[] ) {
-    this.courses = courses;
-  }
+  constructor(readonly courses: Course[]) {}
 
   dataToString(): string {
-    return `GetManyCoursesResponse: ${JSON.stringify(this)}`;
+    return `GetManyCoursesResponse: ${JSON.stringify(this.courses)}`;
   }
 }
