@@ -1,36 +1,36 @@
 import { Trainer } from 'src/trainer/domain/trainer';
 import { ITrainerRepository } from '../../domain/repositories/trainer-repository.interface';
 import { DataSource, Repository } from 'typeorm';
-import { OrmTrainer } from '../entities/trainer.entity';
+import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 import { IMapper } from 'src/common/application/mappers/mapper.interface';
 import { Result } from 'src/common/domain/result-handler/result';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class OrmTrainerRepository
-  extends Repository<OrmTrainer>
+  extends Repository<OrmTrainerEntity>
   implements ITrainerRepository
 {
-  private readonly ormTrainerMapper: IMapper<Trainer, OrmTrainer>;
+  private readonly ormTrainerMapper: IMapper<Trainer, OrmTrainerEntity>;
   private userMapper: OrmUserMapper = new OrmUserMapper();
   private readonly userRepository: OrmUserRepository = new OrmUserRepository(
     this.userMapper,
-    DatabaseSingleton.getInstance(),
+    PgDatabaseSingleton.getInstance(),
   );
   private transactionHandler = new TransactionHandler(
-    DatabaseSingleton.getInstance().createQueryRunner(),
+    PgDatabaseSingleton.getInstance().createQueryRunner(),
   );
 
   constructor(
-    ormTrainerMapper: IMapper<Trainer, OrmTrainer>,
+    ormTrainerMapper: IMapper<Trainer, OrmTrainerEntity>,
     dataSource: DataSource,
   ) {
-    super(OrmTrainer, dataSource.manager);
+    super(OrmTrainerEntity, dataSource.manager);
     this.ormTrainerMapper = ormTrainerMapper;
   }
 
@@ -71,13 +71,13 @@ export class OrmTrainerRepository
 
       if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
-      const ormTrainer = await this.ormTrainerMapper.toOrm(trainer.Value);
+      const OrmTrainerEntity = await this.ormTrainerMapper.toOrm(trainer.Value);
 
       const ormUser = await this.userMapper.toOrm(user.Value);
 
       const trainersWithUsers = await this.find({
         where: {
-          id: ormTrainer.id,
+          id: OrmTrainerEntity.id,
         },
         relations: {
           users: true,
@@ -98,8 +98,8 @@ export class OrmTrainerRepository
         array.push(trainersWithUsers[0].users[x]);
       }
       array.push(ormUser);
-      ormTrainer.users = array;
-      await this.save(ormTrainer);
+      OrmTrainerEntity.users = array;
+      await this.save(OrmTrainerEntity);
       return Result.success<Trainer>(trainer.Value, 200);
       
     } catch (err) {

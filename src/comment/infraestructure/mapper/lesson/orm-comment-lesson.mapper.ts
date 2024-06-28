@@ -1,5 +1,5 @@
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { LessonCommentEntity } from "../../entities/lesson/comment.lesson.entity";
+import { OrmLessonCommentEntity } from "../../entities/orm-entities/orm-comment.lesson.entity";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { CommentLessonUserDisliked } from "src/comment/domain/valueObjects/lesson/comment-lesson-userDisliked";
 import { CommentLessonUserLiked } from "src/comment/domain/valueObjects/lesson/comment-lesson-userLiked";
@@ -12,10 +12,10 @@ import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/le
 import { CommentLesson } from "src/comment/domain/comment-lesson";
 
 
-export class OrmLessonCommentMapper implements IMapper<CommentLesson,LessonCommentEntity> {
+export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCommentEntity> {
 
-    async toOrm(DomainEntity: CommentLesson): Promise<LessonCommentEntity> {
-        const ormComment = LessonCommentEntity.create(
+    async toOrm(DomainEntity: CommentLesson): Promise<OrmLessonCommentEntity> {
+        const ormComment = OrmLessonCommentEntity.create(
             DomainEntity.Id.commentId,
             DomainEntity.PublicationDate.PublicationDate,
             DomainEntity.Body.Body,
@@ -29,7 +29,7 @@ export class OrmLessonCommentMapper implements IMapper<CommentLesson,LessonComme
         return ormComment;
     }
     
-    async toDomain(OrmEntity: LessonCommentEntity): Promise<CommentLesson> {
+    async toDomain(OrmEntity: OrmLessonCommentEntity): Promise<CommentLesson> {
         const domainComment = CommentLesson.create(
             LessonCommentId.create(OrmEntity.Id),
             CommentLessonPublicationDate.create(OrmEntity.PublicationDate),
