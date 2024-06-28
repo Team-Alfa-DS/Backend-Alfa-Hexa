@@ -1,6 +1,6 @@
 /*import { User } from 'src/user/domain/user';
 import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToOne, JoinColumn} from 'typeorm';
-import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-user.entity';
+import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 
 @Entity('token')
 export class Token {

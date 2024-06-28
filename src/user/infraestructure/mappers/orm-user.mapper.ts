@@ -1,6 +1,6 @@
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { User } from "src/user/domain/user";
-import { OrmUserEntity } from "../entities/orm-entities/orm-user.entity";
+import { UserEntity } from "../entities/user.entity";
 import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
@@ -10,10 +10,10 @@ import { UserId } from "src/user/domain/value-objects/user-id";
 import { UserType } from "src/user/domain/value-objects/user-type";
 import { UserRole } from "src/user/domain/enums/role-user.type";
 
-export class OrmUserMapper implements IMapper<User, OrmUserEntity> {
+export class OrmUserMapper implements IMapper<User, UserEntity> {
 
-    async toOrm(domainEntity: User): Promise<OrmUserEntity> {
-        const ormUser = OrmUserEntity.create(
+    async toOrm(domainEntity: User): Promise<UserEntity> {
+        const ormUser = UserEntity.create(
             domainEntity.Id.Id,
             domainEntity.Email.Email,
             domainEntity.Name.Name,
@@ -25,7 +25,7 @@ export class OrmUserMapper implements IMapper<User, OrmUserEntity> {
         return ormUser;
     }
 
-    async toDomain(ormEntity: OrmUserEntity): Promise<User> {
+    async toDomain(ormEntity: UserEntity): Promise<User> {
         const domainUser = User.Create(
             UserId.create(ormEntity.id),
             UserEmail.create(ormEntity.email),

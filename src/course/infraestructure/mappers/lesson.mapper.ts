@@ -1,5 +1,5 @@
 import { Lesson } from "src/course/domain/entities/Lesson";
-import { OrmLessonEntity } from "../entities/orm-entities/orm-lesson.entity";
+import { LessonEntity } from "../entities/lesson.entity";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { LessonTitle } from "src/course/domain/value-objects/lesson-title";
 import { LessonContent } from "src/course/domain/value-objects/lesson-content";
@@ -8,7 +8,7 @@ import { LessonVideo } from "src/course/domain/value-objects/lesson-video";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class LessonMapper {
-  static toDomain(entity: OrmLessonEntity): Lesson {
+  static toDomain(entity: LessonEntity): Lesson {
     const lesson = new Lesson(
       new LessonId(entity.id),
       new LessonTitle(entity.title),

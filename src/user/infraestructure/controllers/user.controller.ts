@@ -2,7 +2,7 @@
 import { Body, Controller, FileTypeValidator, HttpException, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
-import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmUserMapper } from "../mappers/orm-user.mapper";
 import { UpdateUserService } from "src/user/application/services/update-user.application.service";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
@@ -39,15 +39,15 @@ export class UserController {
     private userMapper: OrmUserMapper = new OrmUserMapper();
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
         this.userMapper,
-        PgDatabaseSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        PgDatabaseSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
 
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private transactionHandler = new TransactionHandler(
-        PgDatabaseSingleton.getInstance().createQueryRunner()
+        DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly logger: ILogger = new NestLogger();
     private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();

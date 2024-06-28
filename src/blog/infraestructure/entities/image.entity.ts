@@ -1,15 +1,15 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { OrmBlogEntity } from './orm-blog.entity';
+import { BlogEntity } from './blog.entity';
 
 @Entity('image')
-export class OrmImageEntity {
+export class Image {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column()
     url: string;
 
-    @ManyToOne(() => OrmBlogEntity, blog => blog.images)
+    @ManyToOne(() => BlogEntity, blog => blog.images)
     @JoinColumn({name: 'blog_id'})
-    blog: OrmBlogEntity;
+    blog: BlogEntity;
 }

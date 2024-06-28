@@ -1,7 +1,7 @@
 import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
 import { Course } from "src/course/domain/Course";
 import { DataSource, Repository } from "typeorm";
-import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
+import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CourseMapper } from "../mappers/course.mapper";
 import { Result } from "src/common/domain/result-handler/result";
@@ -10,9 +10,9 @@ import { CourseCategory } from "src/course/domain/value-objects/course-category"
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
 
-export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
+export class TOrmCourseRepository extends Repository<CourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
-    super(OrmCourseEntity, database.manager)
+    super(CourseEntity, database.manager)
   }
 
   async getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>> {
