@@ -8,41 +8,15 @@ import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColum
 @Entity('trainer')
 export class OrmTrainer {
 
-  @ApiProperty({
-    description: 'Id del entrenador',
-    example: '75645sd3424354dfsdf56asdf23r4'
-  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-
-  @ApiProperty({
-    description: 'nombre del entrenador',
-    example: 'Ana Montilla'
-  })
   @Column()
   name: string;
 
-
-  @ApiProperty({
-    description: 'Cantidad de seguidores que tiene el entrenador',
-    example: '242'
-  })
   @Column()
   followers?: number;
 
-
-  @ApiProperty({
-    description: 'seguidos del entrenador',
-    example: '726'
-  })
-  @Column()
-  userFollow?: boolean;
-
-  @ApiProperty({
-    description: 'Ubicacion del entrenador',
-    example: 'placeholder'
-  })
   @Column()
   location?: string;
 
@@ -62,14 +36,12 @@ export class OrmTrainer {
     id: string,
     name: string,
     followers: number,
-    userFollow: boolean,
     location: string,
   ): OrmTrainer {
     const trainer = new OrmTrainer();
     trainer.id = id;
     trainer.name = name;
     trainer.followers = followers;
-    trainer.userFollow = userFollow;
     trainer.location = location;
     return trainer;
   }
