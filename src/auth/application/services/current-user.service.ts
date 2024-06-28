@@ -4,7 +4,6 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IService } from "src/common/application/interfaces/IService";
 import { CurrentUserRequest } from "../dtos/request/current-user.request";
 import { CurrentUserResponse } from "../dtos/response/current-user.response";
-import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class CurrentUserService extends IService<CurrentUserRequest, CurrentUserResponse> {
 
@@ -18,18 +17,18 @@ export class CurrentUserService extends IService<CurrentUserRequest, CurrentUser
     }
     
     async execute(value: CurrentUserRequest): Promise<Result<CurrentUserResponse>> {
-        const userFound = await this.userRepository.findUserById(UserId.create(value.id), this.transactionHandler);
+        const userFound = await this.userRepository.findUserById(value.id, this.transactionHandler);
 
         if (!userFound.isSuccess) {
             return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
         }
 
         const response = new CurrentUserResponse(
-            userFound.Value.Id.Id,
-            userFound.Value.Email.Email,
-            userFound.Value.Name.Name,
-            userFound.Value.Phone.Phone,
-            userFound.Value.Image?.Image ? userFound.Value.Image.Image : null
+            userFound.Value.Id,
+            userFound.Value.Email,
+            userFound.Value.Name,
+            userFound.Value.Phone,
+            userFound.Value.Image
         );
 
         return Result.success(response, 200);

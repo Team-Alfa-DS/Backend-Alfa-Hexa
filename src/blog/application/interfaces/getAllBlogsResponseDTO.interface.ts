@@ -1,12 +1,12 @@
 import { ServiceResponseDto } from "src/common/application/interfaces/IService";
 
-export interface GeneralBlogDTO {
-    id: string,
-    name: string,
-    image: string,
-    date: Date,
-    category: string,
-    trainer: string
+ export interface GeneralBlogDTO {
+    Id: string,
+    Name: string,
+    Image: string,
+    Date: Date,
+    Category: string,
+    Trainer: string
 }
 
 export class GetAllBlogsResponseDTO implements ServiceResponseDto {

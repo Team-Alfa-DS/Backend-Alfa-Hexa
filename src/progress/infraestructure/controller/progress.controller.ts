@@ -35,7 +35,6 @@ import { CourseEntity } from 'src/course/infraestructure/entities/course.entity'
 import { ProfileProgressRequest } from 'src/progress/application/dtos/request/profile-progress.request';
 import { ProfileProgressResponse } from 'src/progress/application/dtos/response/profile-progress.response';
 import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
-import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -135,11 +134,11 @@ export class ProgressController {
         description: 'No se pudo guardar el progreso. Intente de nuevo'
     })
     async markEnd(@Body() value: MarkEndProgressDto, @Request() req: JwtRequest) {
-        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
+        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time);
         const response = await this.markEndProgressService.execute(request);
         
         if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Get('one/:courseId')
@@ -155,7 +154,7 @@ export class ProgressController {
         const response = await this.getOneProgressService.execute(request);
 
         if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw new HttpException(response.Message, response.StatusCode); 
     }
     
     @Get('trending')
@@ -171,7 +170,7 @@ export class ProgressController {
         const response = await this.trendingProgressService.execute(request);
 
         if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Get('courses')
@@ -180,7 +179,7 @@ export class ProgressController {
         const response = await this.coursesProgressService.execute(request);
 
         if (response.isSuccess) return response.Value.courseProgress;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Get('profile')
@@ -189,6 +188,6 @@ export class ProgressController {
         const response = await this.profileProgressService.execute(request);
 
         if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw new HttpException(response.Message, response.StatusCode);
     }
 }

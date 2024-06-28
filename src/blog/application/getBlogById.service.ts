@@ -6,7 +6,6 @@ import { IService } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 
 
 export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlogByIdResponseDTO >{
@@ -21,21 +20,21 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
         return this.constructor.name;
     }
 
-    async execute({id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
-        const domainBlogResult = await this.blogRepository.getBlogById(id);
+    async execute({Id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
+        const domainBlogResult = await this.blogRepository.getBlogById(Id);
         if (domainBlogResult.Error)
             return Result.fail(domainBlogResult.Error, domainBlogResult.StatusCode, domainBlogResult.Message);
         const domainBlog = domainBlogResult.Value;
-        const trainerResult = await this.trainerRepository.findTrainerById(TrainerId.create(domainBlog.Trainer));
-        const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.Category)
+        const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.trainer);
+        const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.category)
         const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
-            domainBlog.Title.value,
-            domainBlog.Content.value,
-            categoryResult.Value ? categoryResult.Value.Name.value : null,    
-            domainBlog.Images.map(image => image.value),
-            trainerResult.Value ? {id: trainerResult.Value.Id.trainerId, name: trainerResult.Value.Name.trainerName} : {id: null, name: null},
-            domainBlog.Tags.map(tag => tag.value),
-            domainBlog.Publication_date.value
+            domainBlog.title,
+            domainBlog.content,
+            categoryResult.Value ? categoryResult.Value.name : null,    
+            domainBlog.images.map(image => image.url),
+            trainerResult.Value ? {Id: trainerResult.Value.Id, Name: trainerResult.Value.Name} : {Id: null, Name: null},
+            domainBlog.tags.map(tag => tag.name),
+            domainBlog.publication_date
         )
         return Result.success(blogResponse, 200);
         

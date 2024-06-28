@@ -9,27 +9,7 @@ export class MailJet implements IMailer {
         this.mailService = mailService;
     }
 
-    async sendUserMail(message: string, subject: string, email: string): Promise<void> {
-        await this.mailService.send({
-            Messages: [
-                {
-                    From: {
-                        Email: 'gymnastic.alfa@gmail.com'
-                    },
-                    To: [
-                        {
-                            Email: email
-                        }
-                    ],
-                    Subject: subject,
-                    TextPart: message,
-
-                }
-            ]
-        })
-    }
-
-    async sendCodeMail(message: string, subject: string, email: string, code: number): Promise<void> {
+    async sendMail(message: string, subject: string, email: string, code: number): Promise<void> {
         const codeS = code.toString();
         await this.mailService.send({
             Messages: [

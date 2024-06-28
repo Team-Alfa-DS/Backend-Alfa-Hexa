@@ -1,10 +1,12 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
-import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment-blog.mapper";
-import { OrmLessonCommentMapper } from "../mapper/lesson/orm-comment-lesson.mapper";
+import { OrmCommentMapper } from "../mapper/orm-comment.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
+import { CourseMapper } from "src/course/infraestructure/mappers/course.mapper";
+import { OrmCommentRepository } from "../repositories/orm-comment.repository";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
+import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
@@ -27,17 +29,7 @@ import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
-import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
-import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
-import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
-import { BlogCommentEntity } from "../entities/blog/comment.blog.entity";
-import { LessonCommentEntity } from "../entities/lesson/comment.lesson.entity";
-
-
-
-
-
+import { CommentEntity } from "../entities/comment.entity";
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -50,18 +42,13 @@ export class CommentController{
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
-    private commentBlogMapper: OrmBlogCommentMapper = new OrmBlogCommentMapper();
-    private commentLessonMapper: OrmLessonCommentMapper = new OrmLessonCommentMapper();
+    private commentMapper: OrmCommentMapper = new OrmCommentMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
+    private courseMapper: CourseMapper = new CourseMapper();
 
     //* Repositorios
-    private readonly commentBlogRepository: IBlogCommentRepository = new OrmBlogCommentRepository(
-        this.commentBlogMapper,
-        DatabaseSingleton.getInstance()
-    );
-
-    private readonly commentLessonRepository: ILessonCommentRepository = new OrmLessonCommentRepository(
-        this.commentLessonMapper,
+    private readonly commentRepository: ICommentRepository = new OrmCommentRepository(
+        this.commentMapper,
         DatabaseSingleton.getInstance()
     );
 
@@ -87,6 +74,7 @@ export class CommentController{
         DatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
+    //private readonly encryptor: IEncryptor = new BcryptEncryptor();
     
     
     private readonly getCommentBlogService: IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>;
@@ -98,26 +86,29 @@ export class CommentController{
 
         this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
-                this.commentBlogRepository,
-                this.transactionHandler
+                this.commentRepository,
+                this.transactionHandler,
+                //this.encryptor
             ),
             this.logger
         );
         this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
-                this.commentLessonRepository,
-                this.transactionHandler
+                this.commentRepository,
+                this.transactionHandler,
+                //this.encryptor
             ),
             this.logger
         );
         this.registerLessonCommentService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterLessonCommentServices(
-                    this.commentLessonRepository,
+                    this.commentRepository,
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,
-                    this.idGenerator
+                    this.idGenerator,
+                    //this.encryptor
                 ),
                 this.auditRepository
             ),
@@ -126,11 +117,12 @@ export class CommentController{
         this.registerBlogCommentService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterBlogCommentServices(
-                    this.commentBlogRepository,
+                    this.commentRepository,
                     this.userRepository,
                     this.blogRepository,
                     this.transactionHandler,
-                    this.idGenerator
+                    this.idGenerator,
+                    //this.encryptor
                 ),
                 this.auditRepository
             ),
@@ -143,7 +135,7 @@ export class CommentController{
     @Get(':many')
     @ApiCreatedResponse({
         description: 'se retorno todos los comentarios correctamente',
-        type: BlogCommentEntity, 
+        type: CommentEntity,
     })
     @ApiBadRequestResponse({
         description: 'No existen comentarios.'
@@ -152,12 +144,6 @@ export class CommentController{
     @ApiQuery({name:'lesson', required: false})
     async getCommets (@Request() req: JwtRequest,
     @Query() commentsQueryParams: GetAllCommentsQueryDto){
-        
-        if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
-            (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
-            throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
-        }
-        
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
@@ -180,7 +166,7 @@ export class CommentController{
     @Post( '/release' )
     @ApiCreatedResponse({
         description: 'se agrego el comentario correctamente',
-        type: BlogCommentEntity,
+        type: CommentEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo agregar el  comentario.'
@@ -191,7 +177,7 @@ export class CommentController{
 
         if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
 
-        if (addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
+        if(addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
         
     }
 

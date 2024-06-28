@@ -1,8 +1,0 @@
-import { DomainException } from "src/common/domain/domain-exception";
-
-
-export class InvalidBlogPublicationDate extends DomainException {
-    constructor(msg: string) {
-        super(msg);
-    }
-}

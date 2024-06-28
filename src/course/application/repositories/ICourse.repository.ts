@@ -7,5 +7,4 @@ export interface ICourseRepository {
   getCoursesByTag(tag: string): Promise<Result<Course[]>>;
   getCourseByLessonId(lessonId: string): Promise<Result<Course>>;
   getAllCourses(page?: number, perpage?: number): Promise<Result<Course[]>>;
-  getCourseCount(category: string, trainerId: string): Promise<Result<number>>;
 }

@@ -14,6 +14,7 @@ import {
   ApiUnauthorizedResponse,
   ApiCreatedResponse,
   ApiBadRequestResponse,
+  ApiQuery,
   ApiParam,
 } from '@nestjs/swagger';
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
@@ -96,7 +97,6 @@ export class TrainerController {
     }
     return oneTrainer.Value;
   }
-  
 
   @Post('/toggle/follow/:id')
   @ApiCreatedResponse({

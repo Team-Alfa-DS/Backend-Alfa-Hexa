@@ -1,32 +1,36 @@
+import { IApplicationService } from "src/common/application-service.interface/aplication-service.interface";
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto, LessonComment } from "../../dto/lesson/lesson-comment.response.dto";
 import { Result } from "src/common/domain/result-handler/result";
+import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { Comment } from "src/comment/domain/Comment";
 import { IService } from "src/common/application/interfaces/IService";
-import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
-    private readonly commentLessonRepository: ILessonCommentRepository;
+    private readonly commentRepository: ICommentRepository;
     private readonly transactionHandler: ITransactionHandler;
+    //private readonly encryptor: IEncryptor;
 
     constructor(
-        commentLessonRepository: ILessonCommentRepository,
+        commentRepository: ICommentRepository,
         transactionHandler: ITransactionHandler,
+        //encryptor: IEncryptor
     ){
         super();
-        this.commentLessonRepository = commentLessonRepository;
+        this.commentRepository = commentRepository;
         this.transactionHandler = transactionHandler;
+        //this.encryptor = encryptor;
     }
     
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
 
         if (!data.pagination.page) data.pagination.page = 0;
-        
-        let lessonId = LessonCommentLessonId.create( data.lessonId );
-
-        const comments = await this.commentLessonRepository.findAllCommentsByLessonId(
-            lessonId,
+                
+        const comments = await this.commentRepository.findAllCommentsByLessonId(
+            data.lessonId, 
+            data.pagination.page, 
+            data.pagination.perPage, 
             this.transactionHandler
         );
         
@@ -34,23 +38,8 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
 
         let commentsRes: LessonComment[] = [];
         for (const comment of comments.Value) {
-            commentsRes.push({
-                id: comment.Id.commentId, 
-                user: comment.UserId.UserId, 
-                body: comment.Body.Body, 
-                countLikes: comment.CountLikes.CountLike, 
-                countDislikes: comment.CountDislikes.CountDislike, 
-                userLiked: comment.UserLiked.UserLiked, 
-                userDisliked: comment.UserDisliked.UserDisliked, 
-                date: comment.PublicationDate.PublicationDate})
+            commentsRes.push({id: comment.Id, user: comment.UserId, body: comment.Body, countLikes: comment.CountLikes, countDislikes: comment.CountDislikes, userLiked: comment.UserLiked, userDisliked: comment.UserDisliked, date: comment.DDate})
         };
-
-        if (data.pagination.perPage) {
-            let page = data.pagination.page;
-            if (!page) {page = 0}
-
-            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
-        }
 
         const response = new GetLessonCommentServiceResponseDto(commentsRes)
         return Result.success<GetLessonCommentServiceResponseDto>(response, comments.StatusCode);

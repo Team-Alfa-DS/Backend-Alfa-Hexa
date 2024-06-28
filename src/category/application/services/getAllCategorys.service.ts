@@ -14,14 +14,7 @@ export class GetAllCategorysService extends IService<GetAllCategoriesRequest, Ge
         const result = await this.categoryRepository.getAllCategory(value.page, value.perpage);
         if (!result.isSuccess) return Result.fail(result.Error, result.StatusCode, result.Message);
 
-        const response = new GetAllCategoriesResponse(result.Value.map(category => {
-            return {
-                id: category.Id.value,
-                name: category.Name.value,
-                icon: category.Icon.value
-            }
-        })
-        );
+        const response = new GetAllCategoriesResponse(result.Value);
         return Result.success(response, 200);
     }
 }

@@ -9,11 +9,8 @@ export class NodeMailer implements IMailer {
     constructor(mailerService: MailerService) {
         this.mailerService = mailerService;
     }
-    sendUserMail(message: string, subject: string, email: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
 
-    async sendCodeMail(message: string, subject: string, email: string, code: number): Promise<void> {
+    async sendMail(message: string, subject: string, email: string, code: number): Promise<void> {
         this.mailerService.sendMail({
             from: 'gymnastic.alfa@gmail.com',
             to: email,

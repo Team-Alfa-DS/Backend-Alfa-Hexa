@@ -3,8 +3,6 @@ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repo
 import { IService } from 'src/common/application/interfaces/IService';
 import { FollowTrainerRequest } from '../dto/request/follow-trainer.request';
 import { FollowTrainerResponse } from '../dto/response/follow-trainer.response';
-import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
-import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class FollowTrainerService extends IService<FollowTrainerRequest, FollowTrainerResponse>
 {
@@ -15,15 +13,10 @@ export class FollowTrainerService extends IService<FollowTrainerRequest, FollowT
   }
 
   async execute(data: FollowTrainerRequest): Promise<Result<FollowTrainerResponse>> {
-    let trainerId = TrainerId.create(data.idTrainer);
-    let userId = UserId.create(data.idUser);
-
-    const trainer = await this.trainerRepository.followTrainer( trainerId, userId );
-
+    const trainer = await this.trainerRepository.followTrainer({idTrainer: data.idTrainer, idUser: data.idUser});
     if (!trainer.isSuccess) {
       return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message);
     }
-
     const response = new FollowTrainerResponse()
     return Result.success(response, 202);
   }

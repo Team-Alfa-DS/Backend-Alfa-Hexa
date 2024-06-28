@@ -1,31 +1,17 @@
 /* eslint-disable prettier/prettier */
 
-import { CategoryIcon } from "./valueObjects/categoryIcon";
-import { CategoryId } from "./valueObjects/categoryId";
-import { CategoryName } from "./valueObjects/categoryName";
-
 export class Category{
-    private id: CategoryId;
-    private name: CategoryName
-    private icon: CategoryIcon
+    id: string;
+    name:string;
+    icon: string;
 
-    private constructor (id: CategoryId, name: CategoryName, icon: CategoryIcon){
+    private constructor (id: string, name:string, icon: string){
         this.id= id;
         this.name= name;
         this.icon=icon;
     }
 
-    static Create(id: CategoryId, name: CategoryName, icon: CategoryIcon) {
+    static Create(id: string, name:string, icon: string) {
         return new Category(id, name, icon);
-    }
-
-    get Id(): CategoryId{
-        return this.id;
-    }
-    get Name(): CategoryName{
-        return this.name;
-    }
-    get Icon(): CategoryIcon{
-        return this.icon;
     }
 }
