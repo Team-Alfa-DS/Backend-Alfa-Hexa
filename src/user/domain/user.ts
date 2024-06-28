@@ -16,6 +16,7 @@ import { UserPhoneUpdated } from "./events/user-phone-updated.event";
 import { UserTypeUpdated } from "./events/user-type-updated.event";
 import { UserImageUpdated } from "./events/user-image-updated.event";
 import { UserType } from "./value-objects/user-type";
+import { UserRegister } from "./events/user-register.event";
 
 export class User extends AggregateRoot<UserId> {
     private email: UserEmail;
@@ -119,5 +120,9 @@ export class User extends AggregateRoot<UserId> {
 
     UpdateImage(image: UserImage): void {
         this.apply(UserImageUpdated.create(this.Id, image));
+    }
+
+    Register(id: UserId, email: UserEmail, name: UserName): void {
+        this.apply(UserRegister.create(id, email, name));
     }
 }

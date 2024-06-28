@@ -31,7 +31,6 @@ export class ChangeUserPasswordService extends IService<ChangeUserPasswordReques
             return Result.fail(user.Error, user.StatusCode, user.Message);
         }
         const userDomain = user.Value;
-        userDomain.pullDomainEvents();
         const hashPassword = await this.encryptor.hash(value.password);
         userDomain.UpdatePassword(UserPassword.create(hashPassword));
 

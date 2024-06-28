@@ -20,6 +20,8 @@ import { GetCourseCountQueryDto } from "../dtos/getCourseCountQuery.dto";
 import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } from "src/course/application/services/getCourseCount.service";
 import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/orm-trainer.repositorie";
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
+import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
+import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -33,14 +35,15 @@ export class CourseController {
   constructor() {
     const courseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
+    const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance), 
+      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance), 
+      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseCountService = new ExceptionLoggerDecorator(

@@ -15,8 +15,8 @@ export class OrmProgressMapper implements IMapper<Progress, OrmProgressEntity> {
             domainEntity.Id.LessonId,
             domainEntity.Id.UserId,
             domainEntity.MarkAsCompleted.MarkAsCompleted,
-            domainEntity.Time?.Time,
-            domainEntity.LastTime?.LastTime
+            domainEntity.Time.Time,
+            domainEntity.LastTime.LastTime
         )
         return ormProgress;
     }
