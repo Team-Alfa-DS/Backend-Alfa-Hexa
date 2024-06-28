@@ -6,7 +6,7 @@ import { ITransactionHandler } from 'src/common/domain/transaction-handler/trans
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { BcryptEncryptor } from '../encryptor/bcrypt';
 import { LoginUserService } from 'src/auth/application/services/login-user.service';

@@ -5,7 +5,7 @@ import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 import { IMapper } from 'src/common/application/mappers/mapper.interface';
 import { Result } from 'src/common/domain/result-handler/result';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';

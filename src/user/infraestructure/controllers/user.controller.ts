@@ -3,7 +3,7 @@ import { Body, Controller, FileTypeValidator, HttpException, ParseFilePipe, Put,
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
-import { OrmUserMapper } from "../mappers/orm-user.mapper";
+import { OrmUserMapper } from "../mappers/orm-mappers/orm-user.mapper";
 import { UpdateUserService } from "src/user/application/services/update-user.application.service";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { UpdateUserDto } from "../dtos/update-user.dto";
