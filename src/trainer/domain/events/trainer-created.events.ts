@@ -16,7 +16,6 @@ export class TrainerCreated extends DomainEvent{
         public  id: TrainerId,
         public  name: TrainerName,
         public  followers: TrainerFollower,
-        public  userfollow: TrainerUserFollow,
         public  trainerlocation: TrainerLocation,
         public  courses: TrainerCourseId[],
         public  blogs: TrainerBlogId[],
@@ -29,13 +28,12 @@ export class TrainerCreated extends DomainEvent{
         id: TrainerId,
         name: TrainerName,
         followers: TrainerFollower,
-        userfollow: TrainerUserFollow,
         trainerlocation: TrainerLocation,
         courses: TrainerCourseId[],
         blogs: TrainerBlogId[],
         users: TrainerFollowerUserId[],
     ): TrainerCreated {
-        return new TrainerCreated(id, name, followers, userfollow, trainerlocation, courses, blogs, users)
+        return new TrainerCreated(id, name, followers, trainerlocation, courses, blogs, users)
     }
 
 }

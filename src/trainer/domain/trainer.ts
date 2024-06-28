@@ -14,7 +14,6 @@ import { TrainerCourseId } from './valueObjects/trainer-courseid';
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
   private followers: TrainerFollower;
-  private userFollow: TrainerUserFollow;
   private location: TrainerLocation;
   private courses: TrainerCourseId[];
   private blogs: TrainerBlogId[];
@@ -24,13 +23,12 @@ export class Trainer extends AggregateRoot<TrainerId> {
     id: TrainerId,
     name: TrainerName,
     followers: TrainerFollower,
-    userFollow: TrainerUserFollow,
     location: TrainerLocation,
     courses: TrainerCourseId[],
     blogs: TrainerBlogId[],
     users: TrainerFollowerUserId[],
   ) {
-    const Trainercreated = TrainerCreated.create(id, name, followers, userFollow, location, courses, blogs, users);
+    const Trainercreated = TrainerCreated.create(id, name, followers, location, courses, blogs, users);
     super(id, Trainercreated)
    
   }
@@ -39,7 +37,6 @@ export class Trainer extends AggregateRoot<TrainerId> {
     if(event instanceof TrainerCreated){
       this.name = event.name;
       this.followers = event.followers;
-      this.userFollow = event.userfollow;
       this.location = event.trainerlocation;
       this.courses = event.courses;
       this.blogs = event.blogs;
@@ -48,7 +45,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   }
 
   protected validateState(): void {
-    if(!this.name || !this.followers || !this.userFollow || !this.location){
+    if(!this.name || !this.followers || !this.location){
       throw new InvalidTrainerException('Entrenador no valido');   
     }
     
@@ -58,13 +55,12 @@ export class Trainer extends AggregateRoot<TrainerId> {
     id: TrainerId,
     name: TrainerName,
     followers: TrainerFollower,
-    userFollow: TrainerUserFollow,
     location: TrainerLocation,
     courses: TrainerCourseId[],
     blogs: TrainerBlogId[],
     users: TrainerFollowerUserId[],
   ): Trainer {
-    return new Trainer(id, name, followers, userFollow, location, courses, blogs, users);
+    return new Trainer(id, name, followers, location, courses, blogs, users);
   }
   
   get Name(): TrainerName {
@@ -72,9 +68,6 @@ export class Trainer extends AggregateRoot<TrainerId> {
   }
   get Followers(): TrainerFollower {
     return this.followers;
-  }
-  get UserFollow(): TrainerUserFollow {
-    return this.userFollow;
   }
   get Location(): TrainerLocation {
     return this.location;

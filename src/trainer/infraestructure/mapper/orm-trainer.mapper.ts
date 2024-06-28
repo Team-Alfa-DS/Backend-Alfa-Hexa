@@ -21,7 +21,6 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
         domainEntity.Id.trainerId,
         domainEntity.Name.trainerName,
         domainEntity.Followers.trainerFollower,
-        domainEntity.UserFollow.trainerUserFollow,
         domainEntity.Location.trainerLocation,
       );
       return ormTrainer;
@@ -41,7 +40,6 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
         TrainerId.create(ormEntity.id),
         TrainerName.create(ormEntity.name),
         TrainerFollower.create(ormEntity.followers),
-        TrainerUserFollow.create(ormEntity.userFollow),
         TrainerLocation.create(ormEntity.location),
         courses,
         blogs,
