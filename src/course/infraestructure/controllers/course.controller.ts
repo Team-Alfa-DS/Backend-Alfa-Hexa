@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, Api
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ServiceLoggerDecorator } from "src/common/application/aspects/serviceLoggerDecorator";
 import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLogger";
@@ -15,7 +15,7 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
-import { CourseEntity } from "../entities/course.entity";
+import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
 import { GetCourseCountQueryDto } from "../dtos/getCourseCountQuery.dto";
 import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } from "src/course/application/services/getCourseCount.service";
 import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/orm-trainer.repositorie";
@@ -33,9 +33,9 @@ export class CourseController {
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
 
   constructor() {
-    const courseRepositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,DatabaseSingleton.getInstance());
-    const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), DatabaseSingleton.getInstance());
+    const courseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
+    const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
@@ -56,7 +56,7 @@ export class CourseController {
   @Get('one/:id')
   @ApiCreatedResponse({
     description: 'se encontro el curso correctamente',
-    type: CourseEntity,
+    type: OrmCourseEntity,
   })
   @ApiBadRequestResponse({
     description: 'No se encontro el curso. Intente con otra Id'
@@ -80,7 +80,7 @@ export class CourseController {
   @ApiQuery({name: 'trainer', required:false})
   @ApiCreatedResponse({
     description: 'se retorno la totalidad de cursos',
-    type: CourseEntity,
+    type: OrmCourseEntity,
   })
   @ApiBadRequestResponse({
     description: 'No se encontraron cursos.'
