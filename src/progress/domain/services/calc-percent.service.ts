@@ -1,6 +1,7 @@
-import { Lesson } from "src/course/domain/Lesson";
+import { Lesson } from "src/course/domain/entities/Lesson";
 import { Progress } from "../progress";
 import { CalcPercentProgressResponse, LessonProgress } from "../response/calc-percent-progress.response";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class CalcPercentService {
 
@@ -14,9 +15,12 @@ export class CalcPercentService {
                 contCompleted++;
             }
             
-            const lesson = lessonsCourse.find(lesson => lesson.id == pro.LessonId);
-            percent = pro.Time / lesson.seconds * 100
-            lessonList.push({lessonId: pro.LessonId, percent});
+            const lesson = lessonsCourse.find(lesson => lesson.id.equals(new LessonId(pro.Id.LessonId)) );
+
+            if (pro.Time) {
+                percent = pro.Time.Time / lesson.seconds.value * 100
+            }
+            lessonList.push({lessonId: pro.Id.LessonId, percent, time: pro.Time.Time});
         }
 
         const totalProgress = contCompleted / lessonsCourse.length * 100;

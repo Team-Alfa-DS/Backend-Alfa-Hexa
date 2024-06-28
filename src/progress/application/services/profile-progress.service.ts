@@ -12,6 +12,7 @@ import { Progress } from "src/progress/domain/progress";
 import { CourseProgress } from "../dtos/response/courses-progress.response";
 import { CalcPercentProgressResponse } from "src/progress/domain/response/calc-percent-progress.response";
 import { CalcTotalCoursesPercentService } from "src/progress/domain/services/calc-total-courses-percent";
+import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class ProfileProgressService extends IService<ProfileProgressRequest, ProfileProgressResponse> {
 
@@ -38,29 +39,29 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
     }
 
     async execute(value: ProfileProgressRequest): Promise<Result<ProfileProgressResponse>> {
-        const user = await this.userRepository.findUserById(value.userId, this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
 
         if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
 
-        const progressUser = await this.progressRepository.findProgressByUser(value.userId, this.transactionHandler);
+        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId), this.transactionHandler);
 
         if (!progressUser.isSuccess) return Result.fail(progressUser.Error, progressUser.StatusCode, progressUser.Message);
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(pro.LessonId);
-            if (courses.findIndex(c => c.id == course.Value.id) == -1) courses.push(course.Value);
+            const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
+            if (courses.findIndex(c => c.Id.equals(course.Value.Id) /*c.id == course.Value.id*/) == -1) courses.push(course.Value);
         }
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(value.userId, course.lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
             progressUserList.push(progress.Value);
         }
 
         let progressCourseUser: CalcPercentProgressResponse[] = [];
         for (let i=0; i < progressUserList.length; i++) {
-            const calc = this.calcPercent.execute(courses[i].lessons, progressUserList[i]);
+            const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
             progressCourseUser.push(calc);
         }
         const totalCoursesPercent = this.calcTotalCoursesPercent.execute(progressCourseUser);

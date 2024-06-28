@@ -1,51 +1,87 @@
-export class Progress {
-    private userId: string;
-    private lessonId: string;
-    private markAsCompleted: boolean;
-    private time?: number;
-    private lastTime?: Date;
+import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { ProgressLastTime } from "./value-objects/progress-lastTime";
+import { ProgressMarkAsCompleted } from "./value-objects/progress-markAsCompleted";
+import { ProgressTime } from "./value-objects/progress-time";
+import { ProgressId } from "./value-objects/progress-Id";
+import { UserId } from "src/user/domain/value-objects/user-id";
+import { DomainEvent } from "src/common/domain/domain-event";
+import { ProgressCreated } from "./events/progress-created.event";
+import { InvalidProgressException } from "./exceptions/invalid-progress.exception";
+import { ProgressMarkAsCompletedUpdated } from "./events/progress-markAsCompleted-updated.event";
+import { ProgressTimeUpdated } from "./events/progress-time-updated.event";
+import { ProgressLastTimeUpdated } from "./events/progress-lastTime-updated.event";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
-    private constructor(userId: string, lessonId: string, markAsCompleted: boolean, time: number, lastTime: Date) {
-        this.userId = userId;
-        this.lessonId = lessonId;
-        this.markAsCompleted = markAsCompleted;
-        this.time = time;
-        this.lastTime = lastTime;
+export class Progress extends AggregateRoot<ProgressId>{
+    private markAsCompleted: ProgressMarkAsCompleted;
+    private time: ProgressTime;
+    private lastTime: ProgressLastTime;
+    private user: UserId;
+    private course: CourseId;
+
+    private constructor(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, course: CourseId, time: ProgressTime, lastTime: ProgressLastTime) {
+        const progressCreated = ProgressCreated.create(id, markAsCompleted, user, course, time, lastTime);
+        super(id, progressCreated);
     }
 
-    get UserId(): string {
-        return this.userId;
+    protected when(event: DomainEvent): void {
+        if (event instanceof ProgressCreated) {
+            this.markAsCompleted = event.markAsCompleted;
+            this.time = event.time;
+            this.lastTime = event.lastTime;
+            this.user = event.user;
+        }
+
+        if (event instanceof ProgressMarkAsCompletedUpdated) {
+            this.markAsCompleted = event.markAsCompleted;
+        }
+
+        if (event instanceof ProgressTimeUpdated) {
+            this.time = event.time;
+        }
+
+        if (event instanceof ProgressLastTimeUpdated) {
+            this.lastTime = event.lastTime;
+        }
     }
 
-    get LessonId(): string {
-        return this.lessonId;
+    protected validateState(): void {
+        if (!this.course || !this.user) throw new InvalidProgressException('El progreso no es valido');
     }
 
-    get MarkAsCompleted(): boolean {
+    get MarkAsCompleted(): ProgressMarkAsCompleted {
         return this.markAsCompleted;
     }
 
-    get Time(): number {
+    get Time(): ProgressTime {
         return this.time;
     }
 
-    get LastTime(): Date {
+    get LastTime(): ProgressLastTime {
         return this.lastTime;
     }
 
-    static create(userId: string, lessonId: string, markAsCompleted: boolean, time?: number, lastTime?: Date) {
-        return new Progress(userId, lessonId, markAsCompleted, time, lastTime);
+    get User(): UserId {
+        return this.user;
     }
 
-    UpdateMarkAsCompleted(markAsCompleted: boolean): void {
-        this.markAsCompleted = markAsCompleted;
+    get Course(): CourseId {
+        return this.course;
     }
 
-    UpdateTime(time: number): void {
-        this.time = time;
+    static create(id: ProgressId, markAsCompleted: ProgressMarkAsCompleted, user: UserId, course: CourseId, time: ProgressTime, lastTime: ProgressLastTime) {
+        return new Progress(id, markAsCompleted, user, course, time, lastTime);
     }
 
-    UpdateLastTime(lastTime: Date): void {
-        this.lastTime = lastTime;
+    UpdateMarkAsCompleted(markAsCompleted: ProgressMarkAsCompleted): void {
+        this.apply(ProgressMarkAsCompletedUpdated.create(this.Id, markAsCompleted));
+    }
+
+    UpdateTime(time: ProgressTime): void {
+        this.apply(ProgressTimeUpdated.create(this.Id, time));
+    }
+
+    UpdateLastTime(lastTime: ProgressLastTime): void {
+        this.apply(ProgressLastTimeUpdated.create(this.Id, lastTime));
     }
 }

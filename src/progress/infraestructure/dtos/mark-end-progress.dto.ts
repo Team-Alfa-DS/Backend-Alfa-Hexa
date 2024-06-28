@@ -33,6 +33,12 @@ export class MarkEndProgressDto {
         example: '1405'
     })
     @IsNumber()
-    @IsOptional()
-    time?: number //segundos
+    time: number //segundos
+
+    @ApiProperty({
+        description: 'tiempo total de la leccion',
+        example: '1800'
+    })
+    @IsNumber()
+    totalTime: number //segundos
 }

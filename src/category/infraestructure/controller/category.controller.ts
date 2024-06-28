@@ -72,7 +72,7 @@ export class CategoryController {
     @ApiBadRequestResponse({
       description: 'No existe una categoria con esa id'
     })
-    async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<Category> {
+    async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       if (response.isSuccess) return response.Value

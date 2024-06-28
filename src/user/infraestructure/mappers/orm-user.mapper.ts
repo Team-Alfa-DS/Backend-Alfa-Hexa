@@ -1,31 +1,39 @@
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { User } from "src/user/domain/user";
 import { UserEntity } from "../entities/user.entity";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserName } from "src/user/domain/value-objects/user-name";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { UserPhone } from "src/user/domain/value-objects/user-phone";
+import { UserImage } from "src/user/domain/value-objects/user-image";
+import { UserId } from "src/user/domain/value-objects/user-id";
+import { UserType } from "src/user/domain/value-objects/user-type";
+import { UserRole } from "src/user/domain/enums/role-user.type";
 
 export class OrmUserMapper implements IMapper<User, UserEntity> {
 
     async toOrm(domainEntity: User): Promise<UserEntity> {
         const ormUser = UserEntity.create(
-            domainEntity.Id,
-            domainEntity.Email,
-            domainEntity.Name,
-            domainEntity.Password,
-            domainEntity.Phone,
-            domainEntity.Type,
-            domainEntity.Image
+            domainEntity.Id.Id,
+            domainEntity.Email.Email,
+            domainEntity.Name.Name,
+            domainEntity.Password.Password,
+            domainEntity.Phone.Phone,
+            domainEntity.Type.Type as UserRole,
+            domainEntity.Image?.Image
         )
         return ormUser;
     }
 
     async toDomain(ormEntity: UserEntity): Promise<User> {
         const domainUser = User.Create(
-            ormEntity.id,
-            ormEntity.email,
-            ormEntity.name,
-            ormEntity.password,
-            ormEntity.phone,
-            ormEntity.type,
-            ormEntity.image
+            UserId.create(ormEntity.id),
+            UserEmail.create(ormEntity.email),
+            UserName.create(ormEntity.name),
+            UserPassword.create(ormEntity.password),
+            UserPhone.create(ormEntity.phone),
+            UserType.create(ormEntity.type),
+            ormEntity.image ? UserImage.create(ormEntity.image) : null
         )
         return domainUser;
     }
