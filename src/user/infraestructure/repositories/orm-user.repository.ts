@@ -1,5 +1,5 @@
 import { DataSource, Repository } from "typeorm";
-import { OrmUserEntity } from "../entities/orm-entities/orm-user.entity";
+import { UserEntity } from "../entities/user.entity";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { User } from "src/user/domain/user";
@@ -9,19 +9,19 @@ import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserId } from "src/user/domain/value-objects/user-id";
 
-export class OrmUserRepository extends Repository<OrmUserEntity> implements IUserRepository {
+export class OrmUserRepository extends Repository<UserEntity> implements IUserRepository {
 
-    private readonly ormUserMapper: IMapper<User, OrmUserEntity>;
+    private readonly ormUserMapper: IMapper<User, UserEntity>;
 
-    constructor(ormUserMapper: IMapper<User, OrmUserEntity>, dataSource: DataSource) {
-        super(OrmUserEntity, dataSource.manager);
+    constructor(ormUserMapper: IMapper<User, UserEntity>, dataSource: DataSource) {
+        super(UserEntity, dataSource.manager);
         this.ormUserMapper = ormUserMapper;
     }
 
     async findUserById(id: UserId, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
 
-        const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {id: id.Id});
+        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {id: id.Id});
 
         if (!userfound) {
             return Result.fail<User>(new Error('User not found'), 404, 'User not found');
@@ -37,7 +37,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
 
     async findUserByEmail(email: UserEmail, runner: TransactionHandler): Promise<Result<User>> {
         const runnerTransaction = runner.getRunner();
-        const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {email: email.Email});
+        const userfound = await runnerTransaction.manager.findOneBy(UserEntity, {email: email.Email});
 
         if (!userfound) {
             return Result.fail<User>(new Error('User not found'), 404, 'User not found');

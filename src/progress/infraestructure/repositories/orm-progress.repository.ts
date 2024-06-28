@@ -1,28 +1,30 @@
 import { DataSource, Repository } from "typeorm";
-import { OrmProgressEntity } from "../entities/orm-entities/orm-progress.entity";
+import { ProgressEntity } from "../entities/progress.entity";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { Progress } from "src/progress/domain/progress";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { Lesson } from "src/course/domain/entities/Lesson";
+import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
-export class OrmProgressRepository extends Repository<OrmProgressEntity> implements IProgressRepository {
+export class OrmProgressRepository extends Repository<ProgressEntity> implements IProgressRepository {
 
-    private readonly ormProgressMapper: IMapper<Progress, OrmProgressEntity>;
+    private readonly ormProgressMapper: IMapper<Progress, ProgressEntity>;
 
-    constructor(ormProgressMapper: IMapper<Progress, OrmProgressEntity>, dataSource: DataSource) {
-        super(OrmProgressEntity, dataSource.manager);
+    constructor(ormProgressMapper: IMapper<Progress, ProgressEntity>, dataSource: DataSource) {
+        super(ProgressEntity, dataSource.manager);
         this.ormProgressMapper = ormProgressMapper;
     }
 
     async findProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner(); 
         try {
-            const progressUser = await runnerTransaction.manager.findBy(OrmProgressEntity, {user_id: userId.Id});
+            const progressUser = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
             let progressDomainList: Progress[] = [];
 
             for (const progress of progressUser) {
@@ -38,7 +40,7 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
         const runnerTransaction = runner.getRunner();
         try {
             const progress = await runnerTransaction.manager
-            .createQueryBuilder(OrmProgressEntity, "progress")
+            .createQueryBuilder(ProgressEntity, "progress")
             .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId: userId.Id})
             .getOne();
             
@@ -55,7 +57,7 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
         const runnerTransaction = runner.getRunner()
         try {
             const ormProgress = await this.ormProgressMapper.toOrm(progress);
-            await runnerTransaction.manager.save(OrmProgressEntity, ormProgress);
+            await runnerTransaction.manager.save(ProgressEntity, ormProgress);
             return Result.success<Progress>(progress, 200)
         } catch(err) {
             return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
@@ -65,7 +67,7 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
     async findProgressByUserCourse(userId: UserId, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progressList = await runnerTransaction.manager.findBy(OrmProgressEntity, {user_id: userId.Id});
+            const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             

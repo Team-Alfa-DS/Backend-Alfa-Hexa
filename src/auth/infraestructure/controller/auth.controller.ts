@@ -3,7 +3,7 @@ import { IEncryptor } from 'src/auth/application/encryptor/encryptor.interface';
 import { RegisterUserService } from 'src/auth/application/services/register-user.service';
 import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
+import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
@@ -48,7 +48,7 @@ import { IMailer } from 'src/common/application/mailer/mailer.interface';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
-import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-entities/orm-user.entity';
+import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventBus } from 'src/common/infraestructure/events/event-bus';
@@ -63,12 +63,12 @@ export class AuthController {
     private userMapper: OrmUserMapper = new OrmUserMapper();
     private readonly jwtGen: JwtGen;
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, PgDatabaseSingleton.getInstance());
+        this.userMapper, DatabaseSingleton.getInstance());
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        PgDatabaseSingleton.getInstance().createQueryRunner()
+        DatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        PgDatabaseSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
@@ -142,7 +142,7 @@ export class AuthController {
     @Post('login')
     @ApiCreatedResponse({
         description: 'A iniciado sesion de manera exitosa',
-        //type: OrmUserEntity,
+        //type: UserEntity,
     })
     @ApiBadRequestResponse({
         description: 'Las credenciales son incorrectas. Intente de nuevo'
@@ -176,7 +176,7 @@ export class AuthController {
     @Post('forget/password')
     @ApiCreatedResponse({
         description: 'Se ha enviado un codigo de verifiacion al correo ingresado',
-        //type: OrmUserEntity,
+        //type: UserEntity,
     })
     @ApiBadRequestResponse({
         description: 'El correo ingresado no coincide con algun usuario. Intente de nuevo'
@@ -218,7 +218,7 @@ export class AuthController {
     @Put('change/password')
     @ApiCreatedResponse({
         description: 'se cambio la contraseña de manera exitosa',
-        type: OrmUserEntity,
+        type: UserEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo cambiar la contraseña. Intente de nuevo'

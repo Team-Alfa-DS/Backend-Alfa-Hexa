@@ -1,4 +1,4 @@
-// import { Blog } from "src/blog/infraestructure/entities/orm-entities/orm-blog.entity";
+// import { Blog } from "src/blog/infraestructure/entities/blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";

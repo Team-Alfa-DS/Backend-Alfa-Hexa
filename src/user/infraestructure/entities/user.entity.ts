@@ -6,14 +6,15 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserRole } from 'src/user/domain/enums/role-user.type';
-import { OrmProgressEntity } from 'src/progress/infraestructure/entities/orm-entities/orm-progress.entity';
-import { OrmTrainerEntity } from 'src/trainer/infraestructure/entities/orm-entities/orm-trainer.entity';
+import { ProgressEntity } from 'src/progress/infraestructure/entities/progress.entity';
+import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
 import { NotifyEntity } from 'src/notify/notify/Infraestructure/entities/notify.entity';
-import { OrmBlogCommentEntity } from 'src/comment/infraestructure/entities/orm-entities/orm-comment.blog.entity';
-import { OrmLessonCommentEntity } from 'src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity';
+import { ApiProperty } from '@nestjs/swagger';
+import { BlogCommentEntity } from 'src/comment/infraestructure/entities/blog/comment.blog.entity';
+import { LessonCommentEntity } from 'src/comment/infraestructure/entities/lesson/comment.lesson.entity';
 
 @Entity('user')
-export class OrmUserEntity {
+export class UserEntity {
 
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -34,19 +35,19 @@ export class OrmUserEntity {
   type: UserRole;
 
   @Column('bytea', { nullable: true })
-  image?: string;
+  image: string;
 
-  @OneToMany(() => OrmBlogCommentEntity, (comment) => comment.user)
-  blogComments: OrmBlogCommentEntity[];
+  @OneToMany(() => BlogCommentEntity, (comment) => comment.user)
+  blogComments: BlogCommentEntity[];
 
-  @OneToMany(() => OrmLessonCommentEntity, (comment) => comment.user)
-  lessonComments: OrmLessonCommentEntity[];
+  @OneToMany(() => LessonCommentEntity, (comment) => comment.user)
+  lessonComments: LessonCommentEntity[];
 
-  @OneToMany(() => OrmProgressEntity, (progress) => progress.user)
-  progress: OrmProgressEntity[];
+  @OneToMany(() => ProgressEntity, (progress) => progress.user)
+  progress: ProgressEntity[];
 
-  @ManyToMany(() => OrmTrainerEntity, (OrmTrainerEntity) => OrmTrainerEntity.users)
-  trainers: OrmTrainerEntity[];
+  @ManyToMany(() => OrmTrainer, (OrmTrainer) => OrmTrainer.users)
+  trainers: OrmTrainer[];
 
   @OneToMany(() => NotifyEntity, notify => notify.user)
   notify: NotifyEntity[];
@@ -60,7 +61,7 @@ export class OrmUserEntity {
     type: UserRole,
     image?: string,
   ) {
-    const user = new OrmUserEntity();
+    const user = new UserEntity();
     user.id = id;
     user.email = email;
     user.name = name;

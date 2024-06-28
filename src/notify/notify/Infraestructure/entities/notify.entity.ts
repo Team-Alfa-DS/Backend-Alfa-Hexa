@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn} from "typeorm";
-import { OrmUserEntity } from "src/user/infraestructure/entities/orm-entities/orm-user.entity";
+import { UserEntity } from "src/user/infraestructure/entities/user.entity";
 import { ApiProperty } from "@nestjs/swagger";
 
 @Entity('notify')
@@ -41,9 +41,9 @@ export class NotifyEntity {
     @Column()
     userReaded: boolean;
 
-    @ManyToOne(() => OrmUserEntity, user => user.notify)
+    @ManyToOne(() => UserEntity, user => user.notify)
     @JoinColumn({name: 'user_id'})
-    user: OrmUserEntity;
+    user: UserEntity;
 
 
     static create (

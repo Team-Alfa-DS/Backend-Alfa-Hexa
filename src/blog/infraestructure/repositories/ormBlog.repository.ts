@@ -1,14 +1,14 @@
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { DataSource, Repository } from "typeorm";
-import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
+import { BlogEntity } from "../entities/blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { BlogMapper } from '../mapper/blog.mapper';
 import { Result } from '../../../common/domain/result-handler/result';
 
-export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
+export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRepository {
 
     constructor(dataBase: DataSource) {
-        super(OrmBlogEntity, dataBase.manager);
+        super(BlogEntity, dataBase.manager);
     }
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try {

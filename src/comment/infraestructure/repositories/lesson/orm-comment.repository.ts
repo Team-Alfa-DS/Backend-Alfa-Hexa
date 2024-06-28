@@ -4,15 +4,15 @@ import { TransactionHandler } from "src/common/infraestructure/database/transact
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
-import { OrmLessonCommentEntity } from "../../entities/orm-entities/orm-comment.lesson.entity";
+import { LessonCommentEntity } from "../../entities/lesson/comment.lesson.entity";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 
-export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntity> implements ILessonCommentRepository{
+export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> implements ILessonCommentRepository{
     
-    private ormCommentMapper: IMapper<CommentLesson, OrmLessonCommentEntity>;
+    private ormCommentMapper: IMapper<CommentLesson, LessonCommentEntity>;
 
-    constructor(ormCommentMapper: IMapper<CommentLesson,OrmLessonCommentEntity>, dataSource: DataSource){
-        super(OrmLessonCommentEntity,dataSource.manager);
+    constructor(ormCommentMapper: IMapper<CommentLesson,LessonCommentEntity>, dataSource: DataSource){
+        super(LessonCommentEntity,dataSource.manager);
         this.ormCommentMapper = ormCommentMapper;
     }
     
@@ -21,7 +21,7 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
         const runnerTransaction = runner.getRunner();
         
         
-        const commentsFound = await runnerTransaction.manager.createQueryBuilder(OrmLessonCommentEntity, "comment")
+        const commentsFound = await runnerTransaction.manager.createQueryBuilder(LessonCommentEntity, "comment")
             .where("comment.lesson_id = :id", { id })
             .getMany();
 

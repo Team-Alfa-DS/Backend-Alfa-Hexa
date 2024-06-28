@@ -1,5 +1,5 @@
 import { IMapper } from 'src/common/application/mappers/mapper.interface';
-import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
+import { OrmTrainer } from '../entities/trainer.entity';
 import { Trainer } from '../../domain/trainer';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { TrainerName } from 'src/trainer/domain/valueObjects/trainer-name';
@@ -13,23 +13,23 @@ import { CourseId } from 'src/course/domain/value-objects/course-id';
 import { BlogId } from 'src/blog/domain/valueObjects/blogId';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 
-export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainerEntity> {
-  async toOrm(domainEntity: Trainer): Promise<OrmTrainerEntity> {
+export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
+  async toOrm(domainEntity: Trainer): Promise<OrmTrainer> {
     //Optional?
     if (domainEntity) {
-      const OrmTrainer = OrmTrainerEntity.create(
+      const ormTrainer = OrmTrainer.create(
         domainEntity.Id.trainerId,
         domainEntity.Name.trainerName,
         domainEntity.Followers.trainerFollower,
         domainEntity.UserFollow.trainerUserFollow,
         domainEntity.Location.trainerLocation,
       );
-      return OrmTrainer;
+      return ormTrainer;
     }
     return null;
   }
 
-  async toDomain(ormEntity: OrmTrainerEntity): Promise<Trainer> {
+  async toDomain(ormEntity: OrmTrainer): Promise<Trainer> {
     if (ormEntity) {
       
       let courses: TrainerCourseId[] = ormEntity.courses?.map(course => TrainerCourseId.create([new CourseId(course.id)])) || [];
@@ -52,7 +52,7 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainerEntity> {
     return null;
   }
 
-  /*async arrayToDomain(entities: OrmTrainerEntity[]): Promise<Trainer[]> {
+  /*async arrayToDomain(entities: OrmTrainer[]): Promise<Trainer[]> {
     const courses: Trainer[] = [];
     for (let entity of entities) {
       courses.push(await this.toDomain(entity));

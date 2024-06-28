@@ -2,11 +2,11 @@
 import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Query } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
-//import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
+//import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmCategoryRepository } from "../repositories/orm-category.repository";
 import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
-import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
-//import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+//import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 import { GetCategoryByIdService } from "src/category/application/services/getCategoryById.service";
 import { Category } from "src/category/domain/Category";
@@ -20,7 +20,7 @@ import { GetCategoryResponse } from "src/category/application/dtos/response/get-
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
-import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
+import { CategoryEntity } from "../entities/category.entity";
 
 
 @ApiTags('Category')
@@ -34,7 +34,7 @@ export class CategoryController {
     private getCategoryByIdService: IService<GetCategoryRequest, GetCategoryResponse>;
     private readonly categoryRepository: OrmCategoryRepository = new OrmCategoryRepository(
         this.categoryMapper,
-        PgDatabaseSingleton.getInstance()
+        DatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
 
@@ -52,7 +52,7 @@ export class CategoryController {
     @Get("many")
     @ApiCreatedResponse({
       description: 'se retornaron todas las categorias de manera exitosa',
-      type: OrmCategoryEntity,
+      type: CategoryEntity,
   })
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
@@ -67,7 +67,7 @@ export class CategoryController {
     @Get("/:id")
     @ApiCreatedResponse({
       description: 'se retorno la categoria de manera exitosa',
-      type: OrmCategoryEntity,
+      type: CategoryEntity,
     })
     @ApiBadRequestResponse({
       description: 'No existe una categoria con esa id'

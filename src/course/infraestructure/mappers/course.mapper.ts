@@ -1,5 +1,5 @@
 import { Course } from "src/course/domain/Course";
-import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
+import { CourseEntity } from "../entities/course.entity";
 import { LessonMapper } from "./lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
@@ -16,7 +16,7 @@ import { CourseId } from "src/course/domain/value-objects/course-id";
 import { CourseImage } from "src/course/domain/value-objects/course-image";
 
 export class CourseMapper {
-  static toDomain(entity: OrmCourseEntity): Course {
+  static toDomain(entity: CourseEntity): Course {
     const domainLessons: Lesson[] = []; 
     for (let lesson of entity.lessons) {
       
@@ -44,7 +44,7 @@ export class CourseMapper {
     return course;
   }
 
-  static arrayToDomain(entities: OrmCourseEntity[]): Course[] {
+  static arrayToDomain(entities: CourseEntity[]): Course[] {
     const courses: Course[] = [];
       for (let entity of entities) {
         courses.push(CourseMapper.toDomain(entity));
