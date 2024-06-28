@@ -1,11 +1,11 @@
 import { DataSource, getMetadataArgsStorage } from "typeorm";
 
-export class DatabaseSingleton {
+export class PgDatabaseSingleton {
     static instance: DataSource;
     
     static getInstance(): DataSource {
-        if (!DatabaseSingleton.instance) {
-            DatabaseSingleton.instance = new DataSource({
+        if (!PgDatabaseSingleton.instance) {
+            PgDatabaseSingleton.instance = new DataSource({
                 type: "postgres",
                 host: process.env.DB_HOST,
                 port: +process.env.DB_PORT,
@@ -18,6 +18,6 @@ export class DatabaseSingleton {
 
             this.instance.initialize(); 
         }
-        return DatabaseSingleton.instance;
+        return PgDatabaseSingleton.instance;
     }
 }
