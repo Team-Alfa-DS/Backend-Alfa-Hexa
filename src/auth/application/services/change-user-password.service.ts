@@ -5,28 +5,43 @@ import { IEncryptor } from "../encryptor/encryptor.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { ChangeUserPasswordRequest } from "../dtos/request/change-user-password.request";
 import { ChangeUserPasswordResponse } from "../dtos/response/change-user-password.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
 export class ChangeUserPasswordService extends IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
+    private readonly eventPublisher: IEventPublisher;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor) {
+    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
         super()
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
+        this.eventPublisher = eventPublisher;
     }
 
     async execute(value: ChangeUserPasswordRequest): Promise<Result<ChangeUserPasswordResponse>> {
+        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email), this.transactionHandler);
 
-        const hashPassword = await this.encryptor.hash(value.password);
-
-        const user = await this.userRepository.updatePassword(value.email, hashPassword, this.transactionHandler);
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message);
         }
+        const userDomain = user.Value;
+        const hashPassword = await this.encryptor.hash(value.password);
+        userDomain.UpdatePassword(UserPassword.create(hashPassword));
+
+        const updatedUser = await this.userRepository.saveUser(user.Value, this.transactionHandler);
+
+        if (!updatedUser.isSuccess) {
+            return Result.fail(user.Error, user.StatusCode, user.Message);
+        }
+
+        this.eventPublisher.publish(userDomain.pullDomainEvents());
+
         const response = new ChangeUserPasswordResponse();
         return Result.success(response, 200);
     }

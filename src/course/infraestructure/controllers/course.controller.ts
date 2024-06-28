@@ -16,6 +16,12 @@ import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 import { CourseEntity } from "../entities/course.entity";
+import { GetCourseCountQueryDto } from "../dtos/getCourseCountQuery.dto";
+import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } from "src/course/application/services/getCourseCount.service";
+import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/orm-trainer.repositorie";
+import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
+import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
+import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -24,19 +30,26 @@ import { CourseEntity } from "../entities/course.entity";
 export class CourseController {
   private readonly getManyCoursesService: IService<GetManyCoursesRequest, GetManyCoursesResponse>;
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
+  private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
 
   constructor() {
-    const repositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
+    const courseRepositoryInstance = new TOrmCourseRepository(DatabaseSingleton.getInstance());
+    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,DatabaseSingleton.getInstance());
+    const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), DatabaseSingleton.getInstance());
     const logger = new NestLogger();
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(repositoryInstance), 
+      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(repositoryInstance), 
+      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
+    this.getCourseCountService = new ExceptionLoggerDecorator(
+      new GetCourseCountService(courseRepositoryInstance),
+      logger
+    )
   }
 
   @UseGuards(JwtAuthGuard)
@@ -91,5 +104,23 @@ export class CourseController {
       throw new HttpException(result.Message, result.StatusCode);
     }
     
+  }
+
+  @Get('/count')
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async getCourseCount(@Query() courseCountQueryDto: GetCourseCountQueryDto) {
+    const request = new GetCourseCountRequest(
+      courseCountQueryDto.category,
+      courseCountQueryDto.trainer
+    )
+
+    const result = await this.getCourseCountService.execute(request);
+
+    if (result.isSuccess) {
+      return result.Value;
+    } else {
+      throw new HttpException(result.Message, result.StatusCode)
+    }
   }
 }

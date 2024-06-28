@@ -5,6 +5,10 @@ import { CourseEntity } from "../entities/course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
 import { CourseMapper } from "../mappers/course.mapper";
 import { Result } from "src/common/domain/result-handler/result";
+import { CourseTag } from "src/course/domain/value-objects/course-tag";
+import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
+import { Uuid } from "src/common/domain/value-objects/Uuid";
 
 export class TOrmCourseRepository extends Repository<CourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
@@ -32,13 +36,13 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     if (filter) {
       for (let tag of filter) {
         if (tag) {
-          courses = courses.filter((course) => course.tags.includes(tag));
+          courses = courses.filter((course) => course.containsTag(tag)); //Tags.includes(new CourseTag(tag))
         } 
       }
       // courses = courses.filter((course) => course.tags.includes(filter))
     }
-    if (category) {courses = courses.filter((course) => course.category === category)} //Aplicar los filtros que correspondan
-    if (trainer) {courses = courses.filter((course) => course.trainer.name === trainer)}
+    if (category) {courses = courses.filter((course) => course.Category.equals(new CourseCategory(category)))} //Aplicar los filtros que correspondan
+    if (trainer) {courses = courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainer)))}
 
     if (courses.length > 0) {
 
@@ -83,7 +87,7 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     });
 
     let courses = CourseMapper.arrayToDomain(result);
-    courses = courses.filter((course) => course.tags.includes(tag));
+    courses = courses.filter((course) => course.containsTag(tag));
 
     if (courses.length > 0) {
 
@@ -135,5 +139,21 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     } else {
       return Result.fail(new Error(`No se encontraron cursos`), HttpStatus.BAD_REQUEST, `No se encontraron cursos`);
     }
+  }
+
+  async getCourseCount(category: string, trainerId: string): Promise<Result<number>> {
+    let result = await this.find({
+      relations: {
+        category: true,
+        trainer: true
+      }
+    })
+    if (result.length == 0) {return Result.success(0, 200)}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
+    const courses = CourseMapper.arrayToDomain(result);
+    
+    courses.filter((course) => course.Category.equals(new CourseCategory(category)))
+    courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainerId)))
+    
+    return Result.success(courses.length, 200)
   }
 }

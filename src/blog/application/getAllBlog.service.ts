@@ -6,6 +6,7 @@ import { Result } from 'src/common/domain/result-handler/result';
 import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
+import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 
 
 export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlogsResponseDTO>{
@@ -19,7 +20,7 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
     get name(): string {
         return this.constructor.name;
     }
-       
+    
 
     async execute(value: GetAllBlogsRequestDTO): Promise<Result<GetAllBlogsResponseDTO>>{
         const prueba = await this.blogRepository.getBlogsTagsNames([ 'Yoga']);
@@ -30,15 +31,15 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
 
         const domainBlogs = domainBlogsResult.Value; 
         const blogs: GeneralBlogDTO[] = await Promise.all(domainBlogs.map(async blog => {
-            const trainerResult = await this.trainerRepository.findTrainerById(blog.trainer);
-            const categoryResult = await this.categoryRepository.getCategoryById(blog.category)
+            const trainerResult = await this.trainerRepository.findTrainerById(TrainerId.create(blog.Trainer));
+            const categoryResult = await this.categoryRepository.getCategoryById(blog.Category)
             return {
-                Id: blog.id,
-                Name: blog.title,
-                Image: blog.images[0].url,
-                Date: blog.publication_date,
-                Category: categoryResult.Value ? categoryResult.Value.name : null,
-                Trainer: trainerResult.Value ? trainerResult.Value.Name : null
+                id: blog.Id.value,
+                name: blog.Title.value,
+                image: blog.Images[0].value,
+                date: blog.Publication_date.value,
+                category: categoryResult.Value ? categoryResult.Value.Name.value : null,
+                trainer: trainerResult.Value ? trainerResult.Value.Name.trainerName : null
             }
         }
     ))

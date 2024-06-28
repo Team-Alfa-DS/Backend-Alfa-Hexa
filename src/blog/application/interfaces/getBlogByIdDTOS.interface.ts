@@ -4,16 +4,16 @@ import { ServiceRequestDto, ServiceResponseDto } from "src/common/application/in
 
 export class GetBlogByIdResponseDTO implements ServiceResponseDto{
     constructor(
-        public Title: string,
-        public Description: string,
-        public Category: string,
-        public Images: string[],
-        public Trainer: {
-            Id: string
-            Name: string
+        public title: string,
+        public description: string,
+        public category: string,
+        public images: string[],
+        public trainer: {
+            id: string
+            name: string
         },
-        public Tags: string[],
-        public Date: Date,
+        public tags: string[],
+        public date: Date,
     ) {}
 
     dataToString(): string {
@@ -24,9 +24,9 @@ export class GetBlogByIdResponseDTO implements ServiceResponseDto{
 
 export class GetBlogByIdRequestDTO implements ServiceRequestDto {
     constructor(
-        public Id: string
+        public id: string
     ) {}
     dataToString(): string {
-        return `BlogId: ${this.Id}`;
+        return `BlogId: ${this.id}`;
     }
 }

@@ -9,6 +9,8 @@ import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper'
 import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
+import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
+import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainer>
@@ -32,8 +34,18 @@ export class OrmTrainerRepository
     this.ormTrainerMapper = ormTrainerMapper;
   }
 
-  async findTrainerById(id: string): Promise<Result<Trainer>> {
-    const trainer = await this.findOneBy({ id });
+  async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
+    let trainerId = id.trainerId;
+
+    const trainer = await this.findOne({
+      relations: {
+        courses: true,
+        blogs: true,
+        users: true,
+    },
+  where: {
+    id: trainerId,
+  }});
     if (!trainer) {
       return Result.fail<Trainer>(
         new Error('Trainer not found'),
@@ -47,21 +59,17 @@ export class OrmTrainerRepository
     return oneTrainer;
   }
 
-  async followTrainer(data: FollowTrainerDto): Promise<Result<Trainer>> {
+  async followTrainer(idTrainer: TrainerId, idUser: UserId): Promise<Result<Trainer>> {
     try {
-      const trainer = await this.findTrainerById(data.idTrainer);
-      if (!trainer.isSuccess) {
-        return trainer;
-      }
+      const trainer = await this.findTrainerById(idTrainer);  
+      if (!trainer.isSuccess) return trainer;
 
       const user = await this.userRepository.findUserById(
-        data.idUser,
+        idUser,
         this.transactionHandler,
       );
 
-      if (!user.isSuccess) {
-        return Result.fail(new Error('User not found'), 404, 'User not found');
-      }
+      if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
       const ormTrainer = await this.ormTrainerMapper.toOrm(trainer.Value);
 
@@ -93,6 +101,7 @@ export class OrmTrainerRepository
       ormTrainer.users = array;
       await this.save(ormTrainer);
       return Result.success<Trainer>(trainer.Value, 200);
+      
     } catch (err) {
       return Result.fail<Trainer>(
         new Error(err.message),

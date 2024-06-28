@@ -1,61 +1,91 @@
-import { Entity } from '../../common/domain/entity';
+import { AggregateRoot } from 'src/common/domain/aggregate-root';
+import { TrainerFollower } from './valueObjects/trainer-followers';
+import { TrainerId } from './valueObjects/trainer-id';
+import { TrainerLocation } from './valueObjects/trainer-location';
+import { TrainerName } from './valueObjects/trainer-name';
+import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
+import { DomainEvent } from 'src/common/domain/domain-event';
+import { TrainerCreated } from './events/trainer-created.events';
+import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';
+import { TrainerFollowerUserId } from './valueObjects/trainer-userid';
+import { TrainerBlogId } from './valueObjects/trainer-blogid';
+import { TrainerCourseId } from './valueObjects/trainer-courseid';
 
-export class Trainer extends Entity<string> {
-  private name: string;
-  private followers: number;
-  private userFollow: boolean;
-  private location: string;
-
+export class Trainer extends AggregateRoot<TrainerId> {
+  private name: TrainerName;
+  private followers: TrainerFollower;
+  private userFollow: TrainerUserFollow;
+  private location: TrainerLocation;
+  private courses: TrainerCourseId[];
+  private blogs: TrainerBlogId[];
+  private users: TrainerFollowerUserId[];
+  
   constructor(
-    id: string,
-    name: string,
-    followers: number,
-    userFollow: boolean,
-    location: string,
+    id: TrainerId,
+    name: TrainerName,
+    followers: TrainerFollower,
+    userFollow: TrainerUserFollow,
+    location: TrainerLocation,
+    courses: TrainerCourseId[],
+    blogs: TrainerBlogId[],
+    users: TrainerFollowerUserId[],
   ) {
-    super(id);
-    this.name = name;
-    this.followers = followers;
-    this.userFollow = userFollow;
-    this.location = location;
+    const Trainercreated = TrainerCreated.create(id, name, followers, userFollow, location, courses, blogs, users);
+    super(id, Trainercreated)
+   
   }
 
+  protected when(event: DomainEvent): void {
+    if(event instanceof TrainerCreated){
+      this.name = event.name;
+      this.followers = event.followers;
+      this.userFollow = event.userfollow;
+      this.location = event.trainerlocation;
+      this.courses = event.courses;
+      this.blogs = event.blogs;
+      this.users = event.users;
+    }
+  }
+
+  protected validateState(): void {
+    if(!this.name || !this.followers || !this.userFollow || !this.location){
+      throw new InvalidTrainerException('Entrenador no valido');   
+    }
+    
+  }
+  
   static create(
-    id: string,
-    name: string,
-    followers: number,
-    userFollow: boolean,
-    location: string,
+    id: TrainerId,
+    name: TrainerName,
+    followers: TrainerFollower,
+    userFollow: TrainerUserFollow,
+    location: TrainerLocation,
+    courses: TrainerCourseId[],
+    blogs: TrainerBlogId[],
+    users: TrainerFollowerUserId[],
   ): Trainer {
-    return new Trainer(id, name, followers, userFollow, location);
+    return new Trainer(id, name, followers, userFollow, location, courses, blogs, users);
   }
-
-  get Name(): string {
+  
+  get Name(): TrainerName {
     return this.name;
   }
-  get Followers(): number {
+  get Followers(): TrainerFollower {
     return this.followers;
   }
-  get UserFollow(): boolean {
+  get UserFollow(): TrainerUserFollow {
     return this.userFollow;
   }
-  get Location(): string {
+  get Location(): TrainerLocation {
     return this.location;
   }
-
-  updateName(name: string) {
-    this.name = name;
+  get Courses(): TrainerCourseId[] {
+    return this.courses;
   }
-
-  updateFollowers(followers: number) {
-    this.followers = followers;
+  get Blogs(): TrainerBlogId[] {
+    return this.blogs;
   }
-
-  updateUserFollow(userFollow: boolean) {
-    this.userFollow = userFollow;
-  }
-
-  updateLocation(location: string) {
-    this.location = location;
+  get Users(): TrainerFollowerUserId[] {
+    return this.users;
   }
 }
