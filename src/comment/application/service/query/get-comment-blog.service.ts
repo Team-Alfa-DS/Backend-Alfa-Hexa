@@ -1,44 +1,54 @@
-import { IApplicationService } from "src/common/application-service.interface/aplication-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { BlogComment, GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "../../dto/blog/blog-comment.response.dto";
-import { ICommentRepository } from "src/comment/domain/repositories/comment-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
-import { Comment } from "src/comment/domain/Comment";
 import { IService } from "src/common/application/interfaces/IService";
-import { response } from "express";
+import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
-    private readonly commentRepository: ICommentRepository;
+    private readonly commentBlogRepository: IBlogCommentRepository;
     private readonly transactionHandler: ITransactionHandler;
-    //private readonly encryptor: IEncryptor;
 
     constructor(
-        commentRepository: ICommentRepository,
+        commentBlogRepository: IBlogCommentRepository,
         transactionHandler: ITransactionHandler,
-        //encryptor: IEncryptor
     ){
         super();
-        this.commentRepository = commentRepository;
+        this.commentBlogRepository = commentBlogRepository;
         this.transactionHandler = transactionHandler;
-        //this.encryptor = encryptor;
     }
     
     async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<GetBlogCommentServiceResponseDto>> {
         if (!data.pagination.page) data.pagination.page = 0;
         
-        const comments = await this.commentRepository.findAllCommentsByBlogId(
-            data.blogId, 
-            data.pagination.page, 
-            data.pagination.perPage, 
-            this.transactionHandler);
+        const blogId = BlogCommentBlogId.create( data.blogId );
 
+        const comments = await this.commentBlogRepository.findAllCommentsByBlogId(
+            blogId, 
+            this.transactionHandler
+        );
                 
         if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
         let commentsRes: BlogComment[] = [];
         for (const comment of comments.Value) {
-            commentsRes.push({id: comment.Id, user: comment.UserId, body: comment.Body, countLikes: comment.CountLikes, countDislikes: comment.CountDislikes, userLiked: comment.UserLiked, userDisliked: comment.UserDisliked, date: comment.DDate})
+            commentsRes.push({
+                id: comment.Id.commentId, 
+                user: comment.UserId.UserId, 
+                body: comment.Body.Body, 
+                countLikes: comment.CountLikes.CountLike, 
+                countDislikes: comment.CountDislikes.CountDislike, 
+                userLiked: comment.UserLiked.UserLiked, 
+                userDisliked: comment.UserDisliked.UserDisliked, 
+                date: comment.PublicationDate.PublicationDate})
         };
+
+        if (data.pagination.perPage) {
+            let page = data.pagination.page;
+            if (!page) {page = 0}
+
+            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+        }
 
         const response = new GetBlogCommentServiceResponseDto(commentsRes)
         return Result.success<GetBlogCommentServiceResponseDto>(response, comments.StatusCode);

@@ -6,6 +6,7 @@ import { IJwtGen } from "../jwt-gen/jwt-gen.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { LoginUserRequest } from "../dtos/request/login-user.request";
 import { LoginUserResponse } from "../dtos/response/login-user.response";
+import { UserEmail } from "src/user/domain/value-objects/user-email";
 
 export class LoginUserService extends IService<LoginUserRequest, LoginUserResponse> {
 
@@ -24,17 +25,21 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
 
     async execute(userLogin: LoginUserRequest): Promise<Result<LoginUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const userFound = await this.userRepository.findUserByEmail(userLogin.email, this.transactionHandler);
+        const userFound = await this.userRepository.findUserByEmail(UserEmail.create(userLogin.email), this.transactionHandler);
         if (!userFound.isSuccess) {
             return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
         }
-        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password);
+        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password.Password);
 
         if (!isMatch) {
             return Result.fail(new Error('La contraseña es incorrecta'), 400, 'La contraseña es incorrecta')
         }
 
-        const response = new LoginUserResponse({id: userFound.Value.Id, email: userFound.Value.Email, name: userFound.Value.Name, phone: userFound.Value.Phone}, await this.jwtGen.genJwt(userFound.Value.Id), userFound.Value.Type);
+        const response = new LoginUserResponse(
+            {id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, 
+            await this.jwtGen.genJwt(userFound.Value.Id.Id), 
+            userFound.Value.Type.Type
+        );
 
         return Result.success(response, 200);
     }
