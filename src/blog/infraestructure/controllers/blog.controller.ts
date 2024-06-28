@@ -2,7 +2,7 @@ import { Controller, Get, Param, ParseUUIDPipe, UseGuards } from "@nestjs/common
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetAllBlogService } from "src/blog/application/getAllBlog.service";
 import { GetBlogByIdService } from "src/blog/application/getBlogById.service";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { OrmBlogRepository } from "../repositories/ormBlog.repository";
 import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/orm-trainer.repositorie";
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
@@ -15,7 +15,7 @@ import { IService } from "src/common/application/interfaces/IService";
 import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlogsRequestDTO.interface";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
-import { BlogEntity } from "../entities/blog.entity";
+import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
@@ -30,9 +30,9 @@ export class BlogController {
     private readonly getBlogByIdService: IService<GetBlogByIdRequestDTO, GetBlogByIdResponseDTO>;
 
     constructor() {
-        const blogRepositoryInstance = new OrmBlogRepository(DatabaseSingleton.getInstance());
-        const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), DatabaseSingleton.getInstance());
-        const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, DatabaseSingleton.getInstance());
+        const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), PgDatabaseSingleton.getInstance());
+        const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
         this.getAllBlogService = new ExceptionLoggerDecorator(
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
@@ -49,7 +49,7 @@ export class BlogController {
     @Get('one/:id')
     @ApiCreatedResponse({
         description: 'se encontro un blog con esa id',
-        type: BlogEntity,
+        type: OrmBlogEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se encontro un blog con esa id. Intente de nuevo'
@@ -64,7 +64,7 @@ export class BlogController {
     @Get('many')
     @ApiCreatedResponse({
         description: 'se retorno todos los blog',
-        type: BlogEntity,
+        type: OrmBlogEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se encontraron blogs. Agregue algunos'

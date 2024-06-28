@@ -16,7 +16,7 @@ import {
   ApiBadRequestResponse,
   ApiParam,
 } from '@nestjs/swagger';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { FindOneTrainerService } from 'src/trainer/application/service/findOneTrainer.service';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { OrmTrainerRepository } from '../repositories/orm-trainer.repositorie';
@@ -33,7 +33,7 @@ import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
-import { OrmTrainer } from '../entities/trainer.entity';
+import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
@@ -46,10 +46,10 @@ export class TrainerController {
   private readonly trainerRepository: OrmTrainerRepository =
     new OrmTrainerRepository(
       this.trainerMapper,
-      DatabaseSingleton.getInstance(),
+      PgDatabaseSingleton.getInstance(),
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-      DatabaseSingleton.getInstance()
+      PgDatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
 
@@ -79,7 +79,7 @@ export class TrainerController {
   @Get('one/:id')
   @ApiCreatedResponse({
     description: 'se encontro un entrenador con esa id',
-    type: OrmTrainer,
+    type: OrmTrainerEntity,
   })
   @ApiBadRequestResponse({
     description: 'No se pudo encontrar un entrenador con esa id. Intente de nuevo'
@@ -101,7 +101,7 @@ export class TrainerController {
   @Post('/toggle/follow/:id')
   @ApiCreatedResponse({
     description: 'Ahora sigues a este entrenador',
-    type: OrmTrainer,
+    type: OrmTrainerEntity,
   })
   @ApiBadRequestResponse({
     description: 'No puedes seguir a este entrenador. Intente de nuevo'
