@@ -14,6 +14,7 @@ import { ProgressLastTime } from "src/progress/domain/value-objects/progress-las
 import { ProgressId } from "src/progress/domain/value-objects/progress-Id";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { CourseId } from "src/course/domain/value-objects/course-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
