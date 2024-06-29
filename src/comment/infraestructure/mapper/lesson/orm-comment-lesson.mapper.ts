@@ -14,7 +14,7 @@ import { CommentLesson } from "src/comment/domain/comment-lesson";
 
 export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCommentEntity> {
 
-    async toOrm(DomainEntity: CommentLesson): Promise<OrmLessonCommentEntity> {
+    async toPersistence(DomainEntity: CommentLesson): Promise<OrmLessonCommentEntity> {
         const ormComment = OrmLessonCommentEntity.create(
             DomainEntity.Id.commentId,
             DomainEntity.PublicationDate.PublicationDate,

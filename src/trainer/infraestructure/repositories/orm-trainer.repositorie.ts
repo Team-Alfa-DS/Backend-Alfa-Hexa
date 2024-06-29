@@ -71,9 +71,9 @@ export class OrmTrainerRepository
 
       if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
-      const OrmTrainerEntity = await this.ormTrainerMapper.toOrm(trainer.Value);
+      const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
 
-      const ormUser = await this.userMapper.toOrm(user.Value);
+      const ormUser = await this.userMapper.toPersistence(user.Value);
 
       const trainersWithUsers = await this.find({
         where: {
@@ -142,7 +142,7 @@ export class OrmTrainerRepository
 
   async saveTrainer(trainer: Trainer): Promise<Result<Trainer>> {
     try {
-      const ormUser = await this.ormTrainerMapper.toOrm(trainer);
+      const ormUser = await this.ormTrainerMapper.toPersistence(trainer);
       await this.save(ormUser);
       return Result.success<Trainer>(trainer, 200);
     } catch (err) {

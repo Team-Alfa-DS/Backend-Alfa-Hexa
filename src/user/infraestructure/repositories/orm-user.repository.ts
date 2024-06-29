@@ -55,7 +55,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
 
         try {
             const runnerTransaction = runner.getRunner();
-            const ormUser = await this.ormUserMapper.toOrm(user);
+            const ormUser = await this.ormUserMapper.toPersistence(user);
             await runnerTransaction.manager.save(ormUser);
             return Result.success<User>(user, 200);
 

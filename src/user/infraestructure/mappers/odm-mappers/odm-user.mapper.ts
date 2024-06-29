@@ -13,16 +13,16 @@ import { UserRole } from "src/user/domain/enums/role-user.type";
 
 export class OdmUserMapper implements IMapper<User, OdmUserEntity> {
 
-    async toOrm(DomainEntity: User): Promise<OdmUserEntity> {
-        const userOdm = new Model<OdmUserEntity>({
-            id: DomainEntity.Id.Id,
-            email: DomainEntity.Email.Email,
-            name: DomainEntity.Name.Name,
-            password: DomainEntity.Password.Password,
-            phone: DomainEntity.Phone.Phone,
-            type: DomainEntity.Type.Type as UserRole,
-            image: DomainEntity.Image?.Image
-        });
+    async toPersistence(DomainEntity: User): Promise<OdmUserEntity> {
+        const userOdm = OdmUserEntity.create(
+            DomainEntity.Id.Id,
+            DomainEntity.Email.Email,
+            DomainEntity.Name.Name,
+            DomainEntity.Password.Password,
+            DomainEntity.Phone.Phone,
+            DomainEntity.Type.Type as UserRole,
+            DomainEntity.Image?.Image
+        );
         return userOdm;
     }
 

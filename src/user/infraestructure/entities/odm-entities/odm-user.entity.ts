@@ -24,6 +24,18 @@ export class OdmUserEntity {
 
     @Prop({required: false})
     image?: string;
+
+    static create (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
+        const odmUser = new OdmUserEntity();
+        odmUser.id = id;
+        odmUser.email = email;
+        odmUser.name = name;
+        odmUser.password = password;
+        odmUser.phone = phone;
+        odmUser.type = type;
+        odmUser.image = image;
+        return odmUser;
+    }
 }
 
 export const UserSchema = SchemaFactory.createForClass(OdmUserEntity);

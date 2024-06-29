@@ -8,24 +8,27 @@ import { ChangeUserPasswordResponse } from "../dtos/response/change-user-passwor
 import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 
 export class ChangeUserPasswordService extends IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse> {
 
     private readonly userRepository: IUserRepository;
+    private readonly odmUserRepository: IOdmUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
     private readonly eventPublisher: IEventPublisher;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
+    constructor(userRepository: IUserRepository, odmUserRepository: IOdmUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
         super()
         this.userRepository = userRepository;
+        this.odmUserRepository = odmUserRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
         this.eventPublisher = eventPublisher;
     }
 
     async execute(value: ChangeUserPasswordRequest): Promise<Result<ChangeUserPasswordResponse>> {
-        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email), this.transactionHandler);
+        const user = await this.odmUserRepository.findUserByEmail(UserEmail.create(value.email));
 
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message);

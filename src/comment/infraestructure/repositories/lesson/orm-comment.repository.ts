@@ -46,7 +46,7 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
     async saveComment(comment: CommentLesson, runner: TransactionHandler): Promise<Result<CommentLesson>> {
         const runnerTransaction = runner.getRunner();
         try{
-            const ormComment = await this.ormCommentMapper.toOrm(comment);
+            const ormComment = await this.ormCommentMapper.toPersistence(comment);
             await runnerTransaction.manager.save(ormComment);
             return Result.success<CommentLesson>(comment, 200);                                                    
         }catch(err){

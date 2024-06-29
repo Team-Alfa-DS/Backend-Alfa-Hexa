@@ -14,13 +14,13 @@ export class OdmUserRespository implements IOdmUserRepository {
     private readonly userModel: Model<OdmUserEntity>;
     private readonly odmUserMapper: OdmUserMapper;
 
-    constructor (userModel: Model<OdmUserEntity>, odmUserMapper: OdmUserMapper) {
+    constructor (odmUserMapper: OdmUserMapper, userModel: Model<OdmUserEntity>) {
         this.userModel = userModel;
         this.odmUserMapper = odmUserMapper;
     }
 
     async saveUser(user: User): Promise<void> {
-        const odmUser = await this.odmUserMapper.toOrm(user);
+        const odmUser = await this.odmUserMapper.toPersistence(user);
         await this.userModel.create(odmUser);
     }
 

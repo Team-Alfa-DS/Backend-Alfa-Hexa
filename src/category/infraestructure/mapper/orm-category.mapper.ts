@@ -16,7 +16,7 @@ export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
       throw new Error("Method not implemented.");
     }
 
-    async toOrm(domainEntity: Category):Promise<OrmCategoryEntity> {
+    async toPersistence(domainEntity: Category):Promise<OrmCategoryEntity> {
 
         const ormCategory : any = OrmCategoryEntity.create(
             domainEntity.Id.value,

@@ -5,7 +5,7 @@ import { DomainEvent } from "src/common/domain/domain-event";
 import { Result } from "src/common/domain/result-handler/result";
 
 export class EventBus extends IEventPublisher {
-    protected subscribers: Map<string, IEventSubscriber[]>;
+    protected subscribers: Map<string, IEventSubscriber<DomainEvent>[]>;
 
     constructor() {
         super();
@@ -13,15 +13,16 @@ export class EventBus extends IEventPublisher {
 
     async publish(events: DomainEvent[]): Promise<Result<EventResponseDto>[]> {
         const eventRes: Result<EventResponseDto>[] = [];
-
         for (const event of events) {
             const subscribers = this.subscribers.get(event.constructor.name);
-            const response = await Promise.all(
-                subscribers.map(async subscriber => {
-                    return subscriber.on(event);
-                })
-            );
-            eventRes.push(...response);
+            if (subscribers) {
+                const response = await Promise.all(
+                    subscribers.map(async subscriber => {
+                        return subscriber.on(event);
+                    })
+                );
+                eventRes.push(...response);
+            }
         }
         return eventRes;
     }

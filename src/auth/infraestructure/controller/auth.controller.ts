@@ -55,6 +55,12 @@ import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { RegisterUserNotify } from 'src/user/application/events/register-user-notify.event';
 import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
+import { saveUserEvent } from 'src/user/infraestructure/events/synchronize/save-user.event';
+import { OdmUserMapper } from 'src/user/infraestructure/mappers/odm-mappers/odm-user.mapper';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { Model } from 'mongoose';
+import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
+import { InjectModel } from '@nestjs/mongoose';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -70,6 +76,11 @@ export class AuthController {
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
         PgDatabaseSingleton.getInstance()
     );
+
+    private odmUserMapper: OdmUserMapper = new OdmUserMapper();
+    private userModel: Model<OdmUserEntity>;
+    private readonly odmUserRepository: OdmUserRespository;
+
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: IMailer;
@@ -85,10 +96,15 @@ export class AuthController {
     private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
     private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
-    constructor(private jwtService: JwtService, private mailerService: MailjetService) {
+    constructor(private jwtService: JwtService, private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>) {
+        this.userModel = userModel;
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
-        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer)]);
+        this.odmUserRepository = new OdmUserRespository(
+            this.odmUserMapper,
+            this.userModel
+        );
+        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.registerUserService = new ExceptionLoggerDecorator(
@@ -99,24 +115,24 @@ export class AuthController {
             this.logger
         );
         this.loginUserService = new ExceptionLoggerDecorator(
-            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
+            new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
             this.logger
         );
         this.currentUserService = new ExceptionLoggerDecorator(
-            new CurrentUserService(this.userRepository, this.transactionHandler),
+            new CurrentUserService(this.odmUserRepository),
             this.logger
         );
         this.forgetUserPasswordService = new ExceptionLoggerDecorator(
-            new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer),
+            new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
             this.logger
         );
         this.validateUserCodeService = new ExceptionLoggerDecorator(
-            new ValidateUserCodeService(this.userRepository, this.transactionHandler),
+            new ValidateUserCodeService(this.odmUserRepository),
             this.logger
         );
         this.changeUserPasswordService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
+                new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger

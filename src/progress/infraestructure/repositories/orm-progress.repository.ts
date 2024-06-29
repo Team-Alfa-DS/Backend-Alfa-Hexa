@@ -54,7 +54,7 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
     async saveProgress(progress: Progress, runner: TransactionHandler): Promise<Result<Progress>> {
         const runnerTransaction = runner.getRunner()
         try {
-            const ormProgress = await this.ormProgressMapper.toOrm(progress);
+            const ormProgress = await this.ormProgressMapper.toPersistence(progress);
             await runnerTransaction.manager.save(OrmProgressEntity, ormProgress);
             return Result.success<Progress>(progress, 200)
         } catch(err) {

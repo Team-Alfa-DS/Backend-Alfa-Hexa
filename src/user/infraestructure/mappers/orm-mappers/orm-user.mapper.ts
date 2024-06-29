@@ -12,7 +12,7 @@ import { OrmUserEntity } from "../../entities/orm-entities/orm-user.entity";
 
 export class OrmUserMapper implements IMapper<User, OrmUserEntity> {
 
-    async toOrm(domainEntity: User): Promise<OrmUserEntity> {
+    async toPersistence(domainEntity: User): Promise<OrmUserEntity> {
         const ormUser = OrmUserEntity.create(
             domainEntity.Id.Id,
             domainEntity.Email.Email,
