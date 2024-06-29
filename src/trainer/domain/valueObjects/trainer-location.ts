@@ -8,7 +8,7 @@ export class TrainerLocation extends ValueObject<TrainerLocation> {
     
     private constructor(location: string) {
         super();
-        const patron = /^[a-zA-Z0-9,-\/]+$/;
+        const patron = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])$/;
         
         if (!location ) throw new EmptyTrainerLocationException( "La ubicacion del entrenador esta vacia" );
         if (!patron.test(location)) throw new InvalidTrainerLocationException( `La ubicacion del entrenador ${location} no puede 
