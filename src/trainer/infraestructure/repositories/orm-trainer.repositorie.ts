@@ -5,7 +5,7 @@ import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 import { IMapper } from 'src/common/application/mappers/mapper.interface';
 import { Result } from 'src/common/domain/result-handler/result';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
@@ -71,9 +71,9 @@ export class OrmTrainerRepository
 
       if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
-      const OrmTrainerEntity = await this.ormTrainerMapper.toOrm(trainer.Value);
+      const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
 
-      const ormUser = await this.userMapper.toOrm(user.Value);
+      const ormUser = await this.userMapper.toPersistence(user.Value);
 
       const trainersWithUsers = await this.find({
         where: {
@@ -142,7 +142,7 @@ export class OrmTrainerRepository
 
   async saveTrainer(trainer: Trainer): Promise<Result<Trainer>> {
     try {
-      const ormUser = await this.ormTrainerMapper.toOrm(trainer);
+      const ormUser = await this.ormTrainerMapper.toPersistence(trainer);
       await this.save(ormUser);
       return Result.success<Trainer>(trainer, 200);
     } catch (err) {

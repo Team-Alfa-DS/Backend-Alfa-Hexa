@@ -1,6 +1,5 @@
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { User } from "src/user/domain/user";
-import { OrmUserEntity } from "../entities/orm-entities/orm-user.entity";
 import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
@@ -9,10 +8,11 @@ import { UserImage } from "src/user/domain/value-objects/user-image";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { UserType } from "src/user/domain/value-objects/user-type";
 import { UserRole } from "src/user/domain/enums/role-user.type";
+import { OrmUserEntity } from "../../entities/orm-entities/orm-user.entity";
 
 export class OrmUserMapper implements IMapper<User, OrmUserEntity> {
 
-    async toOrm(domainEntity: User): Promise<OrmUserEntity> {
+    async toPersistence(domainEntity: User): Promise<OrmUserEntity> {
         const ormUser = OrmUserEntity.create(
             domainEntity.Id.Id,
             domainEntity.Email.Email,

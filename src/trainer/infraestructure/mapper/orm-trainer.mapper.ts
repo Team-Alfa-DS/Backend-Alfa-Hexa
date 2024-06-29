@@ -14,7 +14,7 @@ import { BlogId } from 'src/blog/domain/valueObjects/blogId';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainerEntity> {
-  async toOrm(domainEntity: Trainer): Promise<OrmTrainerEntity> {
+  async toPersistence(domainEntity: Trainer): Promise<OrmTrainerEntity> {
     //Optional?
     if (domainEntity) {
       const OrmTrainer = OrmTrainerEntity.create(

@@ -10,7 +10,7 @@ import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class OrmProgressMapper implements IMapper<Progress, OrmProgressEntity> {
 
-    async toOrm(domainEntity: Progress): Promise<OrmProgressEntity> {
+    async toPersistence(domainEntity: Progress): Promise<OrmProgressEntity> {
         const ormProgress = OrmProgressEntity.create(
             domainEntity.Id.LessonId,
             domainEntity.Id.UserId,

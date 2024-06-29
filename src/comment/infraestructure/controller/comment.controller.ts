@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards }
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment-blog.mapper";
 import { OrmLessonCommentMapper } from "../mapper/lesson/orm-comment-lesson.mapper";
-import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
+import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-mappers/orm-user.mapper";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";

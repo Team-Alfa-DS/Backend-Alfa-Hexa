@@ -14,7 +14,7 @@ import { CommentBlogCountDislike } from "src/comment/domain/valueObjects/blog/co
 
 export class OrmBlogCommentMapper implements IMapper<CommentBlog,OrmBlogCommentEntity> {
 
-    async toOrm(DomainEntity: CommentBlog): Promise<OrmBlogCommentEntity> {
+    async toPersistence(DomainEntity: CommentBlog): Promise<OrmBlogCommentEntity> {
         const ormComment = OrmBlogCommentEntity.create(
             DomainEntity.Id.commentId,
             DomainEntity.PublicationDate.PublicationDate,

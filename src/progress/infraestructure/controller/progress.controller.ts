@@ -3,7 +3,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiU
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { MarkEndProgressDto } from '../dtos/mark-end-progress.dto';
 import { OrmProgressMapper } from '../mappers/orm-progress.mapper';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmProgressRepository } from '../repositories/orm-progress.repository';
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';

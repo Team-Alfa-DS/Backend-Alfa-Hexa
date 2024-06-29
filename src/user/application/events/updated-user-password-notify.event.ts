@@ -7,7 +7,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { UserPasswordUpdated } from "src/user/domain/events/user-password-updated.event";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 
-export class UpdatedUserPasswordNotify implements IEventSubscriber {
+export class UpdatedUserPasswordNotify implements IEventSubscriber<UserPasswordUpdated> {
     private readonly mailer: IMailer;
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;

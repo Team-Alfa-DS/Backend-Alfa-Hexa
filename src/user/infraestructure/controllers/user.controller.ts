@@ -3,7 +3,7 @@ import { Body, Controller, FileTypeValidator, HttpException, ParseFilePipe, Put,
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
-import { OrmUserMapper } from "../mappers/orm-user.mapper";
+import { OrmUserMapper } from "../mappers/orm-mappers/orm-user.mapper";
 import { UpdateUserService } from "src/user/application/services/update-user.application.service";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { UpdateUserDto } from "../dtos/update-user.dto";
@@ -29,6 +29,11 @@ import { MailjetService } from "nest-mailjet";
 import { MailJet } from "src/common/infraestructure/mailer/mailjet";
 import { UpdatedUserPasswordNotify } from "src/user/application/events/updated-user-password-notify.event";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
+import { OdmUserRespository } from "../repositories/odm-user.repository";
+import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -45,6 +50,10 @@ export class UserController {
         PgDatabaseSingleton.getInstance()
     );
 
+    private odmUserMapper: OdmUserMapper = new OdmUserMapper();
+    private userModel: Model<OdmUserEntity>;
+    private readonly odmUserRepository: OdmUserRespository;
+
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private transactionHandler = new TransactionHandler(
         PgDatabaseSingleton.getInstance().createQueryRunner()
@@ -54,8 +63,15 @@ export class UserController {
     private readonly mailer: IMailer;
     private updateUserService: IService<UpdateUserRequest, UpdateUserResponse>;
     
-    constructor(private mailerService: MailjetService) {
+    constructor(private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>) {
+        this.userModel = userModel;
         this.mailer = new MailJet(mailerService);
+
+        this.odmUserRepository = new OdmUserRespository(
+            this.odmUserMapper,
+            this.userModel
+        );
+
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.updateUserService = new ExceptionLoggerDecorator(

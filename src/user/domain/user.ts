@@ -122,7 +122,7 @@ export class User extends AggregateRoot<UserId> {
         this.apply(UserImageUpdated.create(this.Id, image));
     }
 
-    Register(id: UserId, email: UserEmail, name: UserName): void {
-        this.apply(UserRegister.create(id, email, name));
+    Register(id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserType, image: UserImage): void {
+        this.apply(UserRegister.create(id, email, name, password, phone, type, image));
     }
 }
