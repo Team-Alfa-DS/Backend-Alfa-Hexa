@@ -8,10 +8,10 @@ export class TrainerLocation extends ValueObject<TrainerLocation> {
     
     private constructor(location: string) {
         super();
-        const patron = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])$/;
+        const patron = /[`!¡@#$%^&*_+\-=\[\]{};':"\\|<>\/?¿~]/;
         
         if (!location ) throw new EmptyTrainerLocationException( "La ubicacion del entrenador esta vacia" );
-        if (!patron.test(location)) throw new InvalidTrainerLocationException( `La ubicacion del entrenador ${location} no puede 
+        if (patron.test(location)) throw new InvalidTrainerLocationException( `La ubicacion del entrenador ${location} no puede 
             tener caracteres especiales` );
 
         this.location = Object.freeze(location); //*Esto funciona para que no pueda ser modificado
