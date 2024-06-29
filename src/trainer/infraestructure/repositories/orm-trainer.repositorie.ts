@@ -11,6 +11,7 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
+import { stat } from 'fs';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainer>
@@ -111,20 +112,30 @@ export class OrmTrainerRepository
     }
   }
 
-  /*async findAllTrainers(): Promise<Result<Trainer[]>> {
-    const trainer = await this.find();
-    if (!trainer)
-      return Result.fail<Trainer[]>(
-        new Error('Trainers not founds'),
-        404,
-        'Trainers not founds',
-      );
-    const trainerDomain = await this.ormTrainerMapper.arrayToDomain(trainer);
-
-    return Result.success<Trainer[]>(trainerDomain, 200);
+  async findAllTrainers(filter?: string[], user?: string, page?: number, perpage?: number, userFollow?: boolean): Promise<Result<Trainer[]>> {
+    let queryBuilder = this.createQueryBuilder("trainer")
+      .leftJoinAndSelect("trainer.courses", "courses")
+      .leftJoinAndSelect("trainer.blogs", "blogs")
+      .leftJoinAndSelect("trainer.users", "users");
+  
+    if (userFollow) {
+      queryBuilder = queryBuilder.where("trainer.userFollow >= :userFollow", { userFollow });
+    }
+  
+    let trainers = await queryBuilder.getMany();
+  
+    if (perpage) {
+      if (!page) { page = 0; }
+      trainers = trainers.slice((page * perpage), ((page + 1) * perpage));
+    }
+  
+    let trainerDomains = await this.ormTrainerMapper.arrayToDomain(trainers);
+    return Result.success<Trainer[]>(trainerDomains, trainerDomains.code);
+  }
+   
   }
 
-  async updateTrainer(
+ /* async updateTrainer(
     idTrainer: string,
     payload: string,
   ): Promise<Result<Trainer>> {

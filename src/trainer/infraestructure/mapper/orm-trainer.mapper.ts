@@ -34,7 +34,7 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
 
       let courses: TrainerCourseId[] = ormEntity.courses?.map(course => TrainerCourseId.create([new CourseId(course.id)])) || [];
       let blogs: TrainerBlogId[] = ormEntity.blogs?.map(blog => TrainerBlogId.create([BlogId.create(blog.id)])) || [];
-      let users: TrainerFollowerUserId[] = ormEntity.users?.map(user => TrainerFollowerUserId.create([UserId.create(user.id)])) || [];
+      let users: TrainerFollowerUserId[] = ormEntity.users?.map(user => TrainerFollowerUserId.create(UserId.create(user.id))) || []; 
       
 
       const trainer = Trainer.create(
@@ -52,11 +52,11 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainer> {
     return null;
   }
 
-  /*async arrayToDomain(entities: OrmTrainer[]): Promise<Trainer[]> {
+  async arrayToDomain(entities: OrmTrainer[]): Promise<Trainer[]> {
     const courses: Trainer[] = [];
     for (let entity of entities) {
       courses.push(await this.toDomain(entity));
     }
     return courses;
-  }*/
+  }
 }

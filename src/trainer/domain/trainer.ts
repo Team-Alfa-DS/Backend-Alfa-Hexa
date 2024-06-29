@@ -85,7 +85,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   get Blogs(): TrainerBlogId[] {
     return this.blogs;
   }
-  get Users(): TrainerFollowerUserId[] {
+  get User(): TrainerFollowerUserId[] {
     return this.users;
   }
 }

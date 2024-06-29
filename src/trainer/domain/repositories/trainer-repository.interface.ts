@@ -9,7 +9,7 @@ export interface ITrainerRepository {
     idTrainer: TrainerId,
     idUser: UserId
   ): Promise<Result<Trainer>>;
-  // findAllTrainers(): Promise<Result<Trainer[]>>;
+   findAllTrainers(filter?: string[], user?: string, page?: number, perpage?: number, userfollow?: boolean): Promise<Result<Trainer[]>>;
   // updateTrainer(idTrainer: string, payload: string): Promise<Result<Trainer>>;
   // saveTrainer(trainer: Trainer): Promise<Result<Trainer>>;
   // deleteTrainer(trainer: Trainer): Promise<Result<Trainer>>;
