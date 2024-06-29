@@ -96,7 +96,6 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
       category = await this.categoryRepository.getCategoryById(CategoryId.create(blog.Category.value));
       if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
       
-      console.log(blog.Images);
       if (blog.Images[0]) { image = blog.Images[0].value} else { image = ''}
       
       blogsDto.push(new BlogResponseDto(
