@@ -1,28 +1,113 @@
-// import { Result } from 'src/common/domain/result-handler/result';
-// import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
-// import { Trainer } from 'src/trainer/domain/trainer';
-// import { IApplicationService } from '../application-service/application-service.interface';
+import { Result } from 'src/common/domain/result-handler/result';
+ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
+ import { Trainer } from 'src/trainer/domain/trainer';
+ import { IApplicationService } from '../application-service/application-service.interface';
+ import { IService } from 'src/common/application/interfaces/IService';
+ import { IUserRepository } from 'src/user/domain/repositories/user-repository.interface';
+ import { ServiceRequestDto } from 'src/common/application/interfaces/IService';
+ import { ServiceResponseDto } from 'src/common/application/interfaces/IService';
+import  { User } from 'src/user/domain/user';
+import { UserId } from 'src/user/domain/value-objects/user-id';
+import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
+import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
 
-// export class FindAllTrainersService
-//   implements IApplicationService<Trainer, any>
-// {
-//   constructor(private readonly trainerRepository: ITrainerRepository) {
-//     this.trainerRepository = trainerRepository;
-//   }
+ export class FindAllTrainersService extends  IService<GetAllTrainersRequest, GetAllTrainersResponse>{
+constructor(
+    private readonly trainerRepository: ITrainerRepository,
+    private readonly userRepository: IUserRepository,
+    private readonly transactionHandler: ITransactionHandler
+){super()}
 
-//   async execute(): Promise<Result<any>> {
-//     const trainers = await this.trainerRepository.findAllTrainers();
-//     if (!trainers.isSuccess) {
-//       return Result.fail(
-//         new Error('Error trainers not found'),
-//         404,
-//         'Error trainers not found',
-//       );
-//     }
-//     return Result.success(trainers, 202);
-//   }
+async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResponse>> {
+    const trainersResult = await this.trainerRepository.findAllTrainers(
+      [request.filter],
+      request.user,
+      request.page,
+      request.perpage,
+      request.userFollow // Pasar el nuevo filtro
+    );
+    if(trainersResult.isSuccess){
+        const trainersresponse: {
+            id: string;
+            name: string;
+            followers: number;
+            userFollow: boolean;
+            location: string;
+            //courses: string[];
+            //blogs: string[];
+            //users: string[];
+        }[] = [];
 
-//   get name(): string {
-//     return this.constructor.name;
-//   }
-// }
+        //let user: Result<User>;
+        for(let trainer of trainersResult.Value){
+           /* const userIds = trainer.User.map(userFollowerUserId => userFollowerUserId.trainerFollowerUserId.Id);
+            if(!user.isSuccess){
+                return Result.fail(user.Error, user.StatusCode, user.Message);
+            }*/
+            trainersresponse.push({
+                id: trainer.Id.trainerId,
+                name: trainer.Name.trainerName,
+                followers: trainer.Followers.trainerFollower,
+                userFollow: trainer.UserFollow.trainerUserFollow,
+                location: trainer.Location.trainerLocation,
+                //courses: trainer.Courses.map(course => course.trainerCourseId.Value),
+               // blogs: trainer.Blogs.map(blog => blog.trainerBlogId.value),
+                //users: trainer.User.map(user => user.trainerFollowerUserId.Id)
+            });
+            return Result.success(new GetAllTrainersResponse(trainersresponse), 200);
+        }
+    }
+}
+
+ }
+
+ export class GetAllTrainersRequest implements ServiceRequestDto {
+    readonly filter?: string;
+    readonly user?: string;
+    readonly page?: number;
+    readonly perpage?: number;
+    readonly userFollow?: boolean; // Nuevo campo para el filtro
+  
+    constructor(filter?: string, user?: string, page?: number, perpage?: number, userFollow?: boolean) {
+      this.filter = filter;
+      this.user = user;
+      this.page = page;
+      this.perpage = perpage;
+      this.userFollow = userFollow;
+    }
+
+    dataToString(): string {
+        return `Query: { filter: ${this.filter} | user:${this.user}  | page: ${this.page} | perpage: ${this.perpage} }`;
+      }
+  }
+
+ export class GetAllTrainersResponse implements ServiceResponseDto {
+    readonly trainers: {
+        id: string;
+        name: string;
+        followers: number;
+        userFollow: boolean;
+        location: string;
+        //courses: string[];
+        //blogs: string[];
+        //users: string[];
+    }[] = []
+
+    constructor(trainers: {
+        id: string;
+        name: string;
+        followers: number;
+        userFollow: boolean;
+        location: string;
+        //courses: string[];
+        //blogs: string[];
+        //users: string[];
+    }[]){
+        this.trainers = trainers
+    }
+    dataToString(): string {
+        return `GetAllTrainersResponse: ${JSON.stringify(this)}`
+    }
+ }
+
+
