@@ -23,7 +23,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   ) {
     const Trainercreated = TrainerCreated.create(id, name, followers, userFollow, location);
     super(id, Trainercreated)
-   
+  
   }
 
   protected when(event: DomainEvent): void {
