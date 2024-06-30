@@ -121,9 +121,9 @@ export class Course extends AggregateRoot<CourseId>{
     return tags;
   }
 
-  containsTag(searchedTag: string): boolean {
+  containsTag(searchedTag: CourseTag): boolean {
     for (let tag of this.tags) {
-      if (tag.equals(new CourseTag(searchedTag))) {
+      if (tag.equals(searchedTag)) {
         return true;
       }
     }
