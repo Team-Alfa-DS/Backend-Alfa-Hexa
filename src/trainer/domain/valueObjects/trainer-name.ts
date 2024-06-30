@@ -8,7 +8,7 @@ export class TrainerName extends ValueObject<TrainerName> {
     
     private constructor(name: string) {
         super();
-        const patron = /^[a-zA-Z0-9]+$/;
+        const patron = /^[a-zA-Z0-9\s]+$/;
         
         if (!name ) throw new EmptyTrainerNameException( "El nombre del entrenador esta vacio" );
         if (!patron.test(name)) throw new InvalidTrainerNameException( `El nombre del entrenador ${name} no puede 

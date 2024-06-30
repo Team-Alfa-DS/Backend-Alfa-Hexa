@@ -7,7 +7,7 @@ import { ExceptionLoggerDecorator } from 'src/common/application/aspects/excepti
 import { ServiceLoggerDecorator } from 'src/common/application/aspects/serviceLoggerDecorator';
 import { IService } from 'src/common/application/interfaces/IService';
 import { FsPromiseLogger } from 'src/common/infraestructure/adapters/FsPromiseLogger';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
 import { SearchRequestDto } from 'src/search/application/dtos/request/search-request.dto';
@@ -19,6 +19,10 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { OrmTagRepository } from 'src/tag/infraestructure/repositories/orm-tag-repository';
 import { SearchTagResponseDto } from 'src/search/application/dtos/response/search-tag-response.dto';
 import { ITagRepository } from 'src/tag/application/ITagRepository';
+import { OrmCategoryRepository } from 'src/category/infraestructure/repositories/orm-category.repository';
+import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-category.mapper';
+import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
+import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 
 
 @ApiTags('Search')
@@ -32,17 +36,19 @@ export class SearchController {
     private transacctionHandler: ITransactionHandler;
 
     constructor() {
-        const courseRepo = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-        const blogRepo = new OrmBlogRepository(DatabaseSingleton.getInstance());
-        const tagRepo: ITagRepository = new OrmTagRepository(DatabaseSingleton.getInstance());
+        const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+        const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
+        const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
+        const trainerRepo = new OrmTrainerRepository( new OrmTrainerMapper(), PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
 
         this.transacctionHandler = new TransactionHandler(
-            DatabaseSingleton.getInstance().createQueryRunner()
+            PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
         this.searchService =  new ExceptionLoggerDecorator(
-            new SearchService(courseRepo, blogRepo),
+            new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
             logger
         );
 
@@ -53,7 +59,7 @@ export class SearchController {
     }
 
 
-    @Get( ":all" )
+    @Get( "/all" )
     @ApiCreatedResponse({
         description: 'se realizo la busqueda correctamente',
     })
@@ -79,7 +85,7 @@ export class SearchController {
         }
     }
 
-    @Get( ":popular/tags" )
+    @Get( "/popular/tags" )
     async searchPopularTags(
         @Request() req,
         @Query('page', ParseIntPipe,) page: number,

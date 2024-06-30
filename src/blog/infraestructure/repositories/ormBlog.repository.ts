@@ -1,14 +1,14 @@
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { DataSource, Repository } from "typeorm";
-import { BlogEntity } from "../entities/blog.entity";
+import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { BlogMapper } from '../mapper/blog.mapper';
 import { Result } from '../../../common/domain/result-handler/result';
 
-export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRepository {
+export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
     constructor(dataBase: DataSource) {
-        super(BlogEntity, dataBase.manager);
+        super(OrmBlogEntity, dataBase.manager);
     }
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try {
@@ -32,7 +32,7 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
 
 
     async getAllBLogs(): Promise<Result<Blog[]>> {
-       try {
+    try {
         const resp = await this.createQueryBuilder('blog')
         .leftJoinAndSelect('blog.trainer', 'trainer')
         .leftJoinAndSelect('blog.category', 'category')
@@ -44,14 +44,14 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
         const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
         return Result.success(domainBlogs, 200);
 
-       } catch (error) {
+    } catch (error) {
             console.log(error);
             return Result.fail(error, 500, 'Error getting blogs'); 
-       }
+    }
     }
 
 
-   async  getBlogById(id: string): Promise<Result<Blog>> {
+    async  getBlogById(id: string): Promise<Result<Blog>> {
         try {
             const blog = await this.createQueryBuilder('blog')
             .leftJoinAndSelect('blog.trainer', 'trainer')
@@ -64,9 +64,9 @@ export class OrmBlogRepository extends Repository<BlogEntity> implements IBlogRe
             if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`), 404, `Blog with id= ${id} not found`);   
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog, 200);
-           } catch (error) {
+        } catch (error) {
                 console.log(error);
                 return Result.fail(error, 500, `Error getting blog with id= ${id}`); 
-           }
+        }
     }
 }

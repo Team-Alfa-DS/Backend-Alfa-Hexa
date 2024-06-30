@@ -42,7 +42,7 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
 
     async saveNotify(notify: Notify): Promise<Result<Notify>> {
         try {
-            const ormNotify = await this.Notifymapper.toOrm(notify);
+            const ormNotify = await this.Notifymapper.toPersistence(notify);
             return Result.success<Notify>(notify, 200);
         }
         catch(err){

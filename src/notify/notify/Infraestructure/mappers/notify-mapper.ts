@@ -23,7 +23,7 @@ export  class NotifyMapper {
         return notify;
     }
 
-    async toOrm(domainEntity: Notify): Promise<NotifyEntity> {
+    async toPersistence(domainEntity: Notify): Promise<NotifyEntity> {
         const ormUser = NotifyEntity.create(
             domainEntity.Id,
             domainEntity.Title,

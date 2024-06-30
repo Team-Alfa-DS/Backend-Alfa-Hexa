@@ -1,6 +1,6 @@
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { BlogCommentEntity } from "../../entities/blog/comment.blog.entity";
+import { OrmBlogCommentEntity } from "../../entities/orm-entities/orm-comment.blog.entity";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { CommentBlogPublicationDate } from "src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
@@ -13,10 +13,10 @@ import { CommentBlogCountDislike } from "src/comment/domain/valueObjects/blog/co
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
 
 
-export class OrmBlogCommentMapper implements IMapper<CommentBlog,BlogCommentEntity> {
+export class OrmBlogCommentMapper implements IMapper<CommentBlog,OrmBlogCommentEntity> {
 
-    async toOrm(DomainEntity: CommentBlog): Promise<BlogCommentEntity> {
-        const ormComment = BlogCommentEntity.create(
+    async toPersistence(DomainEntity: CommentBlog): Promise<OrmBlogCommentEntity> {
+        const ormComment = OrmBlogCommentEntity.create(
             DomainEntity.Id.commentId,
             DomainEntity.PublicationDate.PublicationDate,
             DomainEntity.Body.Body,
@@ -30,7 +30,7 @@ export class OrmBlogCommentMapper implements IMapper<CommentBlog,BlogCommentEnti
         return ormComment;
     }
     
-    async toDomain(OrmEntity: BlogCommentEntity): Promise<CommentBlog> {
+    async toDomain(OrmEntity: OrmBlogCommentEntity): Promise<CommentBlog> {
         const domainComment = CommentBlog.create(
             BlogCommentId.create(OrmEntity.Id),
             CommentBlogPublicationDate.create(OrmEntity.PublicationDate),
