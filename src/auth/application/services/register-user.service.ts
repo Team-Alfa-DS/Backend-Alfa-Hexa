@@ -12,6 +12,8 @@ import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { UserType } from "src/user/domain/value-objects/user-type";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
 export class RegisterUserService extends IService<RegisterUserRequest, RegisterUserResponse> {
 
@@ -19,13 +21,15 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
     private readonly idGenerator: IIdGen;
+    private readonly eventPublisher: IEventPublisher;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, idGenerator: IIdGen) {
+    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, idGenerator: IIdGen, eventPublisher: IEventPublisher) {
         super();
         this.userRepository = userRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
         this.idGenerator = idGenerator;
+        this.eventPublisher = eventPublisher;
     }
 
     async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
@@ -38,22 +42,27 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
 
         const hashPassword = await this.encryptor.hash(newUser.password);
         const id = await this.idGenerator.genId();
+        const userDomain = User.Create(
+            UserId.create(id),
+            UserEmail.create(newUser.email),
+            UserName.create(newUser.name),
+            UserPassword.create(hashPassword),
+            UserPhone.create(newUser.phone),
+            UserType.create(newUser.type),
+            null
+        );
+
         const userCreate = await this.userRepository.saveUser(
-            User.Create(
-                UserId.create(id),
-                UserEmail.create(newUser.email),
-                UserName.create(newUser.name),
-                UserPassword.create(hashPassword),
-                UserPhone.create(newUser.phone),
-                newUser.type,
-                null
-            ),
+            userDomain,
             this.transactionHandler
         );
         if (!userCreate.isSuccess) {
             return Result.fail(userCreate.Error, userCreate.StatusCode, userCreate.Message);
         }
         // await this.transactionHandler.commitTransaction();
+        userDomain.Register(userDomain.Id, userDomain.Email, userDomain.Name, userDomain.Password, userDomain.Phone, userDomain.Type, userDomain.Image);
+        this.eventPublisher.publish(userDomain.pullDomainEvents());
+
         const response = new RegisterUserResponse(id);
 
         return Result.success(response, 200);

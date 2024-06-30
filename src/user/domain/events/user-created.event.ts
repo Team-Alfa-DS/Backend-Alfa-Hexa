@@ -4,8 +4,8 @@ import { UserEmail } from "../value-objects/user-email";
 import { UserName } from "../value-objects/user-name";
 import { UserPassword } from "../value-objects/user-password";
 import { UserPhone } from "../value-objects/user-phone";
-import { UserRole } from "../enums/role-user.type";
 import { UserImage } from "../value-objects/user-image";
+import { UserType } from "../value-objects/user-type";
 
 export class UserCreated extends DomainEvent {
 
@@ -15,7 +15,7 @@ export class UserCreated extends DomainEvent {
         public name: UserName, 
         public password: UserPassword,
         public phone: UserPhone,
-        public type: UserRole, 
+        public type: UserType, 
         public image?: UserImage
     ) {
         super()
@@ -27,7 +27,7 @@ export class UserCreated extends DomainEvent {
         name: UserName, 
         password: UserPassword,
         phone: UserPhone,
-        type: UserRole, 
+        type: UserType, 
         image?: UserImage
     ): UserCreated {
         return new UserCreated(id, email, name, password, phone, type, image);
