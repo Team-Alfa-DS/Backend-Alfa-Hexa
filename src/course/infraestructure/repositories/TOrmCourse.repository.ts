@@ -24,25 +24,24 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
         tags: true,
       }
     });
-    
-    if (perpage) { 
-      if (!page) {page = 0};
-
-      result = result.slice((page*perpage), ((perpage) + page*perpage));
-    }
-
     let courses = CourseMapper.arrayToDomain(result);
     
     if (filter) {
       for (let tag of filter) {
         if (tag) {
-          courses = courses.filter((course) => course.containsTag(tag)); //Tags.includes(new CourseTag(tag))
+          courses = courses.filter((course) => course.containsTag(new CourseTag(tag))); //Tags.includes(new CourseTag(tag))
         } 
       }
       // courses = courses.filter((course) => course.tags.includes(filter))
     }
     if (category) {courses = courses.filter((course) => course.Category.equals(new CourseCategory(category)))} //Aplicar los filtros que correspondan
     if (trainer) {courses = courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainer)))}
+
+    if (perpage) { 
+      if (!page) {page = 0};
+
+      courses = courses.slice((page*perpage), ((perpage) + page*perpage));
+    }
 
     if (courses.length > 0) {
 
@@ -87,10 +86,9 @@ export class TOrmCourseRepository extends Repository<CourseEntity> implements IC
     });
 
     let courses = CourseMapper.arrayToDomain(result);
-    courses = courses.filter((course) => course.containsTag(tag));
+    courses = courses.filter((course) => course.containsTag(new CourseTag(tag)));
 
     if (courses.length > 0) {
-
       return Result.success(courses, HttpStatus.OK);
     } else {
       return Result.fail(new Error(`No se encontraron cursos con Tag: ${tag}`), HttpStatus.BAD_REQUEST, `No se encontraron cursos con Tag: ${tag}`);
