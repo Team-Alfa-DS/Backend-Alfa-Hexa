@@ -9,6 +9,7 @@ import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
+import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotFound";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
@@ -46,8 +47,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     if (courses.length > 0) {
 
-      return Result.success(courses, HttpStatus.OK);
+      return Result.success(courses, 200);
     } else {
+      //TODO: throw coursesNotFound()
       return Result.fail(new Error(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`), 
       HttpStatus.BAD_REQUEST, 
       `No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`);
@@ -69,9 +71,10 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     if (result) {
       const course = CourseMapper.toDomain(result);
-      return Result.success(course, HttpStatus.OK);
+      return Result.success(course, 200);
     } else {
-      return Result.fail(new Error(`No se encontró el Curso con el id: ${courseId}`), HttpStatus.BAD_REQUEST, `No se encontró el Curso con el id: ${courseId}`);
+      throw new CourseNotFoundException(`No se encontró el Curso con el id: ${courseId}`);
+      // return Result.fail(new Error(`No se encontró el Curso con el id: ${courseId}`), HttpStatus.BAD_REQUEST, `No se encontró el Curso con el id: ${courseId}`);
     }
   }
 
@@ -91,9 +94,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     if (courses.length > 0) {
 
-      return Result.success(courses, HttpStatus.OK);
+      return Result.success(courses, 200);
     } else {
-      return Result.fail(new Error(`No se encontraron cursos con Tag: ${tag}`), HttpStatus.BAD_REQUEST, `No se encontraron cursos con Tag: ${tag}`);
+      return Result.fail(new Error(`No se encontraron cursos con Tag: ${tag}`), 400, 'yes');
     }
   }
 
@@ -114,7 +117,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
         }
       }
     }
-    return Result.fail(new Error(`No se encontró el curso dado la lección: ${lessonId}`), HttpStatus.BAD_REQUEST, `No se encontró el curso dado la lección: ${lessonId}`);
+    return Result.fail(new Error(`No se encontró el curso dado la lección: ${lessonId}`), 400, 'yes');
   }
 
   async getAllCourses(page?: number, perpage?: number): Promise<Result<Course[]>> {
@@ -135,9 +138,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     if (result.length >= 0) {
       const courses = CourseMapper.arrayToDomain(result);
-      return Result.success(courses, HttpStatus.OK);
+      return Result.success(courses, 200);
     } else {
-      return Result.fail(new Error(`No se encontraron cursos`), HttpStatus.BAD_REQUEST, `No se encontraron cursos`);
+      return Result.fail(new Error(`No se encontraron cursos`), 400, 'yes');
     }
   }
 

@@ -22,6 +22,7 @@ import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/o
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
 import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
+import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotFound";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -68,7 +69,7 @@ export class CourseController {
     if (result.isSuccess)
     {
       return result.Value;
-    } else {
+    } else { 
       throw new HttpException(result.Message, result.StatusCode);
     }
   }
