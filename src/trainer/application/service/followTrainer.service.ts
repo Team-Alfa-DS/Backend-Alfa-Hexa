@@ -21,10 +21,10 @@ export class FollowTrainerService extends IService<FollowTrainerRequest, FollowT
     const trainer = await this.trainerRepository.followTrainer( trainerId, userId );
 
     if (!trainer.isSuccess) {
-      return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message);
+      return Result.fail(trainer.Error);
     }
 
     const response = new FollowTrainerResponse()
-    return Result.success(response, 202);
+    return Result.success(response);
   }
 }

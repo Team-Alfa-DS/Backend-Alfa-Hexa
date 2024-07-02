@@ -31,15 +31,15 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
 
     if (value.tags) {
       courseResult = await this.courseRepository.getManyCourses(value.tags);
-      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error, courseResult.StatusCode, courseResult.Message); };
+      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
       blogsResult = await this.blogRepository.getBlogsTagsNames(value.tags);
-      if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error, blogsResult.StatusCode, blogsResult.Message); };
+      if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error); };
 
     } else {
       courseResult = await this.courseRepository.getAllCourses();
-      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error, courseResult.StatusCode, courseResult.Message); };
+      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
       blogsResult = await this.blogRepository.getAllBLogs();
-      if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error, blogsResult.StatusCode, blogsResult.Message); };
+      if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error); };
 
     }
 
@@ -75,9 +75,9 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     let image: string;
     for (let course of courses) {
       trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
-      if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+      if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
       category = await this.categoryRepository.getCategoryById(course.Category.value);
-      if(!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
+      if(!category.isSuccess) {return Result.fail(category.Error)}
 
       coursesDto.push(new CourseResponseDto(
         course.Id.Value,
@@ -91,10 +91,10 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
 
     for (let blog of blogs) {
       trainer = await this.trainerRepository.findTrainerById(TrainerId.create(blog.Trainer));
-      if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+      if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
       
       category = await this.categoryRepository.getCategoryById(CategoryId.create(blog.Category.value));
-      if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
+      if (!category.isSuccess) {return Result.fail(category.Error)}
       
       console.log(blog.Images);
       if (blog.Images[0]) { image = blog.Images[0].value} else { image = ''}
@@ -110,7 +110,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     }
 
     const response = new SearchResponseDto(blogsDto, coursesDto);
-    return Result.success(response, 200);
+    return Result.success(response);
   }
 
 }

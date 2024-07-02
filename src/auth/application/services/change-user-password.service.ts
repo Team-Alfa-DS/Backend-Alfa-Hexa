@@ -31,7 +31,7 @@ export class ChangeUserPasswordService extends IService<ChangeUserPasswordReques
         const user = await this.odmUserRepository.findUserByEmail(UserEmail.create(value.email));
 
         if (!user.isSuccess) {
-            return Result.fail(user.Error, user.StatusCode, user.Message);
+            return Result.fail(user.Error);
         }
         const userDomain = user.Value;
         const hashPassword = await this.encryptor.hash(value.password);
@@ -40,12 +40,12 @@ export class ChangeUserPasswordService extends IService<ChangeUserPasswordReques
         const updatedUser = await this.userRepository.saveUser(user.Value, this.transactionHandler);
 
         if (!updatedUser.isSuccess) {
-            return Result.fail(user.Error, user.StatusCode, user.Message);
+            return Result.fail(user.Error);
         }
 
         this.eventPublisher.publish(userDomain.pullDomainEvents());
 
         const response = new ChangeUserPasswordResponse();
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

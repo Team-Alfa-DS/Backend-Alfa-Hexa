@@ -9,9 +9,9 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
     const count = await this.courseRepository.getCourseCount(service.category, service.trainer);
 
     if (count.isSuccess) {
-      return Result.success(new GetCourseCountResponse(count.Value), count.StatusCode);
+      return Result.success(new GetCourseCountResponse(count.Value));
     } else {
-      return Result.fail(count.Error, count.StatusCode, count.Message);
+      return Result.fail(count.Error);
     }
   }
 

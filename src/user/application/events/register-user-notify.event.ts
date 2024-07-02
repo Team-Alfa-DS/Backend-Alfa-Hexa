@@ -21,6 +21,6 @@ export class RegisterUserNotify implements IEventSubscriber<UserRegister> {
             data: {}
         }
 
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

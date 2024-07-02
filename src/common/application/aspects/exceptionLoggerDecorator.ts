@@ -16,10 +16,10 @@ export class ExceptionLoggerDecorator<I extends ServiceRequestDto, O extends Ser
     const r = await this.decoratee.execute(input);
     
     if (!r.isSuccess) {// Adaptar esto a loggear por texto no es tan complejo, me parece raro que sea solo loggear por consola
-      this.logger.errorLog(this.decoratee.name, `Error execute: Code: ${r.StatusCode} | Error: ${r.Message} -- `, input.dataToString());
+      this.logger.errorLog(this.decoratee.name, `Error execute: Error: ${r.Error} -- `, input.dataToString());
     }
     else {
-      this.logger.successLog(this.decoratee.name, `Successful execute: Code: ${r.StatusCode} -- `, input.dataToString())
+      this.logger.successLog(this.decoratee.name, `Successful execute: -- `, input.dataToString())
     }
 
     return r;

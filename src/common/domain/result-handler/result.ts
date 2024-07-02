@@ -4,7 +4,7 @@ export class Result<T> {
     // private statusCode?: number;
     // private message?: string;
 
-    private constructor(value: T, error: Error, statusCode: number, message: string) {
+    private constructor(value: T, error: Error) {
         this.value = value;
         this.error = error;
         // this.statusCode = statusCode;
@@ -34,11 +34,11 @@ export class Result<T> {
     //     throw new Error('El mensaje no existe');
     // }
 
-    static success<T>(value: T, statusCode: number): Result<T> {
-        return new Result<T>(value, null, statusCode, null);
+    static success<T>(value: T): Result<T> {
+        return new Result<T>(value, null);
     }
 
-    static fail<T>(error: Error, statusCode: number, message: string) {
-        return new Result<T>(null, error, statusCode, message);
+    static fail<T>(error: Error) {
+        return new Result<T>(null, error);
     }
 }

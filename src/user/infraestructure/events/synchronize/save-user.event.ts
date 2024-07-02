@@ -32,9 +32,9 @@ export class saveUserEvent implements IEventSubscriber<UserRegister> {
                 event: this.constructor.name,
                 data: {}
             }
-            return Result.success(response, 200)
+            return Result.success(response)
         } catch (err) {
-            return Result.fail(new Error(err.message), err.code, err.message);
+            return Result.fail(new Error(err.message));
         }
     }
 

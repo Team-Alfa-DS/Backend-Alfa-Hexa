@@ -16,11 +16,11 @@ export class OrmTagRepository extends Repository<OrmTagEntity> implements ITagRe
         const result: OrmTagEntity[] = await runnerTransaction.manager.createQueryBuilder(OrmTagEntity, "tag").getMany();
         
         if (!result) {
-            return Result.fail<string[]>(new Error('Tags not found'), 404, 'Tags not found');
+            return Result.fail<string[]>(new Error('Tags not found'));
         }
 
         const tagNames: string[] = result.map(tag => tag.name);
     
-        return Result.success<string[]>(tagNames, 200);
+        return Result.success<string[]>(tagNames);
     }
 }	

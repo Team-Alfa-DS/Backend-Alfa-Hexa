@@ -33,12 +33,12 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
         const user = await this.userRepository.findUserById(UserId.create(data.id), this.transactionHandler);
 
         if (!user.isSuccess) {
-            return Result.fail(user.Error, user.StatusCode, user.Message)
+            return Result.fail(user.Error)
         }
         const newUser = user.Value;
         if(data.email) {
             const userEmailCheck = await this.userRepository.findUserByEmail(UserEmail.create(data.email), this.transactionHandler)
-            if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'), 400, 'Ya existe un usuario con este email');
+            if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'));
             newUser.UpdateEmail(UserEmail.create(data.email));
         }
         if(data.name) newUser.UpdateName(UserName.create(data.name));
@@ -52,12 +52,12 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
         const updatedUser = await this.userRepository.saveUser(newUser, this.transactionHandler);
 
         if (!updatedUser.isSuccess) {
-            return Result.fail(updatedUser.Error, updatedUser.StatusCode, updatedUser.Message)
+            return Result.fail(updatedUser.Error)
         }
         // await this.transactionHandler.commitTransaction();
         if (data.password) this.eventPublisher.publish(newUser.pullDomainEvents())
         const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
         
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

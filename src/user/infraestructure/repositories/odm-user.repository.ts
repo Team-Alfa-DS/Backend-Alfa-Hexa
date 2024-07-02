@@ -28,9 +28,9 @@ export class OdmUserRespository implements IOdmUserRepository {
         try {
             const user = await this.userModel.findOne({id: id.Id});
             const domainUser = await this.odmUserMapper.toDomain(user);
-            return Result.success(domainUser, 200);
+            return Result.success(domainUser);
         } catch(err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
     }
 
@@ -38,9 +38,9 @@ export class OdmUserRespository implements IOdmUserRepository {
         try {
             const user = await this.userModel.findOne({email: email.Email});
             const domainUser = await this.odmUserMapper.toDomain(user);
-            return Result.success(domainUser, 200);
+            return Result.success(domainUser);
         } catch(err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
     }
 

@@ -37,7 +37,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
         const userFound = await this.userRepository.findUserByEmail(UserEmail.create(newUser.email), this.transactionHandler);
 
         if (userFound.isSuccess) {
-            return Result.fail(new Error('El usuario ya existe'), 500, 'El usuario ya existe');
+            return Result.fail(new Error('El usuario ya existe'));
         }
 
         const hashPassword = await this.encryptor.hash(newUser.password);
@@ -57,7 +57,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
             this.transactionHandler
         );
         if (!userCreate.isSuccess) {
-            return Result.fail(userCreate.Error, userCreate.StatusCode, userCreate.Message);
+            return Result.fail(userCreate.Error);
         }
         // await this.transactionHandler.commitTransaction();
         userDomain.Register(userDomain.Id, userDomain.Email, userDomain.Name, userDomain.Password, userDomain.Phone, userDomain.Type, userDomain.Image);
@@ -65,6 +65,6 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
 
         const response = new RegisterUserResponse(id);
 
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

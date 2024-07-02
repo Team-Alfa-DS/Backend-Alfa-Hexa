@@ -18,11 +18,11 @@ export class GetAllNotify implements IApplicationService<void, Notify[]> {
         try {
             const result = await this.repository.getAllNotify();
             if (result.Error) {
-                return Result.fail<Notify[]>(result.Error, result.StatusCode, result.Message);
+                return Result.fail<Notify[]>(result.Error);
             }
-            return Result.success<Notify[]>(result.Value, result.StatusCode);
+            return Result.success<Notify[]>(result.Value);
         } catch(err) {
-            return Result.fail<Notify[]>(new Error(err.message), 500, err.message);
+            return Result.fail<Notify[]>(new Error(err.message));
         }
     }
 
