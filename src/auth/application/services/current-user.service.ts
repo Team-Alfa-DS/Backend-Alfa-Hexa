@@ -18,7 +18,7 @@ export class CurrentUserService extends IService<CurrentUserRequest, CurrentUser
         const userFound = await this.userRepository.findUserById(UserId.create(value.id));
 
         if (!userFound.isSuccess) {
-            return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
+            return Result.fail(userFound.Error);
         }
 
         const response = new CurrentUserResponse(
@@ -29,6 +29,6 @@ export class CurrentUserService extends IService<CurrentUserRequest, CurrentUser
             userFound.Value.Image?.Image ? userFound.Value.Image.Image : null
         );
 
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

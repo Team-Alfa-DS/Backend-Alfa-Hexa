@@ -32,7 +32,7 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
         // });
 
         if (!commentsFound) return Result.fail<CommentLesson[]>(new Error( 
-            `Ha ocurrido un error al encontrar los coemtarios por id` ), 404, 'Comments not found');
+            `Ha ocurrido un error al encontrar los coemtarios por id` ));
 
         const ListMapper = []
         commentsFound.forEach(async e => {
@@ -40,7 +40,7 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
                 await this.ormCommentMapper.toDomain(e ))
         });
 
-        return Result.success<CommentLesson[]>(ListMapper,200);
+        return Result.success<CommentLesson[]>(ListMapper);
     }
 
     async saveComment(comment: CommentLesson, runner: TransactionHandler): Promise<Result<CommentLesson>> {
@@ -48,9 +48,9 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
         try{
             const ormComment = await this.ormCommentMapper.toPersistence(comment);
             await runnerTransaction.manager.save(ormComment);
-            return Result.success<CommentLesson>(comment, 200);                                                    
+            return Result.success<CommentLesson>(comment);                                                    
         }catch(err){
-            return Result.fail<CommentLesson>(new Error(err.message), err.code, err.message);
+            return Result.fail<CommentLesson>(new Error(err.message));
         }
 
     };

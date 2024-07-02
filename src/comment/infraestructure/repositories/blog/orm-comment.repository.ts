@@ -29,7 +29,7 @@ export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> i
         //     take: page,
         //     skip: perPage,});
 
-        if (!commentsFound) return Result.fail<CommentBlog[]>(new Error('Comments not found'), 404, 'Comments not found');
+        if (!commentsFound) return Result.fail<CommentBlog[]>(new Error('Comments not found'));
 
         const ListMapper = []
         commentsFound.forEach(async e => { 
@@ -37,7 +37,7 @@ export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> i
                 await this.ormCommentMapper.toDomain(e ))  
         });
 
-        return Result.success<CommentBlog[]>(ListMapper,200);
+        return Result.success<CommentBlog[]>(ListMapper);
     }
 
     async saveComment(comment: CommentBlog, runner: TransactionHandler): Promise<Result<CommentBlog>> {
@@ -45,9 +45,9 @@ export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> i
         try{
             const ormComment = await this.ormCommentMapper.toPersistence(comment);
             await runnerTransaction.manager.save(ormComment);
-            return Result.success<CommentBlog>(comment, 200);                                                    
+            return Result.success<CommentBlog>(comment);                                                    
         }catch(err){
-            return Result.fail<CommentBlog>(new Error(err.message), err.code, err.message);
+            return Result.fail<CommentBlog>(new Error(err.message));
         }
 
     };

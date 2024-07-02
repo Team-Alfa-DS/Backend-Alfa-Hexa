@@ -23,9 +23,9 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
       const r = await this.courseRepository.getCourseById(service.courseId);
 
       const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
-        if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)} //TODO: Estos se van cuando estén las excepciones bien implementadas
-        const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Value.Category.value);
-        if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
+      if (!trainer.isSuccess) {return Result.fail(trainer.Error)};
+      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Value.Category.value);
+      if (!category.isSuccess) {return Result.fail(category.Error)}
 
         const lessons: {
           id: string,
@@ -42,22 +42,22 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
           });
         }
 
-        return Result.success(new GetCourseByIdResponse(
-          r.Value.Id.Value,
-          r.Value.Title.value,
-          r.Value.Description.value,
-          category.Value.Name.value,
-          r.Value.Image.Value,
-          {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-          r.Value.Level.value,
-          r.Value.DurationWeeks.value,
-          r.Value.DurationMinutes.value,
-          r.Value.Tags.map(tag => tag.name),
-          r.Value.Date,
-          lessons
-        ), 200);
-    } catch (error) {
-      return Result.fail(error, 400, `yes`);
+      return Result.success(new GetCourseByIdResponse(
+        r.Value.Id.Value,
+        r.Value.Title.value,
+        r.Value.Description.value,
+        category.Value.Name.value,
+        r.Value.Image.Value,
+        {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
+        r.Value.Level.value,
+        r.Value.DurationWeeks.value,
+        r.Value.DurationMinutes.value,
+        r.Value.Tags.map(tag => tag.name),
+        r.Value.Date,
+        lessons
+      ));
+    } else {
+      return Result.fail(r.Error);
     }
     
   }
