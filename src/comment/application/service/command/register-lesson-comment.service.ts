@@ -47,7 +47,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         let course = await this.courseRepository.getCourseByLessonId( data.targetId );
 
-        if ( !course.isSuccess ) return Result.fail( course.Error );
+        // if ( !course.isSuccess ) return Result.fail( course.Error ); //FIXME: Needs try-catch
 
         let publicationDate = CommentLessonPublicationDate.create( new Date() );
         let body = CommentLessonBody.create( data.body );

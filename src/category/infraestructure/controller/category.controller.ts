@@ -21,6 +21,7 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 
 
 @ApiTags('Category')
@@ -61,7 +62,8 @@ export class CategoryController {
       const request = new GetAllCategoriesRequest(page, perpage);
       const response = await this.getAllCategorysService.execute(request);
       if (response.isSuccess) return response.Value
-      throw new HttpException(response.Message, response.StatusCode);
+      // throw new HttpException(response.Message, response.StatusCode);
+      throw ExceptionMapper.toHttp(response.Error);
     }
 
     @Get("/:id")
@@ -76,6 +78,7 @@ export class CategoryController {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       if (response.isSuccess) return response.Value
-      throw new HttpException(response.Message, response.StatusCode);
+      // throw new HttpException(response.Message, response.StatusCode);
+      throw ExceptionMapper.toHttp(response.Error);
     }
 }

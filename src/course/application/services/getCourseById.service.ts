@@ -22,9 +22,9 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     try {
       const r = await this.courseRepository.getCourseById(service.courseId);
 
-      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
-      if (!trainer.isSuccess) {return Result.fail(trainer.Error)};
-      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Value.Category.value);
+      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
+      if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio
+      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Category.value);
       if (!category.isSuccess) {return Result.fail(category.Error)}
 
         const lessons: {
@@ -33,7 +33,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
           content: string,
           video: string
         }[] = [];
-        for (let lesson of r.Value.Lessons) {
+        for (let lesson of r.Lessons) {
           lessons.push({
             id: lesson.id.Value,
             title: lesson.title.value,
@@ -43,21 +43,21 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
         }
 
       return Result.success(new GetCourseByIdResponse(
-        r.Value.Id.Value,
-        r.Value.Title.value,
-        r.Value.Description.value,
+        r.Id.Value,
+        r.Title.value,
+        r.Description.value,
         category.Value.Name.value,
-        r.Value.Image.Value,
+        r.Image.Value,
         {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-        r.Value.Level.value,
-        r.Value.DurationWeeks.value,
-        r.Value.DurationMinutes.value,
-        r.Value.Tags.map(tag => tag.name),
-        r.Value.Date,
+        r.Level.value,
+        r.DurationWeeks.value,
+        r.DurationMinutes.value,
+        r.Tags.map(tag => tag.name),
+        r.Date,
         lessons
       ));
-    } else {
-      return Result.fail(r.Error);
+    } catch (error) {
+      return Result.fail(error);
     }
     
   }

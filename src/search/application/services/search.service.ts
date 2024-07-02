@@ -26,24 +26,24 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
   ) { super() }
 
   async execute(value: SearchRequestDto): Promise<Result<SearchResponseDto>> {
-    let courseResult: Result<Course[]>; let blogsResult: Result<Blog[]>;
+    let blogsResult: Result<Blog[]>;
     let courses: Course[] = []; let blogs: Blog[] = [];
 
     if (value.tags) {
-      courseResult = await this.courseRepository.getManyCourses(value.tags);
-      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
+      courses = await this.courseRepository.getManyCourses(value.tags);
+      // if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
       blogsResult = await this.blogRepository.getBlogsTagsNames(value.tags);
       if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error); };
 
     } else {
-      courseResult = await this.courseRepository.getAllCourses();
-      if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
+      courses = await this.courseRepository.getAllCourses();
+      // if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
       blogsResult = await this.blogRepository.getAllBLogs();
       if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error); };
 
     }
 
-    courses = courseResult.Value;
+    // courses = courseResult.Value;
     blogs = blogsResult.Value;
 
     if (value.term) {

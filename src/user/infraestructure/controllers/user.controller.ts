@@ -34,6 +34,7 @@ import { Model } from "mongoose";
 import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
 import { OdmUserRespository } from "../repositories/odm-user.repository";
 import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -108,6 +109,7 @@ export class UserController {
         )
         const result = await this.updateUserService.execute(dataUser);
         if (result.isSuccess) return result.Value;
-        HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        throw ExceptionMapper.toHttp(result.Error);
     }
 }

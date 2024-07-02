@@ -45,7 +45,7 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
             const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
-            if (courses.findIndex(c => c.Id.equals(course.Value.Id) ) == -1) courses.push(course.Value);
+            if (courses.findIndex(c => c.Id.equals(course.Id) ) == -1) courses.push(course);
         }
 
         if (value.perpage) {

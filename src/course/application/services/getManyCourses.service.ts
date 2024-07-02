@@ -17,14 +17,14 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
   ){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
-    const r = await this.courseRepository.getManyCourses(
-      [request.filter],
-      request.category,
-      request.trainer,
-      request.page,
-      request.perpage
-    ); 
-    if (r.isSuccess) {
+    try {
+      const r = await this.courseRepository.getManyCourses(
+        [request.filter],
+        request.category,
+        request.trainer,
+        request.page,
+        request.perpage
+      );
       const responseCourses: {
         id: string;
         title: string;
@@ -35,9 +35,9 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       }[] = []
       let trainer: Result<Trainer>;
       let category: Result<Category>;
-      for (let course of r.Value) {
+      for (let course of r) {
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
-        if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
+        if (!trainer.isSuccess) {return Result.fail(trainer.Error)} //TODO: Esto se va cuando se aplique el manejo de excepciones de dominio
         category = await this.categoryRepository.getCategoryById(course.Category.value);
         if (!category.isSuccess) {return Result.fail(trainer.Error)}
 
@@ -50,9 +50,16 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
           trainer: trainer.Value.Name.trainerName
         })
       }
+
       return Result.success(new GetManyCoursesResponse(responseCourses));
-    } else {
-      return Result.fail(r.Error);
+      // if (r.isSuccess) {
+        
+      //   return Result.success(new GetManyCoursesResponse(responseCourses));
+      // } else {
+      //   return Result.fail(r.Error);
+      // }
+    } catch (error) {
+      return Result.fail(error);
     }
     
   }

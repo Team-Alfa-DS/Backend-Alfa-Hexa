@@ -88,7 +88,7 @@ export class CourseController {
   })
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
-  async getAllCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {
+  async getManyCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {
     const request = new GetManyCoursesRequest(
       manyCoursesQueryDto.filter,
       manyCoursesQueryDto.category,
@@ -102,7 +102,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode);
+      throw ExceptionMapper.toHttp(result.Error);
     }
     
   }
@@ -121,7 +121,7 @@ export class CourseController {
     if (result.isSuccess) {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode)
+      throw ExceptionMapper.toHttp(result.Error);
     }
   }
 }

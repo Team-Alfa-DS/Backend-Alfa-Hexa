@@ -50,7 +50,7 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
             const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
-            if (courses.findIndex(c => c.Id.equals(course.Value.Id) /*c.id == course.Value.id*/) == -1) courses.push(course.Value);
+            if (courses.findIndex(c => c.Id.equals(course.Id) /*c.id == course.Value.id*/) == -1) courses.push(course);
         }
 
         let progressUserList: Progress[][] = [];

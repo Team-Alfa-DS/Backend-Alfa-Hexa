@@ -36,12 +36,12 @@ export class GetOneProgressService extends IService<GetOneProgressRequest, GetOn
         const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
 
         if (!user.isSuccess) return Result.fail(user.Error);
-        if (!course.isSuccess) return Result.fail(course.Error);
+        // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
 
-        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.Lessons, this.transactionHandler);
+        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error);
 
-        const calc = this.calcPercentService.execute(course.Value.Lessons, progress.Value);
+        const calc = this.calcPercentService.execute(course.Lessons, progress.Value);
         const response = new GetOneProgressResponse(calc.percent, calc.lessons);
 
         return Result.success(response);

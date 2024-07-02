@@ -6,12 +6,13 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
   constructor(private courseRepository: ICourseRepository) {super()}
   
   async execute(service: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
-    const count = await this.courseRepository.getCourseCount(service.category, service.trainer);
+    try {
+      const count = await this.courseRepository.getCourseCount(service.category, service.trainer);
 
-    if (count.isSuccess) {
-      return Result.success(new GetCourseCountResponse(count.Value));
-    } else {
-      return Result.fail(count.Error);
+      return Result.success(new GetCourseCountResponse(count));
+    
+    } catch (error) {
+      return Result.fail(error);
     }
   }
 
