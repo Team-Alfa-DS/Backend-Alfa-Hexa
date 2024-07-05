@@ -18,20 +18,8 @@ export class UpdatedUserPasswordNotify implements IEventSubscriber<UserPasswordU
         this.transactionHandler = transactionHandler;
     }
 
-    async on(event: UserPasswordUpdated): Promise<Result<EventResponseDto>> {
+    async on(event: UserPasswordUpdated): Promise<void> {
         const user = await this.userRepository.findUserById(event.id, this.transactionHandler);
-
-        if (!user.isSuccess) return Result.fail(user.Error);
-
-
         await this.mailer.sendUserMail(`Feliz dia ${user.Value.Name.Name} su contraseña ha sido actualizada con exito`, 'Actualizacion de contraseña', user.Value.Email.Email);
-
-        const response: EventResponseDto = {
-            user: user.Value.Id.Id,
-            event: this.constructor.name,
-            data: {}
-        }
-
-        return Result.success(response);
     }
 }

@@ -34,6 +34,11 @@ import { Model } from "mongoose";
 import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
 import { OdmUserRespository } from "../repositories/odm-user.repository";
 import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
+import { UpdateUserPasswordEvent } from "../events/synchronize/update-user-password.event";
+import { UpdateUserEmailEvent } from "../events/synchronize/update-user-email.event";
+import { UpdateUserImageEvent } from "../events/synchronize/update-user-image.event";
+import { UpdateUserNameEvent } from "../events/synchronize/update-user-name.event";
+import { UpdateUserPhoneEvent } from "../events/synchronize/update-user-phone.event";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -72,12 +77,17 @@ export class UserController {
             this.userModel
         );
 
-        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
+        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler), new UpdateUserPasswordEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserEmailUpdated', [new UpdateUserEmailEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserImageUpdated', [new UpdateUserImageEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserNameUpdated', [new UpdateUserNameEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserPhoneUpdated', [new UpdateUserPhoneEvent(this.odmUserRepository)]);
 
         this.updateUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new UpdateUserService(
                     this.userRepository,
+                    this.odmUserRepository,
                     this.transactionHandler,
                     this.encryptor,
                     this.eventPublisher
