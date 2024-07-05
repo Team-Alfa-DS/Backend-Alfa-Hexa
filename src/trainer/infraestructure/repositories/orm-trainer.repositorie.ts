@@ -11,13 +11,13 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
-import { stat } from 'fs';
+import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainer>
   implements ITrainerRepository
 {
-  private readonly ormTrainerMapper: IMapper<Trainer, OrmTrainer>;
+  private readonly ormTrainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
   private userMapper: OrmUserMapper = new OrmUserMapper();
   private readonly userRepository: OrmUserRepository = new OrmUserRepository(
     this.userMapper,
@@ -28,11 +28,10 @@ export class OrmTrainerRepository
   );
 
   constructor(
-    ormTrainerMapper: IMapper<Trainer, OrmTrainer>,
+  
     dataSource: DataSource,
   ) {
     super(OrmTrainer, dataSource.manager);
-    this.ormTrainerMapper = ormTrainerMapper;
   }
 
   async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
@@ -130,10 +129,17 @@ export class OrmTrainerRepository
     }
   
     let trainerDomains = await this.ormTrainerMapper.arrayToDomain(trainers);
-    return Result.success<Trainer[]>(trainerDomains, trainerDomains.code);
+    return Result.success<Trainer[]>(trainerDomains, 200);
   }
+
+  async countnotreaded(): Promise<Result<number>> {
+    let count = await this.createQueryBuilder("trainer")
+      .where("trainer.userFollow = 0")
+      .getCount();
+    return Result.success<number>(count, 200);
    
   }
+}
 
  /* async updateTrainer(
     idTrainer: string,
@@ -176,4 +182,4 @@ export class OrmTrainerRepository
     }
     return Result.success<Trainer>(trainer, 200);
   }*/
-}
+
