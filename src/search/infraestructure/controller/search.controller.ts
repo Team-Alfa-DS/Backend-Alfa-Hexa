@@ -95,7 +95,7 @@ export class SearchController {
         const result = await this.searchTagService.execute(request);
 
         if (result.isSuccess) {
-            return result.Value;
+            return result.Value.tagNames;
         } else {
             throw new HttpException(result.Error, result.StatusCode);
         }
