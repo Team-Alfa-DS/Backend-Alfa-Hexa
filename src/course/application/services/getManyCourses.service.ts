@@ -39,7 +39,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
         if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
         category = await this.categoryRepository.getCategoryById(course.Category.value);
-        if (!category.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+        if (!category.isSuccess) {return Result.fail(category.Error, category.StatusCode, category.Message)}
 
         responseCourses.push({
           id: course.Id.Value,
