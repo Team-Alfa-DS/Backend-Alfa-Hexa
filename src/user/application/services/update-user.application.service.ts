@@ -12,17 +12,20 @@ import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserImage } from "src/user/domain/value-objects/user-image";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { IOdmUserRepository } from "../repositories/odm-user-repository.interface";
 
 export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserResponse> {
 
-    private readonly userRepository: IUserRepository;
+    private readonly odmUserRepository: IOdmUserRepository;
+    private readonly ormUserRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
     private readonly eventPublisher: IEventPublisher
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
+    constructor(ormUserRepository: IUserRepository, odmUserRepository: IOdmUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, eventPublisher: IEventPublisher) {
         super();
-        this.userRepository = userRepository;
+        this.ormUserRepository = ormUserRepository;
+        this.odmUserRepository = odmUserRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
         this.eventPublisher = eventPublisher;
@@ -30,14 +33,14 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
 
     async execute(data: UpdateUserRequest): Promise<Result<UpdateUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const user = await this.userRepository.findUserById(UserId.create(data.id), this.transactionHandler);
+        const user = await this.odmUserRepository.findUserById(UserId.create(data.id));
 
         if (!user.isSuccess) {
             return Result.fail(user.Error, user.StatusCode, user.Message)
         }
         const newUser = user.Value;
         if(data.email) {
-            const userEmailCheck = await this.userRepository.findUserByEmail(UserEmail.create(data.email), this.transactionHandler)
+            const userEmailCheck = await this.odmUserRepository.findUserByEmail(UserEmail.create(data.email));
             if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'), 400, 'Ya existe un usuario con este email');
             newUser.UpdateEmail(UserEmail.create(data.email));
         }
@@ -49,13 +52,13 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
         if(data.phone) newUser.UpdatePhone(UserPhone.create(data.phone));
         if(data.image) newUser.UpdateImage(UserImage.create(data.image));
 
-        const updatedUser = await this.userRepository.saveUser(newUser, this.transactionHandler);
+        const updatedUser = await this.ormUserRepository.saveUser(newUser, this.transactionHandler);
 
         if (!updatedUser.isSuccess) {
             return Result.fail(updatedUser.Error, updatedUser.StatusCode, updatedUser.Message)
         }
         // await this.transactionHandler.commitTransaction();
-        if (data.password) this.eventPublisher.publish(newUser.pullDomainEvents())
+        this.eventPublisher.publish(newUser.pullDomainEvents())
         const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
         
         return Result.success(response, 200);

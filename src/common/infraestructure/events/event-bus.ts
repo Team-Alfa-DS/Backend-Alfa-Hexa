@@ -11,19 +11,16 @@ export class EventBus extends IEventPublisher {
         super();
     }
 
-    async publish(events: DomainEvent[]): Promise<Result<EventResponseDto>[]> {
-        const eventRes: Result<EventResponseDto>[] = [];
+    async publish(events: DomainEvent[]): Promise<void> {
         for (const event of events) {
             const subscribers = this.subscribers.get(event.constructor.name);
             if (subscribers) {
-                const response = await Promise.all(
+                await Promise.all(
                     subscribers.map(async subscriber => {
                         return subscriber.on(event);
                     })
                 );
-                eventRes.push(...response);
             }
         }
-        return eventRes;
     }
 }

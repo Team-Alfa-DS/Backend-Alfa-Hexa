@@ -14,18 +14,21 @@ import { UserPhone } from "src/user/domain/value-objects/user-phone";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { UserType } from "src/user/domain/value-objects/user-type";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 
 export class RegisterUserService extends IService<RegisterUserRequest, RegisterUserResponse> {
 
-    private readonly userRepository: IUserRepository;
+    private readonly ormUserRepository: IUserRepository;
+    private readonly odmUserRepository: IOdmUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly encryptor: IEncryptor;
     private readonly idGenerator: IIdGen;
     private readonly eventPublisher: IEventPublisher;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, idGenerator: IIdGen, eventPublisher: IEventPublisher) {
+    constructor(ormUserRepository: IUserRepository, odmUserRepository: IOdmUserRepository, transactionHandler: ITransactionHandler, encryptor: IEncryptor, idGenerator: IIdGen, eventPublisher: IEventPublisher) {
         super();
-        this.userRepository = userRepository;
+        this.ormUserRepository = ormUserRepository;
+        this.odmUserRepository = odmUserRepository;
         this.transactionHandler = transactionHandler;
         this.encryptor = encryptor;
         this.idGenerator = idGenerator;
@@ -34,7 +37,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
 
     async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
         // await this.transactionHandler.startTransaction();
-        const userFound = await this.userRepository.findUserByEmail(UserEmail.create(newUser.email), this.transactionHandler);
+        const userFound = await this.odmUserRepository.findUserByEmail(UserEmail.create(newUser.email));
 
         if (userFound.isSuccess) {
             return Result.fail(new Error('El usuario ya existe'), 500, 'El usuario ya existe');
@@ -52,7 +55,7 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
             null
         );
 
-        const userCreate = await this.userRepository.saveUser(
+        const userCreate = await this.ormUserRepository.saveUser(
             userDomain,
             this.transactionHandler
         );

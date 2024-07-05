@@ -1,6 +1,4 @@
-import { EventResponseDto } from "src/common/application/events/dtos/event.response";
 import { IEventSubscriber } from "src/common/application/events/event-subscriber.interface";
-import { Result } from "src/common/domain/result-handler/result";
 import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 import { UserEmailUpdated } from "src/user/domain/events/user-email-updated.event";
 
@@ -11,8 +9,9 @@ export class UpdateUserEmailEvent implements IEventSubscriber<UserEmailUpdated> 
         this.odmUserRepository = odmUserRepository;
     }
 
-    on(event: UserEmailUpdated): Promise<Result<EventResponseDto>> {
-        throw new Error("Method not implemented.");
+    async on(event: UserEmailUpdated): Promise<void> {
+        const user = await this.odmUserRepository.findUserById(event.id)
+        await this.odmUserRepository.updateUserEmail(event.email, user.Value);
     }
 
 }
