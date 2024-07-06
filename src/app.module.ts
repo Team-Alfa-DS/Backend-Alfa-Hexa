@@ -30,6 +30,7 @@ import { CategorySchema } from './category/infraestructure/entities/odm-entities
 import { TrainerSchema } from './trainer/infraestructure/entities/odm-entities/odm-trainer.entity';
 import { ProgressSchema } from './progress/infraestructure/entities/odm-entities/odm-progress.entity';
 import { TagSchema } from './tag/infraestructure/entities/odm-entities/odm-tag.entity';
+import { Synchronize } from './user/infraestructure/entities/synchronize';
 
 @Module({
   imports: [
@@ -113,6 +114,6 @@ import { TagSchema } from './tag/infraestructure/entities/odm-entities/odm-tag.e
     BlogController,
     notifycontroller
   ],
-  providers: [JwtStrategy, CloudinaryProvider, ormDatabaseProvider, odmDatabaseProvider],
+  providers: [JwtStrategy, CloudinaryProvider, ormDatabaseProvider, odmDatabaseProvider, Synchronize],
 })
 export class AppModule {}
