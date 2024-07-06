@@ -1,15 +1,11 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
-import { CategoryId } from "src/category/domain/valueObjects/categoryId";
-import { DomainException } from "src/common/domain/domain-exception";
-import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotFound";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(

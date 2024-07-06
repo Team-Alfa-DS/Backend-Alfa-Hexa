@@ -2,7 +2,7 @@ import { SearchRequestDto } from "../dtos/request/search-request.dto";
 import { IApplicationService } from "src/common/application/application-service/application-service.interface";
 import { SearchResponseDto } from "../dtos/response/search-response.dto";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { Blog } from "src/blog/domain/Blog";

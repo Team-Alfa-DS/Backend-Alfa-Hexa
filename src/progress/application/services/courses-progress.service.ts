@@ -3,7 +3,7 @@ import { CoursesProgressRequest } from "../dtos/request/courses-progress.request
 import { CourseProgress, CoursesProgressResponse } from "../dtos/response/courses-progress.response";
 import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Course } from "src/course/domain/Course";

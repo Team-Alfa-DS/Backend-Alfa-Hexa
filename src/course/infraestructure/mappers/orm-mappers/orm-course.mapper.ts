@@ -1,11 +1,9 @@
 import { Course } from "src/course/domain/Course";
-import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
-import { LessonMapper } from "./lesson.mapper";
+import { OrmCourseEntity } from "../../entities/orm-entities/orm-course.entity";
+import { OrmLessonMapper } from "./orm-lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
-import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { CourseTitle } from "src/course/domain/value-objects/course-title";
 import { CourseDescription } from "src/course/domain/value-objects/course-description";
-import { Url } from "src/common/domain/value-objects/url";
 import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
 import { CourseLevel } from "src/course/domain/value-objects/course-level";
@@ -15,18 +13,18 @@ import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { CourseImage } from "src/course/domain/value-objects/course-image";
 
-export class CourseMapper {
+export class OrmCourseMapper {
   static toDomain(entity: OrmCourseEntity): Course {
     const domainLessons: Lesson[] = []; 
     for (let lesson of entity.lessons) {
       
-      domainLessons.push(LessonMapper.toDomain(lesson));
+      domainLessons.push(OrmLessonMapper.toDomain(lesson));
     }
     const domainTags: CourseTag[] = [];
     for (let tag of entity.tags) {
       domainTags.push(new CourseTag(tag.name));
     }
-    const course = new Course(
+    return new Course(
       new CourseId(entity.id),
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
@@ -41,13 +39,13 @@ export class CourseMapper {
       new CourseTrainer(entity.trainer.id)
     );
 
-    return course;
+    // return course;
   }
 
   static arrayToDomain(entities: OrmCourseEntity[]): Course[] {
     const courses: Course[] = [];
       for (let entity of entities) {
-        courses.push(CourseMapper.toDomain(entity));
+        courses.push(OrmCourseMapper.toDomain(entity));
       }
     return courses;
   }

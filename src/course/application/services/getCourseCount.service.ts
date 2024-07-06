@@ -1,6 +1,6 @@
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 
 export class GetCourseCountService extends IService<GetCourseCountRequest, GetCourseCountResponse> {
   constructor(private courseRepository: ICourseRepository) {super()}

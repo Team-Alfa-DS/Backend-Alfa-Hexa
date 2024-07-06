@@ -1,9 +1,9 @@
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { Course } from "src/course/domain/Course";
 import { DataSource, Repository } from "typeorm";
 import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
 import { HttpException, HttpStatus } from "@nestjs/common";
-import { CourseMapper } from "../mappers/course.mapper";
+import { OrmCourseMapper } from "../mappers/orm-mappers/orm-course.mapper";
 import { Result } from "src/common/domain/result-handler/result";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
@@ -28,7 +28,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     if (result.length <= 0) { throw new CourseNotFoundException(`No hay cursos guardados`)}
     
 
-    let courses = CourseMapper.arrayToDomain(result);
+    let courses = OrmCourseMapper.arrayToDomain(result);
     
     if (filter) {
       for (let tag of filter) {
@@ -51,7 +51,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
       return courses;
     } else {
-      throw new CourseNotFoundException(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`);
+      throw new CourseNotFoundException(`No se encontraron cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`);
       // return Result.fail(new Error(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`))
     }
   }
@@ -71,7 +71,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     if (!result) {throw new CourseNotFoundException(`No se encontró un curso con el id: ${courseId}`)}
 
-    return CourseMapper.toDomain(result);
+    return OrmCourseMapper.toDomain(result);
 
     // if (result) {
     //   const course = CourseMapper.toDomain(result);
@@ -95,7 +95,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
 
-    let courses = CourseMapper.arrayToDomain(result);
+    let courses = OrmCourseMapper.arrayToDomain(result);
     courses = courses.filter((course) => course.containsTag(tag));
     
     if (courses.length <= 0) {
@@ -120,7 +120,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     for (let course of result) {
       for (let lesson of course.lessons) {
         if (lesson.id === lessonId) {
-          return CourseMapper.toDomain(course);
+          return OrmCourseMapper.toDomain(course);
         }
       }
     }
@@ -147,15 +147,13 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
       result = result.slice((page*perpage), ((perpage) + page*perpage));
     }
 
-    
-
     if (result.length <= 0) {
       // return Result.fail(new Error(`No se encontraron cursos`));
       throw new CourseNotFoundException("No se encontraron cursos para la página");
     } else {
       // const courses = CourseMapper.arrayToDomain(result);
       // return courses;
-      return CourseMapper.arrayToDomain(result);
+      return OrmCourseMapper.arrayToDomain(result);
     }
   }
 
@@ -165,9 +163,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
         category: true,
         trainer: true
       }
-    })
+    });
     if (result.length == 0) {return 0}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
-    const courses = CourseMapper.arrayToDomain(result);
+    const courses = OrmCourseMapper.arrayToDomain(result);
     
     courses.filter((course) => course.Category.equals(new CourseCategory(category)))
     courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainerId)))

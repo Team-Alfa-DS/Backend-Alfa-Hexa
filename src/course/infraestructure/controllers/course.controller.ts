@@ -23,6 +23,10 @@ import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer
 import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
 import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { OdmCourseRepository } from "../repositories/OdmCourse.repository";
+import { InjectModel } from "@nestjs/mongoose";
+import { OdmCourseEntity } from "../entities/odm-entities/odm-course.entity";
+import { Model } from "mongoose";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -33,22 +37,23 @@ export class CourseController {
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
 
-  constructor() {
-    const courseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+  constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>) {
+    const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+      new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+      new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseCountService = new ExceptionLoggerDecorator(
-      new GetCourseCountService(courseRepositoryInstance),
+      new GetCourseCountService(OdmCourseRepositoryInstance),
       logger
     )
   }

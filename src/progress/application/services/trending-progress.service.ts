@@ -3,7 +3,7 @@ import { TrendingProgressResponse } from "../dtos/response/trending-progress.res
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { IService } from "src/common/application/interfaces/IService";

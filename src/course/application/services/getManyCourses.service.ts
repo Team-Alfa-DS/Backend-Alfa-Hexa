@@ -1,5 +1,5 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
