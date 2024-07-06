@@ -12,7 +12,7 @@ export class GetAllCategorysService extends IService<GetAllCategoriesRequest, Ge
     async execute(value: GetAllCategoriesRequest): Promise<Result<GetAllCategoriesResponse>>{
 
         const result = await this.categoryRepository.getAllCategory(value.page, value.perpage);
-        if (!result.isSuccess) return Result.fail(result.Error, result.StatusCode, result.Message);
+        if (!result.isSuccess) return Result.fail(result.Error);
 
         const response = new GetAllCategoriesResponse(result.Value.map(category => {
             return {
@@ -22,6 +22,6 @@ export class GetAllCategorysService extends IService<GetAllCategoriesRequest, Ge
             }
         })
         );
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

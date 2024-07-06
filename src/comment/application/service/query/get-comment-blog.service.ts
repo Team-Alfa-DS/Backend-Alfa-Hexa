@@ -28,7 +28,7 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
             this.transactionHandler
         );
                 
-        if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
+        if (!comments.isSuccess)  return Result.fail(comments.Error);
         let commentsRes: BlogComment[] = [];
         for (const comment of comments.Value) {
             commentsRes.push({
@@ -50,6 +50,6 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
         }
 
         const response = new GetBlogCommentServiceResponseDto(commentsRes)
-        return Result.success<GetBlogCommentServiceResponseDto>(response, comments.StatusCode);
+        return Result.success<GetBlogCommentServiceResponseDto>(response);
     }
 }

@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Type } from "class-transformer";
 import mongoose, { Types } from "mongoose";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
@@ -13,8 +14,9 @@ export class OdmTrainerEntity {
     @Prop({required: false})
     location: string;
 
-    @Prop({type: [mongoose.Schema.Types.Mixed]})
-    followers: OdmUserEntity[];
+    @Prop({type: [{type: mongoose.Schema.ObjectId, ref: 'user'}]})
+    @Type(() => OdmUserEntity)
+    followers: OdmUserEntity;
 }
 
 export const TrainerSchema = SchemaFactory.createForClass(OdmTrainerEntity);

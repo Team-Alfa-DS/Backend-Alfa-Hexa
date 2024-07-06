@@ -18,13 +18,13 @@ export class notifycountnotreaded implements IApplicationService<void, number>{
         try {
             const result = await this.repository.countnotreaded();
             if(!result) {
-                return Result.fail<number>(result.Error, result.StatusCode, result.Message)
+                return Result.fail<number>(result.Error)
             }
             const count = result.Value;
-            return Result.success<number>(count, 200);
+            return Result.success<number>(count);
         }
         catch(err){
-            return Result.fail<number>(new Error(err.message), 404, err.message);
+            return Result.fail<number>(new Error(err.message));
         }
 
     }

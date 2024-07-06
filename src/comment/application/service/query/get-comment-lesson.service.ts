@@ -30,7 +30,7 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
             this.transactionHandler
         );
         
-        if (!comments.isSuccess)  return Result.fail(comments.Error, comments.StatusCode, comments.Message);
+        if (!comments.isSuccess)  return Result.fail(comments.Error);
 
         let commentsRes: LessonComment[] = [];
         for (const comment of comments.Value) {
@@ -53,7 +53,7 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
         }
 
         const response = new GetLessonCommentServiceResponseDto(commentsRes)
-        return Result.success<GetLessonCommentServiceResponseDto>(response, comments.StatusCode);
+        return Result.success<GetLessonCommentServiceResponseDto>(response);
     }
 
 }

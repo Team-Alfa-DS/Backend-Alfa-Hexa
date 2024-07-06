@@ -81,7 +81,7 @@ export class SearchController {
         if (result.isSuccess) {
             return result.Value;
         } else {
-            throw new HttpException(result.Error, result.StatusCode);
+            // throw new HttpException(result.Error, result.StatusCode);
         }
     }
 
@@ -97,7 +97,7 @@ export class SearchController {
         if (result.isSuccess) {
             return result.Value.tagNames;
         } else {
-            throw new HttpException(result.Error, result.StatusCode);
+            // throw new HttpException(result.Error, result.StatusCode);
         }
     }
 

@@ -24,7 +24,7 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
     async execute({id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
         const domainBlogResult = await this.blogRepository.getBlogById(id);
         if (domainBlogResult.Error)
-            return Result.fail(domainBlogResult.Error, domainBlogResult.StatusCode, domainBlogResult.Message);
+            return Result.fail(domainBlogResult.Error);
         const domainBlog = domainBlogResult.Value;
         const trainerResult = await this.trainerRepository.findTrainerById(TrainerId.create(domainBlog.Trainer));
         const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.Category)
@@ -37,7 +37,7 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
             domainBlog.Tags.map(tag => tag.value),
             domainBlog.Publication_date.value
         )
-        return Result.success(blogResponse, 200);
+        return Result.success(blogResponse);
         
 
     }

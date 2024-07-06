@@ -20,12 +20,12 @@ export class ForgetUserPasswordService extends IService<ForgetUserPasswordReques
     async execute(value: ForgetUserPasswordRequest): Promise<Result<ForgetUserPasswordResponse>> {
         const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email));
         if (!user.isSuccess) {
-            return Result.fail(user.Error, user.StatusCode, user.Message)
+            return Result.fail(user.Error)
         }
 
         await this.mailer.sendCodeMail('Codigo de seguridad', 'Envio de código de verificación', user.Value.Email.Email, value.code);
 
         const response = new ForgetUserPasswordResponse(new Date());
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

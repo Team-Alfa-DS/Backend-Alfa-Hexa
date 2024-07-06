@@ -14,9 +14,9 @@ export class GetCategoryByIdService extends IService<GetCategoryRequest, GetCate
     
     async execute(value: GetCategoryRequest): Promise<Result<GetCategoryResponse>>{
         const result = await this.categoryRepository.getCategoryById(CategoryId.create(value.categoryId));
-        if (!result.isSuccess) return Result.fail(result.Error, result.StatusCode, result.Message);
+        if (!result.isSuccess) return Result.fail(result.Error);
 
         const response = new GetCategoryResponse(result.Value.Icon.value, result.Value.Id.value, result.Value.Name.value);
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

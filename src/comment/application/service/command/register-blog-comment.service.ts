@@ -44,11 +44,11 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
 
         let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
-        if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
+        if ( !user.isSuccess ) return Result.fail( user.Error );
 
         let blog = await this.blogRepository.getBlogById( data.targetId );
 
-        if ( !blog.isSuccess ) return Result.fail( blog.Error, blog.StatusCode,blog.Message  );
+        if ( !blog.isSuccess ) return Result.fail( blog.Error );
 
         let publicationDate = CommentBlogPublicationDate.create( new Date() );
         let body = CommentBlogBody.create( data.body );
@@ -68,11 +68,11 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
 
         const result = await this.commentBlogRepository.saveComment( comment, this.transactionHandler )
         
-        if ( !result.isSuccess ) return Result.fail( result.Error, result.StatusCode,result.Message  );
+        if ( !result.isSuccess ) return Result.fail( result.Error );
         
         const response = new AddCommentToServiceResponseDto();
 
-        return Result.success<AddCommentToServiceResponseDto>( response, 200 );
+        return Result.success<AddCommentToServiceResponseDto>( response );
     }
     
 }

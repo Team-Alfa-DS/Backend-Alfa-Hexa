@@ -43,11 +43,11 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
-        if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
+        if ( !user.isSuccess ) return Result.fail( user.Error );
 
         let course = await this.courseRepository.getCourseByLessonId( data.targetId );
 
-        if ( !course.isSuccess ) return Result.fail( course.Error, course.StatusCode,course.Message  );
+        if ( !course.isSuccess ) return Result.fail( course.Error );
 
         let publicationDate = CommentLessonPublicationDate.create( new Date() );
         let body = CommentLessonBody.create( data.body );
@@ -68,11 +68,11 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         const result = await this.commentLessonRepository.saveComment( comment, this.transactionHandler )
         
-        if ( !result.isSuccess ) return Result.fail( result.Error, result.StatusCode,result.Message  );
+        if ( !result.isSuccess ) return Result.fail( result.Error );
         
         const response = new AddCommentToServiceResponseDto();
 
-        return Result.success<AddCommentToServiceResponseDto>( response, 200 )
+        return Result.success<AddCommentToServiceResponseDto>( response )
     }
 
 }
