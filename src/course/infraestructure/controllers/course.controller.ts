@@ -22,6 +22,7 @@ import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/o
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
 import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -69,7 +70,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode);
+      throw ExceptionMapper.toHttp(result.Error);
     }
   }
 
@@ -101,7 +102,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode);
+      // throw new HttpException(result.Message, result.StatusCode);
     }
     
   }
@@ -120,7 +121,7 @@ export class CourseController {
     if (result.isSuccess) {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode)
+      // throw new HttpException(result.Message, result.StatusCode)
     }
   }
 }

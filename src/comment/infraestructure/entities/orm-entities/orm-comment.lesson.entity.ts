@@ -1,12 +1,18 @@
 import { OrmUserEntity } from "src/user/infraestructure/entities/orm-entities/orm-user.entity";
 import { OrmLessonEntity } from "src/course/infraestructure/entities/orm-entities/orm-lesson.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 
-@Entity('comment')
+@Entity('lesson_comment')
 export class OrmLessonCommentEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
+
+    @PrimaryColumn({type: 'uuid'})
+    user_id: string;
+
+    @PrimaryColumn({type: 'uuid'})
+    lesson_id: string;
 
     @Column()
     publication_date: Date;
@@ -28,10 +34,8 @@ export class OrmLessonCommentEntity {
 
     @ManyToOne(() => OrmUserEntity, user => user.lessonComments)
     @JoinColumn({name: 'user_id'})
-    user: string;
+    user: OrmUserEntity;
 
-    @Column({ name: 'lesson_id', nullable: true }) 
-    lesson_id: string;
     @ManyToOne(() => OrmLessonEntity, (lesson) => lesson.comments, { eager: true, nullable: true }) 
     @JoinColumn({name: 'lesson_id'}) 
     lesson: OrmLessonEntity;
@@ -51,7 +55,7 @@ export class OrmLessonCommentEntity {
         comment.id = id;
         comment.publication_date = publication_date;
         comment.body = body;
-        comment.user = userId;
+        comment.user_id = userId;
         comment.lesson_id = lessonId;
         comment.count_likes = count_likes;
         comment.count_dislikes = count_dislikes;
@@ -73,7 +77,7 @@ export class OrmLessonCommentEntity {
     }
 
     get UserId(): string {
-        return this.user;
+        return this.user_id;
     }
 
     get LessonId(): string {

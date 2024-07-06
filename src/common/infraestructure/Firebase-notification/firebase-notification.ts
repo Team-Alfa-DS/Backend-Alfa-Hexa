@@ -30,7 +30,7 @@ export class FirebaseNotifier implements INotifier {
         const response = await admin.messaging().sendMulticast(message)
     } catch (error) {
 
-        return Result.fail<NotifierDto>(error, 500, 'Error al enviar notificación');  
+        return Result.fail<NotifierDto>(error);  
     }
 }
 }

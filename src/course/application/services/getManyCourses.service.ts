@@ -37,9 +37,9 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       let category: Result<Category>;
       for (let course of r.Value) {
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
-        if (!trainer.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+        if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
         category = await this.categoryRepository.getCategoryById(course.Category.value);
-        if (!category.isSuccess) {return Result.fail(trainer.Error, trainer.StatusCode, trainer.Message)}
+        if (!category.isSuccess) {return Result.fail(trainer.Error)}
 
         responseCourses.push({
           id: course.Id.Value,
@@ -50,9 +50,9 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
           trainer: trainer.Value.Name.trainerName
         })
       }
-      return Result.success(new GetManyCoursesResponse(responseCourses), r.StatusCode);
+      return Result.success(new GetManyCoursesResponse(responseCourses));
     } else {
-      return Result.fail(r.Error, r.StatusCode, r.Message);
+      return Result.fail(r.Error);
     }
     
   }

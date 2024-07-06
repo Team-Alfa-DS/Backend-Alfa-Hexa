@@ -24,12 +24,12 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
         // await this.transactionHandler.startTransaction();
         const userFound = await this.userRepository.findUserByEmail(UserEmail.create(userLogin.email));
         if (!userFound.isSuccess) {
-            return Result.fail(userFound.Error, userFound.StatusCode, userFound.Message);
+            return Result.fail(userFound.Error);
         }
         const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password.Password);
 
         if (!isMatch) {
-            return Result.fail(new Error('La contraseña es incorrecta'), 400, 'La contraseña es incorrecta')
+            return Result.fail(new Error('La contraseña es incorrecta'))
         }
 
         const response = new LoginUserResponse(
@@ -38,6 +38,6 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
             userFound.Value.Type.Type
         );
 
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

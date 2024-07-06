@@ -23,11 +23,9 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
     
 
     async execute(value: GetAllBlogsRequestDTO): Promise<Result<GetAllBlogsResponseDTO>>{
-        const prueba = await this.blogRepository.getBlogsTagsNames([ 'Yoga']);
-        console.log(prueba.Value);
         const domainBlogsResult =  await this.blogRepository.getAllBLogs();
         if (domainBlogsResult.Error) 
-            return Result.fail(domainBlogsResult.Error, domainBlogsResult.StatusCode, domainBlogsResult.Message);
+            return Result.fail(domainBlogsResult.Error);
 
         const domainBlogs = domainBlogsResult.Value; 
         const blogs: GeneralBlogDTO[] = await Promise.all(domainBlogs.map(async blog => {
@@ -44,6 +42,6 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
         }
     ))
         const blogResponse: GetAllBlogsResponseDTO = new GetAllBlogsResponseDTO(blogs)
-        return Result.success(blogResponse, 200)
+        return Result.success(blogResponse)
     }
 }

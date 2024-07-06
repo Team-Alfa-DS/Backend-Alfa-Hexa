@@ -33,21 +33,21 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
 
     async execute(value: TrendingProgressRequest): Promise<Result<TrendingProgressResponse>> {
         const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
-        if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
+        if (!user.isSuccess) return Result.fail(user.Error);
 
         const progress = await this.progressRepository.findLastProgressByUser(UserId.create(value.userId), this.transactionHandler);
-        if (!progress.isSuccess) return Result.fail(progress.Error, progress.StatusCode, progress.Message);
+        if (!progress.isSuccess) return Result.fail(progress.Error);
         
         const course = await this.courseRepository.getCourseByLessonId(progress.Value.Id.LessonId);
-        if (!course.isSuccess) return Result.fail(course.Error, course.StatusCode, course.Message);
+        if (!course.isSuccess) return Result.fail(course.Error);
 
         const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.Lessons, this.transactionHandler);
-        if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error, totalProgress.StatusCode, totalProgress.Message);
+        if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error);
 
         const result = this.calcPercentService.execute(course.Value.Lessons, totalProgress.Value);
 
         const response = new TrendingProgressResponse(result.percent, course.Value.Title.value, course.Value.Id.Value, progress.Value.LastTime?.LastTime);
-        return Result.success(response, 200);
+        return Result.success(response);
     }
     // get name(): string {
     //     return this.constructor.name;

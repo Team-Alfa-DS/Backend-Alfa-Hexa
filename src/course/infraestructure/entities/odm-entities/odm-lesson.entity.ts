@@ -4,7 +4,7 @@ import { Types } from "mongoose";
 @Schema({collection: 'lesson'})
 export class OdmLessonEntity {
     @Prop({required: true, unique: true, type: Types.UUID})
-    user: string;
+    id: string;
 
     @Prop({required: true})
     title: string;
