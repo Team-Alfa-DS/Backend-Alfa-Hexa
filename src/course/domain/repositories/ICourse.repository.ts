@@ -1,5 +1,10 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { Course } from "src/course/domain/Course";
+import { CourseTag } from "../value-objects/course-tag";
+import { CourseCategory } from "../value-objects/course-category";
+import { CourseTrainer } from "../value-objects/course-trainer";
+import { CourseId } from "../value-objects/course-id";
+import { LessonId } from "../value-objects/lesson-id";
 
 export interface ICourseRepository {
   // getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>>;
@@ -8,10 +13,10 @@ export interface ICourseRepository {
   // getCourseByLessonId(lessonId: string): Promise<Result<Course>>;
   // getAllCourses(page?: number, perpage?: number): Promise<Result<Course[]>>;
   // getCourseCount(category: string, trainerId: string): Promise<Result<number>>;
-  getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Course[]>;
-  getCourseById(courseId: string): Promise<Course>;
-  getCoursesByTag(tag: string): Promise<Course[]>;
-  getCourseByLessonId(lessonId: string): Promise<Course>;
-  getAllCourses(page?: number, perpage?: number): Promise<Course[]>;
-  getCourseCount(category: string, trainerId: string): Promise<number>;
+  getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]>;
+  getCourseById(courseId: CourseId): Promise<Course>;
+  getCoursesByTag(tag: CourseTag): Promise<Course[]>;
+  getCourseByLessonId(lessonId: LessonId): Promise<Course>;
+  getAllCourses(): Promise<Course[]>;
+  getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number>;
 }

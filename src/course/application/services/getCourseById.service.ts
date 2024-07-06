@@ -6,6 +6,7 @@ import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repo
 import { Trainer } from "src/trainer/domain/trainer";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
@@ -16,7 +17,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
 
   async execute(service: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
     try {
-      const r = await this.courseRepository.getCourseById(service.courseId);
+      const r = await this.courseRepository.getCourseById(new CourseId(service.courseId));
 
       const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio

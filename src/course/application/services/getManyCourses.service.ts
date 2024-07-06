@@ -8,6 +8,9 @@ import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { CourseTag } from "src/course/domain/value-objects/course-tag";
+import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
@@ -18,13 +21,19 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     try {
-      const r = await this.courseRepository.getManyCourses(
-        [request.filter],
-        request.category,
-        request.trainer,
-        request.page,
-        request.perpage
+      let r = await this.courseRepository.getManyCourses(
+        [new CourseTag(request.filter)],
+        new CourseCategory(request.category),
+        new CourseTrainer(request.trainer)
       );
+      
+      let page = 0;
+      if (request.perpage) { 
+        if (request.page) {page = request.page};
+
+        r = r.slice((page*request.perpage), ((request.perpage) + page*request.perpage));
+      }
+
       const responseCourses: {
         id: string;
         title: string;

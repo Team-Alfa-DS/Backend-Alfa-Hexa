@@ -10,13 +10,15 @@ import { CourseCategory } from "src/course/domain/value-objects/course-category"
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotFound";
+import { CourseId } from "src/course/domain/value-objects/course-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
     super(OrmCourseEntity, database.manager)
   }
 
-  async getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Course[]> {
+  async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
     let result = await this.find({
       relations: {
         category: true,
@@ -38,25 +40,24 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
       }
       // courses = courses.filter((course) => course.tags.includes(filter))
     }
-    if (category) {courses = courses.filter((course) => course.Category.equals(new CourseCategory(category)))} //Aplicar los filtros que correspondan
-    if (trainer) {courses = courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainer)))}
+    if (category) {courses = courses.filter((course) => course.Category.equals(category))} //Aplicar los filtros que correspondan
+    if (trainer) {courses = courses.filter((course) => course.Trainer.equals(trainer))}
 
-    if (perpage) { 
-      if (!page) {page = 0};
+    // if (perpage) { 
+    //   if (!page) {page = 0};
 
-      courses = courses.slice((page*perpage), ((perpage) + page*perpage));
-    }
+    //   courses = courses.slice((page*perpage), ((perpage) + page*perpage));
+    // }
 
     if (courses.length > 0) {
-
       return courses;
     } else {
-      throw new CourseNotFoundException(`No se encontraron cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`);
+      throw new CourseNotFoundException(`No se encontraron cursos con la búsqueda: ${filter} | ${category} | ${trainer}`);
       // return Result.fail(new Error(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`))
     }
   }
 
-  async getCourseById(courseId: string): Promise<Course> /*Promise<Result<Course>>*/ {
+  async getCourseById(courseId: CourseId): Promise<Course> /*Promise<Result<Course>>*/ {
     const result = await this.findOne({
       relations: {
         category: true,
@@ -65,7 +66,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
         tags: true
       }, 
       where: {
-        id: courseId
+        id: courseId.Value
       }
     });
 
@@ -82,7 +83,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
   }
 
 
-  async getCoursesByTag(tag: string): Promise<Course[]> {
+  async getCoursesByTag(tag: CourseTag): Promise<Course[]> {
     const result = await this.find({
       relations: {
         category: true,
@@ -104,7 +105,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     return courses;
   }
 
-  async getCourseByLessonId(lessonId: string): Promise<Course> {
+  async getCourseByLessonId(lessonId: LessonId): Promise<Course> {
     const result = await this.find({
       relations: {
         category: true,
@@ -119,7 +120,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
 
     for (let course of result) {
       for (let lesson of course.lessons) {
-        if (lesson.id === lessonId) {
+        if (lessonId.equals(new LessonId(lesson.id))) {
           return OrmCourseMapper.toDomain(course);
         }
       }
@@ -127,7 +128,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     throw new CourseNotFoundException(`No se encontró un curso que contenga la lección con id: ${lessonId}`);
   }
 
-  async getAllCourses(page?: number, perpage?: number): Promise<Course[]> {
+  async getAllCourses(): Promise<Course[]> {
     let result = await this.find({
       relations: {
         category: true,
@@ -137,19 +138,20 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
       }
     });
 
-    if (result.length <= 0) {
-      throw new CourseNotFoundException(`No hay cursos guardados`);
-    }
+    // if (result.length <= 0) {
+    //   // throw new CourseNotFoundException(`No hay cursos guardados`);
+    // }
 
-    if (perpage) { 
-      if (!page) {page = 0};
+    // if (perpage) { 
+    //   if (!page) {page = 0};
 
-      result = result.slice((page*perpage), ((perpage) + page*perpage));
-    }
+    //   result = result.slice((page*perpage), ((perpage) + page*perpage));
+    // }
 
     if (result.length <= 0) {
       // return Result.fail(new Error(`No se encontraron cursos`));
-      throw new CourseNotFoundException("No se encontraron cursos para la página");
+      throw new CourseNotFoundException(`No hay cursos guardados`);
+      // throw new CourseNotFoundException("No se encontraron cursos para la página");
     } else {
       // const courses = CourseMapper.arrayToDomain(result);
       // return courses;
@@ -157,7 +159,7 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     }
   }
 
-  async getCourseCount(category: string, trainerId: string): Promise<number> {
+  async getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number> {
     let result = await this.find({
       relations: {
         category: true,
@@ -167,8 +169,8 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     if (result.length == 0) {return 0}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
     const courses = OrmCourseMapper.arrayToDomain(result);
     
-    courses.filter((course) => course.Category.equals(new CourseCategory(category)))
-    courses.filter((course) => course.Trainer.equals(new CourseTrainer(trainerId)))
+    courses.filter((course) => course.Category.equals(category))
+    courses.filter((course) => course.Trainer.equals(trainerId))
     
     return courses.length;
   }
