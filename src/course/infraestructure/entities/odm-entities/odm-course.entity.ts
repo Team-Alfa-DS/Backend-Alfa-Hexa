@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Type } from "class-transformer";
 import mongoose, { Types } from "mongoose";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
@@ -11,7 +12,7 @@ export class OdmCourseEntity {
     id: string;
 
     @Prop({required: true})
-    title: string;
+    name: string;
 
     @Prop({required: true})
     description: string;
@@ -20,27 +21,31 @@ export class OdmCourseEntity {
     image: string;
 
     @Prop({required: true, type: Date})
-    date: Date;
+    publication_date: Date;
 
     @Prop({required: true})
-    durationMinutes: number;
+    minutes: number;
 
     @Prop({required: true})
-    durationWeeks: number;
+    weeks: number;
 
     @Prop({required: true})
     level: string;
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
-    lessons: OdmLessonEntity[];
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.ObjectId, ref: 'lesson'}]})
+    @Type(() => OdmLessonEntity)
+    lessons: OdmLessonEntity;
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
-    tags: OdmTagEntity[];
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.ObjectId, ref: 'tag'}]})
+    @Type(() => OdmTagEntity)
+    tags: OdmTagEntity;
 
-    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: 'category'})
+    @Type(() => OdmCategoryEntity)
     category: OdmCategoryEntity;
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
+    @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: 'trainer'})
+    @Type(() => OdmTrainerEntity)
     trainer: OdmTrainerEntity;
 }
 

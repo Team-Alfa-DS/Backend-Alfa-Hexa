@@ -92,7 +92,7 @@ export class TrainerController {
     const request = new FindOneTrainerRequest(trainerId);
     const oneTrainer = await this.findOneTrainerService.execute(request);
     if (!oneTrainer.isSuccess) {
-      throw new HttpException(oneTrainer.Message, oneTrainer.StatusCode);
+      // throw new HttpException(oneTrainer.Message, oneTrainer.StatusCode);
     }
     return oneTrainer.Value;
   }
@@ -119,7 +119,7 @@ export class TrainerController {
     const request = new FollowTrainerRequest(idTrainer, req.user.tokenUser.id);
     const follow = await this.followTrainerService.execute(request);
     if (!follow.isSuccess) {
-      throw new HttpException(follow.Message, follow.StatusCode);
+      // throw new HttpException(follow.Message, follow.StatusCode);
     }
     return follow.Value;
   }

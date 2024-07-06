@@ -20,13 +20,11 @@ export class FindOneTrainerService extends IService<FindOneTrainerRequest, FindO
 
     if (!trainer.isSuccess) {
       return Result.fail(
-        new Error('Trainer not found'),
-        404,
-        'Trainer not found',
+        new Error('Trainer not found')
       );
     }
 
     const response = new FindOneTrainerResponse(trainer.Value);
-    return Result.success(response, 202);
+    return Result.success(response);
   }
 }

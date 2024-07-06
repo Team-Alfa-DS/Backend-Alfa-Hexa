@@ -41,11 +41,11 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
     async execute(value: ProfileProgressRequest): Promise<Result<ProfileProgressResponse>> {
         const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
 
-        if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
+        if (!user.isSuccess) return Result.fail(user.Error);
 
         const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId), this.transactionHandler);
 
-        if (!progressUser.isSuccess) return Result.fail(progressUser.Error, progressUser.StatusCode, progressUser.Message);
+        if (!progressUser.isSuccess) return Result.fail(progressUser.Error);
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
@@ -67,7 +67,7 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
         const totalCoursesPercent = this.calcTotalCoursesPercent.execute(progressCourseUser);
         
         const response = new ProfileProgressResponse(totalCoursesPercent.percent, totalCoursesPercent.time);
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 
 }

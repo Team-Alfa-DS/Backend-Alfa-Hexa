@@ -162,7 +162,7 @@ export class CommentController{
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
 
-            if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
 
@@ -171,7 +171,7 @@ export class CommentController{
 
             const result = await this.getCommentLessonService.execute( data );
 
-            if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
         }

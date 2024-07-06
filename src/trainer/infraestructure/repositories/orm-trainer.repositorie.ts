@@ -48,14 +48,12 @@ export class OrmTrainerRepository
   }});
     if (!trainer) {
       return Result.fail<Trainer>(
-        new Error('Trainer not found'),
-        404,
-        'Trainer not found',
+        new Error('Trainer not found')
       );
     }
 
     const trainerDomain = await this.ormTrainerMapper.toDomain(trainer);
-    const oneTrainer = Result.success<Trainer>(trainerDomain, 202);
+    const oneTrainer = Result.success<Trainer>(trainerDomain);
     return oneTrainer;
   }
 
@@ -69,7 +67,7 @@ export class OrmTrainerRepository
         this.transactionHandler,
       );
 
-      if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
+      if (!user.isSuccess) return Result.fail(new Error('User not found'));
 
       const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
 
@@ -88,9 +86,7 @@ export class OrmTrainerRepository
       });
       if (a) {
         return Result.fail(
-          new Error('User already follow this trainer'),
-          404,
-          'User already follow this trainer',
+          new Error('User already follow this trainer')
         );
       }
       let array = [];
@@ -100,13 +96,11 @@ export class OrmTrainerRepository
       array.push(ormUser);
       OrmTrainerEntity.users = array;
       await this.save(OrmTrainerEntity);
-      return Result.success<Trainer>(trainer.Value, 200);
+      return Result.success<Trainer>(trainer.Value);
       
     } catch (err) {
       return Result.fail<Trainer>(
-        new Error(err.message),
-        err.code,
-        err.message,
+        new Error(err.message)
       );
     }
   }

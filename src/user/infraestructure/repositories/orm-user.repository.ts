@@ -24,7 +24,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {id: id.Id});
 
         if (!userfound) {
-            return Result.fail<User>(new Error('User not found'), 404, 'User not found');
+            return Result.fail<User>(new Error('User not found'));
         }
 
         if (userfound.image) {
@@ -32,7 +32,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         }
 
         const domainUser = await this.ormUserMapper.toDomain(userfound);
-        return Result.success<User>(domainUser, 200);
+        return Result.success<User>(domainUser);
     }
 
     async findUserByEmail(email: UserEmail, runner: TransactionHandler): Promise<Result<User>> {
@@ -40,7 +40,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {email: email.Email});
 
         if (!userfound) {
-            return Result.fail<User>(new Error('User not found'), 404, 'User not found');
+            return Result.fail<User>(new Error('User not found'));
         }
 
         if (userfound.image) {
@@ -48,7 +48,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         }
 
         const domainUser = await this.ormUserMapper.toDomain(userfound);
-        return Result.success<User>(domainUser, 200);
+        return Result.success<User>(domainUser);
     }
 
     async saveUser(user: User, runner: TransactionHandler): Promise<Result<User>> {
@@ -57,10 +57,10 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
             const runnerTransaction = runner.getRunner();
             const ormUser = await this.ormUserMapper.toPersistence(user);
             await runnerTransaction.manager.save(ormUser);
-            return Result.success<User>(user, 200);
+            return Result.success<User>(user);
 
         } catch (err) {
-            return Result.fail<User>(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail<User>(new Error(err.message));
         }
     }
 
