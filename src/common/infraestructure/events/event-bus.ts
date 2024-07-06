@@ -16,12 +16,14 @@ export class EventBus extends IEventPublisher {
 
         for (const event of events) {
             const subscribers = this.subscribers.get(event.constructor.name);
-            const response = await Promise.all(
-                subscribers.map(async subscriber => {
-                    return subscriber.on(event);
-                })
-            );
-            eventRes.push(...response);
+            if (subscribers) {
+                const response = await Promise.all(
+                    subscribers.map(async subscriber => {
+                        return subscriber.on(event);
+                    })
+                );
+                eventRes.push(...response);
+            }
         }
         return eventRes;
     }
