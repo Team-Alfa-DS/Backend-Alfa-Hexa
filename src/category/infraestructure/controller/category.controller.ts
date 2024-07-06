@@ -61,7 +61,7 @@ export class CategoryController {
       const request = new GetAllCategoriesRequest(page, perpage);
       const response = await this.getAllCategorysService.execute(request);
       if (response.isSuccess) return response.Value
-      throw new HttpException(response.Message, response.StatusCode);
+      // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Get("/:id")
@@ -76,6 +76,6 @@ export class CategoryController {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       if (response.isSuccess) return response.Value
-      throw new HttpException(response.Message, response.StatusCode);
+      // throw new HttpException(response.Message, response.StatusCode);
     }
 }

@@ -102,7 +102,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode);
+      // throw new HttpException(result.Message, result.StatusCode);
     }
     
   }
@@ -121,7 +121,7 @@ export class CourseController {
     if (result.isSuccess) {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode)
+      // throw new HttpException(result.Message, result.StatusCode)
     }
   }
 }

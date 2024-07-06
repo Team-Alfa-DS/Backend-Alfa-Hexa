@@ -152,7 +152,7 @@ export class AuthController {
 
         const response = await this.registerUserService.execute(request);
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('login')
@@ -168,7 +168,7 @@ export class AuthController {
 
         const response = await this.loginUserService.execute(request);
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @ApiBearerAuth()
@@ -186,7 +186,7 @@ export class AuthController {
 
         const response = await this.currentUserService.execute(request);
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('forget/password')
@@ -210,7 +210,7 @@ export class AuthController {
 
         const response = await this.forgetUserPasswordService.execute(request)
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Post('code/validate')
@@ -228,7 +228,7 @@ export class AuthController {
 
         const response = await this.validateUserCodeService.execute(request)
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 
     @Put('change/password')
@@ -255,6 +255,6 @@ export class AuthController {
 
         const response = await this.changeUserPasswordService.execute(requestChange);
         if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        // throw new HttpException(response.Message, response.StatusCode);
     }
 }

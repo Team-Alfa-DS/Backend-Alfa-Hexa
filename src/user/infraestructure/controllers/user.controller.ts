@@ -119,7 +119,7 @@ export class UserController {
         )
         const result = await this.updateUserService.execute(dataUser);
         if (result.isSuccess) return result.Value;
-        HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
     }
 
     @Get('synchronize')
