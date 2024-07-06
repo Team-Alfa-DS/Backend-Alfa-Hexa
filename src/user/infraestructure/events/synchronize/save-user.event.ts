@@ -13,7 +13,7 @@ export class saveUserEvent implements IEventSubscriber<UserRegister> {
         this.odmUserRepository = odmUserRepository;
     }
 
-    async on(event: UserRegister): Promise<Result<EventResponseDto>> {
+    async on(event: UserRegister): Promise<void> {
         try {
             const user = User.Create(
                 event.id,
@@ -27,14 +27,8 @@ export class saveUserEvent implements IEventSubscriber<UserRegister> {
 
             await this.odmUserRepository.saveUser(user)
     
-            const response: EventResponseDto = {
-                user: event.id.Id,
-                event: this.constructor.name,
-                data: {}
-            }
-            return Result.success(response)
         } catch (err) {
-            return Result.fail(new Error(err.message));
+            return
         }
     }
 

@@ -10,7 +10,7 @@ export abstract class IEventPublisher {
         this.subscribers = new Map<string, IEventSubscriber<DomainEvent>[]>();
     }
 
-    abstract publish(events: DomainEvent[]): Promise<Result<EventResponseDto>[]>;
+    abstract publish(events: DomainEvent[]): Promise<void>;
 
     private includes(event: string, subscriber: IEventSubscriber<DomainEvent>): boolean {
         if (this.subscribers.has(event)) return this.subscribers.get(event).includes(subscriber);

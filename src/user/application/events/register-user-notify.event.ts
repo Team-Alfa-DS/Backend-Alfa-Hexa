@@ -11,16 +11,9 @@ export class RegisterUserNotify implements IEventSubscriber<UserRegister> {
         this.mailer = mailer;
     }
 
-    async on(event: UserRegister): Promise<Result<EventResponseDto>> {
+    async on(event: UserRegister): Promise<void> {
 
         await this.mailer.sendUserMail(`Bienvenido ${event.name.Name}`, 'Creacion de cuenta', event.email.Email);
 
-        const response: EventResponseDto = {
-            user: event.id.Id,
-            event: this.constructor.name,
-            data: {}
-        }
-
-        return Result.success(response);
     }
 }

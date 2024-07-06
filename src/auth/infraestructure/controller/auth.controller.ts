@@ -110,7 +110,7 @@ export class AuthController {
 
         this.registerUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
+                new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger

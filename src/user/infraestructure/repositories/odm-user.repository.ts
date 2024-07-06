@@ -8,6 +8,10 @@ import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
 import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
+import { UserImage } from "src/user/domain/value-objects/user-image";
+import { UserName } from "src/user/domain/value-objects/user-name";
+import { UserPassword } from "src/user/domain/value-objects/user-password";
+import { UserPhone } from "src/user/domain/value-objects/user-phone";
 
 export class OdmUserRespository implements IOdmUserRepository {
 
@@ -42,6 +46,36 @@ export class OdmUserRespository implements IOdmUserRepository {
         } catch(err) {
             return Result.fail(new Error(err.message));
         }
+    }
+
+    async updateUserImage(image: UserImage, user: User): Promise<void> {
+        const odmUser = await this.odmUserMapper.toPersistence(user);
+        odmUser.image = image.Image;
+        await this.userModel.findOneAndUpdate({id: odmUser.id}, odmUser);
+    }
+
+    async updateUserPassword(password: UserPassword, user: User): Promise<void> {
+        const odmUser = await this.odmUserMapper.toPersistence(user);
+        odmUser.password = password.Password;
+        await this.userModel.findOneAndUpdate({id: odmUser.id}, odmUser);
+    }
+
+    async updateUserName(name: UserName, user: User): Promise<void> {
+        const odmUser = await this.odmUserMapper.toPersistence(user);
+        odmUser.name = name.Name;
+        await this.userModel.findOneAndUpdate({id: odmUser.id}, odmUser);
+    }
+
+    async updateUserEmail(email: UserEmail, user: User): Promise<void> {
+        const odmUser = await this.odmUserMapper.toPersistence(user);
+        odmUser.email = email.Email;
+        await this.userModel.findOneAndUpdate({id: odmUser.id}, odmUser);
+    }
+
+    async updateUserPhone(phone: UserPhone, user: User): Promise<void> {
+        const odmUser = await this.odmUserMapper.toPersistence(user);
+        odmUser.phone = phone.Phone;
+        await this.userModel.findOneAndUpdate({id: odmUser.id}, odmUser);
     }
 
 }
