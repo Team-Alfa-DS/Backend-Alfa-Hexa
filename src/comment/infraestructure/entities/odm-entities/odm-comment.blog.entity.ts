@@ -20,11 +20,11 @@ export class OdmBlogCommentEntity {
     @Prop({required: true})
     body: string;
 
-    @Prop({required: true, type: Types.UUID, ref: 'blog'})
-    blog: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    blog: OdmBlogCommentEntity;
 
-    @Prop({required: true, type: Types.UUID, ref: 'user'})
-    user: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    user: OdmUserEntity;
 }
 
 export const BlogCommentSchema = SchemaFactory.createForClass(OdmBlogCommentEntity);

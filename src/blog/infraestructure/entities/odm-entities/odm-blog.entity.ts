@@ -20,17 +20,17 @@ export class OdmBlogEntity {
     @Prop({required: true, type: Date})
     publication_date: Date;
 
-    @Prop({required: true, type: Types.UUID, ref: 'category'})
-    category: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    category: OdmCategoryEntity;
 
-    @Prop({required: true, type: Types.UUID, ref: 'trainer'})
-    trainer: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    trainer: OdmTrainerEntity;
 
-    @Prop({required: true, type: [{type: Types.UUID, ref: 'tag'}]})
-    tags: string[];
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
+    tags: OdmTagEntity[];
 
-    @Prop({type: [{type: Types.UUID, ref: 'image'}]})
-    images: string[];
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    images: OdmImageEntity[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(OdmBlogEntity);

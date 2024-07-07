@@ -20,11 +20,11 @@ export class OdmLessonCommentEntity {
     @Prop({required: true})
     body: string;
 
-    @Prop({required: true, type: Types.UUID})
-    lesson: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    lesson: OdmLessonEntity;
 
-    @Prop({required: true, type: Types.UUID})
-    user: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    user: OdmUserEntity;
 }
 
 export const LessonCommentSchema = SchemaFactory.createForClass(OdmLessonCommentEntity);
