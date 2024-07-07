@@ -15,9 +15,9 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     private readonly categoryRepository: ICategoryRepository,
   ) {super();}
 
-  async execute(service: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
+  async execute(request: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
     try {
-      const r = await this.courseRepository.getCourseById(new CourseId(service.courseId));
+      const r = await this.courseRepository.getCourseById(new CourseId(request.courseId));
 
       const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio

@@ -21,10 +21,16 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
     try {
+      let courseTag: CourseTag; let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
+      if (request.filter) {courseTag = new CourseTag(request.filter)}
+      if (request.category) {courseCategory = new CourseCategory(request.category)}
+      if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
+      // console.log(request);//Debug
+      
       let r = await this.courseRepository.getManyCourses(
-        [new CourseTag(request.filter)],
-        new CourseCategory(request.category),
-        new CourseTrainer(request.trainer)
+        [courseTag],
+        courseCategory,
+        courseTrainer
       );
       
       let page = 0;
@@ -48,7 +54,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
         if (!trainer.isSuccess) {return Result.fail(trainer.Error)} //TODO: Esto se va cuando se aplique el manejo de excepciones de dominio
         category = await this.categoryRepository.getCategoryById(course.Category.value);
-        if (!category.isSuccess) {return Result.fail(trainer.Error)}
+        if (!category.isSuccess) {return Result.fail(category.Error)}
 
         responseCourses.push({
           id: course.Id.Value,

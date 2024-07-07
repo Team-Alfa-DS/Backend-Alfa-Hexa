@@ -7,9 +7,12 @@ import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 export class GetCourseCountService extends IService<GetCourseCountRequest, GetCourseCountResponse> {
   constructor(private courseRepository: ICourseRepository) {super()}
   
-  async execute(service: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
+  async execute(request: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
     try {
-      const count = await this.courseRepository.getCourseCount(new CourseCategory(service.category), new CourseTrainer(service.trainer));
+      let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
+      if (request.category) {courseCategory = new CourseCategory(request.category)}
+      if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
+      const count = await this.courseRepository.getCourseCount(courseCategory, courseTrainer);
 
       return Result.success(new GetCourseCountResponse(count));
     
@@ -22,8 +25,8 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
 
 export class GetCourseCountRequest implements ServiceRequestDto {
   constructor(
-    readonly category: string,
-    readonly trainer: string
+    readonly category?: string,
+    readonly trainer?: string
   ) {}
 
   dataToString(): string {

@@ -20,5 +20,5 @@ export interface ICourseRepository {
   getCourseByLessonId(lessonId: LessonId): Promise<Course>;
   getAllCourses(): Promise<Course[]>;
   getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number>;
-  saveCourse(course: Course, runner: ITransactionHandler): Promise<Course>;
+  saveCourse(course: Course): Promise<Course>;
 }

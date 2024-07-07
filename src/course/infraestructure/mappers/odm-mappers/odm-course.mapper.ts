@@ -51,12 +51,13 @@ export class OdmCourseMapper {
     return courses;
   }
 
-  static async toPersistence(domainCourse: Course, categoryModel: Model<OdmCategoryEntity>, trainerModel: Model<OdmTrainerEntity>): Promise<OdmCourseEntity> {
+  static async toPersistence(domainCourse: Course, categoryModel: Model<OdmCategoryEntity>, trainerModel: Model<OdmTrainerEntity>, tagModel: Model<OdmTagEntity>): Promise<OdmCourseEntity> {
     const category = await categoryModel.findOne<OdmCategoryEntity>({id: domainCourse.Category.value.value});
     const trainer = await trainerModel.findOne<OdmTrainerEntity>({id: domainCourse.Trainer.value.trainerId});
-    const tags: OdmTagEntity[] = [];
-    for (let tag in domainCourse.Tags) {
-      tags.push(new OdmTagEntity())
+    const tags: OdmTagEntity[] = []; let tagEntity: OdmTagEntity;
+    for (let tag of domainCourse.Tags) {
+      tagEntity = await tagModel.findOne({name: tag.name});
+      tags.push(tagEntity);
     }
     return OdmCourseEntity.create(
       domainCourse.Id.Value,
@@ -67,6 +68,7 @@ export class OdmCourseMapper {
       domainCourse.DurationWeeks.value,
       domainCourse.Level.value,
       domainCourse.Image.Value,
+      tags,
       category,
       trainer
     );

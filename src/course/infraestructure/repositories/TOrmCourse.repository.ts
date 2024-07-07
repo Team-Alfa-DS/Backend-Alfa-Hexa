@@ -13,6 +13,7 @@ import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotF
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
@@ -160,24 +161,24 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     }
   }
 
-  async getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number> {
-    let result = await this.find({
+  async getCourseCount(category?: CourseCategory, trainerId?: CourseTrainer): Promise<number> {
+    const result = await this.find({
       relations: {
         category: true,
         trainer: true
       }
     });
     if (result.length == 0) {return 0}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
-    const courses = OrmCourseMapper.arrayToDomain(result);
+    let courses = OrmCourseMapper.arrayToDomain(result);
     
-    courses.filter((course) => course.Category.equals(category))
-    courses.filter((course) => course.Trainer.equals(trainerId))
+    if (category) {courses = courses.filter((course) => course.Category.equals(category))}
+    if (trainerId) {courses = courses.filter((course) => course.Trainer.equals(trainerId))}
     
     return courses.length;
   }
 
-  async saveCourse(course: Course, runner: TransactionHandler): Promise<Course> {
-    const runnerTransaction = runner.getRunner();
+  async saveCourse(course: Course): Promise<Course> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
     const ormCourseEntity = OrmCourseMapper.toPersistence(course);
     await runnerTransaction.manager.save(ormCourseEntity);
     return course;

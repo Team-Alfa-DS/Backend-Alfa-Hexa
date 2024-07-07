@@ -29,6 +29,14 @@ import { OdmCourseEntity } from "../entities/odm-entities/odm-course.entity";
 import { Model } from "mongoose";
 import { PostCourseBodyDto } from "../dtos/postCourseBodyDto.dto";
 import { PostCourseRequestDto, PostCourseResponseDto, PostCourseService } from "src/course/application/services/postCourse.service";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { SaveCourseEvent } from "../events/synchronize/save-course.event";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -40,12 +48,22 @@ export class CourseController {
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
   private readonly postCourseService: IService<PostCourseRequestDto, PostCourseResponseDto>;
 
-  constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>) {
+  private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
+
+  constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>, 
+              @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+              @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+              @InjectModel('tag') tagModel: Model<OdmTagEntity>
+  ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel);
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
+    
+    this.eventPublisher.subscribe('CourseRegistered', [new SaveCourseEvent(OdmCourseRepositoryInstance)]);
+
+  
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
       new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
@@ -61,7 +79,12 @@ export class CourseController {
     );
     this.postCourseService = new ExceptionLoggerDecorator(
       new ServiceDBLoggerDecorator(
-        new PostCourseService(OrmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+        new PostCourseService(
+          OrmCourseRepositoryInstance, 
+          new UuidGen(),
+          new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
+          EventManagerSingleton.getInstance()
+        ),
         new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
       ),
       logger
@@ -144,6 +167,21 @@ export class CourseController {
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
   async postCourse(@Body() postCourseBodyDto: PostCourseBodyDto) {
+    const response = await this.postCourseService.execute(new PostCourseRequestDto(
+      postCourseBodyDto.title,
+      postCourseBodyDto.description,
+      postCourseBodyDto.imageUrl,
+      postCourseBodyDto.durationWeeks,
+      postCourseBodyDto.level,
+      postCourseBodyDto.tags,
+      postCourseBodyDto.categoryId,
+      postCourseBodyDto.trainerId
+    ));
 
+    if (response.isSuccess) {
+      return response.Value;
+    } else {
+      return ExceptionMapper.toHttp(response.Error);
+    }
   }
 }

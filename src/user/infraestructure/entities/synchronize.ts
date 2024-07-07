@@ -185,7 +185,7 @@ export class Synchronize {
             for (const lesson of lessons) {
                 lessonsOdm.push(await this.lessonModel.findOne({id: lesson.id}));
             }
-            await this.courseModel.create({category: odmCategory._id, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: odmTrainer._id, weeks});
+            await this.courseModel.create({category: odmCategory, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: odmTrainer, weeks});
         }
         console.log('courses terminados')
 

@@ -51,8 +51,7 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
       );
 
       const createdCourse = await this.courseRepository.saveCourse(
-        domainCourse,
-        this.transactionHandler
+        domainCourse
       );
 
       domainCourse.register(domainCourse.Id, domainCourse.Title, domainCourse.Description, domainCourse.Image, domainCourse.Date, domainCourse.DurationMinutes, domainCourse.DurationWeeks, domainCourse.Level, domainCourse.Lessons, domainCourse.Tags, domainCourse.Category, domainCourse.Trainer);

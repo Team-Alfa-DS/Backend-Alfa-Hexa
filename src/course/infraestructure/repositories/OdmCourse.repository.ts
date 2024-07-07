@@ -10,51 +10,59 @@ import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 
 export class OdmCourseRepository implements ICourseRepository {
   
   constructor(
-    private courseModel: Model<OdmCourseEntity>
+    private courseModel: Model<OdmCourseEntity>,
+    private categoryModel: Model<OdmCategoryEntity>,
+    private trainerModel: Model<OdmTrainerEntity>,
+    private tagModel: Model<OdmTagEntity>
   ){}
 
   async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
-    const result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'lesson',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      },
-      {
-        $lookup: {
-          from: 'tag',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags'
-        }
-      }
-    ]);
+    const result = await this.courseModel.find<OdmCourseEntity>();
+    // const result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'lesson',
+    //       localField: 'lessons',
+    //       foreignField: '_id',
+    //       as: 'lessons'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'tag',
+    //       localField: 'tags',
+    //       foreignField: '_id',
+    //       as: 'tags'
+    //     }
+    //   }
+    // ]);
 
     if (result.length <= 0) {throw new CourseNotFoundException(`No hay cursos guardados`)}
-
+    console.log(result);
+    
     let courses = OdmCourseMapper.arrayToDomain(result);
 
     if (filter) {
@@ -83,85 +91,87 @@ export class OdmCourseRepository implements ICourseRepository {
   }
 
   async getCourseById(courseId: CourseId): Promise<Course> {
-    const result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'lesson',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      },
-      {
-        $lookup: {
-          from: 'tag',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags'
-        }
-      },
-      {
-        $match: {
-          'course.id': {'$eq': courseId}
-        }
-      }
-    ]);
+    const result = await this.courseModel.findOne<OdmCourseEntity>({id: courseId.Value});
+    // const result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'lesson',
+    //       localField: 'lessons',
+    //       foreignField: '_id',
+    //       as: 'lessons'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'tag',
+    //       localField: 'tags',
+    //       foreignField: '_id',
+    //       as: 'tags'
+    //     }
+    //   },
+    //   {
+    //     $match: {
+    //       'course.id': {'$eq': courseId}
+    //     }
+    //   }
+    // ]);
 
-    if (result.length <= 0) {throw new CourseNotFoundException(`No se encontró un curso con el id: ${courseId}`)}
+    if (!result) {throw new CourseNotFoundException(`No se encontró un curso con el id: ${courseId}`)}
 
-    return OdmCourseMapper.toDomain(result[0]);
+    return OdmCourseMapper.toDomain(result);
   }
   async getCoursesByTag(tag: CourseTag): Promise<Course[]> {
-    const result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'lesson',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      },
-      {
-        $lookup: {
-          from: 'tag',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags'
-        }
-      }
-    ]);
+    const result = await this.courseModel.find<OdmCourseEntity>();
+    // const result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'lesson',
+    //       localField: 'lessons',
+    //       foreignField: '_id',
+    //       as: 'lessons'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'tag',
+    //       localField: 'tags',
+    //       foreignField: '_id',
+    //       as: 'tags'
+    //     }
+    //   }
+    // ]);
 
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
@@ -175,41 +185,43 @@ export class OdmCourseRepository implements ICourseRepository {
     } 
     return courses;
   }
+
   async getCourseByLessonId(lessonId: LessonId): Promise<Course> {
-    const result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'lesson',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      },
-      {
-        $lookup: {
-          from: 'tag',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags'
-        }
-      }
-    ]);
+    const result = await this.courseModel.find<OdmCourseEntity>();
+    // const result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'lesson',
+    //       localField: 'lessons',
+    //       foreignField: '_id',
+    //       as: 'lessons'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'tag',
+    //       localField: 'tags',
+    //       foreignField: '_id',
+    //       as: 'tags'
+    //     }
+    //   }
+    // ]);
 
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
@@ -226,40 +238,41 @@ export class OdmCourseRepository implements ICourseRepository {
   }
 
   async getAllCourses(): Promise<Course[]> {
-    let result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'lesson',
-          localField: 'lessons',
-          foreignField: '_id',
-          as: 'lessons'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      },
-      {
-        $lookup: {
-          from: 'tag',
-          localField: 'tags',
-          foreignField: '_id',
-          as: 'tags'
-        }
-      }
-    ]);
+    let result = await this.courseModel.find<OdmCourseEntity>();
+    // let result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'lesson',
+    //       localField: 'lessons',
+    //       foreignField: '_id',
+    //       as: 'lessons'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'tag',
+    //       localField: 'tags',
+    //       foreignField: '_id',
+    //       as: 'tags'
+    //     }
+    //   }
+    // ]);
 
     // if (result.length <= 0) {
     //   throw new CourseNotFoundException(`No hay cursos guardados`);
@@ -282,36 +295,39 @@ export class OdmCourseRepository implements ICourseRepository {
     }
   }
 
-  async getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number> {
-    const result = await this.courseModel.aggregate<OdmCourseEntity>([
-      {
-        $lookup: {
-          from: 'category',
-          localField: 'category',
-          foreignField: '_id',
-          as: 'category'
-        }
-      },
-      {
-        $lookup: {
-          from: 'trainer',
-          localField: 'trainer',
-          foreignField: '_id',
-          as: 'trainer'
-        }
-      }
-    ]);
+  async getCourseCount(category?: CourseCategory, trainerId?: CourseTrainer): Promise<number> {
+    const result = await this.courseModel.find<OdmCourseEntity>();
+    // const result = await this.courseModel.aggregate<OdmCourseEntity>([
+    //   {
+    //     $lookup: {
+    //       from: 'category',
+    //       localField: 'category',
+    //       foreignField: '_id',
+    //       as: 'category'
+    //     }
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: 'trainer',
+    //       localField: 'trainer',
+    //       foreignField: '_id',
+    //       as: 'trainer'
+    //     }
+    //   }
+    // ]);
 
     if (result.length == 0) {return 0}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
-    const courses = OdmCourseMapper.arrayToDomain(result);
+    let courses = OdmCourseMapper.arrayToDomain(result);
     
-    courses.filter((course) => course.Category.equals(category))
-    courses.filter((course) => course.Trainer.equals(trainerId))
+    if (category) {courses = courses.filter((course) => course.Category.equals(category))}
+    if (trainerId) {courses = courses.filter((course) => course.Trainer.equals(trainerId))}
     
     return courses.length;
   }
 
-  async saveCourse(course: Course, runner: ITransactionHandler): Promise<Course> {
-    const OdmCourse = await OdmCourseMapper.toPersistence(course)
+  async saveCourse(course: Course): Promise<Course> {
+    const OdmCourse = await OdmCourseMapper.toPersistence(course, this.categoryModel, this.trainerModel, this.tagModel);
+    await this.courseModel.create(OdmCourse);
+    return course;
   }
 }
