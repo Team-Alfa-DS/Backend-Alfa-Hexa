@@ -11,8 +11,9 @@ export class OdmTagEntity {
     @Prop({required: true})
     name: string;
 
-    @Prop({type: [{type: Types.UUID, ref: 'blog'}]})
-    blogs: string[];
+    @Prop({type: [{type: mongoose.Schema.ObjectId, ref: 'blog'}]})
+    @Type(() => OdmBlogEntity)
+    blogs: OdmBlogEntity;
 }
 
 export const TagSchema = SchemaFactory.createForClass(OdmTagEntity);
