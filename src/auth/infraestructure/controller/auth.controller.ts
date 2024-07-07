@@ -3,10 +3,10 @@ import { IEncryptor } from 'src/auth/application/encryptor/encryptor.interface';
 import { RegisterUserService } from 'src/auth/application/services/register-user.service';
 import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { BcryptEncryptor } from '../encryptor/bcrypt';
 import { LoginUserService } from 'src/auth/application/services/login-user.service';
@@ -48,8 +48,19 @@ import { IMailer } from 'src/common/application/mailer/mailer.interface';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
-import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
+import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-entities/orm-user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
+import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
+import { EventBus } from 'src/common/infraestructure/events/event-bus';
+import { RegisterUserNotify } from 'src/user/application/events/register-user-notify.event';
+import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
+import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
+import { saveUserEvent } from 'src/user/infraestructure/events/synchronize/save-user.event';
+import { OdmUserMapper } from 'src/user/infraestructure/mappers/odm-mappers/odm-user.mapper';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { Model } from 'mongoose';
+import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
+import { InjectModel } from '@nestjs/mongoose';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -58,18 +69,24 @@ export class AuthController {
     private userMapper: OrmUserMapper = new OrmUserMapper();
     private readonly jwtGen: JwtGen;
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, DatabaseSingleton.getInstance());
+        this.userMapper, PgDatabaseSingleton.getInstance());
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        DatabaseSingleton.getInstance().createQueryRunner()
+        PgDatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
+
+    private odmUserMapper: OdmUserMapper = new OdmUserMapper();
+    private userModel: Model<OdmUserEntity>;
+    private readonly odmUserRepository: OdmUserRespository;
+
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: IMailer;
     private readonly codeGenerator: ICodeGen = new CodeGenMath();
     private readonly logger: ILogger = new NestLogger();
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private userCodeList: UserCode[] = [];
 
     private registerUserService: IService<RegisterUserRequest, RegisterUserResponse>;
@@ -79,36 +96,43 @@ export class AuthController {
     private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
     private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
-    constructor(private jwtService: JwtService, private mailerService: MailjetService) {
+    constructor(private jwtService: JwtService, private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>) {
+        this.userModel = userModel;
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
+        this.odmUserRepository = new OdmUserRespository(
+            this.odmUserMapper,
+            this.userModel
+        );
+        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.registerUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator),
+                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger
         );
         this.loginUserService = new ExceptionLoggerDecorator(
-            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
+            new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
             this.logger
         );
         this.currentUserService = new ExceptionLoggerDecorator(
-            new CurrentUserService(this.userRepository, this.transactionHandler),
+            new CurrentUserService(this.odmUserRepository),
             this.logger
         );
         this.forgetUserPasswordService = new ExceptionLoggerDecorator(
-            new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer),
+            new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
             this.logger
         );
         this.validateUserCodeService = new ExceptionLoggerDecorator(
-            new ValidateUserCodeService(this.userRepository, this.transactionHandler),
+            new ValidateUserCodeService(this.odmUserRepository),
             this.logger
         );
         this.changeUserPasswordService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor),
+                new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger
@@ -134,7 +158,7 @@ export class AuthController {
     @Post('login')
     @ApiCreatedResponse({
         description: 'A iniciado sesion de manera exitosa',
-        //type: UserEntity,
+        //type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'Las credenciales son incorrectas. Intente de nuevo'
@@ -168,7 +192,7 @@ export class AuthController {
     @Post('forget/password')
     @ApiCreatedResponse({
         description: 'Se ha enviado un codigo de verifiacion al correo ingresado',
-        //type: UserEntity,
+        //type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'El correo ingresado no coincide con algun usuario. Intente de nuevo'
@@ -210,7 +234,7 @@ export class AuthController {
     @Put('change/password')
     @ApiCreatedResponse({
         description: 'se cambio la contraseña de manera exitosa',
-        type: UserEntity,
+        type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo cambiar la contraseña. Intente de nuevo'

@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards }
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment-blog.mapper";
 import { OrmLessonCommentMapper } from "../mapper/lesson/orm-comment-lesson.mapper";
-import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-user.mapper";
+import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-mappers/orm-user.mapper";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
@@ -22,7 +22,7 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { IService } from "src/common/application/interfaces/IService";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
@@ -31,8 +31,8 @@ import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repos
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
-import { BlogCommentEntity } from "../entities/blog/comment.blog.entity";
-import { LessonCommentEntity } from "../entities/lesson/comment.lesson.entity";
+import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
+import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 
 
 
@@ -57,34 +57,34 @@ export class CommentController{
     //* Repositorios
     private readonly commentBlogRepository: IBlogCommentRepository = new OrmBlogCommentRepository(
         this.commentBlogMapper,
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly commentLessonRepository: ILessonCommentRepository = new OrmLessonCommentRepository(
         this.commentLessonMapper,
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
         this.userMapper,
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly blogRepository = new OrmBlogRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     //*transactionHandler
     private readonly transactionHandler = new TransactionHandler(
-        DatabaseSingleton.getInstance().createQueryRunner()
+        PgDatabaseSingleton.getInstance().createQueryRunner()
     );
 
     private readonly auditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
     
@@ -143,7 +143,7 @@ export class CommentController{
     @Get(':many')
     @ApiCreatedResponse({
         description: 'se retorno todos los comentarios correctamente',
-        type: BlogCommentEntity, 
+        type: OrmBlogCommentEntity, 
     })
     @ApiBadRequestResponse({
         description: 'No existen comentarios.'
@@ -180,7 +180,7 @@ export class CommentController{
     @Post( '/release' )
     @ApiCreatedResponse({
         description: 'se agrego el comentario correctamente',
-        type: BlogCommentEntity,
+        type: OrmBlogCommentEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo agregar el  comentario.'

@@ -3,9 +3,9 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiU
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { MarkEndProgressDto } from '../dtos/mark-end-progress.dto';
 import { OrmProgressMapper } from '../mappers/orm-progress.mapper';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmProgressRepository } from '../repositories/orm-progress.repository';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { MarkEndProgressService } from 'src/progress/application/services/mark-end-progress.service';
@@ -30,8 +30,8 @@ import { CoursesProgressDto } from '../dtos/courses-progress.dto';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
-import { ProgressEntity } from '../entities/progress.entity';
-import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
+import { OrmProgressEntity } from '../entities/orm-entities/orm-progress.entity';
+import { OrmCourseEntity } from 'src/course/infraestructure/entities/orm-entities/orm-course.entity';
 import { ProfileProgressRequest } from 'src/progress/application/dtos/request/profile-progress.request';
 import { ProfileProgressResponse } from 'src/progress/application/dtos/response/profile-progress.response';
 import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
@@ -48,23 +48,23 @@ export class ProgressController {
     private userMapper: OrmUserMapper = new OrmUserMapper();
 
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        DatabaseSingleton.getInstance().createQueryRunner()
+        PgDatabaseSingleton.getInstance().createQueryRunner()
     );
 
     private readonly progressRepository: OrmProgressRepository = new OrmProgressRepository(
-        this.progressMapper, DatabaseSingleton.getInstance()
+        this.progressMapper, PgDatabaseSingleton.getInstance()
     );
 
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, DatabaseSingleton.getInstance()
+        this.userMapper, PgDatabaseSingleton.getInstance()
     );
 
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly logger: ILogger = new NestLogger();
@@ -129,13 +129,13 @@ export class ProgressController {
     @Post('mark/end')
     @ApiCreatedResponse({
         description: 'se guardo el progreso correctamente',
-        // type: ProgressEntity,
+        // type: OrmProgressEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo guardar el progreso. Intente de nuevo'
     })
     async markEnd(@Body() value: MarkEndProgressDto, @Request() req: JwtRequest) {
-        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time);
+        const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
         if (response.isSuccess) return response.Value;
@@ -145,7 +145,7 @@ export class ProgressController {
     @Get('one/:courseId')
     @ApiCreatedResponse({
         description: 'se retorno el curso correctamente',
-        // type: CourseEntity,
+        // type: OrmCourseEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo encontrar un curso con esa id. Intente de nuevo'

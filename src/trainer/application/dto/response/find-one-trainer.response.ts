@@ -6,6 +6,6 @@ export class FindOneTrainerResponse implements ServiceResponseDto {
     constructor(readonly trainer: Trainer) {}
 
     dataToString(): string {
-        return `FindOneTrainerRes: { name: ${this.trainer.Name} | id: ${this.trainer.Id} | followers: ${this.trainer.Followers} | userFollow: ${this.trainer.UserFollow} }`
+        return `FindOneTrainerRes: { name: ${this.trainer.Name} | id: ${this.trainer.Id} | followers: ${this.trainer.Followers} }`
     }
 }

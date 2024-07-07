@@ -14,17 +14,15 @@ import { ITransactionHandler } from 'src/common/domain/transaction-handler/trans
  export class FindAllTrainersService extends  IService<GetAllTrainersRequest, GetAllTrainersResponse>{
 constructor(
     private readonly trainerRepository: ITrainerRepository,
-    private readonly userRepository: IUserRepository,
     private readonly transactionHandler: ITransactionHandler
 ){super()}
 
 async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResponse>> {
     const trainersResult = await this.trainerRepository.findAllTrainers(
-      [request.filter],
-      request.user,
+      request.userFollow, // Pasar el nuevo filtro
+      request.user.Id,
       request.page,
       request.perpage,
-      request.userFollow // Pasar el nuevo filtro
     );
     if(trainersResult.isSuccess){
         const trainersresponse: {
@@ -48,7 +46,7 @@ async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResp
                 id: trainer.Id.trainerId,
                 name: trainer.Name.trainerName,
                 followers: trainer.Followers.trainerFollower,
-                userFollow: trainer.UserFollow.trainerUserFollow,
+                userFollow: trainer.User.map(user => user.trainerFollowerUserId.Id).includes(request.user.Id),
                 location: trainer.Location.trainerLocation,
                 //courses: trainer.Courses.map(course => course.trainerCourseId.Value),
                // blogs: trainer.Blogs.map(blog => blog.trainerBlogId.value),
@@ -62,22 +60,22 @@ async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResp
  }
 
  export class GetAllTrainersRequest implements ServiceRequestDto {
-    readonly filter?: string;
-    readonly user?: string;
+    readonly userFollow?: boolean;
+    readonly user?: UserId;
     readonly page?: number;
     readonly perpage?: number;
-    readonly userFollow?: boolean; // Nuevo campo para el filtro
+     // Nuevo campo para el filtro
   
-    constructor(filter?: string, user?: string, page?: number, perpage?: number, userFollow?: boolean) {
-      this.filter = filter;
+    constructor(userFollow?: boolean,user?: UserId, page?: number, perpage?: number ) {
+      this.userFollow = userFollow;
       this.user = user;
       this.page = page;
       this.perpage = perpage;
-      this.userFollow = userFollow;
+      
     }
 
     dataToString(): string {
-        return `Query: { filter: ${this.filter} | user:${this.user}  | page: ${this.page} | perpage: ${this.perpage} }`;
+        return `Query: user:${this.user}  | page: ${this.page} | perpage: ${this.perpage} }`;
       }
   }
 

@@ -1,12 +1,12 @@
 import { Trainer } from 'src/trainer/domain/trainer';
 import { ITrainerRepository } from '../../domain/repositories/trainer-repository.interface';
 import { DataSource, Repository } from 'typeorm';
-import { OrmTrainer } from '../entities/trainer.entity';
+import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 import { IMapper } from 'src/common/application/mappers/mapper.interface';
 import { Result } from 'src/common/domain/result-handler/result';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
@@ -14,24 +14,24 @@ import { UserId } from 'src/user/domain/value-objects/user-id';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 
 export class OrmTrainerRepository
-  extends Repository<OrmTrainer>
+  extends Repository<OrmTrainerEntity>
   implements ITrainerRepository
 {
   private readonly ormTrainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
   private userMapper: OrmUserMapper = new OrmUserMapper();
   private readonly userRepository: OrmUserRepository = new OrmUserRepository(
     this.userMapper,
-    DatabaseSingleton.getInstance(),
+    PgDatabaseSingleton.getInstance(),
   );
   private transactionHandler = new TransactionHandler(
-    DatabaseSingleton.getInstance().createQueryRunner(),
+    PgDatabaseSingleton.getInstance().createQueryRunner(),
   );
 
   constructor(
   
     dataSource: DataSource,
   ) {
-    super(OrmTrainer, dataSource.manager);
+    super(OrmTrainerEntity, dataSource.manager);
   }
 
   async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
@@ -71,13 +71,13 @@ export class OrmTrainerRepository
 
       if (!user.isSuccess) return Result.fail(new Error('User not found'), 404, 'User not found');
 
-      const ormTrainer = await this.ormTrainerMapper.toOrm(trainer.Value);
+      const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
 
-      const ormUser = await this.userMapper.toOrm(user.Value);
+      const ormUser = await this.userMapper.toPersistence(user.Value);
 
       const trainersWithUsers = await this.find({
         where: {
-          id: ormTrainer.id,
+          id: OrmTrainerEntity.id,
         },
         relations: {
           users: true,
@@ -98,8 +98,8 @@ export class OrmTrainerRepository
         array.push(trainersWithUsers[0].users[x]);
       }
       array.push(ormUser);
-      ormTrainer.users = array;
-      await this.save(ormTrainer);
+      OrmTrainerEntity.users = array;
+      await this.save(OrmTrainerEntity);
       return Result.success<Trainer>(trainer.Value, 200);
       
     } catch (err) {
@@ -111,21 +111,25 @@ export class OrmTrainerRepository
     }
   }
 
-  async findAllTrainers(filter?: string[], user?: string, page?: number, perpage?: number, userFollow?: boolean): Promise<Result<Trainer[]>> {
+  async findAllTrainers(userFollow?: boolean, user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>> {
     let queryBuilder = this.createQueryBuilder("trainer")
-      .leftJoinAndSelect("trainer.courses", "courses")
-      .leftJoinAndSelect("trainer.blogs", "blogs")
+      //.leftJoinAndSelect("trainer.courses", "courses")
+      //.leftJoinAndSelect("trainer.blogs", "blogs")
       .leftJoinAndSelect("trainer.users", "users");
   
-    if (userFollow) {
-      queryBuilder = queryBuilder.where("trainer.userFollow >= :userFollow", { userFollow });
+    if (userFollow === true) {
+      queryBuilder = queryBuilder.where("trainer.userFollow = 1", {userfollow: 1})
+
     }
-  
+    if(userFollow === false){
+      queryBuilder = queryBuilder.where("trainer.userFollow = 0", {userfollow: 0})
+    }
+
     let trainers = await queryBuilder.getMany();
   
     if (perpage) {
       if (!page) { page = 0; }
-      trainers = trainers.slice((page * perpage), ((page + 1) * perpage));
+      trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
     }
   
     let trainerDomains = await this.ormTrainerMapper.arrayToDomain(trainers);
@@ -159,7 +163,7 @@ export class OrmTrainerRepository
 
   async saveTrainer(trainer: Trainer): Promise<Result<Trainer>> {
     try {
-      const ormUser = await this.ormTrainerMapper.toOrm(trainer);
+      const ormUser = await this.ormTrainerMapper.toPersistence(trainer);
       await this.save(ormUser);
       return Result.success<Trainer>(trainer, 200);
     } catch (err) {

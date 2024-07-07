@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,8 +16,9 @@ import {
   ApiCreatedResponse,
   ApiBadRequestResponse,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { FindOneTrainerService } from 'src/trainer/application/service/findOneTrainer.service';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { OrmTrainerRepository } from '../repositories/orm-trainer.repositorie';
@@ -33,7 +35,12 @@ import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
-import { OrmTrainer } from '../entities/trainer.entity';
+import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
+import { GetManyTrainerQueryDto } from '../Dto/GetTrainerQuerydto';
+import { FindAllTrainersService, GetAllTrainersRequest, GetAllTrainersResponse} from 'src/trainer/application/service/findAllTrainer.service';
+import { GetUser } from '../decorador/decoradorGetUser';
+import { User } from 'src/user/domain/user';
+import { get } from 'http';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
@@ -45,16 +52,16 @@ export class TrainerController {
   private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
   private readonly trainerRepository: OrmTrainerRepository =
     new OrmTrainerRepository(
-      this.trainerMapper,
-      DatabaseSingleton.getInstance(),
+      PgDatabaseSingleton.getInstance(),
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-      DatabaseSingleton.getInstance()
+      PgDatabaseSingleton.getInstance()
     );
     private readonly logger: ILogger = new NestLogger();
 
   private findOneTrainerService: IService<FindOneTrainerRequest, FindOneTrainerResponse>;
   private followTrainerService: IService<FollowTrainerRequest, FollowTrainerResponse>;
+  private findAllTrainersService: IService<GetAllTrainersRequest, GetAllTrainersResponse>;
 
   constructor() {
     this.findOneTrainerService = new ExceptionLoggerDecorator(
@@ -74,12 +81,18 @@ export class TrainerController {
       ),
       this.logger
     );
+   /* this.findAllTrainersService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new FindAllTrainersService(
+          this.trainerRepository,
+          this.transactionHandler
+        ),*/
   }
 
   @Get('one/:id')
   @ApiCreatedResponse({
     description: 'se encontro un entrenador con esa id',
-    type: OrmTrainer,
+    type: OrmTrainerEntity,
   })
   @ApiBadRequestResponse({
     description: 'No se pudo encontrar un entrenador con esa id. Intente de nuevo'
@@ -101,7 +114,7 @@ export class TrainerController {
   @Post('/toggle/follow/:id')
   @ApiCreatedResponse({
     description: 'Ahora sigues a este entrenador',
-    type: OrmTrainer,
+    type: OrmTrainerEntity,
   })
   @ApiBadRequestResponse({
     description: 'No puedes seguir a este entrenador. Intente de nuevo'
@@ -123,4 +136,40 @@ export class TrainerController {
     }
     return follow.Value;
   }
+
+
+  @Get('/trainer/many')
+  @ApiQuery({name: 'filter', required:false})
+  @ApiCreatedResponse({
+    description: 'se retorno la totalidad de entrenadores',
+    type: OrmTrainerEntity,
+  })
+  @ApiBadRequestResponse({
+    description: 'No se encontraron entrenadores.'
+  })
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({
+    description: 'Acceso no autorizado, no se pudo encontrar el token',
+  })
+  @UseGuards(JwtAuthGuard)
+  async getAllTrainers(@Query() GetManyTrainerQueryDto: GetManyTrainerQueryDto, @GetUser() user: User) {
+    const request = new GetAllTrainersRequest(
+      GetManyTrainerQueryDto.userfollow,
+      user.Id,
+      GetManyTrainerQueryDto.page,  
+      GetManyTrainerQueryDto.perpage);
+    const result = await this.findAllTrainersService.execute(request);
+    
+    if (result.isSuccess)
+    {
+      return result.Value;
+    } else {
+      throw new HttpException(result.Message, result.StatusCode);
+    }
+    
+  }
+   
+
 }
+
+

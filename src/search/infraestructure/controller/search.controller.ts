@@ -7,7 +7,7 @@ import { ExceptionLoggerDecorator } from 'src/common/application/aspects/excepti
 import { ServiceLoggerDecorator } from 'src/common/application/aspects/serviceLoggerDecorator';
 import { IService } from 'src/common/application/interfaces/IService';
 import { FsPromiseLogger } from 'src/common/infraestructure/adapters/FsPromiseLogger';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
 import { SearchRequestDto } from 'src/search/application/dtos/request/search-request.dto';
@@ -36,15 +36,15 @@ export class SearchController {
     private transacctionHandler: ITransactionHandler;
 
     constructor() {
-        const courseRepo = new TOrmCourseRepository(DatabaseSingleton.getInstance());
-        const blogRepo = new OrmBlogRepository(DatabaseSingleton.getInstance());
-        const tagRepo: ITagRepository = new OrmTagRepository(DatabaseSingleton.getInstance());
-        const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), DatabaseSingleton.getInstance());
-        const trainerRepo = new OrmTrainerRepository( new OrmTrainerMapper(), DatabaseSingleton.getInstance());
+        const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+        const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
+        const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
+        const trainerRepo = new OrmTrainerRepository( PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
 
         this.transacctionHandler = new TransactionHandler(
-            DatabaseSingleton.getInstance().createQueryRunner()
+            PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
         this.searchService =  new ExceptionLoggerDecorator(

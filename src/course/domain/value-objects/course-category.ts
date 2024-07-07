@@ -1,18 +1,19 @@
 import { ValueObject } from "src/common/domain/value-object";
 import { NullCourseCategoryException } from "../exceptions/nullCourseCategory";
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 
 export class CourseCategory extends ValueObject<CourseCategory> {
-  readonly name: string; 
+  readonly value: CategoryId; 
   
-  constructor(name: string) {
+  constructor(id: string) {
     super();
 
-    if (!name) { throw new NullCourseCategoryException('No se proporcionó una categoría')}
+    if (!id) { throw new NullCourseCategoryException('No se proporcionó un valor para la categoría')}
 
-    this.name = name;
+    this.value = CategoryId.create(id);
   }
 
   equals(obj: CourseCategory): boolean {
-      return this.name === obj.name;
+    return this.value.equals(obj.value);
   }
 }
