@@ -175,6 +175,8 @@ export class Synchronize {
         const courses = await this.courseRepository.find({relations: {lessons: true, category: true, tags: true, trainer: true}});
         for (const course of courses) {
             const {category, description, id, image, lessons, level, minutes, name, publication_date, tags, trainer, weeks} = course;
+            const odmCategory = await this.categoryModel.findOne({id: category.id});
+            const odmTrainer = await this.trainerModel.findOne({id: trainer.id});
 
             let tagsOdm: OdmTagEntity[] = [];
 
@@ -219,6 +221,5 @@ export class Synchronize {
             await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
         }
         console.log('lessonComments terminado');
-        
     }
 } 

@@ -3,11 +3,12 @@ import { TrendingProgressResponse } from "../dtos/response/trending-progress.res
 import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class TrendingProgressService extends IService<TrendingProgressRequest, TrendingProgressResponse> {
 
@@ -38,15 +39,15 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
         const progress = await this.progressRepository.findLastProgressByUser(UserId.create(value.userId), this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error);
         
-        const course = await this.courseRepository.getCourseByLessonId(progress.Value.Id.LessonId);
-        if (!course.isSuccess) return Result.fail(course.Error);
+        const course = await this.courseRepository.getCourseByLessonId(new LessonId(progress.Value.Id.LessonId));
+        // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
 
-        const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Value.Lessons, this.transactionHandler);
+        const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
         if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error);
 
-        const result = this.calcPercentService.execute(course.Value.Lessons, totalProgress.Value);
+        const result = this.calcPercentService.execute(course.Lessons, totalProgress.Value);
 
-        const response = new TrendingProgressResponse(result.percent, course.Value.Title.value, course.Value.Id.Value, progress.Value.LastTime?.LastTime);
+        const response = new TrendingProgressResponse(result.percent, course.Title.value, course.Id.Value, progress.Value.LastTime?.LastTime);
         return Result.success(response);
     }
     // get name(): string {

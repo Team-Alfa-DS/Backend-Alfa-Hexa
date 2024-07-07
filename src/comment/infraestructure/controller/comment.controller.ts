@@ -32,6 +32,7 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 import { OrmLessonCommentMapper } from "../mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
 
 
@@ -156,13 +157,14 @@ export class CommentController{
         if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
             (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
             throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
+            //FIXME: Este error debería manejarse con excepciones de dominio
         }
         
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
 
-            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
 
@@ -171,7 +173,7 @@ export class CommentController{
 
             const result = await this.getCommentLessonService.execute( data );
 
-            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
         }

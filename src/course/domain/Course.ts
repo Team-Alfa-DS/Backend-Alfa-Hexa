@@ -16,6 +16,12 @@ import { CourseCreated } from "./events/course-created.event";
 import { DomainEvent } from "src/common/domain/domain-event";
 import { InvalidCourseException } from "./exceptions/invalidCourseException";
 import { LessonId } from "./value-objects/lesson-id";
+import { CourseRegistered } from "./events/course-registered.event";
+import { LessonTitle } from "./value-objects/lesson-title";
+import { LessonContent } from "./value-objects/lesson-content";
+import { LessonDuration } from "./value-objects/lesson-duration";
+import { LessonVideo } from "./value-objects/lesson-video";
+import { LessonPosted } from "./events/lesson-posted.event";
 
 export class Course extends AggregateRoot<CourseId>{
   // private id: CourseId;
@@ -31,7 +37,7 @@ export class Course extends AggregateRoot<CourseId>{
   private category: CourseCategory; 
   private trainer: CourseTrainer; 
 
-  constructor(
+  private constructor(
     id: CourseId,
     title: CourseTitle,
     description: CourseDescription,
@@ -49,6 +55,50 @@ export class Course extends AggregateRoot<CourseId>{
     super(id, courseCreated);
   }
 
+  static create(
+    id: CourseId,
+    title: CourseTitle,
+    description: CourseDescription,
+    image: CourseImage,
+    date: Date,
+    durationMinutes: CourseDurationMinutes,
+    durationWeeks: CourseDurationWeeks,
+    level: CourseLevel,
+    lessons: Lesson[],
+    tags: CourseTag[],
+    category: CourseCategory, 
+    trainer: CourseTrainer 
+  ): Course {
+    return new Course(id, title, description, image, date, durationMinutes, durationWeeks, level, lessons, tags, category, trainer);
+  }
+  
+  register(
+    id: CourseId,
+    title: CourseTitle,
+    description: CourseDescription,
+    image: CourseImage,
+    date: Date,
+    durationMinutes: CourseDurationMinutes,
+    durationWeeks: CourseDurationWeeks,
+    level: CourseLevel,
+    lessons: Lesson[],
+    tags: CourseTag[],
+    category: CourseCategory, 
+    trainer: CourseTrainer 
+  ) {
+    this.apply(new CourseRegistered(id, title, description, image, date, durationMinutes, durationWeeks, level, tags, category, trainer));
+  }
+
+  postLesson(
+    id: LessonId,
+    title: LessonTitle,
+    content: LessonContent,
+    seconds: LessonDuration,
+    video: LessonVideo,
+  ) {
+    this.apply(new LessonPosted(id, title, content, seconds, video, this.Id));
+  }
+
   protected when(event: DomainEvent): void {
     if (event instanceof CourseCreated) {
       this.title = event.title;
@@ -63,11 +113,25 @@ export class Course extends AggregateRoot<CourseId>{
       this.category = event.category;
       this.trainer = event.trainer;
     }
+
+    if (event instanceof LessonPosted) {
+
+      const lesson = new Lesson(
+        event.id,
+        event.title,
+        event.content,
+        event.seconds,
+        event.video
+      );
+
+      this.lessons.push(lesson);
+      this.addMinutes(new CourseDurationMinutes((Math.round(event.seconds.value/60))))
+    }
   }
   
   protected validateState(): void {
     if (!this.title || !this.description || !this.image || !this.date || !this.durationMinutes 
-      || !this.durationWeeks || !this.level || !this.lessons || !this.tags || !this.category || !this.category || !this.trainer) {
+      || !this.durationWeeks || !this.level || !this.lessons || !this.tags || !this.category || !this.trainer) {
         throw new InvalidCourseException('El curso no es válido');
       }
   }
@@ -96,6 +160,10 @@ export class Course extends AggregateRoot<CourseId>{
     return new CourseDurationMinutes(this.durationMinutes.value)
   }
 
+  private addMinutes(minutes: CourseDurationMinutes): void {
+    this.durationMinutes = new CourseDurationMinutes(this.durationMinutes.value + minutes.value);
+  }
+
   get DurationWeeks(): CourseDurationWeeks {
     return new CourseDurationWeeks(this.durationWeeks.value)
   }
@@ -121,9 +189,9 @@ export class Course extends AggregateRoot<CourseId>{
     return tags;
   }
 
-  containsTag(searchedTag: string): boolean {
+  containsTag(searchedTag: CourseTag): boolean {
     for (let tag of this.tags) {
-      if (tag.equals(new CourseTag(searchedTag))) {
+      if (tag.equals(searchedTag)) {
         return true;
       }
     }

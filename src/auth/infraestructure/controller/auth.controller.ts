@@ -61,6 +61,7 @@ import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/od
 import { Model } from 'mongoose';
 import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
 import { InjectModel } from '@nestjs/mongoose';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -153,6 +154,7 @@ export class AuthController {
         const response = await this.registerUserService.execute(request);
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 
     @Post('login')
@@ -169,6 +171,7 @@ export class AuthController {
         const response = await this.loginUserService.execute(request);
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 
     @ApiBearerAuth()
@@ -187,6 +190,7 @@ export class AuthController {
         const response = await this.currentUserService.execute(request);
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 
     @Post('forget/password')
@@ -211,6 +215,7 @@ export class AuthController {
         const response = await this.forgetUserPasswordService.execute(request)
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 
     @Post('code/validate')
@@ -229,6 +234,7 @@ export class AuthController {
         const response = await this.validateUserCodeService.execute(request)
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 
     @Put('change/password')
@@ -256,5 +262,6 @@ export class AuthController {
         const response = await this.changeUserPasswordService.execute(requestChange);
         if (response.isSuccess) return response.Value;
         // throw new HttpException(response.Message, response.StatusCode);
+        throw ExceptionMapper.toHttp(response.Error);
     }
 }
