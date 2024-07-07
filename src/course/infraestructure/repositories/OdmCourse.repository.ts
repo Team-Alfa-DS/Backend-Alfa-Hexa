@@ -214,7 +214,7 @@ export class OdmCourseRepository implements ICourseRepository {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
 
-    for (let course of result) {
+    for (let course of result) { 
       for (let lesson of course.lessons) {
         if (lessonId.equals(new LessonId(lesson.id))) {
           return OdmCourseMapper.toDomain(course);

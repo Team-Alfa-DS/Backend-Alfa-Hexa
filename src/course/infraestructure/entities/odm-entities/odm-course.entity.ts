@@ -34,11 +34,11 @@ export class OdmCourseEntity {
 
     @Prop({required: true, type: [{type: mongoose.Schema.Types.ObjectId, ref: 'lesson'}]})
     @Type(() => OdmLessonEntity)
-    lessons: OdmLessonEntity;
+    lessons: OdmLessonEntity[];
 
     @Prop({required: true, type: [{type: mongoose.Schema.Types.ObjectId, ref: 'tag'}]})
     @Type(() => OdmTagEntity)
-    tags: OdmTagEntity;
+    tags: OdmTagEntity[];
 
     @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: 'category'})
     @Type(() => OdmCategoryEntity)

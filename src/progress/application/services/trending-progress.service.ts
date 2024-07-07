@@ -8,6 +8,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class TrendingProgressService extends IService<TrendingProgressRequest, TrendingProgressResponse> {
 
@@ -38,7 +39,7 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
         const progress = await this.progressRepository.findLastProgressByUser(UserId.create(value.userId), this.transactionHandler);
         if (!progress.isSuccess) return Result.fail(progress.Error);
         
-        const course = await this.courseRepository.getCourseByLessonId(progress.Value.Id.LessonId);
+        const course = await this.courseRepository.getCourseByLessonId(new LessonId(progress.Value.Id.LessonId));
         // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
 
         const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);

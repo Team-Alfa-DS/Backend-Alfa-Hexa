@@ -10,6 +10,7 @@ import { Course } from "src/course/domain/Course";
 import { Progress } from "src/progress/domain/progress";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class CoursesProgressService extends IService<CoursesProgressRequest, CoursesProgressResponse> {
 
@@ -44,7 +45,7 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
+            const course = await this.courseRepository.getCourseByLessonId(new LessonId(pro.Id.LessonId));
             if (courses.findIndex(c => c.Id.equals(course.Id) ) == -1) courses.push(course);
         }
 

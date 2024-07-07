@@ -13,6 +13,7 @@ import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/commen
 import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comment-lesson-userId";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -45,7 +46,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         if ( !user.isSuccess ) return Result.fail( user.Error );
 
-        let course = await this.courseRepository.getCourseByLessonId( data.targetId );
+        let course = await this.courseRepository.getCourseByLessonId( new LessonId(data.targetId) );
 
         // if ( !course.isSuccess ) return Result.fail( course.Error ); //FIXME: Needs try-catch
 

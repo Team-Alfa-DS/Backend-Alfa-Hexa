@@ -25,12 +25,12 @@ export class OdmCourseMapper {
     }
     return new Course(
       new CourseId(entity.id),
-      new CourseTitle(entity.title),
+      new CourseTitle(entity.name),
       new CourseDescription(entity.description),
       new CourseImage(entity.image),
-      entity.date,
-      new CourseDurationMinutes(entity.durationMinutes),
-      new CourseDurationWeeks(entity.durationWeeks),
+      entity.publication_date,
+      new CourseDurationMinutes(entity.minutes),
+      new CourseDurationWeeks(entity.weeks),
       new CourseLevel(entity.level),
       domainLessons,
       domainTags,

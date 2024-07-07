@@ -15,6 +15,7 @@ import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { Category } from "src/category/domain/Category";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { CourseTag } from "src/course/domain/value-objects/course-tag";
 
 export class SearchService extends IService<SearchRequestDto, SearchResponseDto> {
 
@@ -28,9 +29,12 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
   async execute(value: SearchRequestDto): Promise<Result<SearchResponseDto>> {
     let blogsResult: Result<Blog[]>;
     let courses: Course[] = []; let blogs: Blog[] = [];
-
+    let courseTags: CourseTag[] = [];
     if (value.tags) {
-      courses = await this.courseRepository.getManyCourses(value.tags);
+      for (let tag of value.tags) {
+        courseTags.push(new CourseTag(tag));
+      }
+      courses = await this.courseRepository.getManyCourses(courseTags);
       // if (!courseResult.isSuccess) { return Result.fail(courseResult.Error); };
       blogsResult = await this.blogRepository.getBlogsTagsNames(value.tags);
       if (!blogsResult.isSuccess) { return Result.fail(blogsResult.Error); };

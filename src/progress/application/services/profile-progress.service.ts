@@ -13,6 +13,7 @@ import { CourseProgress } from "../dtos/response/courses-progress.response";
 import { CalcPercentProgressResponse } from "src/progress/domain/response/calc-percent-progress.response";
 import { CalcTotalCoursesPercentService } from "src/progress/domain/services/calc-total-courses-percent";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class ProfileProgressService extends IService<ProfileProgressRequest, ProfileProgressResponse> {
 
@@ -49,7 +50,7 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
+            const course = await this.courseRepository.getCourseByLessonId(new LessonId(pro.Id.LessonId));
             if (courses.findIndex(c => c.Id.equals(course.Id) /*c.id == course.Value.id*/) == -1) courses.push(course);
         }
 

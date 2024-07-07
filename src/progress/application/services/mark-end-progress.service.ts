@@ -36,7 +36,7 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
     }
 
     async execute(value: MarkEndProgressRequest): Promise<Result<MarkEndProgressResponse>> {
-        const course = await this.courseRepository.getCourseById(value.courseId); //TODO: el retorno deberia de ser un Result
+        const course = await this.courseRepository.getCourseById(new CourseId(value.courseId)); //TODO: el retorno deberia de ser un Result
         const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler)
 
         // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
