@@ -32,17 +32,17 @@ export class OdmCourseEntity {
     @Prop({required: true})
     level: string;
 
-    @Prop({required: true, type: [{type: Types.UUID, ref: 'lesson'}]})
-    lessons: string[];
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
+    lessons: OdmLessonEntity[];
 
-    @Prop({required: true, type: [{type: Types.UUID, ref: 'tag'}]})
-    tags: string[];
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
+    tags: OdmTagEntity[];
 
-    @Prop({required: true, type: Types.UUID, ref: 'category'})
-    category: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    category: OdmCategoryEntity;
 
-    @Prop({required: true, type: Types.UUID, ref: 'trainer'})
-    trainer: string[];
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    trainer: OdmTrainerEntity;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(OdmCourseEntity);

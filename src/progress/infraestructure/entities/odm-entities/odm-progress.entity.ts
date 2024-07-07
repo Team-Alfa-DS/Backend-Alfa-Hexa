@@ -6,11 +6,11 @@ import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/od
 
 @Schema({collection: 'progress'})
 export class OdmProgressEntity {
-    @Prop({required: true, type: Types.UUID, ref: 'user'})
-    user: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    user: OdmUserEntity;
 
-    @Prop({required: true, type: Types.UUID, ref: 'lesson'})
-    lesson: string;
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    lesson: OdmLessonEntity;
 
     @Prop({required: true})
     markAsCompleted: boolean;
