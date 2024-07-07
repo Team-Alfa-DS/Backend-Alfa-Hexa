@@ -111,8 +111,7 @@ export class Synchronize {
 
             let usersOdm = [];
             for (const user of users) {
-                const userOdm = await this.userModel.findOne({id: user.id});
-                usersOdm.push(userOdm._id);
+                usersOdm.push(user.id);
             }  
             await this.trainerModel.create({followers: usersOdm, id, location, name})
         }
@@ -137,21 +136,17 @@ export class Synchronize {
         const blogs = await this.blogRepository.find({relations: {tags: true, category: true, trainer: true, images: true}});
         for (const blog of blogs) {
             const {category, description, id, publication_date, trainer, title, tags, images} = blog;
-            const odmCategory = await this.categoryModel.findOne({id: category.id});
-            const odmTrainer = await this.trainerModel.findOne({id: trainer.id});
             let tagsOdm = [];
 
             for (const tag of tags) {
-                const tagOdm = await this.tagModel.findOne({id: tag.id});
-                tagsOdm.push(tagOdm._id);
+                tagsOdm.push(tag.id);
             }
 
             let imagesOdm = [];
             for (const image of images) {
-                const imageOdm = await this.imageModel.findOne({id: image.id});
-                imagesOdm.push(imageOdm._id);
+                imagesOdm.push(image.id);
             }
-            await this.blogModel.create({id, category: odmCategory._id, description, publication_date, tags: tagsOdm, title, trainer: odmTrainer._id, images: imagesOdm});
+            await this.blogModel.create({id, category: category.id, description, publication_date, tags: tagsOdm, title, trainer: trainer.id, images: imagesOdm});
         }
         console.log('blogs terminados')
 
@@ -167,50 +162,41 @@ export class Synchronize {
         const courses = await this.courseRepository.find({relations: {lessons: true, category: true, tags: true, trainer: true}});
         for (const course of courses) {
             const {category, description, id, image, lessons, level, minutes, name, publication_date, tags, trainer, weeks} = course;
-            const odmCategory = await this.categoryModel.findOne({id: category.id});
-            const odmTrainer = await this.trainerModel.findOne({id: trainer.id});
 
             let tagsOdm = [];
 
             for (const tag of tags) {
-                const tagOdm = await this.tagModel.findOne({id: tag.id});
-                tagsOdm.push(tagOdm._id);
+                tagsOdm.push(tag.id);
             }
 
             let lessonsOdm = [];
             for (const lesson of lessons) {
-                const lessonOdm = await this.lessonModel.findOne({id: lesson.id});
-                lessonsOdm.push(lessonOdm._id);
+                lessonsOdm.push(lesson.id);
             }
-            await this.courseModel.create({category: odmCategory._id, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: odmTrainer._id, weeks});
+            await this.courseModel.create({category: category.id, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: trainer.id, weeks});
         }
         console.log('courses terminados')
 
         const allProgress = await this.progressRepository.find();
         for (const progress of allProgress) {
             const {lastTime, lesson_id, markAsCompleted, time, user_id} = progress
-            const odmUser = await this.userModel.findOne({id: user_id});
-            const odmLesson = await this.lessonModel.findOne({id: lesson_id});
-            await this.progressModel.create({lastTime, lesson: odmLesson._id, markAsCompleted, time, user: odmUser._id})
+            await this.progressModel.create({lastTime, lesson: lesson_id, markAsCompleted, time, user: user_id})
         }
         console.log('progress terminados')
 
         const blogComments = await this.blogCommentRepository.find();
         for (const comment of blogComments) {
             const {id, blog_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-            const odmUser = await this.userModel.findOne({id: user_id});
-            const odmBlog = await this.blogModel.findOne({id: blog_id});
-            await this.blogCommentModel.create({blog: odmBlog._id, body, id, publication_date, user: odmUser._id, userDisliked, userLiked});
+            await this.blogCommentModel.create({blog: blog_id, body, id, publication_date, user: user_id, userDisliked, userLiked});
         }
         console.log('blogComments terminado');
 
         const lessonComments = await this.lessonCommentRepository.find();
         for (const comment of lessonComments) {
             const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-            const odmUser = await this.userModel.findOne({id: user_id});
-            const odmLesson = await this.lessonModel.findOne({id: lesson_id});
-            await this.lessonCommentModel.create({lesson: odmLesson._id, body, id, publication_date, user: odmUser._id, userDisliked, userLiked});
+            await this.lessonCommentModel.create({lesson: lesson_id, body, id, publication_date, user: user_id, userDisliked, userLiked});
         }
         console.log('lessonComments terminado');
+        
     }
 }
