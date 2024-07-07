@@ -14,6 +14,8 @@ import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
+import { OrmLessonMapper } from "../mappers/orm-mappers/orm-lesson.mapper";
+import { Lesson } from "src/course/domain/entities/Lesson";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
@@ -182,5 +184,12 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     const ormCourseEntity = OrmCourseMapper.toPersistence(course);
     await runnerTransaction.manager.save(ormCourseEntity);
     return course;
+  }
+
+  async saveLesson(lesson: Lesson, course: Course): Promise<Lesson> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+    const ormLessonEntity = OrmLessonMapper.toPersistence(lesson, course);
+    await runnerTransaction.manager.save(ormLessonEntity);
+    return lesson;
   }
 }

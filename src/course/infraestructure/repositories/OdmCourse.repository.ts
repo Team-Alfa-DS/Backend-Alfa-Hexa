@@ -13,6 +13,9 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { Lesson } from "src/course/domain/entities/Lesson";
+import { OdmLessonMapper } from "../mappers/odm-mappers/odm-lesson.mapper";
+import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
 
 export class OdmCourseRepository implements ICourseRepository {
   
@@ -20,7 +23,8 @@ export class OdmCourseRepository implements ICourseRepository {
     private courseModel: Model<OdmCourseEntity>,
     private categoryModel: Model<OdmCategoryEntity>,
     private trainerModel: Model<OdmTrainerEntity>,
-    private tagModel: Model<OdmTagEntity>
+    private tagModel: Model<OdmTagEntity>,
+    private lessonModel: Model<OdmLessonEntity>
   ){}
 
   async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
@@ -329,5 +333,14 @@ export class OdmCourseRepository implements ICourseRepository {
     const OdmCourse = await OdmCourseMapper.toPersistence(course, this.categoryModel, this.trainerModel, this.tagModel);
     await this.courseModel.create(OdmCourse);
     return course;
+  }
+
+  async saveLesson(lesson:Lesson, course:Course): Promise<Lesson> {
+    const OdmLesson = await OdmLessonMapper.toPersistence(lesson);
+    const OdmCourse = await OdmCourseMapper.toPersistence(course, this.categoryModel, this.trainerModel, this.tagModel)
+    await this.lessonModel.create(OdmLesson);
+    OdmCourse.lessons.push(OdmLesson);
+    await this.courseModel.findOneAndUpdate({id: OdmCourse.id}, OdmCourse);
+    return lesson;
   }
 }

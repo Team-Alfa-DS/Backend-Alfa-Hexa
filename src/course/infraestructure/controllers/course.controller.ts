@@ -37,6 +37,10 @@ import { TransactionHandler } from "src/common/infraestructure/database/transact
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { SaveCourseEvent } from "../events/synchronize/save-course.event";
+import { PostLesonBodyDto } from "../dtos/postLessonBody.dto";
+import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
+import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
+import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -47,22 +51,24 @@ export class CourseController {
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
   private readonly postCourseService: IService<PostCourseRequestDto, PostCourseResponseDto>;
+  private readonly postLessonService: IService<PostLessonRequestDto, PostLessonResponseDto>;
 
   private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
 
   constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>, 
               @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
               @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
-              @InjectModel('tag') tagModel: Model<OdmTagEntity>
+              @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>
   ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel);
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
     
     this.eventPublisher.subscribe('CourseRegistered', [new SaveCourseEvent(OdmCourseRepositoryInstance)]);
-
+    this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
@@ -82,13 +88,24 @@ export class CourseController {
         new PostCourseService(
           OrmCourseRepositoryInstance, 
           new UuidGen(),
-          new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
+          // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
           EventManagerSingleton.getInstance()
         ),
         new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
       ),
       logger
     );
+    this.postLessonService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new PostLessonService(
+          OrmCourseRepositoryInstance,
+          new UuidGen(),
+          EventManagerSingleton.getInstance()
+        ),
+        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
+      ),
+      logger
+    )
   }
 
   @UseGuards(JwtAuthGuard)
@@ -176,6 +193,25 @@ export class CourseController {
       postCourseBodyDto.tags,
       postCourseBodyDto.categoryId,
       postCourseBodyDto.trainerId
+    ));
+
+    if (response.isSuccess) {
+      return response.Value;
+    } else {
+      return ExceptionMapper.toHttp(response.Error);
+    }
+  }
+
+  @Post('lesson')
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async postLesson(@Body() postLessonBodyDto: PostLesonBodyDto) {
+    const response = await this.postLessonService.execute(new PostLessonRequestDto(
+      postLessonBodyDto.courseId,
+      postLessonBodyDto.title,
+      postLessonBodyDto.content,
+      postLessonBodyDto.seconds,
+      postLessonBodyDto.videoUrl
     ));
 
     if (response.isSuccess) {

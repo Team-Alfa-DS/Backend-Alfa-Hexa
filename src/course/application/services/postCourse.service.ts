@@ -22,7 +22,7 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
   constructor(
     private courseRepository: ICourseRepository,
     private idGen: IIdGen,
-    private transactionHandler: ITransactionHandler,
+    // private transactionHandler: ITransactionHandler,
     private eventPublisher: IEventPublisher
   ) {}
   
@@ -83,7 +83,7 @@ export class PostCourseRequestDto implements ServiceRequestDto {
 
 
   dataToString(): string {
-    return `PostCourseResponse: ${JSON.stringify(this)}`
+    return `PostCourseRequest: ${JSON.stringify(this)}`
   }
 }
 

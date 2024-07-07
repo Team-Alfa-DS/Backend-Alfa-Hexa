@@ -6,6 +6,7 @@ import { LessonContent } from "src/course/domain/value-objects/lesson-content";
 import { LessonDuration } from "src/course/domain/value-objects/lesson-duration";
 import { LessonVideo } from "src/course/domain/value-objects/lesson-video";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { Course } from "src/course/domain/Course";
 
 export class OrmLessonMapper {
   static toDomain(entity: OrmLessonEntity): Lesson {
@@ -17,5 +18,16 @@ export class OrmLessonMapper {
       new LessonVideo(entity.video),
     );
     // return lesson;
+  }
+
+  static toPersistence(lesson: Lesson, course: Course): OrmLessonEntity {
+    return OrmLessonEntity.create(
+      lesson.id.Value,
+      lesson.title.value,
+      lesson.content.value,
+      lesson.seconds.value,
+      lesson.video.Value,
+      course.Id.Value
+    )
   }
 }

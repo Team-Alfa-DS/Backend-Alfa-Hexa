@@ -6,6 +6,7 @@ import { CourseTrainer } from "../value-objects/course-trainer";
 import { CourseId } from "../value-objects/course-id";
 import { LessonId } from "../value-objects/lesson-id";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
+import { Lesson } from "../entities/Lesson";
 
 export interface ICourseRepository {
   // getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>>;
@@ -21,4 +22,5 @@ export interface ICourseRepository {
   getAllCourses(): Promise<Course[]>;
   getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number>;
   saveCourse(course: Course): Promise<Course>;
+  saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
 }

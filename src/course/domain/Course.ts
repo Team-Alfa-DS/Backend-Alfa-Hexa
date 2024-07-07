@@ -17,6 +17,11 @@ import { DomainEvent } from "src/common/domain/domain-event";
 import { InvalidCourseException } from "./exceptions/invalidCourseException";
 import { LessonId } from "./value-objects/lesson-id";
 import { CourseRegistered } from "./events/course-registered.event";
+import { LessonTitle } from "./value-objects/lesson-title";
+import { LessonContent } from "./value-objects/lesson-content";
+import { LessonDuration } from "./value-objects/lesson-duration";
+import { LessonVideo } from "./value-objects/lesson-video";
+import { LessonPosted } from "./events/lesson-posted.event";
 
 export class Course extends AggregateRoot<CourseId>{
   // private id: CourseId;
@@ -84,6 +89,16 @@ export class Course extends AggregateRoot<CourseId>{
     this.apply(new CourseRegistered(id, title, description, image, date, durationMinutes, durationWeeks, level, tags, category, trainer));
   }
 
+  postLesson(
+    id: LessonId,
+    title: LessonTitle,
+    content: LessonContent,
+    seconds: LessonDuration,
+    video: LessonVideo,
+  ) {
+    this.apply(new LessonPosted(id, title, content, seconds, video, this.Id));
+  }
+
   protected when(event: DomainEvent): void {
     if (event instanceof CourseCreated) {
       this.title = event.title;
@@ -99,7 +114,19 @@ export class Course extends AggregateRoot<CourseId>{
       this.trainer = event.trainer;
     }
 
+    if (event instanceof LessonPosted) {
 
+      const lesson = new Lesson(
+        event.id,
+        event.title,
+        event.content,
+        event.seconds,
+        event.video
+      );
+
+      this.lessons.push(lesson);
+      this.addMinutes(new CourseDurationMinutes((Math.round(event.seconds.value/60))))
+    }
   }
   
   protected validateState(): void {
@@ -131,6 +158,10 @@ export class Course extends AggregateRoot<CourseId>{
 
   get DurationMinutes(): CourseDurationMinutes {
     return new CourseDurationMinutes(this.durationMinutes.value)
+  }
+
+  private addMinutes(minutes: CourseDurationMinutes): void {
+    this.durationMinutes = new CourseDurationMinutes(this.durationMinutes.value + minutes.value);
   }
 
   get DurationWeeks(): CourseDurationWeeks {
