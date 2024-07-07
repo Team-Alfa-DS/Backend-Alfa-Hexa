@@ -1,5 +1,4 @@
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { OrmLessonCommentEntity } from "../../entities/orm-entities/orm-comment.lesson.entity";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { CommentLessonUserDisliked } from "src/comment/domain/valueObjects/lesson/comment-lesson-userDisliked";
 import { CommentLessonUserLiked } from "src/comment/domain/valueObjects/lesson/comment-lesson-userLiked";
@@ -10,6 +9,7 @@ import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comm
 import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/comment-lesson-body";
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
+import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
 
 
 export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCommentEntity> {

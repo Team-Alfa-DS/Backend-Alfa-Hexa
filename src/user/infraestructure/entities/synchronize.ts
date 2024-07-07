@@ -27,9 +27,9 @@ import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog
 import { OrmBlogCommentRepository } from "src/comment/infraestructure/repositories/blog/orm-comment.repository";
 import { OrmBlogCommentMapper } from "src/comment/infraestructure/mapper/blog/orm-comment-blog.mapper";
 import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/lesson/orm-comment.repository";
-import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-comment-lesson.mapper";
 import { Injectable } from "@nestjs/common";
 import { OrmTagRepository } from "src/tag/infraestructure/repositories/orm-tag-repository";
+import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
 
 @Injectable()
 export class Synchronize {

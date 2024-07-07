@@ -1,7 +1,6 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment-blog.mapper";
-import { OrmLessonCommentMapper } from "../mapper/lesson/orm-comment-lesson.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-mappers/orm-user.mapper";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
@@ -33,6 +32,7 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
+import { OrmLessonCommentMapper } from "../mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
 
 
 
