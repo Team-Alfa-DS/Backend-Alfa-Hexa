@@ -94,6 +94,7 @@ export class Synchronize {
         const users = await this.userRepository.find()
         for (const user of users) {
             const {id, email, name, password, phone, type, image} = user
+
             await this.userModel.create({id, email, image, name, password, phone, type})
         }
         console.log('users terminados')
@@ -115,7 +116,16 @@ export class Synchronize {
             }  
             await this.trainerModel.create({followers: usersOdm, id, location, name})
         }
-        console.log('trainers terminados')
+        console.log('trainers terminados');
+
+        const follows = await this.userRepository.find({relations: {trainers: true}});
+        for (const user of follows) {
+            let odmTrainers: OdmTrainerEntity[] = []
+            for (const trainer of user.trainers) {
+                odmTrainers.push(await this.trainerModel.findOne({id: trainer.id}))
+            }
+            await this.userModel.updateOne({id: user.id}, {trainers: odmTrainers});
+        }
 
         const tags = await this.tagRepository.find();
         for (const tag of tags) {
@@ -203,6 +213,6 @@ export class Synchronize {
             await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
         }
         console.log('lessonComments terminado');
-        console.log(await this.courseModel.distinct('tags'))
+        
     }
 } 

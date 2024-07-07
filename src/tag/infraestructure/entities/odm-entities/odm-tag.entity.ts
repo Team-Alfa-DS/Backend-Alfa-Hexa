@@ -10,9 +10,6 @@ export class OdmTagEntity {
 
     @Prop({required: true})
     name: string;
-
-    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
-    blogs: OdmBlogEntity[];
 }
 
 export const TagSchema = SchemaFactory.createForClass(OdmTagEntity);
