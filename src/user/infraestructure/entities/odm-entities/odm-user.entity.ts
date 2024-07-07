@@ -27,9 +27,8 @@ export class OdmUserEntity {
     @Prop({required: false, type: Types.Buffer})
     image?: string;
 
-    @Prop({type: [{type: mongoose.Schema.ObjectId, ref: 'trainer'}]})
-    @Type(() => OdmTrainerEntity)
-    trainers: OdmTrainerEntity;
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    trainers: OdmTrainerEntity[];
 
     static create (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
         const odmUser = new OdmUserEntity();
