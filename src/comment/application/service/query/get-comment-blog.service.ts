@@ -35,8 +35,6 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
                 id: comment.Id.commentId, 
                 user: comment.UserId.UserId, 
                 body: comment.Body.Body, 
-                countLikes: comment.CountLikes.CountLike, 
-                countDislikes: comment.CountDislikes.CountDislike, 
                 userLiked: comment.UserLiked.UserLiked, 
                 userDisliked: comment.UserDisliked.UserDisliked, 
                 date: comment.PublicationDate.PublicationDate})

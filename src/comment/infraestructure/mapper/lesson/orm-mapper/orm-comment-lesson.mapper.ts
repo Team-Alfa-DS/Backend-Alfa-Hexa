@@ -10,6 +10,7 @@ import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/commen
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
 export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCommentEntity> {
@@ -20,9 +21,7 @@ export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCo
             DomainEntity.PublicationDate.PublicationDate,
             DomainEntity.Body.Body,
             DomainEntity.UserId.UserId,
-            DomainEntity.LessonId.LessonId,
-            DomainEntity.CountLikes.CountLike,
-            DomainEntity.CountDislikes.CountDislike,
+            DomainEntity.LessonId.LessonId.Value,
             DomainEntity.UserLiked.UserLiked,
             DomainEntity.UserDisliked.UserDisliked
         )
@@ -35,9 +34,7 @@ export class OrmLessonCommentMapper implements IMapper<CommentLesson,OrmLessonCo
             CommentLessonPublicationDate.create(OrmEntity.PublicationDate),
             CommentLessonBody.create(OrmEntity.Body),
             CommentLessonUserId.create(OrmEntity.UserId),
-            LessonCommentLessonId.create(OrmEntity.LessonId),
-            CommentLessonCountLike.create(OrmEntity.CountLikes),
-            CommentLessonCountDislike.create(OrmEntity.CountDislikes),
+            LessonCommentLessonId.create(LessonId.create(OrmEntity.LessonId)),
             CommentLessonUserLiked.create(OrmEntity.UserLiked),
             CommentLessonUserDisliked.create(OrmEntity.UserDisliked),
         )

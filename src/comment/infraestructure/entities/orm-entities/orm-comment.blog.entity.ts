@@ -17,12 +17,6 @@ export class OrmBlogCommentEntity {
 
     @Column()
     publication_date: Date;
-
-    @Column({nullable: true})
-    count_likes?: number;
-
-    @Column({nullable: true})
-    count_dislikes?: number;
     
     @Column({nullable: true})
     userLiked?: boolean;
@@ -47,8 +41,6 @@ export class OrmBlogCommentEntity {
         body: string,
         userId: string,
         blogId: string,
-        count_likes?: number,
-        count_dislikes?: number,
         userLiked?: boolean,
         userDisliked?: boolean,
     ){
@@ -58,8 +50,6 @@ export class OrmBlogCommentEntity {
         comment.body = body;
         comment.user_id = userId;
         comment.blog_id = blogId;
-        comment.count_likes = count_likes;
-        comment.count_dislikes = count_dislikes;
         comment.userLiked = userLiked;
         comment.userDisliked = userDisliked;
         return comment
@@ -83,14 +73,6 @@ export class OrmBlogCommentEntity {
 
     get BlogId(): string {
         return this.blog_id;
-    }
-
-    get CountLikes(): number | undefined {
-        return this.count_likes;
-    }
-
-    get CountDislikes(): number | undefined {
-        return this.count_dislikes;
     }
 
     get UserLiked(): boolean | undefined {

@@ -13,6 +13,7 @@ import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/commen
 import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comment-lesson-userId";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -52,7 +53,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
         let publicationDate = CommentLessonPublicationDate.create( new Date() );
         let body = CommentLessonBody.create( data.body );
         let userId = CommentLessonUserId.create( data.userId );
-        let target = LessonCommentLessonId.create( data.targetId );
+        let target = LessonCommentLessonId.create(LessonId.create(data.targetId));
 
         const comment: CommentLesson = CommentLesson.create(
             commentID,
@@ -60,8 +61,6 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
             body,
             userId,
             target,
-            null,
-            null,
             null,
             null,
         );

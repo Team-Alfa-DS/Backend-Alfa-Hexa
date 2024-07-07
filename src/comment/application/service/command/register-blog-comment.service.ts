@@ -62,8 +62,6 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         userId,
         target,
         null,
-        null,
-        null,
         null,)
 
         const result = await this.commentBlogRepository.saveComment( comment, this.transactionHandler )

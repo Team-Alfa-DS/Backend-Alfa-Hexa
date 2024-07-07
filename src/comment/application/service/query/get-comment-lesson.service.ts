@@ -4,6 +4,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { IService } from "src/common/application/interfaces/IService";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
@@ -23,7 +24,7 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
 
         if (!data.pagination.page) data.pagination.page = 0;
         
-        let lessonId = LessonCommentLessonId.create( data.lessonId );
+        let lessonId = LessonCommentLessonId.create(LessonId.create(data.lessonId));
 
         const comments = await this.commentLessonRepository.findAllCommentsByLessonId(
             lessonId,
@@ -38,8 +39,6 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
                 id: comment.Id.commentId, 
                 user: comment.UserId.UserId, 
                 body: comment.Body.Body, 
-                countLikes: comment.CountLikes.CountLike, 
-                countDislikes: comment.CountDislikes.CountDislike, 
                 userLiked: comment.UserLiked.UserLiked, 
                 userDisliked: comment.UserDisliked.UserDisliked, 
                 date: comment.PublicationDate.PublicationDate})
