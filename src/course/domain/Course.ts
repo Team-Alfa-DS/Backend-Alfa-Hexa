@@ -125,7 +125,13 @@ export class Course extends AggregateRoot<CourseId>{
       );
 
       this.lessons.push(lesson);
-      this.addMinutes(new CourseDurationMinutes((Math.round(event.seconds.value/60))))
+      // this.addMinutes(new CourseDurationMinutes((Math.round(event.seconds.value/60))))
+      this.durationMinutes = new CourseDurationMinutes(0);
+      let seconds:number = 0
+      for (let lesson of this.lessons) {
+        seconds += lesson.seconds.value;
+      }
+      this.addMinutes(new CourseDurationMinutes(Math.round(seconds / 60)));
     }
   }
   
