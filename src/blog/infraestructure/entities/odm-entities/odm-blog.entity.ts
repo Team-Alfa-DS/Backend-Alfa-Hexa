@@ -20,21 +20,17 @@ export class OdmBlogEntity {
     @Prop({required: true, type: Date})
     publication_date: Date;
 
-    @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: 'category'})
-    @Type(() => OdmCategoryEntity)
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     category: OdmCategoryEntity;
 
-    @Prop({required: true, type: mongoose.Schema.Types.ObjectId, ref: 'trainer'})
-    @Type(() => OdmTrainerEntity)
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     trainer: OdmTrainerEntity;
 
-    @Prop({required: true, type: [{type: mongoose.Schema.Types.ObjectId, ref: 'tag'}]})
-    @Type(() => OdmTagEntity)
-    tags: OdmTagEntity;
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
+    tags: OdmTagEntity[];
 
-    @Prop({type: [{type: mongoose.Schema.Types.ObjectId, ref: 'image'}]})
-    @Type(() => OdmImageEntity)
-    images: OdmImageEntity;
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    images: OdmImageEntity[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(OdmBlogEntity);

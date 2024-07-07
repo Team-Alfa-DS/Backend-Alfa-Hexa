@@ -14,9 +14,8 @@ export class OdmTrainerEntity {
     @Prop({required: false})
     location: string;
 
-    @Prop({type: [{type: mongoose.Schema.ObjectId, ref: 'user'}]})
-    @Type(() => OdmUserEntity)
-    followers: OdmUserEntity;
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    followers: OdmUserEntity[];
 }
 
 export const TrainerSchema = SchemaFactory.createForClass(OdmTrainerEntity);
