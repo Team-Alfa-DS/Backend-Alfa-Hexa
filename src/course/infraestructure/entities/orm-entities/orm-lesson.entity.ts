@@ -5,32 +5,51 @@ import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm
 
 @Entity('lesson')
 export class OrmLessonEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    title: string;
+  @Column()
+  title: string;
 
-    @Column()
-    content: string;
+  @Column()
+  content: string;
 
-    @Column()
-    seconds: number;
+  @Column()
+  seconds: number;
 
-    @Column({nullable: true})
-    video: string;
+  @Column()
+  video: string;
 
-    @Column({nullable: true})
-    image: string;
+  @Column({ type: "uuid" })
+  course_id: string;
 
-    @ManyToOne(() => OrmCourseEntity, course => course.lessons)
-    @JoinColumn({name: 'course_id'})
-    course: OrmCourseEntity;
+  @ManyToOne(() => OrmCourseEntity, course => course.lessons)
+  @JoinColumn({name: 'course_id'})
+  course: OrmCourseEntity;
 
-    @OneToMany(() => OrmProgressEntity, progress => progress.lesson)
-    progress: OrmProgressEntity[];
+  @OneToMany(() => OrmProgressEntity, progress => progress.lesson)
+  progress: OrmProgressEntity[];
 
-    @OneToMany(() => OrmLessonCommentEntity, comment => comment.lesson)
-    comments: OrmLessonCommentEntity[];
+  @OneToMany(() => OrmLessonCommentEntity, comment => comment.lesson)
+  comments: OrmLessonCommentEntity[];
 
+
+  static create(
+    id: string,
+    title: string,
+    content: string,
+    seconds: number,
+    video: string,
+    course_id: string
+  ): OrmLessonEntity {
+    const ormLesson = new OrmLessonEntity();
+    ormLesson.id = id;
+    ormLesson.title = title;
+    ormLesson.content = content;
+    ormLesson.seconds = seconds;
+    ormLesson.video = video;
+    ormLesson.course_id = course_id;
+
+    return ormLesson;
+  }
 }

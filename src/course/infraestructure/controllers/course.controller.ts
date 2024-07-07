@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe, Post, Body } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
@@ -27,6 +27,8 @@ import { OdmCourseRepository } from "../repositories/OdmCourse.repository";
 import { InjectModel } from "@nestjs/mongoose";
 import { OdmCourseEntity } from "../entities/odm-entities/odm-course.entity";
 import { Model } from "mongoose";
+import { PostCourseBodyDto } from "../dtos/postCourseBodyDto.dto";
+import { PostCourseRequestDto, PostCourseResponseDto, PostCourseService } from "src/course/application/services/postCourse.service";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -36,6 +38,7 @@ export class CourseController {
   private readonly getManyCoursesService: IService<GetManyCoursesRequest, GetManyCoursesResponse>;
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
+  private readonly postCourseService: IService<PostCourseRequestDto, PostCourseResponseDto>;
 
   constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
@@ -55,7 +58,14 @@ export class CourseController {
     this.getCourseCountService = new ExceptionLoggerDecorator(
       new GetCourseCountService(OdmCourseRepositoryInstance),
       logger
-    )
+    );
+    this.postCourseService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new PostCourseService(OrmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
+      ),
+      logger
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -128,5 +138,12 @@ export class CourseController {
     } else {
       throw ExceptionMapper.toHttp(result.Error);
     }
+  }
+
+  @Post()
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async postCourse(@Body() postCourseBodyDto: PostCourseBodyDto) {
+
   }
 }

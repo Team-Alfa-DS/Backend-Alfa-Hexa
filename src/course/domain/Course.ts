@@ -16,6 +16,7 @@ import { CourseCreated } from "./events/course-created.event";
 import { DomainEvent } from "src/common/domain/domain-event";
 import { InvalidCourseException } from "./exceptions/invalidCourseException";
 import { LessonId } from "./value-objects/lesson-id";
+import { CourseRegistered } from "./events/course-registered.event";
 
 export class Course extends AggregateRoot<CourseId>{
   // private id: CourseId;
@@ -31,7 +32,7 @@ export class Course extends AggregateRoot<CourseId>{
   private category: CourseCategory; 
   private trainer: CourseTrainer; 
 
-  constructor(
+  private constructor(
     id: CourseId,
     title: CourseTitle,
     description: CourseDescription,
@@ -49,6 +50,40 @@ export class Course extends AggregateRoot<CourseId>{
     super(id, courseCreated);
   }
 
+  static create(
+    id: CourseId,
+    title: CourseTitle,
+    description: CourseDescription,
+    image: CourseImage,
+    date: Date,
+    durationMinutes: CourseDurationMinutes,
+    durationWeeks: CourseDurationWeeks,
+    level: CourseLevel,
+    lessons: Lesson[],
+    tags: CourseTag[],
+    category: CourseCategory, 
+    trainer: CourseTrainer 
+  ): Course {
+    return new Course(id, title, description, image, date, durationMinutes, durationWeeks, level, lessons, tags, category, trainer);
+  }
+  
+  register(
+    id: CourseId,
+    title: CourseTitle,
+    description: CourseDescription,
+    image: CourseImage,
+    date: Date,
+    durationMinutes: CourseDurationMinutes,
+    durationWeeks: CourseDurationWeeks,
+    level: CourseLevel,
+    lessons: Lesson[],
+    tags: CourseTag[],
+    category: CourseCategory, 
+    trainer: CourseTrainer 
+  ) {
+    this.apply(new CourseRegistered(id, title, description, image, date, durationMinutes, durationWeeks, level, tags, category, trainer));
+  }
+
   protected when(event: DomainEvent): void {
     if (event instanceof CourseCreated) {
       this.title = event.title;
@@ -63,11 +98,13 @@ export class Course extends AggregateRoot<CourseId>{
       this.category = event.category;
       this.trainer = event.trainer;
     }
+
+
   }
   
   protected validateState(): void {
     if (!this.title || !this.description || !this.image || !this.date || !this.durationMinutes 
-      || !this.durationWeeks || !this.level || !this.lessons || !this.tags || !this.category || !this.category || !this.trainer) {
+      || !this.durationWeeks || !this.level || !this.lessons || !this.tags || !this.category || !this.trainer) {
         throw new InvalidCourseException('El curso no es válido');
       }
   }

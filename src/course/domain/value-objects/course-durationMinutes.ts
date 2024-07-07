@@ -8,9 +8,9 @@ export class CourseDurationMinutes extends ValueObject<CourseDurationMinutes> {
   constructor(value: number) {
     super();
 
-    if (!value) { throw new NullCourseMinutesException('No se proporcionó los minutos de duración para el curso') /* throw DomainException NullCourseMinutesException */}
+    if ((value == null) || (value == undefined)) { throw new NullCourseMinutesException('No se proporcionó los minutos de duración para el curso') /* throw DomainException NullCourseMinutesException */}
 
-    if (value <= 0) { throw new NegativeCourseWeeksException(`Los minutos de duración no pueden ser negativos: ${value}`) /* throw DomainException NegativeCourseMinutesException */}
+    if (value < 0) { throw new NegativeCourseWeeksException(`Los minutos de duración no pueden ser negativos: ${value}`) /* throw DomainException NegativeCourseMinutesException */}
 
     this.value = value;
   }

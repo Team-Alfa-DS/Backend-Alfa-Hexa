@@ -9,6 +9,7 @@ import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 
 export class OdmCourseRepository implements ICourseRepository {
   
@@ -310,4 +311,7 @@ export class OdmCourseRepository implements ICourseRepository {
     return courses.length;
   }
 
+  async saveCourse(course: Course, runner: ITransactionHandler): Promise<Course> {
+    const OdmCourse = await OdmCourseMapper.toPersistence(course)
+  }
 }

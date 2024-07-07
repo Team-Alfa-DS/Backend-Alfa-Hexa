@@ -12,6 +12,7 @@ import { Uuid } from "src/common/domain/value-objects/Uuid";
 import { CourseNotFoundException } from "src/course/domain/exceptions/courseNotFound";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   constructor(database: DataSource){
@@ -173,5 +174,12 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     courses.filter((course) => course.Trainer.equals(trainerId))
     
     return courses.length;
+  }
+
+  async saveCourse(course: Course, runner: TransactionHandler): Promise<Course> {
+    const runnerTransaction = runner.getRunner();
+    const ormCourseEntity = OrmCourseMapper.toPersistence(course);
+    await runnerTransaction.manager.save(ormCourseEntity);
+    return course;
   }
 }

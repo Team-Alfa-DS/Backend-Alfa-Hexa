@@ -12,6 +12,10 @@ import { CourseDurationWeeks } from "src/course/domain/value-objects/course-dura
 import { CourseLevel } from "src/course/domain/value-objects/course-level";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { Model } from "mongoose";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 
 export class OdmCourseMapper {
   static toDomain(entity: OdmCourseEntity): Course {
@@ -23,7 +27,7 @@ export class OdmCourseMapper {
     for (let tag of entity.tags) {
       domainTags.push(new CourseTag(tag.name));
     }
-    return new Course(
+    return Course.create(
       new CourseId(entity.id),
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
@@ -45,5 +49,27 @@ export class OdmCourseMapper {
         courses.push(OdmCourseMapper.toDomain(entity));
       }
     return courses;
+  }
+
+  static async toPersistence(domainCourse: Course, categoryModel: Model<OdmCategoryEntity>, trainerModel: Model<OdmTrainerEntity>): Promise<OdmCourseEntity> {
+    const category = await categoryModel.findOne<OdmCategoryEntity>({id: domainCourse.Category.value.value});
+    const trainer = await trainerModel.findOne<OdmTrainerEntity>({id: domainCourse.Trainer.value.trainerId});
+    const tags: OdmTagEntity[] = [];
+    for (let tag in domainCourse.Tags) {
+      tags.push(new OdmTagEntity())
+    }
+    return OdmCourseEntity.create(
+      domainCourse.Id.Value,
+      domainCourse.Title.value,
+      domainCourse.Description.value,
+      domainCourse.Date,
+      domainCourse.DurationMinutes.value,
+      domainCourse.DurationWeeks.value,
+      domainCourse.Level.value,
+      domainCourse.Image.Value,
+      category,
+      trainer
+    );
+    // return odmCourse; //FIXME: No está implementado
   }
 }

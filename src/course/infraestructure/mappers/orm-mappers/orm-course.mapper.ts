@@ -24,7 +24,7 @@ export class OrmCourseMapper {
     for (let tag of entity.tags) {
       domainTags.push(new CourseTag(tag.name));
     }
-    return new Course(
+    return Course.create(
       new CourseId(entity.id),
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
@@ -48,5 +48,22 @@ export class OrmCourseMapper {
         courses.push(OrmCourseMapper.toDomain(entity));
       }
     return courses;
+  }
+
+  static toPersistence(domainCourse: Course) {
+    const ormCourse = OrmCourseEntity.create(
+      domainCourse.Id.Value,
+      domainCourse.Title.value,
+      domainCourse.Description.value,
+      domainCourse.Date,
+      domainCourse.DurationMinutes.value,
+      domainCourse.DurationWeeks.value,
+      domainCourse.Level.value,
+      domainCourse.Image.Value,
+      domainCourse.Category.value.value,
+      domainCourse.Trainer.value.trainerId
+    )
+
+    return ormCourse;
   }
 }
