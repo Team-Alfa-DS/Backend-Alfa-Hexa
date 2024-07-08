@@ -16,8 +16,14 @@ import { TransactionHandler } from "src/common/infraestructure/database/transact
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { OrmLessonMapper } from "../mappers/orm-mappers/orm-lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
+import { CommentLesson } from "src/comment/domain/comment-lesson";
+import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
+import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
+  private readonly ormCommentMapper: OrmLessonCommentMapper;
+  
   constructor(database: DataSource){
     super(OrmCourseEntity, database.manager)
   }
@@ -192,4 +198,38 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     await runnerTransaction.manager.save(ormLessonEntity);
     return lesson;
   }
+
+  async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>> {
+
+    const course = await this.findOne({
+      relations: {
+      category: true,
+      lessons: true,
+      trainer: true,
+      tags: true,
+      },
+      where: {
+      lessons: {
+        id: id.LessonId.Value,
+      },
+      },
+    });
+    
+    if (!course) {
+      throw new CourseNotFoundException(`No se encontró un curso que contenga la lección con id: ${id.LessonId.Value}`);
+    }
+
+    let commentsFound = course.lessons[0].comments;
+
+    if (!commentsFound) return Result.fail<CommentLesson[]>(new Error( 
+        `Ha ocurrido un error al encontrar los coemtarios por id` ));
+
+    const ListMapper = []
+    commentsFound.forEach(async e => {
+        ListMapper.push( 
+            await this.ormCommentMapper.toDomain(e ))
+    });
+
+    return Result.success<CommentLesson[]>(ListMapper);
+}
 }

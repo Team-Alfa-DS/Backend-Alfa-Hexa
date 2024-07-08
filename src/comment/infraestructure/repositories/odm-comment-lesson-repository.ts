@@ -8,6 +8,7 @@ import { Model } from "mongoose";
 import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
 import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
 import { OdmLessonCommentMapper } from "../mapper/lesson/odm-mapper/odm-comment-lesson.mapper";
+import { CommentsLessonNotFoundException } from "src/comment/domain/exceptions/lesson/comments-lesson-not-found-exception";
 
 export class OrmLessonCommentRepository implements IOdmLessonCommentRepository{
     
@@ -22,7 +23,7 @@ export class OrmLessonCommentRepository implements IOdmLessonCommentRepository{
         try{
             const r = await this.commentModel.find<OdmLessonCommentEntity>();
             
-            if (!r) return Result.fail<CommentLesson[]>(new Error( 
+            if (!r) return Result.fail<CommentLesson[]>(new CommentsLessonNotFoundException( 
                 `Ha ocurrido un error al encontrar los comentarios` ));
             
             const comment = r.filter(e => e.lesson.id === id.LessonId.Value)

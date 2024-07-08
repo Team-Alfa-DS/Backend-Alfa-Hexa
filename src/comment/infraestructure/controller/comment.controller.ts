@@ -34,6 +34,21 @@ import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 import { OrmLessonCommentMapper } from "../mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
+import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
+import { IOdmBlogCommentRepository } from "src/comment/application/odm-comment-blog-repository-interface";
+import { OdmBlogCommentRepository } from "../repositories/odm-comment-blog-repository";
+import { OdmLessonCommentEntity } from "../entities/odm-entities/odm-comment.lesson.entity";
+import { Model } from "mongoose";
+import { InjectModel } from "@nestjs/mongoose";
+import { OdmLessonCommentMapper } from "../mapper/lesson/odm-mapper/odm-comment-lesson.mapper";
+import { OdmBlogCommentEntity } from "../entities/odm-entities/odm-comment.blog.entity";
+import { IOdmLessonCommentRepository } from "src/comment/application/odm-comment-lesson-repository-interface";
+import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
+import { OdmCourseRepository } from "src/course/infraestructure/repositories/OdmCourse.repository";
 
 
 
@@ -51,11 +66,15 @@ export class CommentController{
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
+    private OdmcommentBlogMapper: OdmBlogCommentMapper = new OdmBlogCommentMapper();
+    private OdmcommentLessonMapper: OdmLessonCommentMapper = new OdmLessonCommentMapper();
     private commentBlogMapper: OrmBlogCommentMapper = new OrmBlogCommentMapper();
     private commentLessonMapper: OrmLessonCommentMapper = new OrmLessonCommentMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
 
     //* Repositorios
+    
+
     private readonly commentBlogRepository: IBlogCommentRepository = new OrmBlogCommentRepository(
         this.commentBlogMapper,
         PgDatabaseSingleton.getInstance()
@@ -95,7 +114,23 @@ export class CommentController{
     private readonly registerLessonCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
     private readonly registerBlogCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
     
-    constructor() {
+    constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>, 
+                @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+                @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+                @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+                @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
+                @InjectModel('comment') commentLessonModel: Model<OdmLessonCommentEntity>,
+                @InjectModel('comment') commentBlogModel: Model<OdmBlogCommentEntity>){
+
+        //const OdmcommentBlogRepository: IOdmBlogCommentRepository = new OdmBlogCommentRepository(commentModel);
+        const OdmCourseRepositoryInstance = new OdmCourseRepository(
+            courseModel, 
+            categoryModel, 
+            trainerModel, 
+            tagModel, 
+            lessonModel, 
+            commentLessonModel);
+
 
         this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
@@ -106,8 +141,7 @@ export class CommentController{
         );
         this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
-                this.commentLessonRepository,
-                this.transactionHandler
+                OdmCourseRepositoryInstance
             ),
             this.logger
         );

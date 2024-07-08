@@ -6,6 +6,7 @@ import { OdmBlogCommentEntity } from "../entities/odm-entities/odm-comment.blog.
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { IOdmBlogCommentRepository } from "src/comment/application/odm-comment-blog-repository-interface";
+import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
 
 export class OdmBlogCommentRepository implements IOdmBlogCommentRepository{
     
@@ -20,11 +21,11 @@ export class OdmBlogCommentRepository implements IOdmBlogCommentRepository{
         try{
             const r = await this.commentModel.find<OdmBlogCommentEntity>();
             
-            if (!r) return Result.fail<CommentBlog[]>(new Error( 
+            if (!r) return Result.fail<CommentBlog[]>(new CommentsBlogNotFoundException( 
                 `Ha ocurrido un error al encontrar los comentarios` ));
             
             const comment = r.filter(e => e.blog.id === id.BlogId.value);
-            
+
             const ListMapper = []
             comment.forEach(async e => {
                 ListMapper.push( 

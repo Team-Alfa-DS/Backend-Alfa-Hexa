@@ -1,23 +1,19 @@
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto, LessonComment } from "../../dto/lesson/lesson-comment.response.dto";
 import { Result } from "src/common/domain/result-handler/result";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
-    private readonly commentLessonRepository: ILessonCommentRepository;
-    private readonly transactionHandler: ITransactionHandler;
+    private readonly courseRepository: ICourseRepository
 
     constructor(
-        commentLessonRepository: ILessonCommentRepository,
-        transactionHandler: ITransactionHandler,
+        courseRepository: ICourseRepository,
     ){
         super();
-        this.commentLessonRepository = commentLessonRepository;
-        this.transactionHandler = transactionHandler;
+        this.courseRepository = courseRepository;
     }
     
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
@@ -26,9 +22,8 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
         
         let lessonId = LessonCommentLessonId.create(LessonId.create(data.lessonId));
 
-        const comments = await this.commentLessonRepository.findAllCommentsByLessonId(
-            lessonId,
-            this.transactionHandler
+        const comments = await this.courseRepository.findAllCommentsByLessonId(
+            lessonId
         );
         
         if (!comments.isSuccess)  return Result.fail(comments.Error);

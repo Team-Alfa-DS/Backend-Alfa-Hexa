@@ -7,6 +7,10 @@ import { CourseId } from "../value-objects/course-id";
 import { LessonId } from "../value-objects/lesson-id";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Lesson } from "../entities/Lesson";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { CommentBlog } from "src/comment/domain/comment-blog";
+import { CommentLesson } from "src/comment/domain/comment-lesson";
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 
 export interface ICourseRepository {
   // getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>>;
@@ -23,4 +27,6 @@ export interface ICourseRepository {
   getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number>;
   saveCourse(course: Course): Promise<Course>;
   saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
+  findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>>;
+
 }
