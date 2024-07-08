@@ -30,7 +30,8 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
         new LessonTitle(request.title),
         new LessonContent(request.content),
         new LessonDuration(request.seconds),
-        new LessonVideo(request.videoUrl)
+        new LessonVideo(request.videoUrl),
+        []
       );
 
       const lesson = courseToPostIn.getLesson(new LessonId(generatedId));

@@ -19,7 +19,7 @@ import { Lesson } from "src/course/domain/entities/Lesson";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
-import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
+import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   private readonly ormCommentMapper: OrmLessonCommentMapper;
@@ -198,6 +198,17 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     await runnerTransaction.manager.save(ormLessonEntity);
     return lesson;
   }
+
+  async saveComment(comment: CommentLesson): Promise<Result<CommentLesson>> {
+    try{
+        const ormComment = await this.ormCommentMapper.toPersistence(comment);
+        await this.save(ormComment);
+        return Result.success<CommentLesson>(comment);                                                    
+    }catch(err){
+        return Result.fail<CommentLesson>(new Error(err.message));
+    }
+
+};
 
   async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>> {
 

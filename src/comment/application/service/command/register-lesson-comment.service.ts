@@ -14,25 +14,23 @@ import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comm
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { error } from 'console';
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
-    
-    private readonly commentLessonRepository: ILessonCommentRepository;
+
     private readonly userRepository: IUserRepository;
     private readonly courseRepository: ICourseRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen
 
     constructor(
-        commentLessonRepository: ILessonCommentRepository,
         userRepository: IUserRepository,
         courseRepository: ICourseRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
     ){
         super();
-        this.commentLessonRepository = commentLessonRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.transactionHandler = transactionHandler;
@@ -40,38 +38,38 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
+        try{
         const commentID = LessonCommentId.create(await this.idGenerator.genId());
 
         let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
-        if ( !user.isSuccess ) return Result.fail( user.Error );
-
         let course = await this.courseRepository.getCourseByLessonId( new LessonId(data.targetId) );
-
-        // if ( !course.isSuccess ) return Result.fail( course.Error ); //FIXME: Needs try-catch
 
         let publicationDate = CommentLessonPublicationDate.create( new Date() );
         let body = CommentLessonBody.create( data.body );
         let userId = CommentLessonUserId.create( data.userId );
         let target = LessonCommentLessonId.create(LessonId.create(data.targetId));
 
-        const comment: CommentLesson = CommentLesson.create(
+        course.createComment(
             commentID,
             publicationDate,
             body,
             userId,
             target,
             null,
-            null,
+            null
         );
 
-        const result = await this.commentLessonRepository.saveComment( comment, this.transactionHandler )
-        
-        if ( !result.isSuccess ) return Result.fail( result.Error );
+        const comment = course.getComment(target.LessonId, commentID);
+
+        const result = await this.courseRepository.saveComment( comment );
         
         const response = new AddCommentToServiceResponseDto();
 
-        return Result.success<AddCommentToServiceResponseDto>( response )
+        return Result.success<AddCommentToServiceResponseDto>( response );
+        }catch(error){
+            return Result.fail<AddCommentToServiceResponseDto>(error);
+        }
     }
 
 }

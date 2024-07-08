@@ -15,7 +15,8 @@ export class PostLessonEvent implements IEventSubscriber<LessonPosted> {
       event.title,
       event.content,
       event.seconds,
-      event.video
+      event.video,
+      []
     );
 
     await this.odmCourseRepository.saveLesson(lesson, course);

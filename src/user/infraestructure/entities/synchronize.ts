@@ -29,7 +29,7 @@ import { OrmBlogCommentMapper } from "src/comment/infraestructure/mapper/blog/or
 import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/lesson/orm-comment.repository";
 import { Injectable } from "@nestjs/common";
 import { OrmTagRepository } from "src/tag/infraestructure/repositories/orm-tag-repository";
-import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
+import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
 
 @Injectable()
 export class Synchronize {

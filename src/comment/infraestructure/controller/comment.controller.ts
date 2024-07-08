@@ -29,30 +29,24 @@ import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
-import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
-import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
-import { OrmLessonCommentMapper } from "../mapper/lesson/orm-mapper/orm-comment-lesson.mapper";
+import { OrmLessonCommentMapper } from "../../../course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
 import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
-import { IOdmBlogCommentRepository } from "src/comment/application/odm-comment-blog-repository-interface";
-import { OdmBlogCommentRepository } from "../repositories/odm-comment-blog-repository";
 import { OdmLessonCommentEntity } from "../entities/odm-entities/odm-comment.lesson.entity";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { OdmLessonCommentMapper } from "../mapper/lesson/odm-mapper/odm-comment-lesson.mapper";
+import { OdmLessonCommentMapper } from "../../../course/infraestructure/mappers/odm-mappers/odm-comment-lesson.mapper";
 import { OdmBlogCommentEntity } from "../entities/odm-entities/odm-comment.blog.entity";
-import { IOdmLessonCommentRepository } from "src/comment/application/odm-comment-lesson-repository-interface";
 import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
 import { OdmCourseRepository } from "src/course/infraestructure/repositories/OdmCourse.repository";
-
-
-
-
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
+import { CreateCommentLessonEvent } from "src/course/infraestructure/events/synchronize/create-commentLesson.event";
 
 
 @ApiBearerAuth()
@@ -62,7 +56,7 @@ import { OdmCourseRepository } from "src/course/infraestructure/repositories/Odm
 @Controller( 'comments' )
 export class CommentController{
 
-
+    private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
@@ -77,11 +71,6 @@ export class CommentController{
 
     private readonly commentBlogRepository: IBlogCommentRepository = new OrmBlogCommentRepository(
         this.commentBlogMapper,
-        PgDatabaseSingleton.getInstance()
-    );
-
-    private readonly commentLessonRepository: ILessonCommentRepository = new OrmLessonCommentRepository(
-        this.commentLessonMapper,
         PgDatabaseSingleton.getInstance()
     );
 
@@ -122,15 +111,18 @@ export class CommentController{
                 @InjectModel('comment') commentLessonModel: Model<OdmLessonCommentEntity>,
                 @InjectModel('comment') commentBlogModel: Model<OdmBlogCommentEntity>){
 
-        //const OdmcommentBlogRepository: IOdmBlogCommentRepository = new OdmBlogCommentRepository(commentModel);
+                    
+                    
         const OdmCourseRepositoryInstance = new OdmCourseRepository(
             courseModel, 
             categoryModel, 
             trainerModel, 
             tagModel, 
             lessonModel, 
-            commentLessonModel);
-
+            commentLessonModel
+        );
+        
+        this.eventPublisher.subscribe('CommentPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
 
         this.getCommentBlogService = new ExceptionLoggerDecorator(
             new GetCommentBlogService(
@@ -141,14 +133,13 @@ export class CommentController{
         );
         this.getCommentLessonService = new ExceptionLoggerDecorator(
             new GetCommentLessonService(
-                OdmCourseRepositoryInstance
+                this.courseRepository
             ),
             this.logger
         );
         this.registerLessonCommentService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterLessonCommentServices(
-                    this.commentLessonRepository,
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,

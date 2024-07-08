@@ -18,10 +18,10 @@ import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entit
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 
 export class OdmCourseMapper {
-  static toDomain(entity: OdmCourseEntity): Course {
+  static async toDomain(entity: OdmCourseEntity): Promise<Course> {
     const domainLessons: Lesson[] = [];
     for( let lesson of entity.lessons ) {
-      domainLessons.push(OdmLessonMapper.toDomain(lesson));
+      domainLessons.push(await OdmLessonMapper.toDomain(lesson));
     }
     const domainTags: CourseTag[] = [];
     for (let tag of entity.tags) {
@@ -43,10 +43,10 @@ export class OdmCourseMapper {
     );
   }
 
-  static arrayToDomain(entities: OdmCourseEntity[]): Course[] {
+  static async arrayToDomain(entities: OdmCourseEntity[]): Promise<Course[]> {
     const courses: Course[] = [];
       for (let entity of entities) {
-        courses.push(OdmCourseMapper.toDomain(entity));
+        courses.push(await OdmCourseMapper.toDomain(entity));
       }
     return courses;
   }

@@ -28,5 +28,5 @@ export interface ICourseRepository {
   saveCourse(course: Course): Promise<Course>;
   saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
   findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>>;
-
+  saveComment(comment: CommentLesson): Promise<Result<CommentLesson>>;
 }
