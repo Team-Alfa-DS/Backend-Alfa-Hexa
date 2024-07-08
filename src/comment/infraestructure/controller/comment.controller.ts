@@ -164,7 +164,7 @@ export class CommentController{
 
             if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
 
-            return result.Value;
+            return result.Value.blogComments;
 
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
@@ -173,7 +173,7 @@ export class CommentController{
 
             if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
 
-            return result.Value;
+            return result.Value.lessonComments;
         }
     }
 
