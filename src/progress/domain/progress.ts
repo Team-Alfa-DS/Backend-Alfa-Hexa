@@ -31,6 +31,7 @@ export class Progress extends AggregateRoot<ProgressId>{
             this.time = event.time;
             this.lastTime = event.lastTime;
             this.user = event.user;
+            this.course = event.course;
         }
 
         if (event instanceof ProgressMarkAsCompletedUpdated) {

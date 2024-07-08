@@ -50,6 +50,7 @@ import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-us
 import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
+import { SaveProgressEvent } from '../events/save-progress.event';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -98,6 +99,8 @@ export class ProgressController {
 
         this.odmUserRepository = new OdmUserRespository(this.odmUserMapper, userModel);
         this.odmprogressRepository = new OdmProgressRepository(progressModel, this.odmProgressMapper);
+
+        this.eventPublisher.subscribe('ProgressRegister', [new SaveProgressEvent(this.odmprogressRepository)]);
         
         
         this.markEndProgressService = new ExceptionLoggerDecorator(
