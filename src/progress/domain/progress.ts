@@ -25,11 +25,13 @@ export class Progress extends AggregateRoot<ProgressId>{
     }
 
     protected when(event: DomainEvent): void {
+        console.log(event);
         if (event instanceof ProgressCreated) {
             this.markAsCompleted = event.markAsCompleted;
             this.time = event.time;
             this.lastTime = event.lastTime;
             this.user = event.user;
+            this.course = event.course
         }
 
         if (event instanceof ProgressMarkAsCompletedUpdated) {
