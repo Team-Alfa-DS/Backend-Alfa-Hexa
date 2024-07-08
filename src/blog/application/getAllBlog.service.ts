@@ -28,13 +28,13 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
             return Result.fail(domainBlogsResult.Error, domainBlogsResult.StatusCode, domainBlogsResult.Message);
 
         const domainBlogs = domainBlogsResult.Value; 
-        const blogs: GeneralBlogDTO[] = await Promise.all(domainBlogs.map(async blog => {
+        const blogs = await Promise.all(domainBlogs.map(async blog => {
             const trainerResult = await this.trainerRepository.findTrainerById(TrainerId.create(blog.Trainer));
-            const categoryResult = await this.categoryRepository.getCategoryById(blog.Category)
+            const categoryResult = await this.categoryRepository.getCategoryById(blog.Category);
             return {
                 id: blog.Id.value,
                 name: blog.Title.value,
-                image: blog.Images[0].value,
+                image: blog.Images[0] ? blog.Images[0].value : null,
                 date: blog.Publication_date.value,
                 category: categoryResult.Value ? categoryResult.Value.Name.value : null,
                 trainer: trainerResult.Value ? trainerResult.Value.Name.trainerName : null
