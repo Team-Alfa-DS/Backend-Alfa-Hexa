@@ -156,7 +156,10 @@ export class Synchronize {
             for (const image of images) {
                 imagesOdm.push(await this.imageModel.findOne({id: image.id}));
             }
-            await this.blogModel.create({id, category: category.id, description, publication_date, tags: tagsOdm, title, trainer: trainer.id, images: imagesOdm});
+
+            const categoryOdm = await this.categoryModel.findOne({id: category.id});
+            const trainerOdm = await this.trainerModel.findOne({id: trainer.id});
+            await this.blogModel.create({id, category: categoryOdm, description, publication_date, tags: tagsOdm, title, trainer: trainerOdm, images: imagesOdm});
         }
         console.log('blogs terminados')
 
@@ -172,6 +175,8 @@ export class Synchronize {
         const courses = await this.courseRepository.find({relations: {lessons: true, category: true, tags: true, trainer: true}});
         for (const course of courses) {
             const {category, description, id, image, lessons, level, minutes, name, publication_date, tags, trainer, weeks} = course;
+            const odmCategory = await this.categoryModel.findOne({id: category.id});
+            const odmTrainer = await this.trainerModel.findOne({id: trainer.id});
 
             let tagsOdm: OdmTagEntity[] = [];
 
@@ -183,7 +188,10 @@ export class Synchronize {
             for (const lesson of lessons) {
                 lessonsOdm.push(await this.lessonModel.findOne({id: lesson.id}));
             }
-            await this.courseModel.create({category: category.id, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: trainer.id, weeks});
+
+            const categoryOdm = await this.categoryModel.findOne({id: category.id});
+            const trainerOdm = await this.trainerModel.findOne({id: trainer.id});
+            await this.courseModel.create({category: categoryOdm, description, id, image, lessons: lessonsOdm, level, minutes, publication_date, tags: tagsOdm, name, trainer: trainerOdm, weeks});
         }
         console.log('courses terminados')
 
@@ -213,6 +221,5 @@ export class Synchronize {
             await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
         }
         console.log('lessonComments terminado');
-        
     }
 } 

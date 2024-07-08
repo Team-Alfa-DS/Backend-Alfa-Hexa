@@ -1,5 +1,5 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
@@ -8,6 +8,9 @@ import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { CourseTag } from "src/course/domain/value-objects/course-tag";
+import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
@@ -17,14 +20,26 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
   ){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
-    const r = await this.courseRepository.getManyCourses(
-      [request.filter],
-      request.category,
-      request.trainer,
-      request.page,
-      request.perpage
-    ); 
-    if (r.isSuccess) {
+    try {
+      let courseTag: CourseTag; let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
+      if (request.filter) {courseTag = new CourseTag(request.filter)}
+      if (request.category) {courseCategory = new CourseCategory(request.category)}
+      if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
+      // console.log(request);//Debug
+      
+      let r = await this.courseRepository.getManyCourses(
+        [courseTag],
+        courseCategory,
+        courseTrainer
+      );
+      
+      let page = 0;
+      if (request.perpage) { 
+        if (request.page) {page = request.page};
+
+        r = r.slice((page*request.perpage), ((request.perpage) + page*request.perpage));
+      }
+
       const responseCourses: {
         id: string;
         title: string;
@@ -35,11 +50,11 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       }[] = []
       let trainer: Result<Trainer>;
       let category: Result<Category>;
-      for (let course of r.Value) {
+      for (let course of r) {
         trainer = await this.trainerRepository.findTrainerById(course.Trainer.value);
-        if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
+        if (!trainer.isSuccess) {return Result.fail(trainer.Error)} //TODO: Esto se va cuando se aplique el manejo de excepciones de dominio
         category = await this.categoryRepository.getCategoryById(course.Category.value);
-        if (!category.isSuccess) {return Result.fail(trainer.Error)}
+        if (!category.isSuccess) {return Result.fail(category.Error)}
 
         responseCourses.push({
           id: course.Id.Value,
@@ -50,9 +65,16 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
           trainer: trainer.Value.Name.trainerName
         })
       }
+
       return Result.success(new GetManyCoursesResponse(responseCourses));
-    } else {
-      return Result.fail(r.Error);
+      // if (r.isSuccess) {
+        
+      //   return Result.success(new GetManyCoursesResponse(responseCourses));
+      // } else {
+      //   return Result.fail(r.Error);
+      // }
+    } catch (error) {
+      return Result.fail(error);
     }
     
   }
