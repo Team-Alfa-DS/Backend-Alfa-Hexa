@@ -22,7 +22,7 @@ export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> impl
         const commentsFound = await runnerTransaction.manager.createQueryBuilder(BlogCommentEntity, "comment")
             //.take(perPage)
             //.skip(page)
-            .where("comment.blog_id = :id", { id })
+            .where("comment.blog_id = :id", { id: id.BlogId })
             .getMany();
 
         // const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },

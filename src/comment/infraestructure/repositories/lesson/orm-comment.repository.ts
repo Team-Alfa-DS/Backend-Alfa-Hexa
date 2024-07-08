@@ -22,7 +22,7 @@ export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> 
         
         
         const commentsFound = await runnerTransaction.manager.createQueryBuilder(LessonCommentEntity, "comment")
-            .where("comment.lesson_id = :id", { id })
+            .where("comment.lesson_id = :id", { id: id.LessonId })
             .getMany();
 
 
