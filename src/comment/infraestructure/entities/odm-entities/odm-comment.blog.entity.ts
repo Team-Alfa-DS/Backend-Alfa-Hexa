@@ -21,7 +21,7 @@ export class OdmBlogCommentEntity {
     body: string;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
-    blog: OdmBlogEntity;
+    blog: OdmBlogCommentEntity;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     user: OdmUserEntity;

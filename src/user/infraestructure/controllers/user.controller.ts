@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, FileTypeValidator, HttpException, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, FileTypeValidator, Get, HttpException, Inject, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { OrmUserRepository } from "../repositories/orm-user.repository";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
@@ -34,6 +34,13 @@ import { Model } from "mongoose";
 import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
 import { OdmUserRespository } from "../repositories/odm-user.repository";
 import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { UpdateUserPasswordEvent } from "../events/synchronize/update-user-password.event";
+import { UpdateUserEmailEvent } from "../events/synchronize/update-user-email.event";
+import { UpdateUserImageEvent } from "../events/synchronize/update-user-image.event";
+import { UpdateUserNameEvent } from "../events/synchronize/update-user-name.event";
+import { UpdateUserPhoneEvent } from "../events/synchronize/update-user-phone.event";
+import { Synchronize } from "../entities/synchronize";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -63,7 +70,7 @@ export class UserController {
     private readonly mailer: IMailer;
     private updateUserService: IService<UpdateUserRequest, UpdateUserResponse>;
     
-    constructor(private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>) {
+    constructor(private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>, private syncro: Synchronize) {
         this.userModel = userModel;
         this.mailer = new MailJet(mailerService);
 
@@ -72,12 +79,17 @@ export class UserController {
             this.userModel
         );
 
-        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
+        this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler), new UpdateUserPasswordEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserEmailUpdated', [new UpdateUserEmailEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserImageUpdated', [new UpdateUserImageEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserNameUpdated', [new UpdateUserNameEvent(this.odmUserRepository)]);
+        this.eventPublisher.subscribe('UserPhoneUpdated', [new UpdateUserPhoneEvent(this.odmUserRepository)]);
 
         this.updateUserService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new UpdateUserService(
                     this.userRepository,
+                    this.odmUserRepository,
                     this.transactionHandler,
                     this.encryptor,
                     this.eventPublisher
@@ -108,6 +120,12 @@ export class UserController {
         )
         const result = await this.updateUserService.execute(dataUser);
         if (result.isSuccess) return result.Value;
-        HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        // // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        throw ExceptionMapper.toHttp(result.Error);
+    }
+
+    @Get('synchronize')
+    sync() {
+        this.syncro.execute()
     }
 }

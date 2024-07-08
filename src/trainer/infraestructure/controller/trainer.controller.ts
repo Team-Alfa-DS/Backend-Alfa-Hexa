@@ -41,6 +41,7 @@ import { FindAllTrainersService, GetAllTrainersRequest, GetAllTrainersResponse} 
 import { GetUser } from '../decorador/decoradorGetUser';
 import { User } from 'src/user/domain/user';
 import { get } from 'http';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
@@ -105,7 +106,8 @@ export class TrainerController {
     const request = new FindOneTrainerRequest(trainerId);
     const oneTrainer = await this.findOneTrainerService.execute(request);
     if (!oneTrainer.isSuccess) {
-      throw new HttpException(oneTrainer.Message, oneTrainer.StatusCode);
+      // throw new HttpException(oneTrainer.Message, oneTrainer.StatusCode);
+      throw ExceptionMapper.toHttp(oneTrainer.Error);
     }
     return oneTrainer.Value;
   }
@@ -132,7 +134,8 @@ export class TrainerController {
     const request = new FollowTrainerRequest(idTrainer, req.user.tokenUser.id);
     const follow = await this.followTrainerService.execute(request);
     if (!follow.isSuccess) {
-      throw new HttpException(follow.Message, follow.StatusCode);
+      // throw new HttpException(follow.Message, follow.StatusCode);
+      throw ExceptionMapper.toHttp(follow.Error);
     }
     return follow.Value;
   }
@@ -164,7 +167,7 @@ export class TrainerController {
     {
       return result.Value;
     } else {
-      throw new HttpException(result.Message, result.StatusCode);
+      // throw new HttpException(result.Message, result.StatusCode);
     }
     
   }

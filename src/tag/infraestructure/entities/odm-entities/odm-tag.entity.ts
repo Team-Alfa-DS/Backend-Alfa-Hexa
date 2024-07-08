@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Type } from "class-transformer";
+import mongoose, { Types } from "mongoose";
+import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 
 @Schema({collection: 'tag'})
 export class OdmTagEntity {

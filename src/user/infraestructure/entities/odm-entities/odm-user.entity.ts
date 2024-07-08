@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Types } from "mongoose";
+import { Type } from "class-transformer";
+import mongoose, { Types } from "mongoose";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { UserRole } from "src/user/domain/enums/role-user.type";
 
 @Schema({collection: 'user'})
@@ -22,8 +24,11 @@ export class OdmUserEntity {
     @Prop({required: true, enum: UserRole, default: UserRole.CLIENT})
     type: UserRole;
 
-    @Prop({required: false})
+    @Prop({required: false, type: Types.Buffer})
     image?: string;
+
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    trainers: OdmTrainerEntity[];
 
     static create (id: string, email: string, name: string, password: string, phone: string, type: UserRole, image: string) {
         const odmUser = new OdmUserEntity();

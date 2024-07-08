@@ -1,17 +1,23 @@
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
+import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 
 export class GetCourseCountService extends IService<GetCourseCountRequest, GetCourseCountResponse> {
   constructor(private courseRepository: ICourseRepository) {super()}
   
-  async execute(service: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
-    const count = await this.courseRepository.getCourseCount(service.category, service.trainer);
+  async execute(request: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
+    try {
+      let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
+      if (request.category) {courseCategory = new CourseCategory(request.category)}
+      if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
+      const count = await this.courseRepository.getCourseCount(courseCategory, courseTrainer);
 
-    if (count.isSuccess) {
-      return Result.success(new GetCourseCountResponse(count.Value), count.StatusCode);
-    } else {
-      return Result.fail(count.Error, count.StatusCode, count.Message);
+      return Result.success(new GetCourseCountResponse(count));
+    
+    } catch (error) {
+      return Result.fail(error);
     }
   }
 
@@ -19,8 +25,8 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
 
 export class GetCourseCountRequest implements ServiceRequestDto {
   constructor(
-    readonly category: string,
-    readonly trainer: string
+    readonly category?: string,
+    readonly trainer?: string
   ) {}
 
   dataToString(): string {

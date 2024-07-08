@@ -28,9 +28,9 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
             for (const progress of progressUser) {
                 progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
             }
-            return Result.success(progressDomainList, 200);
+            return Result.success(progressDomainList);
         } catch (err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
     }
     
@@ -42,12 +42,12 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
             .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId: userId.Id})
             .getOne();
             
-            if (!progress) return Result.fail(new Error('El usuario no posee progreso'), 404, 'El usuario no posee progreso');
+            if (!progress) return Result.fail(new Error('El usuario no posee progreso'));
 
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
-            return Result.success(progressDomain, 200);
+            return Result.success(progressDomain);
         } catch (err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
     }
 
@@ -56,9 +56,9 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
         try {
             const ormProgress = await this.ormProgressMapper.toPersistence(progress);
             await runnerTransaction.manager.save(OrmProgressEntity, ormProgress);
-            return Result.success<Progress>(progress, 200)
+            return Result.success<Progress>(progress)
         } catch(err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
     }
     
@@ -69,13 +69,13 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             
-            // for (const progress of progressCourse) {
-            //     progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
-            // }
+            for (const progress of progressCourse) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
 
-            return Result.success(progressDomainList, 200)
+            return Result.success(progressDomainList)
         } catch(err) {
-            return Result.fail(new Error(err.message), err.code || 500, err.message || 'Ha ocurrido un error inesperado');
+            return Result.fail(new Error(err.message));
         }
 
     }

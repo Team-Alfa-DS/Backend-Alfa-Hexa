@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Type } from "class-transformer";
 import mongoose, { Types } from "mongoose";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
@@ -11,7 +12,7 @@ export class OdmCourseEntity {
     id: string;
 
     @Prop({required: true})
-    title: string;
+    name: string;
 
     @Prop({required: true})
     description: string;
@@ -20,28 +21,57 @@ export class OdmCourseEntity {
     image: string;
 
     @Prop({required: true, type: Date})
-    date: Date;
+    publication_date: Date;
 
     @Prop({required: true})
-    durationMinutes: number;
+    minutes: number;
 
     @Prop({required: true})
-    durationWeeks: number;
+    weeks: number;
 
     @Prop({required: true})
     level: string;
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
     lessons: OdmLessonEntity[];
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
+    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
     tags: OdmTagEntity[];
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     category: OdmCategoryEntity;
 
-    @Prop({required: true, type: [mongoose.Schema.Types.Mixed]})
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     trainer: OdmTrainerEntity;
+
+    static create(
+        id: string,
+        name: string,
+        description: string,
+        publication_date: Date,
+        minutes: number,
+        weeks: number,
+        level: string,
+        image: string,
+        tags: OdmTagEntity[],
+        category: OdmCategoryEntity,
+        trainer: OdmTrainerEntity
+      ): OdmCourseEntity {
+        const odmCourse = new OdmCourseEntity();
+        odmCourse.id = id;
+        odmCourse.name = name;
+        odmCourse.description = description;
+        odmCourse.publication_date = publication_date;
+        odmCourse.minutes = minutes;
+        odmCourse.weeks = weeks;
+        odmCourse.level = level;
+        odmCourse.image = image;
+        odmCourse.tags = tags;
+        odmCourse.category = category;
+        odmCourse.trainer = trainer;
+        odmCourse.lessons = []
+        return odmCourse;
+      }
 }
 
 export const CourseSchema = SchemaFactory.createForClass(OdmCourseEntity);
