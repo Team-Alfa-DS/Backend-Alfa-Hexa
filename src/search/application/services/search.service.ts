@@ -90,7 +90,7 @@ export class SearchService extends IService<SearchRequestDto, SearchResponseDto>
     }
 
     for (let blog of blogs) {
-      trainer = await this.trainerRepository.findTrainerById(TrainerId.create(blog.Trainer));
+      trainer = await this.trainerRepository.findTrainerById(blog.Trainer);
       if (!trainer.isSuccess) {return Result.fail(trainer.Error)}
       
       category = await this.categoryRepository.getCategoryById(CategoryId.create(blog.Category.value));

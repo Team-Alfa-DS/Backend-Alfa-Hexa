@@ -16,7 +16,7 @@ export class BlogTag extends ValueObject<BlogTag>{
     }
 
     public static create(blogTag: string): BlogTag {
-        return new BlogTag(blogTag);
+        return new BlogTag(blogTag.toLowerCase());
     }
 
     private isValid(value: string): boolean {
