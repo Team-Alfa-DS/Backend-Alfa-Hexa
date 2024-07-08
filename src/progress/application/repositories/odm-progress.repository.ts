@@ -4,7 +4,7 @@ import { Progress } from "src/progress/domain/progress";
 import { UserId } from "src/user/domain/value-objects/user-id";
 
 export interface IOdmProgressRepository {
-    saveProgress(progress: Progress): Promise<Result<Progress>>;
+    saveProgress(progress: Progress): Promise<void>;
     findProgressByUserCourse(userId: UserId, lessons: Lesson[]): Promise<Result<Progress[]>>;
     findLastProgressByUser(userId: UserId): Promise<Result<Progress>>;
     findProgressByUser(userId: UserId): Promise<Result<Progress[]>>;
