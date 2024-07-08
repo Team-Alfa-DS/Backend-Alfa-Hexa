@@ -24,7 +24,7 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
     async findProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner(); 
         try {
-            const progressUser = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
+            const progressUser = await this.find({relations: {lesson: true}, where: {user_id: userId.Id}});
             let progressDomainList: Progress[] = [];
 
             for (const progress of progressUser) {
@@ -39,13 +39,12 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
     async findLastProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progress = await runnerTransaction.manager
+            const progressInc = await runnerTransaction.manager
             .createQueryBuilder(ProgressEntity, "progress")
             .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId: userId.Id})
             .getOne();
-            
+            const progress = await this.findOne({relations: {lesson: true}, where: {user_id: userId.Id, lesson_id: progressInc.lesson_id}})
             if (!progress) return Result.fail(new Error('El usuario no posee progreso'), 404, 'El usuario no posee progreso');
-
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
             return Result.success(progressDomain, 200);
         } catch (err) {
@@ -67,13 +66,13 @@ export class OrmProgressRepository extends Repository<ProgressEntity> implements
     async findProgressByUserCourse(userId: UserId, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progressList = await runnerTransaction.manager.findBy(ProgressEntity, {user_id: userId.Id});
+            const progressList = await runnerTransaction.manager.find(ProgressEntity, {relations: {lesson: true}, where: {user_id: userId.Id}});
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             
-            // for (const progress of progressCourse) {
-            //     progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
-            // }
+            for (const progress of progressCourse) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
 
             return Result.success(progressDomainList, 200)
         } catch(err) {

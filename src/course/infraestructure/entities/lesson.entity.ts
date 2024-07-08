@@ -23,7 +23,7 @@ export class LessonEntity {
     @Column({nullable: true})
     image: string;
 
-    @ManyToOne(() => CourseEntity, course => course.lessons)
+    @ManyToOne(() => CourseEntity, course => course.lessons, {eager: true})
     @JoinColumn({name: 'course_id'})
     course: CourseEntity;
 
