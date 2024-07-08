@@ -40,10 +40,10 @@ export class BlogController {
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
-        // const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
+        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
         const logger = new NestLogger();
         this.getAllBlogService = new ExceptionLoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+            new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
         this.getBlogByIdService = new ExceptionLoggerDecorator(
