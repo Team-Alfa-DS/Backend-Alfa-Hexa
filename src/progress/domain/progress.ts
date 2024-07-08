@@ -11,6 +11,7 @@ import { ProgressMarkAsCompletedUpdated } from "./events/progress-markAsComplete
 import { ProgressTimeUpdated } from "./events/progress-time-updated.event";
 import { ProgressLastTimeUpdated } from "./events/progress-lastTime-updated.event";
 import { CourseId } from "src/course/domain/value-objects/course-id";
+import { ProgressRegister } from "./events/progress-register.event";
 
 export class Progress extends AggregateRoot<ProgressId>{
     private markAsCompleted: ProgressMarkAsCompleted;
@@ -83,5 +84,9 @@ export class Progress extends AggregateRoot<ProgressId>{
 
     UpdateLastTime(lastTime: ProgressLastTime): void {
         this.apply(ProgressLastTimeUpdated.create(this.Id, lastTime));
+    }
+
+    Register() {
+        this.apply(ProgressRegister.create(this.Id, this.MarkAsCompleted, this.User, this.Course, this.Time, this.LastTime));
     }
 }

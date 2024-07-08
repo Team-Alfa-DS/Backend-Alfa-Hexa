@@ -37,6 +37,19 @@ import { ProfileProgressResponse } from 'src/progress/application/dtos/response/
 import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
 import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { OdmProgressRepository } from '../repositories/odm-progress.repository';
+import { Model } from 'mongoose';
+import { OdmProgressEntity } from '../entities/odm-entities/odm-progress.entity';
+import { OdmProgressMapper } from '../mappers/odm-progress.mapper';
+import { OdmUserMapper } from 'src/user/infraestructure/mappers/odm-mappers/odm-user.mapper';
+import { InjectModel } from '@nestjs/mongoose';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmCourseEntity } from 'src/course/infraestructure/entities/odm-entities/odm-course.entity';
+import { OdmLessonEntity } from 'src/course/infraestructure/entities/odm-entities/odm-lesson.entity';
+import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
+import { EventBus } from 'src/common/infraestructure/events/event-bus';
+import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
+import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -47,6 +60,8 @@ export class ProgressController {
 
     private progressMapper: OrmProgressMapper = new OrmProgressMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
+    private odmProgressMapper: OdmProgressMapper;
+    private odmUserMapper: OdmUserMapper;
 
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
         PgDatabaseSingleton.getInstance().createQueryRunner()
@@ -56,17 +71,18 @@ export class ProgressController {
         this.progressMapper, PgDatabaseSingleton.getInstance()
     );
 
+    private readonly odmprogressRepository: OdmProgressRepository;
+    private readonly odmUserRepository: OdmUserRespository;
+
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
         PgDatabaseSingleton.getInstance()
-    );
-
-    private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, PgDatabaseSingleton.getInstance()
     );
 
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
         PgDatabaseSingleton.getInstance()
     );
+
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
 
     private readonly logger: ILogger = new NestLogger();
 
@@ -76,14 +92,22 @@ export class ProgressController {
     private coursesProgressService: IService<CoursesProgressRequest, CoursesProgressResponse>;
     private profileProgressService: IService<ProfileProgressRequest, ProfileProgressResponse>;
 
-    constructor() {
+    constructor(@InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('progress') progressModel: Model<OdmProgressEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>) {
+        this.odmUserMapper = new OdmUserMapper();
+        this.odmProgressMapper = new OdmProgressMapper(courseModel, userModel, lessonModel);
+
+        this.odmUserRepository = new OdmUserRespository(this.odmUserMapper, userModel);
+        this.odmprogressRepository = new OdmProgressRepository(progressModel, this.odmProgressMapper);
+        
+        
         this.markEndProgressService = new ExceptionLoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new MarkEndProgressService(
                     this.progressRepository,
                     this.courseRepository,
-                    this.userRepository,
-                    this.transactionHandler
+                    this.odmUserRepository,
+                    this.transactionHandler,
+                    this.eventPublisher
                 ),
                 this.auditRepository
             ),
@@ -91,8 +115,8 @@ export class ProgressController {
         );
         this.getOneProgressService = new ExceptionLoggerDecorator(
             new GetOneProgressService(
-                this.userRepository,
-                this.progressRepository,
+                this.odmUserRepository,
+                this.odmprogressRepository,
                 this.courseRepository,
                 this.transactionHandler
             ),
@@ -100,28 +124,25 @@ export class ProgressController {
         );
         this.trendingProgressService = new ExceptionLoggerDecorator(
             new TrendingProgressService(
-                this.userRepository,
-                this.progressRepository,
-                this.courseRepository,
-                this.transactionHandler
+                this.odmUserRepository,
+                this.odmprogressRepository,
+                this.courseRepository
             ),
             this.logger
         );
         this.coursesProgressService = new ExceptionLoggerDecorator(
             new CoursesProgressService(
-                this.progressRepository,
+                this.odmprogressRepository,
                 this.courseRepository,
-                this.userRepository,
-                this.transactionHandler
+                this.odmUserRepository
             ),
             this.logger
         );
         this.profileProgressService = new ExceptionLoggerDecorator(
             new ProfileProgressService(
-                this.progressRepository,
+                this.odmprogressRepository,
                 this.courseRepository,
-                this.userRepository,
-                this.transactionHandler
+                this.odmUserRepository
             ),
             this.logger
         );
