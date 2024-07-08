@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsOptional, IsString } from "class-validator";
 
 export class GetCourseCountQueryDto {
   
@@ -8,13 +8,15 @@ export class GetCourseCountQueryDto {
     example: 'Yoga'
   })
   @IsString()
-  category: string;
+  @IsOptional()
+  category?: string;
 
   @ApiProperty({
     description: 'Id del entrenador de los cursos a contar',
     example: '3fcfac6c-53d1-47f1-ae9a-2351a86c5d0d'
   })
   @IsString()
-  trainer: string;
+  @IsOptional()
+  trainer?: string;
 
 }

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Type } from "class-transformer";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 

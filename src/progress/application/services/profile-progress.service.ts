@@ -5,7 +5,7 @@ import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { Course } from "src/course/domain/Course";
 import { Progress } from "src/progress/domain/progress";
@@ -13,6 +13,7 @@ import { CourseProgress } from "../dtos/response/courses-progress.response";
 import { CalcPercentProgressResponse } from "src/progress/domain/response/calc-percent-progress.response";
 import { CalcTotalCoursesPercentService } from "src/progress/domain/services/calc-total-courses-percent";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 export class ProfileProgressService extends IService<ProfileProgressRequest, ProfileProgressResponse> {
 
@@ -49,8 +50,8 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
 
         let courses: Course[] = [];
         for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(pro.Id.LessonId);
-            if (courses.findIndex(c => c.Id.equals(course.Value.Id) /*c.id == course.Value.id*/) == -1) courses.push(course.Value);
+            const course = await this.courseRepository.getCourseByLessonId(new LessonId(pro.Id.LessonId));
+            if (courses.findIndex(c => c.Id.equals(course.Id) /*c.id == course.Value.id*/) == -1) courses.push(course);
         }
 
         let progressUserList: Progress[][] = [];

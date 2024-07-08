@@ -23,6 +23,7 @@ import { OrmCategoryRepository } from 'src/category/infraestructure/repositories
 import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-category.mapper';
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 
 
 @ApiTags('Search')
@@ -82,6 +83,7 @@ export class SearchController {
             return result.Value;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
         }
     }
 
@@ -98,6 +100,7 @@ export class SearchController {
             return result.Value;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
         }
     }
 

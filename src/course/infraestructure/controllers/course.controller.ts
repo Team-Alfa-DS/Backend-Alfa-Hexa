@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe } from "@nestjs/common";
+import { Controller, Get, Inject, Param, UseGuards, Query, HttpException, ParseUUIDPipe, Post, Body } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 import { GetManyCoursesService, GetManyCoursesRequest, GetManyCoursesResponse } from "src/course/application/services/getManyCourses.service";
 import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } from "src/course/application/services/getCourseById.service";
@@ -23,6 +23,24 @@ import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer
 import { OrmCategoryRepository } from "src/category/infraestructure/repositories/orm-category.repository";
 import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { OdmCourseRepository } from "../repositories/OdmCourse.repository";
+import { InjectModel } from "@nestjs/mongoose";
+import { OdmCourseEntity } from "../entities/odm-entities/odm-course.entity";
+import { Model } from "mongoose";
+import { PostCourseBodyDto } from "../dtos/postCourseBodyDto.dto";
+import { PostCourseRequestDto, PostCourseResponseDto, PostCourseService } from "src/course/application/services/postCourse.service";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { SaveCourseEvent } from "../events/synchronize/save-course.event";
+import { PostLesonBodyDto } from "../dtos/postLessonBody.dto";
+import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
+import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
+import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -32,23 +50,60 @@ export class CourseController {
   private readonly getManyCoursesService: IService<GetManyCoursesRequest, GetManyCoursesResponse>;
   private readonly getCourseByIdService: IService<GetCourseByIdRequest, GetCourseByIdResponse>;
   private readonly getCourseCountService: IService<GetCourseCountRequest, GetCourseCountResponse>;
+  private readonly postCourseService: IService<PostCourseRequestDto, PostCourseResponseDto>;
+  private readonly postLessonService: IService<PostLessonRequestDto, PostLessonResponseDto>;
 
-  constructor() {
-    const courseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+  private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
+
+  constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>, 
+              @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+              @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+              @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>
+  ) {
+    const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
+    
+    this.eventPublisher.subscribe('CourseRegistered', [new SaveCourseEvent(OdmCourseRepositoryInstance)]);
+    this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
+  
 
     this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+      new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(courseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+      new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
     this.getCourseCountService = new ExceptionLoggerDecorator(
-      new GetCourseCountService(courseRepositoryInstance),
+      new GetCourseCountService(OdmCourseRepositoryInstance),
+      logger
+    );
+    this.postCourseService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new PostCourseService(
+          OrmCourseRepositoryInstance, 
+          new UuidGen(),
+          // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
+          EventManagerSingleton.getInstance()
+        ),
+        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
+      ),
+      logger
+    );
+    this.postLessonService = new ExceptionLoggerDecorator(
+      new ServiceDBLoggerDecorator(
+        new PostLessonService(
+          OrmCourseRepositoryInstance,
+          new UuidGen(),
+          EventManagerSingleton.getInstance()
+        ),
+        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
+      ),
       logger
     )
   }
@@ -88,7 +143,7 @@ export class CourseController {
   })
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
-  async getAllCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {
+  async getManyCourses(@Query() manyCoursesQueryDto: GetManyCoursesQueryDto) {
     const request = new GetManyCoursesRequest(
       manyCoursesQueryDto.filter,
       manyCoursesQueryDto.category,
@@ -102,7 +157,7 @@ export class CourseController {
     {
       return result.Value;
     } else {
-      // throw new HttpException(result.Message, result.StatusCode);
+      throw ExceptionMapper.toHttp(result.Error);
     }
     
   }
@@ -121,7 +176,48 @@ export class CourseController {
     if (result.isSuccess) {
       return result.Value;
     } else {
-      // throw new HttpException(result.Message, result.StatusCode)
+      throw ExceptionMapper.toHttp(result.Error);
+    }
+  }
+
+  @Post()
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async postCourse(@Body() postCourseBodyDto: PostCourseBodyDto) {
+    const response = await this.postCourseService.execute(new PostCourseRequestDto(
+      postCourseBodyDto.title,
+      postCourseBodyDto.description,
+      postCourseBodyDto.imageUrl,
+      postCourseBodyDto.durationWeeks,
+      postCourseBodyDto.level,
+      postCourseBodyDto.tags,
+      postCourseBodyDto.categoryId,
+      postCourseBodyDto.trainerId
+    ));
+
+    if (response.isSuccess) {
+      return response.Value;
+    } else {
+      return ExceptionMapper.toHttp(response.Error);
+    }
+  }
+
+  @Post('lesson')
+  @ApiBearerAuth('token')
+  @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+  async postLesson(@Body() postLessonBodyDto: PostLesonBodyDto) {
+    const response = await this.postLessonService.execute(new PostLessonRequestDto(
+      postLessonBodyDto.courseId,
+      postLessonBodyDto.title,
+      postLessonBodyDto.content,
+      postLessonBodyDto.seconds,
+      postLessonBodyDto.videoUrl
+    ));
+
+    if (response.isSuccess) {
+      return response.Value;
+    } else {
+      return ExceptionMapper.toHttp(response.Error);
     }
   }
 }

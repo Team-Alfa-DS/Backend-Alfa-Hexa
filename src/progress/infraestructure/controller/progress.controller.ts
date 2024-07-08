@@ -36,6 +36,7 @@ import { ProfileProgressRequest } from 'src/progress/application/dtos/request/pr
 import { ProfileProgressResponse } from 'src/progress/application/dtos/response/profile-progress.response';
 import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
 import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -140,6 +141,7 @@ export class ProgressController {
         
         if (response.isSuccess) return response.Value;
         // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw ExceptionMapper.toHttp(response.Error)
     }
 
     @Get('one/:courseId')
@@ -156,6 +158,7 @@ export class ProgressController {
 
         if (response.isSuccess) return response.Value;
         // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw ExceptionMapper.toHttp(response.Error)
     }
     
     @Get('trending')
@@ -172,6 +175,7 @@ export class ProgressController {
 
         if (response.isSuccess) return response.Value;
         // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw ExceptionMapper.toHttp(response.Error)
     }
 
     @Get('courses')
@@ -181,6 +185,7 @@ export class ProgressController {
 
         if (response.isSuccess) return response.Value.courseProgress;
         // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw ExceptionMapper.toHttp(response.Error)
     }
 
     @Get('profile')
@@ -190,5 +195,6 @@ export class ProgressController {
 
         if (response.isSuccess) return response.Value;
         // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        throw ExceptionMapper.toHttp(response.Error)
     }
 }
