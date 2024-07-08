@@ -14,37 +14,36 @@ import { CalcPercentProgressResponse } from "src/progress/domain/response/calc-p
 import { CalcTotalCoursesPercentService } from "src/progress/domain/services/calc-total-courses-percent";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
+import { IOdmProgressRepository } from "../repositories/odm-progress.repository";
 
 export class ProfileProgressService extends IService<ProfileProgressRequest, ProfileProgressResponse> {
 
-    private readonly progressRepository: IProgressRepository;
+    private readonly progressRepository: IOdmProgressRepository;
     private readonly courseRepository: ICourseRepository;
-    private readonly userRepository: IUserRepository;
-    private readonly transactionHandler: ITransactionHandler;
+    private readonly userRepository: IOdmUserRepository;
     private readonly calcPercent: CalcPercentService;
     private readonly calcTotalCoursesPercent: CalcTotalCoursesPercentService;
 
     constructor(
-        progressRepository: IProgressRepository,
+        progressRepository: IOdmProgressRepository,
         courseRepository: ICourseRepository,
-        userRepository: IUserRepository,
-        transactionHandler: ITransactionHandler
+        userRepository: IOdmUserRepository,
     ) {
         super();
         this.progressRepository = progressRepository;
         this.courseRepository = courseRepository;
         this.userRepository = userRepository;
-        this.transactionHandler = transactionHandler;
         this.calcPercent = new CalcPercentService();
         this.calcTotalCoursesPercent = new CalcTotalCoursesPercentService();
     }
 
     async execute(value: ProfileProgressRequest): Promise<Result<ProfileProgressResponse>> {
-        const user = await this.userRepository.findUserById(UserId.create(value.userId), this.transactionHandler);
+        const user = await this.userRepository.findUserById(UserId.create(value.userId));
 
         if (!user.isSuccess) return Result.fail(user.Error);
 
-        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId), this.transactionHandler);
+        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId));
 
         if (!progressUser.isSuccess) return Result.fail(progressUser.Error);
 
@@ -56,7 +55,7 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
 
         let progressUserList: Progress[][] = [];
         for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons, this.transactionHandler);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
             progressUserList.push(progress.Value);
         }
 

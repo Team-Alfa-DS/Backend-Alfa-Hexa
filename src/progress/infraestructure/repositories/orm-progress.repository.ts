@@ -69,9 +69,9 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             
-            // for (const progress of progressCourse) {
-            //     progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
-            // }
+            for (const progress of progressCourse) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
 
             return Result.success(progressDomainList)
         } catch(err) {
