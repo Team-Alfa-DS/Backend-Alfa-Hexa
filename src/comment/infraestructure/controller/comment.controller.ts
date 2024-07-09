@@ -51,6 +51,7 @@ import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { CreateCommentBlogEvent } from "src/blog/infraestructure/events/synchronize/commenBlog-posted.event";
 
 
 @ApiBearerAuth()
@@ -136,7 +137,8 @@ export class CommentController{
             userModel
         );
         
-        this.eventPublisher.subscribe('CommentPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
+        this.eventPublisher.subscribe('CommentLessonPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
+        this.eventPublisher.subscribe('CommentBlogPosted', [new CreateCommentBlogEvent(odmBlogRepositoryInstance)]);
 
         this.getCommentBlogService = new LoggerDecorator(
             new GetCommentBlogService(

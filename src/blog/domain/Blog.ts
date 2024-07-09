@@ -103,8 +103,8 @@ constructor(
         body: CommentBlogBody,
         userId: CommentBlogUserId,
         BlogId: BlogCommentBlogId,
-        userLiked: CommentBlogUserLiked,
-        userDisliked: CommentBlogUserDisliked
+        //userLiked: CommentBlogUserLiked,
+        //userDisliked: CommentBlogUserDisliked
     ){
         this.apply(new CommentBlogPosted(
             id, 
@@ -112,8 +112,13 @@ constructor(
             body, 
             userId, 
             BlogId, 
-            userLiked, 
-            userDisliked));
+            //userLiked, 
+            //userDisliked
+        ));
+    }
+
+    getComments():BlogCommentId[]{
+        return this.comments;
     }
 
     get Title(): BlogTitle{

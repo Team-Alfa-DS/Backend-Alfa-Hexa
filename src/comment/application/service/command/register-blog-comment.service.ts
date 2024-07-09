@@ -6,13 +6,11 @@ import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
-import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { CommentBlogPublicationDate } from "src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
 import { CommentBlogBody } from "src/comment/domain/valueObjects/blog/comment-blog-body";
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
-import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
@@ -66,7 +64,12 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
             null,
         );
 
+        let comments = blog.Value.getComments();
+
+        comments.push(commentID);
+
         await this.blogRepository.saveComment( comment );
+        await this.odmBlogRepository.saveBlog( blog.Value, comments );
 
         blog.Value.PostComment(
             commentID,
@@ -74,8 +77,6 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
             body,
             userId,
             target,
-            null,
-            null,
         );
         
         this.eventPublisher.publish(blog.Value.pullDomainEvents());

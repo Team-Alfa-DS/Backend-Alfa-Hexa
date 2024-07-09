@@ -29,7 +29,7 @@ import { CommentLessonBody } from 'src/comment/domain/valueObjects/lesson/commen
 import { CommentLessonUserId } from 'src/comment/domain/valueObjects/lesson/comment-lesson-userId';
 import { LessonCommentLessonId } from 'src/comment/domain/valueObjects/lesson/comment-lesson-lessonId';
 import { CommentLessonUserLiked } from 'src/comment/domain/valueObjects/lesson/comment-lesson-userLiked';
-import { CommentPosted } from './events/comment-lesson-posted.event';
+import { CommentLessonPosted } from './events/comment-lesson-posted.event';
 import { CommentLesson } from './entities/comment-lesson';
 
 export class Course extends AggregateRoot<CourseId>{
@@ -118,7 +118,7 @@ export class Course extends AggregateRoot<CourseId>{
     // userLiked: CommentLessonUserLiked,
     // userDisliked: CommentLessonUserDisliked
   ){
-    this.apply(new CommentPosted(id, publicationDate, body, userId, LessonId));
+    this.apply(new CommentLessonPosted(id, publicationDate, body, userId, LessonId));
     // this.apply(new CommentPosted(id, publicationDate, body, userId, LessonId, userLiked, userDisliked));
   }
 
@@ -159,7 +159,7 @@ export class Course extends AggregateRoot<CourseId>{
       this.addMinutes(new CourseDurationMinutes(Math.round(seconds / 60)));
     }
 
-    if (event instanceof CommentPosted){
+    if (event instanceof CommentLessonPosted){
       const comment: CommentLesson = CommentLesson.create(
         event.id,
         event.publicationDate,

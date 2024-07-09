@@ -66,26 +66,5 @@ export class OdmBlogMapper {
         );
     }
 
-    async toPersistence(blog: Blog): Promise<OdmBlogEntity> {
-        
-        let odmBlogMapper = new OdmBlogMapper(this.userModel,this.blogModel,this.commentModel, this.trainerModel);
-
-        let trainerRepo = new OdmTrainerRepository(odmTrainerMapper, this.trainerModel);
-        let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel);
-        
-        
-        
-        let odmBlog = OdmBlogEntity.create(
-            blog.Id.value,
-            blog.Title.value,
-            blog.Content.value,
-            blog.Publication_date.value,
-            blog.Trainer.trainerId,
-            blog.Category.value,
-            blog.Tags.map((tag) => tag.value),
-            blog.Images.map((image) => image.value)
-        );
-        return odmBlog;
-    }
     
 }

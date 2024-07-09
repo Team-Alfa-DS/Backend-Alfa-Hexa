@@ -15,8 +15,8 @@ export class CommentBlogPosted extends DomainEvent{
         public body: CommentBlogBody,
         public userId: CommentBlogUserId,
         public BlogId: BlogCommentBlogId,
-        public userLiked: CommentBlogUserLiked,
-        public userDisliked: CommentBlogUserDisliked
+        //public userLiked: CommentBlogUserLiked,
+        //public userDisliked: CommentBlogUserDisliked
     ){
         super();
     }

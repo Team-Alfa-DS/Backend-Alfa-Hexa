@@ -7,7 +7,7 @@ import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comm
 import { CommentLessonUserLiked } from "src/comment/domain/valueObjects/lesson/comment-lesson-userLiked";
 import { DomainEvent } from "src/common/domain/domain-event";
 
-export class CommentPosted extends DomainEvent {
+export class CommentLessonPosted extends DomainEvent {
 
 constructor(
     public id: LessonCommentId,

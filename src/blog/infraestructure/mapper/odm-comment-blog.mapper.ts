@@ -18,6 +18,7 @@ import { UserId } from "src/user/domain/value-objects/user-id";
 import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog.repository";
 import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { find } from 'rxjs';
 
 
 export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentEntity>{
@@ -60,16 +61,22 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
         let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel);
         
         let user = await userRepo.findUserById(UserId.create(Domain.UserId.UserId));
-        let blog = await blogRepo.getBlogById(Domain.BlogId.BlogId.value);
 
         let userPersistence = await odmUserMapper.toPersistence(user.Value);
-        let blogPersistence = await odmBlogMapper.toPersistence(blog.Value);
+
+        const blog = await this.blogModel.aggregate<OdmBlogEntity>([
+            {
+                $match: {
+                    'id': Domain.BlogId.BlogId
+                }
+            }
+        ]);
 
         const OrmComment = OdmBlogCommentEntity.create(
             Domain.Id.commentId,
             Domain.PublicationDate.PublicationDate,
             Domain.Body.Body,
-            blogPersistence,
+            blog[0],
             userPersistence,
             Domain.UserLiked.UserLiked,
             Domain.UserDisliked.UserDisliked
