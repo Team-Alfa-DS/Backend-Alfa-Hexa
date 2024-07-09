@@ -24,7 +24,6 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
         let trainerId = id.trainerId;
 
         const trainer = await this.trainerModel.findOne({id: trainerId});
-
         if (!trainer) {
             return Result.fail<Trainer>(new Error('Trainer not found'));
         }

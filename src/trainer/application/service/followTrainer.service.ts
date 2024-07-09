@@ -27,8 +27,7 @@ export class FollowTrainerService extends IService<FollowTrainerRequest, FollowT
     if (!trainer.isSuccess) return Result.fail(new Error('No existe el trainer'));
     const trainerDomain = trainer.Value;
     trainerDomain.AddUserFollow(TrainerFollowerUserId.create(userId));
-
-    await this.trainerRepository.followTrainer( trainerDomain );
+    await this.trainerRepository.followTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
     this.eventPublisher.publish(trainerDomain.pullDomainEvents());
     const response = new FollowTrainerResponse()
     return Result.success(response);

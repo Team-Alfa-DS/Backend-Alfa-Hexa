@@ -12,6 +12,7 @@ import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto'
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
+import { TrainerFollowerUserId } from 'src/trainer/domain/valueObjects/trainer-userid';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainerEntity>
@@ -58,8 +59,12 @@ export class OrmTrainerRepository
     return oneTrainer;
   }
 
-  async followTrainer(trainer: Trainer): Promise<void> {
+  async followTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void> {
     const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer);
+    const followers = (await this.findOne({relations: {users: true}, where: {id: OrmTrainerEntity.id}})).users;
+    const userOrm = await this.userRepository.findOneBy({id: user.trainerFollowerUserId.Id})
+    followers.push(userOrm);
+    OrmTrainerEntity.users = followers;
     await this.save(OrmTrainerEntity);
   }
 

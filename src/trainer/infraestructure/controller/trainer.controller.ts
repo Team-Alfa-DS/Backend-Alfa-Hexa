@@ -94,7 +94,7 @@ export class TrainerController {
 
     this.odmTrainerMapper = new OdmTrainerMapper(courseModel, blogModel, userModel);
     this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper, userModel);
-    this.eventPublisher.subscribe('UpdateUsersTrainers', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
+    this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
     this.findOneTrainerService = new ExceptionLoggerDecorator(
       new FindOneTrainerService(
