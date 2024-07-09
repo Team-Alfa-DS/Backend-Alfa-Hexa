@@ -68,7 +68,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         
         if ( !result.isSuccess ) return Result.fail( result.Error );
         
-        const response = new AddCommentToServiceResponseDto();
+        const response = new AddCommentToServiceResponseDto(commentID.commentId);
 
         return Result.success<AddCommentToServiceResponseDto>( response );
     }

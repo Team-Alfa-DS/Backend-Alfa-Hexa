@@ -15,24 +15,27 @@ import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-
 import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
 import { OdmCourseRepository } from "../../repositories/OdmCourse.repository";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { OdmLessonCommentMapper } from "./odm-comment-lesson.mapper";
 
 export class OdmLessonMapper {
-  static async toDomain(entity: OdmLessonEntity) {
+  static async toDomain(entity: OdmLessonEntity, commentModel: Model<OdmLessonCommentEntity>) {
 
-    let courseModel = new Model<OdmCourseEntity>;
-    let categoryModel = new Model<OdmCategoryEntity>;
-    let trainerModel = new Model<OdmTrainerEntity>;
-    let tagModel = new Model<OdmTagEntity>;
-    let lessonModel = new Model<OdmLessonEntity>;
-    let commentModel = new Model<OdmLessonCommentEntity>
+    // let courseModel = new Model<OdmCourseEntity>;
+    // let categoryModel = new Model<OdmCategoryEntity>;
+    // let trainerModel = new Model<OdmTrainerEntity>;
+    // let tagModel = new Model<OdmTagEntity>;
+    // let lessonModel = new Model<OdmLessonEntity>;
+    // let commentModel = new Model<OdmLessonCommentEntity>;
+    // let 
 
-    let courseRepo: OdmCourseRepository = new OdmCourseRepository( courseModel, categoryModel, trainerModel, tagModel, lessonModel,commentModel)
+    // let courseRepo: OdmCourseRepository = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel,commentModel)
     
-    let course = await courseRepo.getCourseByLessonId(LessonId.create(entity.id));
+    // let course = await courseRepo.getCourseByLessonId(LessonId.create(entity.id));
 
-    let lesson = course.Lessons.find(lesson => lesson.id.Value === entity.id);
+    // let lesson = course.Lessons.find(lesson => lesson.id.Value === entity.id);
 
-    let comments = lesson.comments;
+    let comments = await commentModel.find();
+    comments = comments.filter((comment) => comment.lesson.id === entity.id )
 
     return new Lesson(
       new LessonId(entity.id),
@@ -40,7 +43,7 @@ export class OdmLessonMapper {
       new LessonContent(entity.content),
       new LessonDuration(entity.seconds),
       new LessonVideo(entity.video),
-      comments,
+      await OdmLessonCommentMapper.arrayToDomain(comments)
     );
   }
 

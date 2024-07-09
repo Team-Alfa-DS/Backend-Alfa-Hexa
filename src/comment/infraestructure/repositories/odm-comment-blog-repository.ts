@@ -1,5 +1,4 @@
 import { Result } from "src/common/domain/result-handler/result";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { Model } from "mongoose";
 import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
 import { OdmBlogCommentEntity } from "../entities/odm-entities/odm-comment.blog.entity";

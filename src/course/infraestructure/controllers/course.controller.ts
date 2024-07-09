@@ -38,6 +38,7 @@ import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
 import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
 import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -57,10 +58,11 @@ export class CourseController {
               @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
               @InjectModel('tag') tagModel: Model<OdmTagEntity>,
               @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
-              @InjectModel('comment') commentModel: Model<OdmLessonCommentEntity>
+              @InjectModel('lesson_comment') commentModel: Model<OdmLessonCommentEntity>,
+              @InjectModel('user') userModel: Model<OdmUserEntity>
   ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel);
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();

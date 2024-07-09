@@ -5,7 +5,7 @@ import { LessonTitle } from "../value-objects/lesson-title";
 import { Url } from "../../../common/domain/value-objects/url";
 import { LessonVideo } from "../value-objects/lesson-video";
 import { LessonId } from "../value-objects/lesson-id";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
+import { CommentLesson } from "./comment-lesson";
 
 export class Lesson {
   readonly id: LessonId;

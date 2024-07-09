@@ -47,13 +47,14 @@ import { OdmCourseRepository } from "src/course/infraestructure/repositories/Odm
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { CreateCommentLessonEvent } from "src/course/infraestructure/events/synchronize/create-commentLesson.event";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
-@Controller( 'comments' )
+@Controller( 'comment' )
 export class CommentController{
 
     private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
@@ -106,10 +107,11 @@ export class CommentController{
     constructor(@InjectModel('course') courseModel: Model<OdmCourseEntity>, 
                 @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
                 @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+                @InjectModel('user') userModel: Model<OdmUserEntity>,
                 @InjectModel('tag') tagModel: Model<OdmTagEntity>,
                 @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
-                @InjectModel('comment') commentLessonModel: Model<OdmLessonCommentEntity>,
-                @InjectModel('comment') commentBlogModel: Model<OdmBlogCommentEntity>){
+                @InjectModel('lesson_comment') commentLessonModel: Model<OdmLessonCommentEntity>,
+                @InjectModel('blog_comment') commentBlogModel: Model<OdmBlogCommentEntity>){
 
                     
                     
@@ -119,7 +121,8 @@ export class CommentController{
             trainerModel, 
             tagModel, 
             lessonModel, 
-            commentLessonModel
+            commentLessonModel,
+            userModel
         );
         
         this.eventPublisher.subscribe('CommentPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
@@ -143,6 +146,7 @@ export class CommentController{
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,
+                    this.eventPublisher,
                     this.idGenerator
                 ),
                 this.auditRepository
@@ -166,7 +170,7 @@ export class CommentController{
     
     }
     
-    @Get(':many')
+    @Get('/many')
     @ApiCreatedResponse({
         description: 'se retorno todos los comentarios correctamente',
         type: OrmBlogCommentEntity, 
@@ -182,11 +186,10 @@ export class CommentController{
         if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
             (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
             throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
-            //FIXME: Este error debería manejarse con excepciones de dominio
         }
         
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
-            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
+            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
 
             if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
@@ -194,7 +197,7 @@ export class CommentController{
             return result.Value;
 
         }else {
-            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
+            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
 

@@ -11,11 +11,11 @@ export class OdmLessonCommentEntity {
     @Prop({required: true, type: Date})
     publication_date: Date;
 
-    @Prop({required: false})
-    userLiked?: boolean;
+    // @Prop({required: false})
+    // userLiked?: boolean;
 
-    @Prop({required: false})
-    userDisliked?: boolean;
+    // @Prop({required: false})
+    // userDisliked?: boolean;
 
     @Prop({required: true})
     body: string;
@@ -33,8 +33,8 @@ export class OdmLessonCommentEntity {
         body: string, 
         lesson: OdmLessonEntity, 
         user: OdmUserEntity,
-        userLiked?: boolean,
-        userDisliked?: boolean
+        // userLiked?: boolean,
+        // userDisliked?: boolean
     ) {
         const odmCommentLesson = new OdmLessonCommentEntity();
         odmCommentLesson.id = id;
@@ -42,8 +42,8 @@ export class OdmLessonCommentEntity {
         odmCommentLesson.body = body;
         odmCommentLesson.lesson = lesson;
         odmCommentLesson.user = user;
-        odmCommentLesson.userLiked = userLiked;
-        odmCommentLesson.userDisliked = userDisliked;
+        // odmCommentLesson.userLiked = userLiked;
+        // odmCommentLesson.userDisliked = userDisliked;
         return odmCommentLesson; 
     }
 

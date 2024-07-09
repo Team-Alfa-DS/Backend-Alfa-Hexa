@@ -5,7 +5,6 @@ import { LessonContent } from "../value-objects/lesson-content";
 import { LessonDuration } from "../value-objects/lesson-duration";
 import { LessonVideo } from "../value-objects/lesson-video";
 import { LessonId } from "../value-objects/lesson-id";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 
 export class LessonPosted extends DomainEvent {
   
@@ -15,7 +14,7 @@ export class LessonPosted extends DomainEvent {
     public content: LessonContent,
     public seconds: LessonDuration,
     public video: LessonVideo,
-    public courseId: CourseId,
-    public comments: CommentLesson[]
+    public courseId: CourseId
+    // public comments: CommentLesson[]
   ) {super()}
 }

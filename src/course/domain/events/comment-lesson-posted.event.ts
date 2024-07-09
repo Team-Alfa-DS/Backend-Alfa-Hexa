@@ -15,7 +15,7 @@ constructor(
     public body: CommentLessonBody,
     public userId: CommentLessonUserId,
     public LessonId: LessonCommentLessonId,
-    public userLiked: CommentLessonUserLiked,
-    public userDisliked: CommentLessonUserDisliked
+    // public userLiked: CommentLessonUserLiked,
+    // public userDisliked: CommentLessonUserDisliked
     ) {super()}
 }

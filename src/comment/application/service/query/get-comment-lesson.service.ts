@@ -18,36 +18,40 @@ export class GetCommentLessonService extends IService<GetLessonCommentsServiceRe
     
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
 
-        if (!data.pagination.page) data.pagination.page = 0;
+        try {
+            if (!data.pagination.page) data.pagination.page = 0;
         
-        let lessonId = LessonCommentLessonId.create(LessonId.create(data.lessonId));
+            let lessonId = LessonCommentLessonId.create(LessonId.create(data.lessonId));
 
-        const comments = await this.courseRepository.findAllCommentsByLessonId(
-            lessonId
-        );
-        
-        if (!comments.isSuccess)  return Result.fail(comments.Error);
+            const comments = await this.courseRepository.findAllCommentsByLessonId(
+                lessonId
+            );
+            
+            // if (!comments.isSuccess)  return Result.fail(comments.Error);
 
-        let commentsRes: LessonComment[] = [];
-        for (const comment of comments.Value) {
-            commentsRes.push({
-                id: comment.Id.commentId, 
-                user: comment.UserId.UserId, 
-                body: comment.Body.Body, 
-                userLiked: comment.UserLiked.UserLiked, 
-                userDisliked: comment.UserDisliked.UserDisliked, 
-                date: comment.PublicationDate.PublicationDate})
-        };
+            let commentsRes: LessonComment[] = [];
+            for (const comment of comments) {
+                commentsRes.push({
+                    id: comment.Id.commentId, 
+                    user: comment.UserId.UserId, 
+                    body: comment.Body.Body, 
+                    userLiked: false, //TODO: Por ahora se manda falso, armar calculo de si le dió like o no //comment.UserLiked.UserLiked,
+                    userDisliked: false,  //comment.UserDisliked.UserDisliked,
+                    date: comment.PublicationDate.PublicationDate})
+            };
 
-        if (data.pagination.perPage) {
-            let page = data.pagination.page;
-            if (!page) {page = 0}
+            if (data.pagination.perPage) {
+                let page = data.pagination.page;
+                if (!page) {page = 0}
 
-            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+                commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+            }
+
+            const response = new GetLessonCommentServiceResponseDto(commentsRes)
+            return Result.success<GetLessonCommentServiceResponseDto>(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        const response = new GetLessonCommentServiceResponseDto(commentsRes)
-        return Result.success<GetLessonCommentServiceResponseDto>(response);
     }
 
 }
