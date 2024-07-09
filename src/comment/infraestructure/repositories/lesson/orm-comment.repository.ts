@@ -19,15 +19,15 @@ export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> 
 
     async findAllCommentsByLessonId(id: LessonCommentLessonId, runner: TransactionHandler): Promise<Result<CommentLesson[]>> {
         const runnerTransaction = runner.getRunner();
-        
-        
-        const commentsFound = await runnerTransaction.manager.createQueryBuilder(LessonCommentEntity, "comment")
-            .leftJoinAndSelect("comment.lesson", "lesson")
-            .leftJoinAndSelect("comment.user", "user")
-            .where("comment.lesson_id = :id", { id: id.LessonId })
-            .getMany();
-
-        
+                
+        const commentsFound = await this.find({
+            relations: {
+                lesson: true
+            },
+            where: {
+                lesson_id: id.LessonId 
+            }
+        });
 
         // const commentsFound = await runnerTransaction.manager.find(CommentEntity, { where: { lesson_id: id }, 
         //     take: page, 
