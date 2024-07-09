@@ -21,7 +21,6 @@ export class OrmCategoryMapper{
     }
 
     toDomain(ormEntity: OrmCategoryEntity): Category {
-        console.log('entra en el mapper')
         const id = CategoryId.create(ormEntity.id);
         const name = CategoryName.create(ormEntity.name);
         const icon = CategoryIcon.create(ormEntity.icon);

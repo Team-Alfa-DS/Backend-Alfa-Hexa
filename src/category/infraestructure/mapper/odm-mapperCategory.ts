@@ -23,7 +23,6 @@ export class OdmCategoryMapper{
     }
 
     toDomain(odmEntity: OdmCategoryEntity): Category {
-        console.log('entra en el mapper')
         const id = CategoryId.create(odmEntity.id);
         const name = CategoryName.create(odmEntity.name);
         const icon = CategoryIcon.create(odmEntity.icon);
