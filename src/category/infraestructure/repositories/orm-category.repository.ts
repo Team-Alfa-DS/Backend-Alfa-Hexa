@@ -21,12 +21,7 @@ export class OrmCategoryRepository extends Repository<CategoryEntity> implements
     
     async getAllCategory(page: number, perpage: number): Promise<Result<Category[]>> {
         try {
-          const result = await this.find(
-            {
-              take: page,
-              skip: perpage
-            }
-          )
+          const result = await this.find()
           
           let categories: Category[] = [];
           

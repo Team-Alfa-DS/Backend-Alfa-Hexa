@@ -11,10 +11,19 @@ export class GetAllCategorysService extends IService<GetAllCategoriesRequest, Ge
     
     async execute(value: GetAllCategoriesRequest): Promise<Result<GetAllCategoriesResponse>>{
 
-        const result = await this.categoryRepository.getAllCategory(value.page, value.perpage);
+        const result = (await this.categoryRepository.getAllCategory(value.page, value.perpage));
         if (!result.isSuccess) return Result.fail(result.Error, result.StatusCode, result.Message);
 
-        const response = new GetAllCategoriesResponse(result.Value.map(category => {
+        let categories = result.Value;
+
+        if (value.perpage) {
+            let page = value.page;
+            if (!page) {page = 0}
+
+            categories = categories.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
+        }
+
+        const response = new GetAllCategoriesResponse(categories.map(category => {
             return {
                 id: category.Id.value,
                 name: category.Name.value,
