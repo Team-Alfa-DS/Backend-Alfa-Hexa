@@ -52,6 +52,9 @@ import { IEventPublisher } from 'src/common/application/events/event-publisher.a
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { SaveProgressEvent } from '../events/save-progress.event';
 import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { StartCourseProgressRequest } from 'src/progress/application/dtos/request/start-course-progress.request';
+import { StartCourseProgressResponse } from 'src/progress/application/dtos/response/start-course-progress.response';
+import { StartCourseProgressService } from 'src/progress/application/services/start-course-progress.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -93,6 +96,7 @@ export class ProgressController {
     private trendingProgressService: IService<TrendingProgressRequest, TrendingProgressResponse>;
     private coursesProgressService: IService<CoursesProgressRequest, CoursesProgressResponse>;
     private profileProgressService: IService<ProfileProgressRequest, ProfileProgressResponse>;
+    private startCourseProgressService: IService<StartCourseProgressRequest, StartCourseProgressResponse>;
 
     constructor(@InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('progress') progressModel: Model<OdmProgressEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>) {
         this.odmUserMapper = new OdmUserMapper();
@@ -160,6 +164,21 @@ export class ProgressController {
                 this.logger
             )
         );
+        this.startCourseProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new StartCourseProgressService(
+                        this.progressRepository,
+                        this.odmUserRepository,
+                        this.courseRepository,
+                        this.transactionHandler,
+                        this.eventPublisher
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        )
     }
 
     @Post('mark/end')
@@ -207,5 +226,12 @@ export class ProgressController {
         const response = await this.profileProgressService.execute(request);
 
         return response.Value;
+    }
+
+    @Get('start/:courseId')
+    async startProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
+        const request = new StartCourseProgressRequest(courseId, req.user.tokenUser.id);
+        const response = await this.startCourseProgressService.execute(request);
+        return response.Value
     }
 }
