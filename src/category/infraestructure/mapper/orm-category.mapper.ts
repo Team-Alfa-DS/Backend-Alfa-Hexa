@@ -11,9 +11,9 @@ import { CategoryIcon } from '../../domain/valueObjects/categoryIcon';
 
 /* eslint-disable prettier/prettier */
 
-export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
+export class OrmCategoryMapper{
 
-    async toPersistence(domainEntity: Category):Promise<OrmCategoryEntity> {
+    toPersistence(domainEntity: Category):OrmCategoryEntity {
 
         const ormCategory : any = OrmCategoryEntity.create(
             domainEntity.Id.value,
@@ -25,10 +25,13 @@ export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
 
     }
 
-    async toDomain(ormEntity: OrmCategoryEntity): Promise<Category> {
+    toDomain(ormEntity: OrmCategoryEntity): Category {
+        console.log('entra en el mapper')
         const id = CategoryId.create(ormEntity.id);
         const name = CategoryName.create(ormEntity.name);
         const icon = CategoryIcon.create(ormEntity.icon);
+        console.log({icon})
+        console.log({id, name, icon})
         return  Category.create(
             id,
             name,
@@ -37,15 +40,4 @@ export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
     //     console.log({domainCategory})
     //     return domainCategory;
     }
-
-    
-    todomain(ormEntity: OrmCategoryEntity):Category {
-        const id = CategoryId.create(ormEntity.id);
-        const name = CategoryName.create(ormEntity.name);
-        const icon = CategoryIcon.create(ormEntity.icon);
-        return  Category.create(
-            id,
-            name,
-            icon
-        )}
 }

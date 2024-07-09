@@ -32,9 +32,8 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
           let categories: Category[] = [];
           
           for (const category of result) {
-            categories.push( await this.ormCategoryMapper.todomain(category))
+            categories.push(this.ormCategoryMapper.toDomain(category))
           }
-          
           return Result.success<Category[]>(categories);
         } catch (error) {
           return Result.fail<Category[]>(new Error(error.message));
@@ -45,7 +44,10 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         try {
           const result = await this.findOne({where: {id: idCategory.value}
           });
-          return Result.success<Category>(await this.ormCategoryMapper.todomain(result));
+          console.log({result})
+          const domainCategory = (this.ormCategoryMapper.toDomain(result));
+          console.log({domainCategory})
+          return Result.success<Category>(domainCategory)
         } catch (error) {
           return Result.fail<Category>(new Error(error.message));
         }
