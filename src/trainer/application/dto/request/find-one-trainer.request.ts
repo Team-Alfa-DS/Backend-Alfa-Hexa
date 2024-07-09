@@ -2,9 +2,12 @@ import { ServiceRequestDto } from "src/common/application/interfaces/IService";
 
 export class FindOneTrainerRequest implements ServiceRequestDto {
 
-    constructor(readonly id: string) {}
+    constructor(
+        readonly id: string,
+        readonly userId: string
+    ) {}
 
     dataToString(): string {
-        return `FindOneTrainerReq: { id: ${this.id} }`
+        return `FindOneTrainerReq: { idTrainer: ${this.id} | userId: ${this.userId} }`
     }
 }
