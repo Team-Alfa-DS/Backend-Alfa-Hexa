@@ -1,11 +1,11 @@
 import { DataSource, Repository } from "typeorm";
 import { Result } from "src/common/domain/result-handler/result";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { BlogCommentEntity } from "../../entities/blog/comment.blog.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> implements IBlogCommentRepository{
     
@@ -19,7 +19,10 @@ export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> impl
     async findAllCommentsByBlogId(id: BlogCommentBlogId, runner: TransactionHandler): Promise<Result<CommentBlog[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.createQueryBuilder(BlogCommentEntity, "comment")
+        const commentsFound = await runnerTransaction.manager.createQueryBuilder(
+            BlogCommentEntity, "comment")
+            .leftJoinAndSelect("comment.blog", "blog")
+            .leftJoinAndSelect("comment.user", "user")
             //.take(perPage)
             //.skip(page)
             .where("comment.blog_id = :id", { id: id.BlogId })

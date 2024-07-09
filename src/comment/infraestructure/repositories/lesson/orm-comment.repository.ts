@@ -1,11 +1,11 @@
 import { DataSource, Repository } from "typeorm";
 import { Result } from "src/common/domain/result-handler/result";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { LessonCommentEntity } from "../../entities/lesson/comment.lesson.entity";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> implements ILessonCommentRepository{
     
@@ -22,9 +22,12 @@ export class OrmLessonCommentRepository extends Repository<LessonCommentEntity> 
         
         
         const commentsFound = await runnerTransaction.manager.createQueryBuilder(LessonCommentEntity, "comment")
+            .leftJoinAndSelect("comment.lesson", "lesson")
+            .leftJoinAndSelect("comment.user", "user")
             .where("comment.lesson_id = :id", { id: id.LessonId })
             .getMany();
 
+        
 
         // const commentsFound = await runnerTransaction.manager.find(CommentEntity, { where: { lesson_id: id }, 
         //     take: page, 
