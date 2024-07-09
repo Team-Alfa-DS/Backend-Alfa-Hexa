@@ -216,9 +216,9 @@ export class CommentController{
     @Body() addCommentEntryDto: AddCommentEntryDto){
         const data = new AddCommentToServiceRequestDto(addCommentEntryDto.target, req.user.tokenUser.id, addCommentEntryDto.body); 
 
-        if (addCommentEntryDto.targetType == "LESSON") return await this.registerLessonCommentService.execute( data );
+        if (addCommentEntryDto.targetType.toUpperCase() === "LESSON") return await this.registerLessonCommentService.execute( data );
 
-        if (addCommentEntryDto.targetType == "BLOG") return await this.registerBlogCommentService.execute( data );
+        if (addCommentEntryDto.targetType.toUpperCase() === "BLOG") return await this.registerBlogCommentService.execute( data );
         
     }
 
