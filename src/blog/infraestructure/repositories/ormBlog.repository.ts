@@ -58,7 +58,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     }
 
 
-    async getAllBLogs(): Promise<Result<Blog[]>> {
+    async getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
     try {
         const resp = await this.createQueryBuilder('blog')
         .leftJoinAndSelect('blog.trainer', 'trainer')
