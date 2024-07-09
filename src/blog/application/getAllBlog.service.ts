@@ -35,7 +35,7 @@ export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResp
             return {
                 id: blog.Id.value,
                 name: blog.Title.value,
-                image: blog.Images[0].value,
+                image: blog.Images[0] ? blog.Images[0].value : null,
                 date: blog.Publication_date.value,
                 category: categoryResult.Value ? categoryResult.Value.Name.value: null,
                 trainer: trainerResult.Value ? trainerResult.Value.Name.trainerName : null
