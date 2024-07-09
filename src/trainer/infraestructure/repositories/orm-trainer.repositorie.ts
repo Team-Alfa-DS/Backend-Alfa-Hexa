@@ -11,6 +11,8 @@ import { TransactionHandler } from 'src/common/infraestructure/database/transact
 import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
+import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
+import { TrainerFollowerUserId } from 'src/trainer/domain/valueObjects/trainer-userid';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainerEntity>
@@ -57,68 +59,53 @@ export class OrmTrainerRepository
     return oneTrainer;
   }
 
-  async followTrainer(idTrainer: TrainerId, idUser: UserId): Promise<Result<Trainer>> {
-    try {
-      const trainer = await this.findTrainerById(idTrainer);  
-      if (!trainer.isSuccess) return trainer;
+  async followTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void> {
+    const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer);
+    const followers = (await this.findOne({relations: {users: true}, where: {id: OrmTrainerEntity.id}})).users;
+    const userOrm = await this.userRepository.findOneBy({id: user.trainerFollowerUserId.Id})
+    followers.push(userOrm);
+    OrmTrainerEntity.users = followers;
+    await this.save(OrmTrainerEntity);
+  }
 
-      const user = await this.userRepository.findUserById(
-        idUser,
-        this.transactionHandler,
-      );
+  async findAllTrainers(userFollow?: boolean, user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>> {
+    let queryBuilder = this.createQueryBuilder("trainer")
+      //.leftJoinAndSelect("trainer.courses", "courses")
+      //.leftJoinAndSelect("trainer.blogs", "blogs")
+      .leftJoinAndSelect("trainer.users", "users");
+  
+    if (userFollow === true) {
+      queryBuilder = queryBuilder.where("trainer.userFollow = 1", {userfollow: 1})
 
-      if (!user.isSuccess) return Result.fail(new Error('User not found'));
-
-      const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
-
-      const ormUser = await this.userMapper.toPersistence(user.Value);
-
-      const trainersWithUsers = await this.find({
-        where: {
-          id: OrmTrainerEntity.id,
-        },
-        relations: {
-          users: true,
-        },
-      });
-      const a = trainersWithUsers[0].users.find((user) => {
-        if (user.id === ormUser.id) return true;
-      });
-      if (a) {
-        return Result.fail(
-          new Error('User already follow this trainer')
-        );
-      }
-      let array = [];
-      for (let x = 0; x < trainersWithUsers[0].users.length; x++) {
-        array.push(trainersWithUsers[0].users[x]);
-      }
-      array.push(ormUser);
-      OrmTrainerEntity.users = array;
-      await this.save(OrmTrainerEntity);
-      return Result.success<Trainer>(trainer.Value);
-      
-    } catch (err) {
-      return Result.fail<Trainer>(
-        new Error(err.message)
-      );
     }
+    if(userFollow === false){
+      queryBuilder = queryBuilder.where("trainer.userFollow = 0", {userfollow: 0})
+    }
+
+    let trainers = await queryBuilder.getMany();
+  
+    if (perpage) {
+      if (!page) { page = 0; }
+      trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
+    }
+    const trainerDomains: Trainer[] = [];
+
+    for (const trainer of trainers) {
+      trainerDomains.push(await this.ormTrainerMapper.toDomain(trainer))
+    }
+    return Result.success<Trainer[]>(trainerDomains);
   }
 
-  /*async findAllTrainers(): Promise<Result<Trainer[]>> {
-    const trainer = await this.find();
-    if (!trainer)
-      return Result.fail<Trainer[]>(
-        new Error('Trainers not founds'),
-        404,
-        'Trainers not founds',
-      );
-    const trainerDomain = await this.ormTrainerMapper.arrayToDomain(trainer);
-
-    return Result.success<Trainer[]>(trainerDomain, 200);
+  async countnotreaded(): Promise<Result<number>> {
+    let count = await this.createQueryBuilder("trainer")
+      .where("trainer.userFollow = 0")
+      .getCount();
+    return Result.success<number>(count);
+   
   }
+}
 
-  async updateTrainer(
+ /* async updateTrainer(
     idTrainer: string,
     payload: string,
   ): Promise<Result<Trainer>> {
@@ -159,4 +146,4 @@ export class OrmTrainerRepository
     }
     return Result.success<Trainer>(trainer, 200);
   }*/
-}
+

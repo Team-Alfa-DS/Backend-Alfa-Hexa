@@ -19,7 +19,7 @@ export class BlogCreated extends DomainEvent {
         public readonly comments: BlogCommentId[],              
         public readonly category: CategoryId,
         public readonly trainer: TrainerId, 
-        public readonly tag: BlogTag,
+        public readonly tags: BlogTag[],
         public readonly images: BlogImage[],
     ) {
         super();
@@ -33,9 +33,9 @@ export class BlogCreated extends DomainEvent {
         comments: BlogCommentId[],              
         category: CategoryId,
         trainer: TrainerId, 
-        tag: BlogTag,
+        tags: BlogTag[],
         images: BlogImage[],
     ): BlogCreated {
-        return new BlogCreated(id, title, content, publication_date, comments, category, trainer, tag, images);
+        return new BlogCreated(id, title, content, publication_date, comments, category, trainer, tags, images);
     }
 }

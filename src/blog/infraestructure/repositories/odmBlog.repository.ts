@@ -12,24 +12,34 @@ export class OdmBlogRepository implements IBlogRepository{
     constructor(private odmBlogMapper: OdmBlogMapper, private blogModel: Model<OdmBlogEntity >) {
         
     }
+   async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
+       try {
+        const blogs = await this.blogModel.find();
+        if(!blogs) return Result.fail(new Error('Blogs not found'));
+        let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
+
+    
+        if (category){
+            domainBlogs = domainBlogs.filter(blog => blog.Category.equals(CategoryId.create(category)));
+        }
+
+        if (trainer){
+            domainBlogs = domainBlogs.filter(blog => blog.Trainer.equals(TrainerId.create(trainer)));
+        }
+
+        return Result.success(domainBlogs.length);
+       } catch (error) {
+        return Result.fail(error);
+       }
+
+
+    }
 
    async  getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
         try {
             const blogs = await this.blogModel.find();
-            console.log(blogs[0])
             if(!blogs) return Result.fail(new Error('Blogs not found'));
-            let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain({
-                id: blog.id,
-                name: blog.title,
-                content: blog.description,
-                date: blog.date,
-                trainer: blog.trainer_id,
-                category: blog.category_id,
-                tag_id: blog.tag_id,
-                images: blog.images,
-                comments: blog.comments
-            
-            }));
+            let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
 
         
         if (category){
@@ -42,36 +52,29 @@ export class OdmBlogRepository implements IBlogRepository{
 
         const filteredBlogs: Blog[] = [];
         if(filter && filter.length > 0){
-            domainBlogs = domainBlogs.filter(blog => blog.Tag.value.toLowerCase().includes(filter.toLowerCase()));
+            domainBlogs.forEach(blog => {
+                if(blog.Tags.some(tag => tag.value.toLowerCase().includes(filter.toLowerCase()))){
+                    filteredBlogs.push(blog);
+                }
+            });
+            domainBlogs = filteredBlogs;
         }
 
         const blogsResponse = domainBlogs.slice(page * perpage, page * perpage + perpage)
         return Result.success(blogsResponse);
 
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
         
     }
    async getBlogById(id: string): Promise<Result<Blog>> {
        try {
-        const blog = await this.blogModel.findById(id);
+        const blog = await this.blogModel.findOne({id: id});
         if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`));   
-        const domainBlog =  OdmBlogMapper.toDomain({
-            id: blog.id,
-            name: blog.title,
-            content: blog.description,
-            date: blog.date,
-            trainer: blog.trainer_id,
-            category: blog.category_id,
-            tag_id: blog.tag_id,
-            images: blog.images,
-            comments: blog.comments
-        });
+        const domainBlog =  OdmBlogMapper.toDomain(blog);
         return Result.success(domainBlog);
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
     }
@@ -79,21 +82,9 @@ export class OdmBlogRepository implements IBlogRepository{
         try{
             const resp = await this.blogModel.find({tag_id: {$in: tagsName}});
             if(!resp) return Result.fail(new Error(`Blogs with tags: ${tagsName} not found`));
-            const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain({
-                id: blog.id,
-                name: blog.title,
-                content: blog.description,
-                date: blog.date,
-                trainer: blog.trainer_id,
-                category: blog.category_id,
-                tag_id: blog.tag_id,
-                images: blog.images,
-                comments: blog.comments
-
-            }));
+            const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
-            console.log(error);
             return Result.fail(error);
             
         }

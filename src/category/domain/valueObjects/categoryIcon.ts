@@ -4,10 +4,12 @@ export class CategoryIcon extends ValueObject<CategoryIcon>{
     private constructor(public value: string) {
         super();
         if (!this.isValid(value)) {
+            console.log('entra en el if')
             throw new Error(`CategoryIcon ${value} is invalid`);
         } 
 
         this.value = value;
+        console.log('saliendo de categoryIcon')
     }
 
     equals(categoryIcon: CategoryIcon): boolean {
@@ -19,11 +21,6 @@ export class CategoryIcon extends ValueObject<CategoryIcon>{
     }
 
     private isValid(value: string): boolean {
-        try {
-            new URL(value);
-            return true;
-        } catch (_) {
-            return false;
-        }
+        return value.length > 0;
     }
 }

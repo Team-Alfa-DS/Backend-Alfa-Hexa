@@ -1,5 +1,6 @@
 import { Blog } from "../Blog";
 import { Result } from '../../../common/domain/result-handler/result';
+import { get } from 'http';
 
 
 export interface IBlogRepository {
@@ -9,4 +10,6 @@ export interface IBlogRepository {
     getBlogById(id: string): Promise<Result<Blog>>;
 
     getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>>;
+
+    getBlogsCount (category?: string, trainer?: string): Promise<Result<number>>;
 }

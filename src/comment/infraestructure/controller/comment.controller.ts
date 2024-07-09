@@ -24,7 +24,7 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
@@ -34,6 +34,7 @@ import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.r
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 
 
@@ -97,45 +98,53 @@ export class CommentController{
     
     constructor() {
 
-        this.getCommentBlogService = new ExceptionLoggerDecorator(
-            new GetCommentBlogService(
-                this.commentBlogRepository,
-                this.transactionHandler
-            ),
-            this.logger
-        );
-        this.getCommentLessonService = new ExceptionLoggerDecorator(
-            new GetCommentLessonService(
-                this.commentLessonRepository,
-                this.transactionHandler
-            ),
-            this.logger
-        );
-        this.registerLessonCommentService = new ExceptionLoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterLessonCommentServices(
-                    this.commentLessonRepository,
-                    this.userRepository,
-                    this.courseRepository,
-                    this.transactionHandler,
-                    this.idGenerator
-                ),
-                this.auditRepository
-            ),
-            this.logger
-        );
-        this.registerBlogCommentService = new ExceptionLoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterBlogCommentServices(
+        this.getCommentBlogService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetCommentBlogService(
                     this.commentBlogRepository,
-                    this.userRepository,
-                    this.blogRepository,
-                    this.transactionHandler,
-                    this.idGenerator
+                    this.transactionHandler
                 ),
-                this.auditRepository
-            ),
-            this.logger
+                this.logger
+            )
+        );
+        this.getCommentLessonService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetCommentLessonService(
+                    this.commentLessonRepository,
+                    this.transactionHandler
+                ),
+                this.logger
+            )
+        );
+        this.registerLessonCommentService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterLessonCommentServices(
+                        this.commentLessonRepository,
+                        this.userRepository,
+                        this.courseRepository,
+                        this.transactionHandler,
+                        this.idGenerator
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        );
+        this.registerBlogCommentService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterBlogCommentServices(
+                        this.commentBlogRepository,
+                        this.userRepository,
+                        this.blogRepository,
+                        this.transactionHandler,
+                        this.idGenerator
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
 
     
@@ -163,18 +172,12 @@ export class CommentController{
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-
-            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
-
             return result.Value;
 
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
-
-            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
-
             return result.Value;
         }
     }
