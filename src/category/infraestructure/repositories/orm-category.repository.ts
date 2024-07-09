@@ -20,14 +20,9 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         this.ormCategoryMapper = ormCategoryMapper;
     }
     
-    async getAllCategory(page: number=0, perpage: number=0): Promise<Result<Category[]>> {
+    async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
-          const result = await this.find(
-            {
-              take: page,
-              skip: perpage
-            }
-          )
+          const result = await this.find()
           
           let categories: Category[] = [];
           

@@ -20,10 +20,12 @@ export class OdmCategoryRepository implements ICategoryRepository{
         } catch (error) {
             return Result.fail(error);
         }
+
+        
     }
     async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
-            const resp = await this.categoryModel.find();
+            const resp = await this.categoryModel.find().skip(page * perpage).limit(perpage);
             if(!resp) return Result.fail(new Error('Categories not found'));
             const domainCategories = resp.map(category => this.odmCategoryMapper.toDomain(category));
             return Result.success(domainCategories);

@@ -9,7 +9,7 @@ export class GetAllCategoriesRequest implements ServiceRequestDto {
         return `GetAllCategoriesReq: { page: ${this.page} | perpage: ${this.perpage} }`
     }
     @ApiProperty({
-        description: 'Desde donde se empiezan a contar los blogs',
+        description: 'Desde donde se empiezan a contar las categorias',
         example: '1'
       })
       @IsOptional()
@@ -18,7 +18,7 @@ export class GetAllCategoriesRequest implements ServiceRequestDto {
       page?: number;
       
       @ApiProperty({
-        description: 'Cantidad de blogs que deseas recibir ',
+        description: 'Cantidad de categorias que deseas recibir ',
         example: '1'
       })
       @IsNumber()
