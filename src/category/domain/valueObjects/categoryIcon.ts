@@ -19,11 +19,6 @@ export class CategoryIcon extends ValueObject<CategoryIcon>{
     }
 
     private isValid(value: string): boolean {
-        try {
-            new URL(value);
-            return true;
-        } catch (_) {
-            return false;
-        }
+        return value.length > 0;
     }
 }

@@ -4,11 +4,39 @@ import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { Blog } from "src/blog/domain/Blog";
 import { BlogMapper } from '../mapper/blog.mapper';
 import { Result } from '../../../common/domain/result-handler/result';
+import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { BlogTag } from "src/blog/domain/valueObjects/blogTag";
 
 export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
     constructor(dataBase: DataSource) {
         super(OrmBlogEntity, dataBase.manager);
+    }
+   async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
+       try {
+        const resp = await this.createQueryBuilder('blog')
+        .leftJoinAndSelect('blog.trainer', 'trainer')
+        .leftJoinAndSelect('blog.category', 'category')
+        .leftJoinAndSelect('blog.tags', 'tags')
+        .leftJoinAndSelect('blog.images', 'images')
+        .leftJoinAndSelect('blog.comments', 'comments')
+        .getMany();
+        if(!resp) return Result.fail(new Error('Blogs not found'));
+        let domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
+        
+        
+        if (category){
+            domainBlogs = domainBlogs.filter(blog => blog.Category.equals(CategoryId.create(category)));
+        }
+
+        if (trainer){
+            domainBlogs = domainBlogs.filter(blog => blog.Trainer.equals(TrainerId.create(trainer)));
+        }
+        return Result.success(domainBlogs.length);
+       } catch (error) {
+            return Result.fail(error);
+       }
     }
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try {
@@ -24,14 +52,13 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
-            console.log(error);
             return Result.fail(error);
             
         }
     }
 
 
-    async getAllBLogs(): Promise<Result<Blog[]>> {
+    async getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
        try {
         const resp = await this.createQueryBuilder('blog')
         .leftJoinAndSelect('blog.trainer', 'trainer')
@@ -41,11 +68,31 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
         .leftJoinAndSelect('blog.comments', 'comments')
         .getMany();
         if(!resp) return Result.fail(new Error('Blogs not found'));
-        const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
-        return Result.success(domainBlogs);
+        let domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
+        
+        
+        if (category){
+            domainBlogs = domainBlogs.filter(blog => blog.Category.equals(CategoryId.create(category)));
+        }
+
+        if (trainer){
+            domainBlogs = domainBlogs.filter(blog => blog.Trainer.equals(TrainerId.create(trainer)));
+        }
+
+        const filteredBlogs: Blog[] = [];
+        if(filter && filter.length > 0){
+            domainBlogs.forEach(blog => {
+                if(blog.Tags.some(tag => tag.value.toLowerCase().includes(filter.toLowerCase()))){
+                    filteredBlogs.push(blog);
+                }
+            });
+            domainBlogs = filteredBlogs;
+        }
+        
+        const blogsResponse = domainBlogs.slice(page * perpage, page * perpage + perpage)
+        return Result.success(blogsResponse);
 
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
     }
@@ -65,7 +112,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog);
            } catch (error) {
-                console.log(error);
                 return Result.fail(error); 
            }
     }

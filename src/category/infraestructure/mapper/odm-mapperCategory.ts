@@ -5,10 +5,12 @@ import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity"
 import { CategoryId } from '../../domain/valueObjects/categoryId';
 import { CategoryName } from '../../domain/valueObjects/categoryName';
 import { CategoryIcon } from '../../domain/valueObjects/categoryIcon';
+import { OdmCategoryEntity } from "../entities/odm-entities/odm-category.entity";
 
-export class OrmCategoryMapper{
 
-    toPersistence(domainEntity: Category):OrmCategoryEntity {
+export class OdmCategoryMapper{
+
+    toPersistence(domainEntity: Category):OdmCategoryEntity {
 
         const ormCategory : any = OrmCategoryEntity.create(
             domainEntity.Id.value,
@@ -20,10 +22,10 @@ export class OrmCategoryMapper{
 
     }
 
-    toDomain(ormEntity: OrmCategoryEntity): Category {
-        const id = CategoryId.create(ormEntity.id);
-        const name = CategoryName.create(ormEntity.name);
-        const icon = CategoryIcon.create(ormEntity.icon);
+    toDomain(odmEntity: OdmCategoryEntity): Category {
+        const id = CategoryId.create(odmEntity.id);
+        const name = CategoryName.create(odmEntity.name);
+        const icon = CategoryIcon.create(odmEntity.icon);
         return  Category.create(
             id,
             name,

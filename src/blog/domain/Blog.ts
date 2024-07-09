@@ -9,6 +9,8 @@ import { AggregateRoot } from "src/common/domain/aggregate-root";
 import { DomainEvent } from "src/common/domain/domain-event";
 import { BlogCreated } from './events/blogCreated.event';
 import { InvalidBlogException } from "./exceptions/invalidBlogException";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 
 
 
@@ -36,9 +38,9 @@ export class Blog extends AggregateRoot<BlogId>{
     private title: BlogTitle
     private content: BlogContent
     private publication_date: BlogPublicationDate
-    private comments: string[]              
+    private comments: BlogCommentId[]           
     private category: CategoryId
-    private trainer: string 
+    private trainer: TrainerId
     private tags: BlogTag[]
     private images: BlogImage[]
 constructor(
@@ -46,9 +48,9 @@ constructor(
      title: BlogTitle,
      content: BlogContent,
      publication_date: BlogPublicationDate,
-     comments: string[],              
+     comments: BlogCommentId[],              
      category: CategoryId,
-     trainer: string, 
+     trainer: TrainerId, 
      tags: BlogTag[],
      images: BlogImage[],
     ){
@@ -72,13 +74,13 @@ constructor(
     get Publication_date(): BlogPublicationDate{
         return this.publication_date;
     }
-    get Comments(): string[]{
+    get Comments(): BlogCommentId[]{
         return this.comments;
     }
     get Category(): CategoryId{
         return this.category;
     }
-    get Trainer(): string{
+    get Trainer(): TrainerId{
         return this.trainer;
     }
     get Tags(): BlogTag[]{
