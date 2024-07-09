@@ -66,9 +66,7 @@ export class CategoryController {
     async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
       const request = new GetAllCategoriesRequest(page, perpage);
       const response = await this.getAllCategorysService.execute(request);
-      if (response.isSuccess) return response.Value
-      // // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+      return response.Value
     }
 
     @Get("/:id")
@@ -82,8 +80,6 @@ export class CategoryController {
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
-      if (response.isSuccess) return response.Value
-      // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+      return response.Value
     }
 }

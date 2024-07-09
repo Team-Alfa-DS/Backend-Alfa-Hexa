@@ -60,9 +60,7 @@ export class BlogController {
     })
     async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
-        if (result.Value)
-            return result.Value
-        return { message: result.Error.message};
+        return result.Value
     }
 
     @Get('many')
@@ -75,8 +73,6 @@ export class BlogController {
     })
     async  getAllBlogs() {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(new GetAllBlogsRequestDTO());
-        if (result.Value)
-            return result.Value.blogs
-        return { message: result.Error.message };
+        return result.Value.blogs
     }
 }

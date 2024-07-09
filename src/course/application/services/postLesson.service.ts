@@ -20,7 +20,6 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
   ) {}
 
   async execute(request: PostLessonRequestDto): Promise<Result<PostLessonResponseDto>> {
-    try {
       const generatedId = await this.idGen.genId();
       
       const courseToPostIn = await this.courseRepository.getCourseById(new CourseId(request.courseId));
@@ -40,10 +39,6 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
       this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
 
       return Result.success(new PostLessonResponseDto(generatedId));
-
-    } catch (error) {
-      return Result.fail(error);
-    }
   }
 
   get name(): string {

@@ -122,9 +122,7 @@ export class UserController {
             data.image
         )
         const result = await this.updateUserService.execute(dataUser);
-        if (result.isSuccess) return result.Value;
-        // // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
-        throw ExceptionMapper.toHttp(result.Error);
+        return result.Value;
     }
 
     @Get('synchronize')

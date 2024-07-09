@@ -20,7 +20,6 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
   ){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {
-    try {
       let courseTag: CourseTag; let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
       if (request.filter) {courseTag = new CourseTag(request.filter)}
       if (request.category) {courseCategory = new CourseCategory(request.category)}
@@ -73,10 +72,6 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       // } else {
       //   return Result.fail(r.Error);
       // }
-    } catch (error) {
-      return Result.fail(error);
-    }
-    
   }
 }
 

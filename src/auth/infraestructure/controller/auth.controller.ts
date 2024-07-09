@@ -165,9 +165,7 @@ export class AuthController {
         const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
 
         const response = await this.registerUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('login')
@@ -182,9 +180,7 @@ export class AuthController {
         const request = new LoginUserRequest(user.email, user.password);
 
         const response = await this.loginUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @ApiBearerAuth()
@@ -201,9 +197,7 @@ export class AuthController {
         const request = new CurrentUserRequest(req.user.tokenUser.id);
 
         const response = await this.currentUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('forget/password')
@@ -226,9 +220,7 @@ export class AuthController {
         const request = new ForgetUserPasswordRequest(user.email, code)
 
         const response = await this.forgetUserPasswordService.execute(request)
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('code/validate')
@@ -245,9 +237,7 @@ export class AuthController {
         const request = new ValidateUserCodeRequest(validate.email, validate.code, userCode.code);
 
         const response = await this.validateUserCodeService.execute(request)
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Put('change/password')
@@ -265,16 +255,11 @@ export class AuthController {
         const requestVal = new ValidateUserCodeRequest(newPassword.email, newPassword.code, userCode.code);
         const validate = await this.validateUserCodeService.execute(requestVal)
 
-        if (!validate.isSuccess) {
-            throw new HttpException('Codigo incorrecto', HttpStatus.BAD_REQUEST);
-        }
         this.userCodeList = this.userCodeList.filter(userCode => userCode.email != newPassword.email);
 
         const requestChange = new ChangeUserPasswordRequest(newPassword.email, newPassword.code, newPassword.password);
 
         const response = await this.changeUserPasswordService.execute(requestChange);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 }
