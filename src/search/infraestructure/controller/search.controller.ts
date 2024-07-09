@@ -3,7 +3,7 @@ import { Controller, Get, HttpException, ParseArrayPipe, ParseIntPipe, Query, Re
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { OrmBlogRepository } from 'src/blog/infraestructure/repositories/ormBlog.repository';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { ServiceLoggerDecorator } from 'src/common/application/aspects/serviceLoggerDecorator';
 import { IService } from 'src/common/application/interfaces/IService';
 import { FsPromiseLogger } from 'src/common/infraestructure/adapters/FsPromiseLogger';
@@ -49,12 +49,12 @@ export class SearchController {
             PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
-        this.searchService =  new ExceptionLoggerDecorator(
+        this.searchService =  new LoggerDecorator(
             new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
             logger
         );
 
-        this.searchTagService = new ExceptionLoggerDecorator(
+        this.searchTagService = new LoggerDecorator(
             new SearchTagService(tagRepo,this.transacctionHandler),
             logger
         );

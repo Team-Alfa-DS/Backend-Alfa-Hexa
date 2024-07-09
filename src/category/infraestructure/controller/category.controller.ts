@@ -17,7 +17,7 @@ import { GetAllCategoriesRequest } from "src/category/application/dtos/request/g
 import { GetAllCategoriesResponse } from "src/category/application/dtos/response/get-all-categories.response";
 import { GetCategoryRequest } from "src/category/application/dtos/request/get-category.request";
 import { GetCategoryResponse } from "src/category/application/dtos/response/get-category.response";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
@@ -40,11 +40,11 @@ export class CategoryController {
     private readonly logger: ILogger = new NestLogger();
 
     constructor() {
-      this.getAllCategorysService = new ExceptionLoggerDecorator(
+      this.getAllCategorysService = new LoggerDecorator(
         new GetAllCategorysService(this.categoryRepository),
         this.logger
       );
-      this.getCategoryByIdService = new ExceptionLoggerDecorator(
+      this.getCategoryByIdService = new LoggerDecorator(
         new GetCategoryByIdService(this.categoryRepository),
         this.logger
       );

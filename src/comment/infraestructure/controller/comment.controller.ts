@@ -24,7 +24,7 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
@@ -97,21 +97,21 @@ export class CommentController{
     
     constructor() {
 
-        this.getCommentBlogService = new ExceptionLoggerDecorator(
+        this.getCommentBlogService = new LoggerDecorator(
             new GetCommentBlogService(
                 this.commentBlogRepository,
                 this.transactionHandler
             ),
             this.logger
         );
-        this.getCommentLessonService = new ExceptionLoggerDecorator(
+        this.getCommentLessonService = new LoggerDecorator(
             new GetCommentLessonService(
                 this.commentLessonRepository,
                 this.transactionHandler
             ),
             this.logger
         );
-        this.registerLessonCommentService = new ExceptionLoggerDecorator(
+        this.registerLessonCommentService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterLessonCommentServices(
                     this.commentLessonRepository,
@@ -124,7 +124,7 @@ export class CommentController{
             ),
             this.logger
         );
-        this.registerBlogCommentService = new ExceptionLoggerDecorator(
+        this.registerBlogCommentService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterBlogCommentServices(
                     this.commentBlogRepository,

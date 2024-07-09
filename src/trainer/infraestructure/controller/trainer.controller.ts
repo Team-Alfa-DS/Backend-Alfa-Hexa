@@ -34,7 +34,7 @@ import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
 import { GetManyTrainerQueryDto } from '../Dto/GetTrainerQuerydto';
 import { FindAllTrainersService, GetAllTrainersRequest, GetAllTrainersResponse} from 'src/trainer/application/service/findAllTrainer.service';
@@ -96,14 +96,14 @@ export class TrainerController {
     this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper, userModel);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
-    this.findOneTrainerService = new ExceptionLoggerDecorator(
+    this.findOneTrainerService = new LoggerDecorator(
       new FindOneTrainerService(
         this.odmTrainerRepository,
         //this.transactionHandler
       ),
       this.logger
     );
-    this.followTrainerService = new ExceptionLoggerDecorator(
+    this.followTrainerService = new LoggerDecorator(
       new ServiceDBLoggerDecorator(
         new FollowTrainerService(
           this.trainerRepository,
@@ -115,13 +115,13 @@ export class TrainerController {
       ),
       this.logger
     );
-    this.countUserFollowTrainerService = new ExceptionLoggerDecorator(
+    this.countUserFollowTrainerService = new LoggerDecorator(
       new CountUserFollowTrainerService(
         this.odmTrainerRepository
       ),
       this.logger
     );
-    this.findAllTrainersService = new ExceptionLoggerDecorator(
+    this.findAllTrainersService = new LoggerDecorator(
       new FindAllTrainersService(
         this.odmTrainerRepository
       ),

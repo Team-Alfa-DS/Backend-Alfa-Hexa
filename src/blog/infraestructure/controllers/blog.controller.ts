@@ -16,7 +16,7 @@ import { GetAllBlogsRequestDTO } from "src/blog/application/interfaces/getAllBlo
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 
@@ -35,11 +35,11 @@ export class BlogController {
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
-        this.getAllBlogService = new ExceptionLoggerDecorator(
+        this.getAllBlogService = new LoggerDecorator(
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
-        this.getBlogByIdService = new ExceptionLoggerDecorator(
+        this.getBlogByIdService = new LoggerDecorator(
             new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
