@@ -6,19 +6,25 @@ import { LessonDuration } from "src/course/domain/value-objects/lesson-duration"
 import { LessonVideo } from "src/course/domain/value-objects/lesson-video";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { Course } from "src/course/domain/Course";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { OrmLessonCommentMapper } from "./orm-comment-lesson.mapper";
+import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 
 export class OrmLessonMapper {
   
   static toDomain(entity: OrmLessonEntity): Lesson {
-    const ormLessonCommmentMapper = new OrmLessonCommentMapper();
+    // const ormLessonCommmentMapper = new OrmLessonCommentMapper();
     
     let domainComments: CommentLesson[] = [];
 
-    entity.comments.forEach(async (comment) => {
-      domainComments.push(await ormLessonCommmentMapper.toDomain(comment))
-    });
+    // entity.comments.forEach(async (comment) => {
+    //   domainComments.push(await OrmLessonCommentMapper.toDomain(comment))
+    // });
+    
+    if (entity.comments) {
+      for (let comment of entity.comments) {
+        domainComments.push( OrmLessonCommentMapper.toDomain(comment));
+      }
+    }
     
     return new Lesson(
       new LessonId(entity.id),

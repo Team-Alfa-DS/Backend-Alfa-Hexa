@@ -22,7 +22,6 @@ import { LessonContent } from "./value-objects/lesson-content";
 import { LessonDuration } from "./value-objects/lesson-duration";
 import { LessonVideo } from "./value-objects/lesson-video";
 import { LessonPosted } from "./events/lesson-posted.event";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLessonUserDisliked } from 'src/comment/domain/valueObjects/lesson/comment-lesson-userDisliked';
@@ -31,6 +30,7 @@ import { CommentLessonUserId } from 'src/comment/domain/valueObjects/lesson/comm
 import { LessonCommentLessonId } from 'src/comment/domain/valueObjects/lesson/comment-lesson-lessonId';
 import { CommentLessonUserLiked } from 'src/comment/domain/valueObjects/lesson/comment-lesson-userLiked';
 import { CommentPosted } from './events/comment-lesson-posted.event';
+import { CommentLesson } from './entities/comment-lesson';
 
 export class Course extends AggregateRoot<CourseId>{
   // private id: CourseId;
@@ -103,10 +103,10 @@ export class Course extends AggregateRoot<CourseId>{
     title: LessonTitle,
     content: LessonContent,
     seconds: LessonDuration,
-    video: LessonVideo,
-    comments: CommentLesson[]
+    video: LessonVideo
+    // comments: CommentLesson[]
   ) {
-    this.apply(new LessonPosted(id, title, content, seconds, video, this.Id,comments));
+    this.apply(new LessonPosted(id, title, content, seconds, video, this.Id));
   }
 
   createComment(
@@ -115,10 +115,11 @@ export class Course extends AggregateRoot<CourseId>{
     body: CommentLessonBody,
     userId: CommentLessonUserId,
     LessonId: LessonCommentLessonId,
-    userLiked: CommentLessonUserLiked,
-    userDisliked: CommentLessonUserDisliked
+    // userLiked: CommentLessonUserLiked,
+    // userDisliked: CommentLessonUserDisliked
   ){
-    this.apply(new CommentPosted(id, publicationDate, body, userId, LessonId, userLiked, userDisliked));
+    this.apply(new CommentPosted(id, publicationDate, body, userId, LessonId));
+    // this.apply(new CommentPosted(id, publicationDate, body, userId, LessonId, userLiked, userDisliked));
   }
 
 
@@ -145,7 +146,7 @@ export class Course extends AggregateRoot<CourseId>{
         event.content,
         event.seconds,
         event.video,
-        event.comments
+        [] // event.comments
       );
 
       this.lessons.push(lesson);
@@ -165,8 +166,8 @@ export class Course extends AggregateRoot<CourseId>{
         event.body,
         event.userId,
         event.LessonId,
-        event.userLiked,
-        event.userDisliked
+        // event.userLiked,
+        // event.userDisliked
       );
 
       let lesson = this.getLesson(event.LessonId.LessonId);

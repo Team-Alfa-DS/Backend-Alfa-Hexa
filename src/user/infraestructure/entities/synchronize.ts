@@ -67,10 +67,10 @@ export class Synchronize {
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly lessonCommentRepository = new OrmLessonCommentRepository(
-        new OrmLessonCommentMapper(),
-        PgDatabaseSingleton.getInstance()
-    );
+    // private readonly lessonCommentRepository = new OrmLessonCommentRepository(
+    //     new OrmLessonCommentMapper(),
+    //     PgDatabaseSingleton.getInstance()
+    // );
 
     private readonly tagRepository = new OrmTagRepository(
         PgDatabaseSingleton.getInstance()
@@ -213,12 +213,16 @@ export class Synchronize {
         }
         console.log('blogComments terminado');
 
-        const lessonComments = await this.lessonCommentRepository.find();
-        for (const comment of lessonComments) {
-            const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-            const lesson = await this.lessonModel.findOne({id: lesson_id});
-            const user = await this.userModel.findOne({id: user_id});
-            await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
+        const commentCourses = await this.courseRepository.getAllCourses();
+        for (let commentCourse of commentCourses) {
+            for (let lessons of commentCourse.Lessons) {
+                for (let comment of lessons.comments) {
+                    const {Id, LessonId, UserId, Body, PublicationDate} = comment;
+                    const lesson = await this.lessonModel.findOne({id: LessonId});
+                    const user = await this.userModel.findOne({id: UserId});
+                    await this.lessonCommentModel.create({lesson, Body, Id, PublicationDate, user});
+                }
+            }
         }
         console.log('lessonComments terminado');
     }

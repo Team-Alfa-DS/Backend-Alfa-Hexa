@@ -9,17 +9,19 @@ export class AddCommentToServiceRequestDto implements ServiceRequestDto {
     ) {}
 
     dataToString(): string {
-        return `RegisterBlogOrLessonCommentReq: { blogId: ${this.targetId} | userId: ${this.userId} | body: ${this.body} }`
+        return `RegisterBlogOrLessonCommentReq: { targetId: ${this.targetId} | userId: ${this.userId} | body: ${this.body} }`
     }
 
 }
 
 export class AddCommentToServiceResponseDto implements ServiceResponseDto {
 
-    constructor() {}
+    constructor(
+        readonly registeredCommentId: string
+    ) {}
 
     dataToString(): string {
-        return `RegisterBlogOrLessonCommentRes: { }`
+        return `RegisterBlogOrLessonCommentRes: ${JSON.stringify(this)}`
     }
 
 }

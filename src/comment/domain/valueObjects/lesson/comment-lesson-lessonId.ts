@@ -17,7 +17,7 @@ export class LessonCommentLessonId extends ValueObject<LessonCommentLessonId> {
     }
     
     equals(obj: LessonCommentLessonId): boolean {
-        return this.lessonId === obj.lessonId;
+        return this.lessonId.equals(obj.LessonId);
     }
 
     public static create(lessonId: LessonId): LessonCommentLessonId {

@@ -17,9 +17,9 @@ import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-data
 import { OrmLessonMapper } from "../mappers/orm-mappers/orm-lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
 import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
+import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 
 export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
   private readonly ormCommentMapper: OrmLessonCommentMapper;
@@ -127,9 +127,13 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
-
+    // console.log(result); //Debug
+    
     for (let course of result) {
+      // console.log(course.lessons);
+      
       for (let lesson of course.lessons) {
+        // console.log(lesson);
         if (lessonId.equals(new LessonId(lesson.id))) {
           return OrmCourseMapper.toDomain(course);
         }
@@ -185,6 +189,28 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     return courses.length;
   }
 
+  async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]> {
+    const result = await this.find({
+      relations: {
+        lessons: {
+          comments: true
+        }
+      }
+    });
+
+    if (result.length == 0) {throw new CourseNotFoundException(`No hay cursos guardados`);}
+
+    for (let course of result) {
+      for (let lesson of course.lessons) {
+        if (id.equals(LessonCommentLessonId.create(new LessonId(lesson.id)))) {
+          return OrmLessonCommentMapper.arrayToDomain(lesson.comments);
+        }
+      }
+    }
+
+    return [];
+  } 
+
   async saveCourse(course: Course): Promise<Course> {
     const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
     const ormCourseEntity = OrmCourseMapper.toPersistence(course);
@@ -199,48 +225,12 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     return lesson;
   }
 
-  async saveComment(comment: CommentLesson): Promise<Result<CommentLesson>> {
-    try{
-        const ormComment = await this.ormCommentMapper.toPersistence(comment);
-        await this.save(ormComment);
-        return Result.success<CommentLesson>(comment);                                                    
-    }catch(err){
-        return Result.fail<CommentLesson>(new Error(err.message));
-    }
+  async saveComment(comment: CommentLesson): Promise<CommentLesson> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+    const ormLessonComment = OrmLessonCommentMapper.toPersistence(comment);
+    await runnerTransaction.manager.save(ormLessonComment);
+    return comment;
+  };
 
-};
-
-  async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>> {
-
-    const course = await this.findOne({
-      relations: {
-      category: true,
-      lessons: true,
-      trainer: true,
-      tags: true,
-      },
-      where: {
-      lessons: {
-        id: id.LessonId.Value,
-      },
-      },
-    });
-    
-    if (!course) {
-      throw new CourseNotFoundException(`No se encontró un curso que contenga la lección con id: ${id.LessonId.Value}`);
-    }
-
-    let commentsFound = course.lessons[0].comments;
-
-    if (!commentsFound) return Result.fail<CommentLesson[]>(new Error( 
-        `Ha ocurrido un error al encontrar los coemtarios por id` ));
-
-    const ListMapper = []
-    commentsFound.forEach(async e => {
-        ListMapper.push( 
-            await this.ormCommentMapper.toDomain(e ))
-    });
-
-    return Result.success<CommentLesson[]>(ListMapper);
-}
+  
 }

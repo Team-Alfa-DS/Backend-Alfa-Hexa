@@ -51,13 +51,14 @@ import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
 @UseGuards(JwtAuthGuard)
 @ApiTags( 'Comments' )
-@Controller( 'comments' )
+@Controller( 'comment' )
 export class CommentController{
 
     private eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
@@ -124,13 +125,19 @@ export class CommentController{
             commentBlogModel);
         
         
+                @InjectModel('lesson_comment') commentLessonModel: Model<OdmLessonCommentEntity>,
+                @InjectModel('blog_comment') commentBlogModel: Model<OdmBlogCommentEntity>){
+
+                    
+                    
         const OdmCourseRepositoryInstance = new OdmCourseRepository(
             courseModel, 
             categoryModel, 
             trainerModel, 
             tagModel, 
             lessonModel, 
-            commentLessonModel
+            commentLessonModel,
+            userModel
         );
         
         this.eventPublisher.subscribe('CommentPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
@@ -153,6 +160,7 @@ export class CommentController{
                     this.userRepository,
                     this.courseRepository,
                     this.transactionHandler,
+                    this.eventPublisher,
                     this.idGenerator
                 ),
                 this.auditRepository
@@ -177,7 +185,7 @@ export class CommentController{
     
     }
     
-    @Get(':many')
+    @Get('/many')
     @ApiCreatedResponse({
         description: 'se retorno todos los comentarios correctamente',
         type: OrmBlogCommentEntity, 
@@ -193,16 +201,15 @@ export class CommentController{
         if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
             (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
             throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
-            //FIXME: Este error debería manejarse con excepciones de dominio
         }
         
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
-            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
+            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
             return result.Value;
 
         }else {
-            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
+            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
             return result.Value;
