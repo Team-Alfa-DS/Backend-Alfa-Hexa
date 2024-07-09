@@ -132,7 +132,7 @@ export class OdmBlogRepository implements IBlogRepository{
         return Result.success<CommentBlog>(comment);
     }
 
-    async saveBlog(blog: Blog, comments: BlogCommentId[]): Promise<Result<Blog>>{ 
+    async saveBlog(blog: Blog): Promise<Result<Blog>>{ 
         //const odmBlog = await this.odmBlogMapper.toPersistence(blog);
         //let comment = comments.map(e => e.commentId);
         //await this.commentModel.create(odmBlog);

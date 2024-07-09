@@ -13,7 +13,7 @@ export interface IBlogRepository {
 
     getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>>;
 
-    saveBlog(comment: Blog, comments: BlogCommentId[]): Promise<Result<Blog>>;
+    saveBlog(comment: Blog): Promise<Result<Blog>>;
 
     findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>>;
 

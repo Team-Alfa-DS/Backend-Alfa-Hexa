@@ -69,7 +69,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         comments.push(commentID);
 
         await this.blogRepository.saveComment( comment );
-        await this.odmBlogRepository.saveBlog( blog.Value, comments );
+        await this.blogRepository.saveBlog( blog.Value );
 
         blog.Value.PostComment(
             commentID,
