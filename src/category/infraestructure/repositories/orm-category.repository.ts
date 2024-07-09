@@ -20,14 +20,9 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         this.ormCategoryMapper = ormCategoryMapper;
     }
     
-    async getAllCategory(page: number=0, perpage: number=0): Promise<Result<Category[]>> {
+    async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
-          const result = await this.find(
-            {
-              take: page,
-              skip: perpage
-            }
-          )
+          const result = await this.find()
           
           let categories: Category[] = [];
           
@@ -44,9 +39,7 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         try {
           const result = await this.findOne({where: {id: idCategory.value}
           });
-          console.log({result})
           const domainCategory = (this.ormCategoryMapper.toDomain(result));
-          console.log({domainCategory})
           return Result.success<Category>(domainCategory)
         } catch (error) {
           return Result.fail<Category>(new Error(error.message));
