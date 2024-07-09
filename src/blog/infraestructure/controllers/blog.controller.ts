@@ -27,6 +27,16 @@ import { Model } from "mongoose";
 import { get } from "http";
 import { GetManyBlogsDTO } from "../dtos/getManyBlogsDTO";
 import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { OrmBlogCommentRepository } from '../../../comment/infraestructure/repositories/blog/orm-comment.repository';
+import { OrmBlogCommentMapper } from '../../../comment/infraestructure/mapper/blog/orm-comment-blog.mapper';
+import { OdmTrainerRepository } from '../../../trainer/infraestructure/repositories/odm-trainer.repository';
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
+import { OdmTrainerMapper } from "src/trainer/infraestructure/mapper/odm-trainer.mapper";
+import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
+
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -38,11 +48,16 @@ export class BlogController {
     private readonly getBlogByIdService: IService<GetBlogByIdRequestDTO, GetBlogByIdResponseDTO>;
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
-    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>) {
+    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+                @InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>){
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
+        
         const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
+        const odmTrainerRepositoryInstance = new OdmTrainerRepository( trainerModel,  new OdmTrainerMapper(courseModel, blogModel, userModel), userModel);
+        //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
+
         const logger = new NestLogger();
         this.getAllBlogService = new ExceptionDecorator(
             new LoggerDecorator(

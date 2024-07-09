@@ -1,19 +1,16 @@
-import { error } from "console";
-import { Blog } from "../domain/Blog";
+
 import { IBlogRepository } from "../domain/repositories/IBlog.repository";
 import { GetBlogByIdRequestDTO, GetBlogByIdResponseDTO } from "./interfaces/getBlogByIdDTOS.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-
 
 export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlogByIdResponseDTO >{
     constructor(
         private readonly blogRepository: IBlogRepository,
         private readonly trainerRepository: ITrainerRepository,
-        private readonly categoryRepository: ICategoryRepository
+        private readonly categoryRepository: ICategoryRepository,
     ) {
         super();
     }
