@@ -112,8 +112,8 @@ export class CommentController{
                 @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
                 @InjectModel('tag') tagModel: Model<OdmTagEntity>,
                 @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
-                @InjectModel('commentLesson') commentLessonModel: Model<OdmLessonCommentEntity>,
-                @InjectModel('commentBlog') commentBlogModel: Model<OdmBlogCommentEntity>,
+                @InjectModel('lesson_comment') commentLessonModel: Model<OdmLessonCommentEntity>,
+                @InjectModel('blog_comment') commentBlogModel: Model<OdmBlogCommentEntity>,
                 @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
                 @InjectModel('user') userModel: Model<OdmUserEntity>){
 

@@ -54,7 +54,7 @@ export class BlogController {
                 @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
                 @InjectModel('user') userModel: Model<OdmUserEntity>, 
                 @InjectModel('course') courseModel: Model<OdmCourseEntity>,
-                @InjectModel('commentBlog') commentModel: Model<OdmBlogCommentEntity>){
+                @InjectModel('blog_comment') commentModel: Model<OdmBlogCommentEntity>,){
 
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());

@@ -18,4 +18,6 @@ export interface IBlogRepository {
     findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>>;
 
     saveComment(comment: CommentBlog): Promise<Result<CommentBlog>>;
+
+    getBlogsCount (category?: string, trainer?: string): Promise<Result<number>>;
 }
