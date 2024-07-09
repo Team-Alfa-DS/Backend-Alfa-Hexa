@@ -59,6 +59,7 @@ import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/od
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { UpdateUsersTrainersEvent } from '../events/update-users-trainer.event';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
@@ -96,36 +97,44 @@ export class TrainerController {
     this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper, userModel);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
-    this.findOneTrainerService = new LoggerDecorator(
-      new FindOneTrainerService(
-        this.odmTrainerRepository,
-        //this.transactionHandler
-      ),
-      this.logger
-    );
-    this.followTrainerService = new LoggerDecorator(
-      new ServiceDBLoggerDecorator(
-        new FollowTrainerService(
-          this.trainerRepository,
+    this.findOneTrainerService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new FindOneTrainerService(
           this.odmTrainerRepository,
-          this.eventPublisher
           //this.transactionHandler
         ),
-        this.auditRepository
-      ),
-      this.logger
+        this.logger
+      )
     );
-    this.countUserFollowTrainerService = new LoggerDecorator(
-      new CountUserFollowTrainerService(
-        this.odmTrainerRepository
-      ),
-      this.logger
+    this.followTrainerService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new FollowTrainerService(
+            this.trainerRepository,
+            this.odmTrainerRepository,
+            this.eventPublisher
+            //this.transactionHandler
+          ),
+          this.auditRepository
+        ),
+        this.logger
+      )
     );
-    this.findAllTrainersService = new LoggerDecorator(
-      new FindAllTrainersService(
-        this.odmTrainerRepository
-      ),
-      this.logger
+    this.countUserFollowTrainerService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new CountUserFollowTrainerService(
+          this.odmTrainerRepository
+        ),
+        this.logger
+      )
+    );
+    this.findAllTrainersService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new FindAllTrainersService(
+          this.odmTrainerRepository
+        ),
+        this.logger
+      )
     );
   }
 

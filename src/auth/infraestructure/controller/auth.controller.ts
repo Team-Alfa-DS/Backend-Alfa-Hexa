@@ -62,6 +62,7 @@ import { Model } from 'mongoose';
 import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -108,35 +109,47 @@ export class AuthController {
         this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
-        this.registerUserService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.registerUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
-        this.loginUserService = new LoggerDecorator(
-            new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
-            this.logger
+        this.loginUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
+                this.logger
+            )
         );
-        this.currentUserService = new LoggerDecorator(
-            new CurrentUserService(this.odmUserRepository),
-            this.logger
+        this.currentUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new CurrentUserService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.forgetUserPasswordService = new LoggerDecorator(
-            new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
-            this.logger
+        this.forgetUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
+                this.logger
+            )
         );
-        this.validateUserCodeService = new LoggerDecorator(
-            new ValidateUserCodeService(this.odmUserRepository),
-            this.logger
+        this.validateUserCodeService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ValidateUserCodeService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.changeUserPasswordService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.changeUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
     }
 

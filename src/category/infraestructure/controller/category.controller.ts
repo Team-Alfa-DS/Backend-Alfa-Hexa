@@ -22,6 +22,7 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 
 @ApiTags('Category')
@@ -40,13 +41,17 @@ export class CategoryController {
     private readonly logger: ILogger = new NestLogger();
 
     constructor() {
-      this.getAllCategorysService = new LoggerDecorator(
-        new GetAllCategorysService(this.categoryRepository),
-        this.logger
+      this.getAllCategorysService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetAllCategorysService(this.categoryRepository),
+          this.logger
+        )
       );
-      this.getCategoryByIdService = new LoggerDecorator(
-        new GetCategoryByIdService(this.categoryRepository),
-        this.logger
+      this.getCategoryByIdService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetCategoryByIdService(this.categoryRepository),
+          this.logger
+        )
       );
     }
     

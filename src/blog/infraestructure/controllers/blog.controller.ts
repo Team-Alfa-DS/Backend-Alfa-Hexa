@@ -19,6 +19,7 @@ import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -35,16 +36,18 @@ export class BlogController {
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
-        this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getAllBlogService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-        this.getBlogByIdService = new LoggerDecorator(
-            new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getBlogByIdService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-
-
     }
 
     @Get('one/:id')

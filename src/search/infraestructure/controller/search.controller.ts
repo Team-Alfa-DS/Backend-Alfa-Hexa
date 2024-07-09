@@ -24,6 +24,7 @@ import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-categ
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 
 @ApiTags('Search')
@@ -49,14 +50,18 @@ export class SearchController {
             PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
-        this.searchService =  new LoggerDecorator(
-            new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
-            logger
+        this.searchService =  new ExceptionDecorator(
+            new LoggerDecorator(
+                new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
+                logger
+            )
         );
 
-        this.searchTagService = new LoggerDecorator(
-            new SearchTagService(tagRepo,this.transacctionHandler),
-            logger
+        this.searchTagService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new SearchTagService(tagRepo,this.transacctionHandler),
+                logger
+            )
         );
     }
 

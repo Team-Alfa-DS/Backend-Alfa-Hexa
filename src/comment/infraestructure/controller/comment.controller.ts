@@ -34,6 +34,7 @@ import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.r
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 
 
@@ -97,45 +98,53 @@ export class CommentController{
     
     constructor() {
 
-        this.getCommentBlogService = new LoggerDecorator(
-            new GetCommentBlogService(
-                this.commentBlogRepository,
-                this.transactionHandler
-            ),
-            this.logger
-        );
-        this.getCommentLessonService = new LoggerDecorator(
-            new GetCommentLessonService(
-                this.commentLessonRepository,
-                this.transactionHandler
-            ),
-            this.logger
-        );
-        this.registerLessonCommentService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterLessonCommentServices(
-                    this.commentLessonRepository,
-                    this.userRepository,
-                    this.courseRepository,
-                    this.transactionHandler,
-                    this.idGenerator
-                ),
-                this.auditRepository
-            ),
-            this.logger
-        );
-        this.registerBlogCommentService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterBlogCommentServices(
+        this.getCommentBlogService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetCommentBlogService(
                     this.commentBlogRepository,
-                    this.userRepository,
-                    this.blogRepository,
-                    this.transactionHandler,
-                    this.idGenerator
+                    this.transactionHandler
                 ),
-                this.auditRepository
-            ),
-            this.logger
+                this.logger
+            )
+        );
+        this.getCommentLessonService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetCommentLessonService(
+                    this.commentLessonRepository,
+                    this.transactionHandler
+                ),
+                this.logger
+            )
+        );
+        this.registerLessonCommentService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterLessonCommentServices(
+                        this.commentLessonRepository,
+                        this.userRepository,
+                        this.courseRepository,
+                        this.transactionHandler,
+                        this.idGenerator
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        );
+        this.registerBlogCommentService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterBlogCommentServices(
+                        this.commentBlogRepository,
+                        this.userRepository,
+                        this.blogRepository,
+                        this.transactionHandler,
+                        this.idGenerator
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
 
     
