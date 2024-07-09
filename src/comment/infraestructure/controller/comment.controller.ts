@@ -7,7 +7,6 @@ import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-use
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
-import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
 import { GetCommentLessonService } from "src/comment/application/service/query/get-comment-lesson.service";
 import { AddCommentEntryDto } from "../dto/entry/add-commet.dto";
@@ -22,7 +21,6 @@ import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-au
 import { IService } from "src/common/application/interfaces/IService";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
@@ -33,6 +31,8 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
 import { BlogCommentEntity } from "../entities/blog/comment.blog.entity";
 import { LessonCommentEntity } from "../entities/lesson/comment.lesson.entity";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 
 

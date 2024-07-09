@@ -5,7 +5,6 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiU
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { OrmCategoryRepository } from "../repositories/orm-category.repository";
 import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 //import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
 import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 import { GetCategoryByIdService } from "src/category/application/services/getCategoryById.service";
@@ -21,6 +20,8 @@ import { ExceptionLoggerDecorator } from "src/common/application/aspects/excepti
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { CategoryEntity } from "../entities/category.entity";
+import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { PaginationDto } from "src/common/infraestructure/dto/entry/pagination.dto";
 
 
 @ApiTags('Category')
@@ -57,8 +58,9 @@ export class CategoryController {
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
   })
-    async getAllCategorys(@Query('page', ParseIntPipe) page?: number, @Query('perpage', ParseIntPipe) perpage?: number) {
-      const request = new GetAllCategoriesRequest(page, perpage);
+    //async getAllCategorys(@Query('page', ParseIntPipe) page?: number, @Query('perpage', ParseIntPipe) perpage?: number)
+    async getAllCategorys(@Query() pagination: PaginationDto) {
+      const request = new GetAllCategoriesRequest(pagination.page, pagination.perPage);
       const response = await this.getAllCategorysService.execute(request);
       if (response.isSuccess) return response.Value
       throw new HttpException(response.Message, response.StatusCode);
