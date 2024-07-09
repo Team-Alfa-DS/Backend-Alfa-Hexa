@@ -11,7 +11,7 @@ import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLo
 import { IService } from "src/common/application/interfaces/IService";
 import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
@@ -63,7 +63,7 @@ export class CourseController {
   ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
     const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel);
-    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
+    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() , PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
     
@@ -71,19 +71,19 @@ export class CourseController {
     this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
-    this.getManyCoursesService = new ExceptionLoggerDecorator( 
+    this.getManyCoursesService = new LoggerDecorator( 
       new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
-    this.getCourseByIdService = new ExceptionLoggerDecorator(
+    this.getCourseByIdService = new LoggerDecorator(
       new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
       logger
     );
-    this.getCourseCountService = new ExceptionLoggerDecorator(
+    this.getCourseCountService = new LoggerDecorator(
       new GetCourseCountService(OdmCourseRepositoryInstance),
       logger
     );
-    this.postCourseService = new ExceptionLoggerDecorator(
+    this.postCourseService = new LoggerDecorator(
       new ServiceDBLoggerDecorator(
         new PostCourseService(
           OrmCourseRepositoryInstance, 
@@ -95,7 +95,7 @@ export class CourseController {
       ),
       logger
     );
-    this.postLessonService = new ExceptionLoggerDecorator(
+    this.postLessonService = new LoggerDecorator(
       new ServiceDBLoggerDecorator(
         new PostLessonService(
           OrmCourseRepositoryInstance,

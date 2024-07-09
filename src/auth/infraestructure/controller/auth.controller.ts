@@ -45,7 +45,7 @@ import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/val
 import { MailjetService } from 'nest-mailjet';
 import { MailJet } from 'src/common/infraestructure/mailer/mailjet';
 import { IMailer } from 'src/common/application/mailer/mailer.interface';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-entities/orm-user.entity';
@@ -108,30 +108,30 @@ export class AuthController {
         this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
-        this.registerUserService = new ExceptionLoggerDecorator(
+        this.registerUserService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
                 this.auditRepository
             ),
             this.logger
         );
-        this.loginUserService = new ExceptionLoggerDecorator(
+        this.loginUserService = new LoggerDecorator(
             new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
             this.logger
         );
-        this.currentUserService = new ExceptionLoggerDecorator(
+        this.currentUserService = new LoggerDecorator(
             new CurrentUserService(this.odmUserRepository),
             this.logger
         );
-        this.forgetUserPasswordService = new ExceptionLoggerDecorator(
+        this.forgetUserPasswordService = new LoggerDecorator(
             new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
             this.logger
         );
-        this.validateUserCodeService = new ExceptionLoggerDecorator(
+        this.validateUserCodeService = new LoggerDecorator(
             new ValidateUserCodeService(this.odmUserRepository),
             this.logger
         );
-        this.changeUserPasswordService = new ExceptionLoggerDecorator(
+        this.changeUserPasswordService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
                 this.auditRepository
