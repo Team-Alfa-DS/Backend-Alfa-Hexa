@@ -43,6 +43,35 @@ export class OdmCourseEntity {
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     trainer: OdmTrainerEntity;
+
+    static create(
+        id: string,
+        name: string,
+        description: string,
+        publication_date: Date,
+        minutes: number,
+        weeks: number,
+        level: string,
+        image: string,
+        tags: OdmTagEntity[],
+        category: OdmCategoryEntity,
+        trainer: OdmTrainerEntity
+      ): OdmCourseEntity {
+        const odmCourse = new OdmCourseEntity();
+        odmCourse.id = id;
+        odmCourse.name = name;
+        odmCourse.description = description;
+        odmCourse.publication_date = publication_date;
+        odmCourse.minutes = minutes;
+        odmCourse.weeks = weeks;
+        odmCourse.level = level;
+        odmCourse.image = image;
+        odmCourse.tags = tags;
+        odmCourse.category = category;
+        odmCourse.trainer = trainer;
+        odmCourse.lessons = []
+        return odmCourse;
+      }
 }
 
 export const CourseSchema = SchemaFactory.createForClass(OdmCourseEntity);

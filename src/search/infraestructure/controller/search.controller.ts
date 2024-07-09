@@ -3,7 +3,7 @@ import { Controller, Get, HttpException, ParseArrayPipe, ParseIntPipe, Query, Re
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { OrmBlogRepository } from 'src/blog/infraestructure/repositories/ormBlog.repository';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { ServiceLoggerDecorator } from 'src/common/application/aspects/serviceLoggerDecorator';
 import { IService } from 'src/common/application/interfaces/IService';
 import { FsPromiseLogger } from 'src/common/infraestructure/adapters/FsPromiseLogger';
@@ -23,6 +23,7 @@ import { OrmCategoryRepository } from 'src/category/infraestructure/repositories
 import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-category.mapper';
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 
 
 @ApiTags('Search')
@@ -34,25 +35,26 @@ export class SearchController {
     private searchService: IService<SearchRequestDto, SearchResponseDto>;
     private searchTagService: IService<SearchRequestDto, SearchTagResponseDto>;
     private transacctionHandler: ITransactionHandler;
+    private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
     constructor() {
         const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
         const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
-        const trainerRepo = new OrmTrainerRepository( new OrmTrainerMapper(), PgDatabaseSingleton.getInstance());
+        const trainerRepo = new OrmTrainerRepository( this.trainerMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
 
         this.transacctionHandler = new TransactionHandler(
             PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
-        this.searchService =  new ExceptionLoggerDecorator(
+        this.searchService =  new LoggerDecorator(
             new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
             logger
         );
 
-        this.searchTagService = new ExceptionLoggerDecorator(
+        this.searchTagService = new LoggerDecorator(
             new SearchTagService(tagRepo,this.transacctionHandler),
             logger
         );
@@ -82,6 +84,7 @@ export class SearchController {
             return result.Value;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
         }
     }
 
@@ -98,6 +101,7 @@ export class SearchController {
             return result.Value;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
         }
     }
 

@@ -1,13 +1,12 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../repositories/ICourse.repository";
+import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
-import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { CourseId } from "src/course/domain/value-objects/course-id";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
@@ -16,46 +15,46 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
     private readonly categoryRepository: ICategoryRepository,
   ) {super();}
 
-  async execute(service: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
-    const r = await this.courseRepository.getCourseById(service.courseId);
+  async execute(request: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
+    try {
+      const r = await this.courseRepository.getCourseById(new CourseId(request.courseId));
 
-    if (r.isSuccess) {
-      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Value.Trainer.value);
-      if (!trainer.isSuccess) {return Result.fail(trainer.Error)};
-      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Value.Category.value);
+      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
+      if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio
+      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Category.value);
       if (!category.isSuccess) {return Result.fail(category.Error)}
 
-      const lessons: {
-        id: string,
-        title: string,
-        content: string,
-        video: string
-      }[] = [];
-      for (let lesson of r.Value.Lessons) {
-        lessons.push({
-          id: lesson.id.Value,
-          title: lesson.title.value,
-          content: lesson.content.value,
-          video: lesson.video.Value
-        });
-      }
+        const lessons: {
+          id: string,
+          title: string,
+          content: string,
+          video: string
+        }[] = [];
+        for (let lesson of r.Lessons) {
+          lessons.push({
+            id: lesson.id.Value,
+            title: lesson.title.value,
+            content: lesson.content.value,
+            video: lesson.video.Value
+          });
+        }
 
       return Result.success(new GetCourseByIdResponse(
-        r.Value.Id.Value,
-        r.Value.Title.value,
-        r.Value.Description.value,
+        r.Id.Value,
+        r.Title.value,
+        r.Description.value,
         category.Value.Name.value,
-        r.Value.Image.Value,
+        r.Image.Value,
         {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-        r.Value.Level.value,
-        r.Value.DurationWeeks.value,
-        r.Value.DurationMinutes.value,
-        r.Value.Tags.map(tag => tag.name),
-        r.Value.Date,
+        r.Level.value,
+        r.DurationWeeks.value,
+        r.DurationMinutes.value,
+        r.Tags.map(tag => tag.name),
+        r.Date,
         lessons
       ));
-    } else {
-      return Result.fail(r.Error);
+    } catch (error) {
+      return Result.fail(error);
     }
     
   }

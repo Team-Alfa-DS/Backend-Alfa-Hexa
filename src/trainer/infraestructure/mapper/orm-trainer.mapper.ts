@@ -30,10 +30,10 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainerEntity> {
 
   async toDomain(ormEntity: OrmTrainerEntity): Promise<Trainer> {
     if (ormEntity) {
-      
-      let courses: TrainerCourseId[] = ormEntity.courses?.map(course => TrainerCourseId.create([new CourseId(course.id)])) || [];
-      let blogs: TrainerBlogId[] = ormEntity.blogs?.map(blog => TrainerBlogId.create([BlogId.create(blog.id)])) || [];
-      let users: TrainerFollowerUserId[] = ormEntity.users?.map(user => TrainerFollowerUserId.create([UserId.create(user.id)])) || [];
+
+      let courses: TrainerCourseId[] = ormEntity.courses?.map(course => TrainerCourseId.create(new CourseId(course.id))) || [];
+      let blogs: TrainerBlogId[] = ormEntity.blogs?.map(blog => TrainerBlogId.create(BlogId.create(blog.id))) || [];
+      let users: TrainerFollowerUserId[] = ormEntity.users?.map(user => TrainerFollowerUserId.create(UserId.create(user.id))) || []; 
       
 
       const trainer = Trainer.create(
@@ -50,11 +50,11 @@ export class OrmTrainerMapper implements IMapper<Trainer, OrmTrainerEntity> {
     return null;
   }
 
-  /*async arrayToDomain(entities: OrmTrainerEntity[]): Promise<Trainer[]> {
+  async arrayToDomain(entities: OrmTrainerEntity[]): Promise<Trainer[]> {
     const courses: Trainer[] = [];
     for (let entity of entities) {
       courses.push(await this.toDomain(entity));
     }
     return courses;
-  }*/
+  }
 }

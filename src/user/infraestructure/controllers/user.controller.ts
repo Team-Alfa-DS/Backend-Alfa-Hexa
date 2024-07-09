@@ -19,7 +19,7 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { UpdateUserResponseDto } from "../dtos/UpdateUserResponse.response";
 import { HttpResponseHandler } from "src/common/infraestructure/handlers/http-response.handler";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
@@ -34,6 +34,7 @@ import { Model } from "mongoose";
 import { OdmUserEntity } from "../entities/odm-entities/odm-user.entity";
 import { OdmUserRespository } from "../repositories/odm-user.repository";
 import { OdmUserMapper } from "../mappers/odm-mappers/odm-user.mapper";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 import { UpdateUserPasswordEvent } from "../events/synchronize/update-user-password.event";
 import { UpdateUserEmailEvent } from "../events/synchronize/update-user-email.event";
 import { UpdateUserImageEvent } from "../events/synchronize/update-user-image.event";
@@ -84,7 +85,7 @@ export class UserController {
         this.eventPublisher.subscribe('UserNameUpdated', [new UpdateUserNameEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPhoneUpdated', [new UpdateUserPhoneEvent(this.odmUserRepository)]);
 
-        this.updateUserService = new ExceptionLoggerDecorator(
+        this.updateUserService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new UpdateUserService(
                     this.userRepository,
@@ -119,7 +120,8 @@ export class UserController {
         )
         const result = await this.updateUserService.execute(dataUser);
         if (result.isSuccess) return result.Value;
-        // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        // // HttpResponseHandler.HandleException(result.StatusCode, result.Message, result.Error);
+        throw ExceptionMapper.toHttp(result.Error);
     }
 
     @Get('synchronize')

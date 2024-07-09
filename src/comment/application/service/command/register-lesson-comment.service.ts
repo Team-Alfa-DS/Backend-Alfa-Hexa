@@ -3,7 +3,7 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
@@ -13,6 +13,7 @@ import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/commen
 import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comment-lesson-userId";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
@@ -45,9 +46,9 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
         if ( !user.isSuccess ) return Result.fail( user.Error );
 
-        let course = await this.courseRepository.getCourseByLessonId( data.targetId );
+        let course = await this.courseRepository.getCourseByLessonId( new LessonId(data.targetId) );
 
-        if ( !course.isSuccess ) return Result.fail( course.Error );
+        // if ( !course.isSuccess ) return Result.fail( course.Error ); //FIXME: Needs try-catch
 
         let publicationDate = CommentLessonPublicationDate.create( new Date() );
         let body = CommentLessonBody.create( data.body );

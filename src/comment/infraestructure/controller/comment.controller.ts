@@ -24,7 +24,7 @@ import { ServiceDBLoggerDecorator } from "src/common/application/aspects/service
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto } from "src/comment/application/dto/lesson/lesson-comment.response.dto";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
@@ -33,6 +33,7 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmLessonCommentRepository } from "../repositories/lesson/orm-comment.repository";
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
+import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 
 
 
@@ -96,21 +97,21 @@ export class CommentController{
     
     constructor() {
 
-        this.getCommentBlogService = new ExceptionLoggerDecorator(
+        this.getCommentBlogService = new LoggerDecorator(
             new GetCommentBlogService(
                 this.commentBlogRepository,
                 this.transactionHandler
             ),
             this.logger
         );
-        this.getCommentLessonService = new ExceptionLoggerDecorator(
+        this.getCommentLessonService = new LoggerDecorator(
             new GetCommentLessonService(
                 this.commentLessonRepository,
                 this.transactionHandler
             ),
             this.logger
         );
-        this.registerLessonCommentService = new ExceptionLoggerDecorator(
+        this.registerLessonCommentService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterLessonCommentServices(
                     this.commentLessonRepository,
@@ -123,7 +124,7 @@ export class CommentController{
             ),
             this.logger
         );
-        this.registerBlogCommentService = new ExceptionLoggerDecorator(
+        this.registerBlogCommentService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterBlogCommentServices(
                     this.commentBlogRepository,
@@ -156,13 +157,14 @@ export class CommentController{
         if (( commentsQueryParams.blog && commentsQueryParams.lesson) || 
             (!commentsQueryParams.blog && !commentsQueryParams.lesson )) {
             throw new HttpException( 'Debe proporcionar exactamente un blog o una leccion', 400 );
+            //FIXME: Este error debería manejarse con excepciones de dominio
         }
         
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
 
-            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
 
@@ -171,7 +173,7 @@ export class CommentController{
 
             const result = await this.getCommentLessonService.execute( data );
 
-            // if (!result.isSuccess) return new HttpException(result.Message, result.StatusCode);
+            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
 
             return result.Value;
         }
