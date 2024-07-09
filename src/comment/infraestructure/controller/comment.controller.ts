@@ -116,9 +116,12 @@ export class CommentController{
                 @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
                 @InjectModel('user') userModel: Model<OdmUserEntity>){
 
-        const OdmcommentBlogMapper = new OdmBlogCommentMapper(userModel, blogModel, commentBlogModel);
+        const OdmcommentBlogMapper = new OdmBlogCommentMapper(userModel, blogModel, commentBlogModel,trainerModel);
 
-        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel, commentBlogModel);
+        const odmBlogRepositoryInstance = new OdmBlogRepository(
+            new OdmBlogMapper(userModel,blogModel,commentBlogModel,trainerModel), 
+            blogModel, 
+            commentBlogModel);
         
         
         const OdmCourseRepositoryInstance = new OdmCourseRepository(

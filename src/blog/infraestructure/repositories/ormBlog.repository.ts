@@ -161,7 +161,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
 
     async saveBlog(blog: Blog): Promise<Result<Blog>>{
         const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
-        const ormBlogEntity = BlogMapper.toPersistence(blog);
+        const ormBlogEntity = await BlogMapper.toPersistence(blog);
         await runnerTransaction.manager.save(ormBlogEntity);
         return Result.success<Blog>(blog);
     }

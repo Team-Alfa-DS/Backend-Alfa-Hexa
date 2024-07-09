@@ -17,6 +17,7 @@ import { OdmUserRespository } from "src/user/infraestructure/repositories/odm-us
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog.repository";
 import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 
 
 export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentEntity>{
@@ -24,15 +25,18 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
     private readonly userModel: Model<OdmUserEntity>;
     private readonly blogModel: Model<OdmBlogEntity>;
     private readonly commentModel: Model<OdmBlogCommentEntity>;
+    private readonly trainerModel: Model<OdmTrainerEntity>
 
     constructor(
         userModel: Model<OdmUserEntity>,
         blogModel: Model<OdmBlogEntity>,
-        commentModel: Model<OdmBlogCommentEntity>
+        commentModel: Model<OdmBlogCommentEntity>,
+        trainerModel: Model<OdmTrainerEntity>
     ){
         this.userModel = userModel;
         this.blogModel = blogModel;
         this.commentModel = commentModel;
+        this.trainerModel = trainerModel;
     }
     
     async toDomain(OdmEntity: OdmBlogCommentEntity): Promise<CommentBlog> {
@@ -50,10 +54,10 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
 
     async toPersistence(Domain: CommentBlog): Promise<OdmBlogCommentEntity> {
         let odmUserMapper = new OdmUserMapper();
-        let odmBlogMapper = new OdmBlogMapper();
+        let odmBlogMapper = new OdmBlogMapper(this.userModel,this.blogModel,this.commentModel, this.trainerModel);
 
         let userRepo: OdmUserRespository = new OdmUserRespository(odmUserMapper, this.userModel);
-        let blogRepo = new OdmBlogRepository(new OdmBlogMapper(), this.blogModel, this.commentModel);
+        let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel);
         
         let user = await userRepo.findUserById(UserId.create(Domain.UserId.UserId));
         let blog = await blogRepo.getBlogById(Domain.BlogId.BlogId.value);

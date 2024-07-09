@@ -69,7 +69,7 @@ export class BlogMapper {
         );
     }
 
-    toPersistence(blog: Blog): OrmBlogEntity {
+    static async toPersistence(blog: Blog): Promise<OrmBlogEntity> {
         let ormBlog = OrmBlogEntity.create(
             blog.Id.value,
             blog.Title.value,
@@ -77,7 +77,7 @@ export class BlogMapper {
             blog.Publication_date.value,
             blog.Category.value,
             blog.Trainer.trainerId,
-            blog.Tag.value,
+            blog.Tags.map((tag) => tag.value),
             blog.Images.map((image) => image.value),
             blog.Comments.map((comment) => comment.commentId)
         );
