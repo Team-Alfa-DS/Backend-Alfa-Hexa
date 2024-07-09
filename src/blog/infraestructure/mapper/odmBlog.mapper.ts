@@ -11,6 +11,7 @@ import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 
 interface BlogFromODM {
     id: string;
@@ -27,18 +28,17 @@ interface BlogFromODM {
 }
 
 export class OdmBlogMapper {
-    static toDomain(blog: BlogFromODM): Blog {
-        console.log(blog.tag_id)
+    static toDomain(blog: OdmBlogEntity): Blog {
         return new Blog(
             BlogId.create(blog.id),
-            BlogTitle.create(blog.name),
-            BlogContent.create(blog.content),
-            BlogPublicationDate.create(blog.date),
-            blog.comments.map((comment) => BlogCommentId.create(comment)),
-            CategoryId.create(blog.category),
-            TrainerId.create(blog.trainer),
-            BlogTag.create(blog.tag_id),
-            blog.images.map((image) => BlogImage.create(image))
+            BlogTitle.create(blog.title),
+            BlogContent.create(blog.description),
+            BlogPublicationDate.create(blog.publication_date),
+            [],
+            CategoryId.create(blog.category.id),
+            TrainerId.create(blog.trainer.id),
+            blog.tags.map((tag) => BlogTag.create(tag.name)),
+            blog.images.map((image) => BlogImage.create(image.url))
 
         );
     }

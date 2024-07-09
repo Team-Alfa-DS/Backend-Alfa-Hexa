@@ -57,9 +57,14 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
 
         const filteredBlogs: Blog[] = [];
         if(filter && filter.length > 0){
-            domainBlogs = domainBlogs.filter(blog => blog.Tag.value.toLowerCase().includes(filter.toLowerCase()));
+            domainBlogs.forEach(blog => {
+                if(blog.Tags.some(tag => tag.value.toLowerCase().includes(filter.toLowerCase()))){
+                    filteredBlogs.push(blog);
+                }
+            });
+            domainBlogs = filteredBlogs;
         }
-
+        
         const blogsResponse = domainBlogs.slice(page * perpage, page * perpage + perpage)
         return Result.success(blogsResponse);
 

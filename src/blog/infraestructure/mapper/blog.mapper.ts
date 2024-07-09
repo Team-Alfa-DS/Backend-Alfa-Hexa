@@ -62,7 +62,7 @@ export class BlogMapper {
             blog.comments.map((comment: Comment) => BlogCommentId.create(comment.id)),
             CategoryId.create(blog.category.id),
             TrainerId.create(blog.trainer.id),
-            BlogTag.create(blog.tags[0].name),
+            blog.tags.map((tag: Tag) => BlogTag.create(tag.name)),
             blog.images.map((image: Image) => BlogImage.create(image.url))
 
         );

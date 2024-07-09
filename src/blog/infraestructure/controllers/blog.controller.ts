@@ -44,11 +44,11 @@ export class BlogController {
         const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
         const logger = new NestLogger();
         this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+            new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
         this.getBlogByIdService = new LoggerDecorator(
-            new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+            new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
 
