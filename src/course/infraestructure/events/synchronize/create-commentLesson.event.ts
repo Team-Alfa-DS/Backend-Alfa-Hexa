@@ -3,15 +3,15 @@ import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-
 import { IEventSubscriber } from "src/common/application/events/event-subscriber.interface";
 import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 import { Lesson } from "src/course/domain/entities/Lesson";
-import { CommentPosted } from "src/course/domain/events/comment-lesson-posted.event";
+import { CommentLessonPosted } from "src/course/domain/events/comment-lesson-posted.event";
 import { LessonPosted } from "src/course/domain/events/lesson-posted.event";
 import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 
-export class CreateCommentLessonEvent implements IEventSubscriber<CommentPosted> {
+export class CreateCommentLessonEvent implements IEventSubscriber<CommentLessonPosted> {
 
     constructor(private odmCourseRepository: ICourseRepository) {}
 
-    async on(event: CommentPosted): Promise<void> {
+    async on(event: CommentLessonPosted): Promise<void> {
         const comment = CommentLesson.create(
             event.id, 
             event.publicationDate, 

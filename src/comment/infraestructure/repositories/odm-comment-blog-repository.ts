@@ -1,11 +1,11 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { Model } from "mongoose";
-import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
 import { OdmBlogCommentEntity } from "../entities/odm-entities/odm-comment.blog.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { IOdmBlogCommentRepository } from "src/comment/application/odm-comment-blog-repository-interface";
 import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
+import { OdmBlogCommentMapper } from "src/blog/infraestructure/mapper/odm-comment-blog.mapper";
 
 export class OdmBlogCommentRepository implements IOdmBlogCommentRepository{
     

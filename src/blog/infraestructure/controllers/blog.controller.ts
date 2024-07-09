@@ -24,12 +24,7 @@ import { OdmBlogMapper } from "../mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { get } from "http";
-import { GetManyBlogsDTO } from "../dtos/getManyBlogsDTO";
-import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
 import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
-import { OrmBlogCommentRepository } from '../../../comment/infraestructure/repositories/blog/orm-comment.repository';
-import { OrmBlogCommentMapper } from '../../../comment/infraestructure/mapper/blog/orm-comment-blog.mapper';
 import { OdmTrainerRepository } from '../../../trainer/infraestructure/repositories/odm-trainer.repository';
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
@@ -54,16 +49,17 @@ export class BlogController {
     private readonly getBlogsCountService: IService<GetBlogsCountDTO, GetBlogsCountResponseDTO>;
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
-    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>,
-                @InjectModel('commentBlog') commentBlogModel: Model<OdmBlogCommentEntity>) {
-    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
-                @InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>){
+    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>, 
+                @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, 
+                @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+                @InjectModel('user') userModel: Model<OdmUserEntity>, 
+                @InjectModel('course') courseModel: Model<OdmCourseEntity>,
+                @InjectModel('commentBlog') commentModel: Model<OdmBlogCommentEntity>){
+
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
-        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel,commentBlogModel);
-        
-        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
+        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(userModel,blogModel,commentModel,trainerModel), blogModel,commentModel);
         const odmTrainerRepositoryInstance = new OdmTrainerRepository( trainerModel,  new OdmTrainerMapper(courseModel, blogModel, userModel), userModel);
         //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
 
@@ -71,6 +67,7 @@ export class BlogController {
         this.getAllBlogService = new LoggerDecorator(
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
+        );
         this.getAllBlogService = new ExceptionDecorator(
             new LoggerDecorator(
                 new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
