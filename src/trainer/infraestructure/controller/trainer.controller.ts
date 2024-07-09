@@ -161,7 +161,7 @@ export class TrainerController {
   }
 
 
-  @Get('/trainer/many')
+  @Get('/many')
   @ApiQuery({name: 'filter', required:false})
   @ApiBearerAuth('token')
   @UseGuards(JwtAuthGuard)

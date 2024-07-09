@@ -54,7 +54,6 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
             trainers = (await this.userModel.findOne({id: userId})).trainers;
         } else {
             const trainerList = await this.trainerModel.find();
-
             for (const trainer of trainerList) {
                 if (trainer.followers.findIndex(user => user.id == userId) == -1) {
                     trainers.push(trainer);
