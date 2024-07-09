@@ -51,7 +51,6 @@ import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
-import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
 @ApiBearerAuth()
@@ -123,10 +122,7 @@ export class CommentController{
             new OdmBlogMapper(userModel,blogModel,commentBlogModel,trainerModel), 
             blogModel, 
             commentBlogModel);
-        
-        
-                @InjectModel('lesson_comment') commentLessonModel: Model<OdmLessonCommentEntity>,
-                @InjectModel('blog_comment') commentBlogModel: Model<OdmBlogCommentEntity>){
+
 
                     
                     

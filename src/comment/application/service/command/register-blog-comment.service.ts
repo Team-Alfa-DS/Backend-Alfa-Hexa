@@ -80,7 +80,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         
         this.eventPublisher.publish(blog.Value.pullDomainEvents());
 
-        const response = new AddCommentToServiceResponseDto();
+        const response = new AddCommentToServiceResponseDto(commentID.commentId);
 
         return Result.success<AddCommentToServiceResponseDto>( response );
         }catch(err){
