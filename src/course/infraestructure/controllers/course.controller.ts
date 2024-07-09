@@ -41,6 +41,7 @@ import { PostLesonBodyDto } from "../dtos/postLessonBody.dto";
 import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
 import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -71,40 +72,50 @@ export class CourseController {
     this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
-    this.getManyCoursesService = new LoggerDecorator( 
-      new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
-      logger
+    this.getManyCoursesService = new ExceptionDecorator(
+      new LoggerDecorator( 
+        new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        logger
+      )
     );
-    this.getCourseByIdService = new LoggerDecorator(
-      new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
-      logger
+    this.getCourseByIdService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        logger
+      )
     );
-    this.getCourseCountService = new LoggerDecorator(
-      new GetCourseCountService(OdmCourseRepositoryInstance),
-      logger
+    this.getCourseCountService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new GetCourseCountService(OdmCourseRepositoryInstance),
+        logger
+      )
     );
-    this.postCourseService = new LoggerDecorator(
-      new ServiceDBLoggerDecorator(
-        new PostCourseService(
-          OrmCourseRepositoryInstance, 
-          new UuidGen(),
-          // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
-          EventManagerSingleton.getInstance()
+    this.postCourseService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new PostCourseService(
+            OrmCourseRepositoryInstance, 
+            new UuidGen(),
+            // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
+            EventManagerSingleton.getInstance()
+          ),
+          new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
         ),
-        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
-      ),
-      logger
+        logger
+      )
     );
-    this.postLessonService = new LoggerDecorator(
-      new ServiceDBLoggerDecorator(
-        new PostLessonService(
-          OrmCourseRepositoryInstance,
-          new UuidGen(),
-          EventManagerSingleton.getInstance()
+    this.postLessonService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new PostLessonService(
+            OrmCourseRepositoryInstance,
+            new UuidGen(),
+            EventManagerSingleton.getInstance()
+          ),
+          new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
         ),
-        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
-      ),
-      logger
+        logger
+      )
     )
   }
 
@@ -120,13 +131,7 @@ export class CourseController {
   async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
     const result = await this.getCourseByIdService.execute(request);
-    
-    if (result.isSuccess)
-    {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
+    return result.Value;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -152,14 +157,7 @@ export class CourseController {
       manyCoursesQueryDto.perpage);
 
     const result = await this.getManyCoursesService.execute(request);
-    
-    if (result.isSuccess)
-    {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
-    
+    return result.Value;
   }
 
   @Get('/count')
@@ -172,12 +170,7 @@ export class CourseController {
     )
 
     const result = await this.getCourseCountService.execute(request);
-
-    if (result.isSuccess) {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
+    return result.Value;
   }
 
   @Post()
@@ -195,11 +188,7 @@ export class CourseController {
       postCourseBodyDto.trainerId
     ));
 
-    if (response.isSuccess) {
-      return response.Value;
-    } else {
-      return ExceptionMapper.toHttp(response.Error);
-    }
+    return response.Value;
   }
 
   @Post('lesson')
@@ -213,11 +202,6 @@ export class CourseController {
       postLessonBodyDto.seconds,
       postLessonBodyDto.videoUrl
     ));
-
-    if (response.isSuccess) {
-      return response.Value;
-    } else {
-      return ExceptionMapper.toHttp(response.Error);
-    }
+    return response.Value;
   }
 }

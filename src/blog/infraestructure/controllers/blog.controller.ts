@@ -19,6 +19,7 @@ import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -35,16 +36,18 @@ export class BlogController {
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
-        this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getAllBlogService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-        this.getBlogByIdService = new LoggerDecorator(
-            new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getBlogByIdService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetBlogByIdService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-
-
     }
 
     @Get('one/:id')
@@ -57,9 +60,7 @@ export class BlogController {
     })
     async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
-        if (result.Value)
-            return result.Value
-        return { message: result.Error.message};
+        return result.Value
     }
 
     @Get('many')
@@ -72,8 +73,6 @@ export class BlogController {
     })
     async  getAllBlogs() {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(new GetAllBlogsRequestDTO());
-        if (result.Value)
-            return result.Value.blogs
-        return { message: result.Error.message };
+        return result.Value.blogs
     }
 }

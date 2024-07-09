@@ -8,7 +8,6 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
   constructor(private courseRepository: ICourseRepository) {super()}
   
   async execute(request: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
-    try {
       let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;
       if (request.category) {courseCategory = new CourseCategory(request.category)}
       if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
@@ -16,11 +15,7 @@ export class GetCourseCountService extends IService<GetCourseCountRequest, GetCo
 
       return Result.success(new GetCourseCountResponse(count));
     
-    } catch (error) {
-      return Result.fail(error);
-    }
   }
-
 }
 
 export class GetCourseCountRequest implements ServiceRequestDto {
