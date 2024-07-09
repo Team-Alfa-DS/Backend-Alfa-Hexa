@@ -2,14 +2,12 @@ import { Result } from 'src/common/domain/result-handler/result';
  import { IService } from 'src/common/application/interfaces/IService';
  import { ServiceRequestDto } from 'src/common/application/interfaces/IService';
  import { ServiceResponseDto } from 'src/common/application/interfaces/IService';
-import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
 import { IOdmTrainerRepository } from 'src/trainer/domain/repositories/odm-trainer-repository.interface';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export class FindAllTrainersService extends  IService<GetAllTrainersRequest, GetAllTrainersResponse>{
     constructor(
         private readonly trainerRepository: IOdmTrainerRepository,
-        private readonly transactionHandler: ITransactionHandler
     ){super()}
 
     async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResponse>> {

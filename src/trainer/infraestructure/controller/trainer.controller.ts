@@ -120,7 +120,13 @@ export class TrainerController {
         this.odmTrainerRepository
       ),
       this.logger
-    )
+    );
+    this.findAllTrainersService = new ExceptionLoggerDecorator(
+      new FindAllTrainersService(
+        this.odmTrainerRepository
+      ),
+      this.logger
+    );
   }
 
   @Get('one/:id')
