@@ -10,6 +10,7 @@ import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { OrmBlogCommentMapper } from "../mapper/orm-comment-blog.mapper";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 
 export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
@@ -131,4 +132,12 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
         }
 
     };
+
+    async saveBlog(blog: Blog): Promise<Result<Blog>>{
+        const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+        const ormBlogEntity = BlogMapper.toPersistence(blog);
+        await runnerTransaction.manager.save(ormBlogEntity);
+        return Result.success<Blog>(blog);
+    }
+
 }

@@ -14,63 +14,78 @@ import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
     
-    private readonly commentBlogRepository: IBlogCommentRepository;
+    private readonly odmBlogRepository: IBlogRepository;
     private readonly userRepository: IUserRepository;
     private readonly blogRepository: IBlogRepository;
     private readonly transactionHandler: ITransactionHandler;
-    private readonly idGenerator: IIdGen
+    private readonly idGenerator: IIdGen;
+    private readonly eventPublisher: IEventPublisher;
 
     constructor(
-        commentBlogRepository: IBlogCommentRepository,
+        odmBlogRepository: IBlogRepository,
         userRepository: IUserRepository,
         blogRepository: IBlogRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
+        eventPublisher: IEventPublisher
     ){
         super()
-        this.commentBlogRepository = commentBlogRepository;
+        this.odmBlogRepository = odmBlogRepository;
         this.userRepository = userRepository;
         this.blogRepository = blogRepository;
         this.transactionHandler = transactionHandler;
         this.idGenerator = idGenerator;
+        this.eventPublisher = eventPublisher;
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
+        try{
         let commentID = BlogCommentId.create(await this.idGenerator.genId());
 
         let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
 
-        if ( !user.isSuccess ) return Result.fail( user.Error );
-
-        let blog = await this.blogRepository.getBlogById( data.targetId );
-
-        if ( !blog.isSuccess ) return Result.fail( blog.Error );
+        let blog = await this.odmBlogRepository.getBlogById( data.targetId );
 
         let publicationDate = CommentBlogPublicationDate.create( new Date() );
         let body = CommentBlogBody.create( data.body );
         let userId = CommentBlogUserId.create( data.userId );
         let target = BlogCommentBlogId.create( BlogId.create(data.targetId) );
-
-        const comment: CommentBlog = CommentBlog.create(
-        commentID,
-        publicationDate,
-        body,
-        userId,
-        target,
-        null,
-        null,)
-
-        const result = await this.commentBlogRepository.saveComment( comment, this.transactionHandler )
         
-        if ( !result.isSuccess ) return Result.fail( result.Error );
+        let comment = blog.Value.createComment(
+            commentID,
+            publicationDate,
+            body,
+            userId,
+            target,
+            null,
+            null,
+        );
+
+        await this.blogRepository.saveComment( comment );
+
+        blog.Value.PostComment(
+            commentID,
+            publicationDate,
+            body,
+            userId,
+            target,
+            null,
+            null,
+        );
         
+        this.eventPublisher.publish(blog.Value.pullDomainEvents());
+
         const response = new AddCommentToServiceResponseDto();
 
         return Result.success<AddCommentToServiceResponseDto>( response );
+        }catch(err){
+            return Result.fail<AddCommentToServiceResponseDto>(err);
+        }
     }
     
 }

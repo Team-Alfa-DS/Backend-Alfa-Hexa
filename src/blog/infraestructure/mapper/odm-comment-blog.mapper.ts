@@ -21,6 +21,20 @@ import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 
 export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentEntity>{
 
+    private readonly userModel: Model<OdmUserEntity>;
+    private readonly blogModel: Model<OdmBlogEntity>;
+    private readonly commentModel: Model<OdmBlogCommentEntity>;
+
+    constructor(
+        userModel: Model<OdmUserEntity>,
+        blogModel: Model<OdmBlogEntity>,
+        commentModel: Model<OdmBlogCommentEntity>
+    ){
+        this.userModel = userModel;
+        this.blogModel = blogModel;
+        this.commentModel = commentModel;
+    }
+    
     async toDomain(OdmEntity: OdmBlogCommentEntity): Promise<CommentBlog> {
         const domainComment = CommentBlog.create(
             BlogCommentId.create(OdmEntity.id),
@@ -36,19 +50,16 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
 
     async toPersistence(Domain: CommentBlog): Promise<OdmBlogCommentEntity> {
         let odmUserMapper = new OdmUserMapper();
+        let odmBlogMapper = new OdmBlogMapper();
 
-        let userModel = new Model<OdmUserEntity>;
-        let blogModel = new Model<OdmBlogEntity>;
-        let commentModel = new Model<OdmBlogCommentEntity>
-
-        let userRepo: OdmUserRespository = new OdmUserRespository(odmUserMapper, userModel);
-        let blogRepo = new OdmBlogRepository(new OdmBlogMapper(), blogModel, commentModel);
+        let userRepo: OdmUserRespository = new OdmUserRespository(odmUserMapper, this.userModel);
+        let blogRepo = new OdmBlogRepository(new OdmBlogMapper(), this.blogModel, this.commentModel);
         
         let user = await userRepo.findUserById(UserId.create(Domain.UserId.UserId));
         let blog = await blogRepo.getBlogById(Domain.BlogId.BlogId.value);
 
         let userPersistence = await odmUserMapper.toPersistence(user.Value);
-        let blogPersistence = await OdmBlogMapper.toPersistence(blog.Value);
+        let blogPersistence = await odmBlogMapper.toPersistence(blog.Value);
 
         const OrmComment = OdmBlogCommentEntity.create(
             Domain.Id.commentId,

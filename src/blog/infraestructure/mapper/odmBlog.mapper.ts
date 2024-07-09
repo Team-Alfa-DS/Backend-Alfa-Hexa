@@ -43,7 +43,7 @@ export class OdmBlogMapper {
         );
     }
 
-    static async toPersistence(blog: Blog): Promise<OdmBlogEntity> {
+    async toPersistence(blog: Blog): Promise<OdmBlogEntity> {
         let odmBlog = OdmBlogEntity.create(
             blog.Id.value,
             blog.Title.value,

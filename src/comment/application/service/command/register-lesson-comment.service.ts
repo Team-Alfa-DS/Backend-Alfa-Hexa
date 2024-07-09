@@ -6,15 +6,12 @@ import { IUserRepository } from "src/user/domain/repositories/user-repository.in
 import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/comment-lesson-body";
 import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comment-lesson-userId";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
-import { error } from 'console';
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{

@@ -50,6 +50,7 @@ import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog
 import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
 @ApiBearerAuth()
@@ -63,7 +64,6 @@ export class CommentController{
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
-    private OdmcommentBlogMapper = new OdmBlogCommentMapper();
     private OdmcommentLessonMapper = new OdmLessonCommentMapper();
     private commentBlogMapper: OrmBlogCommentMapper = new OrmBlogCommentMapper();
     private commentLessonMapper: OrmLessonCommentMapper = new OrmLessonCommentMapper();
@@ -113,9 +113,11 @@ export class CommentController{
                 @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
                 @InjectModel('commentLesson') commentLessonModel: Model<OdmLessonCommentEntity>,
                 @InjectModel('commentBlog') commentBlogModel: Model<OdmBlogCommentEntity>,
-                @InjectModel('blog') blogModel: Model<OdmBlogEntity>){
+                @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
+                @InjectModel('user') userModel: Model<OdmUserEntity>){
 
-        
+        const OdmcommentBlogMapper = new OdmBlogCommentMapper(userModel, blogModel, commentBlogModel);
+
         const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel, commentBlogModel);
         
         
@@ -157,11 +159,12 @@ export class CommentController{
         this.registerBlogCommentService = new LoggerDecorator(
             new ServiceDBLoggerDecorator(
                 new RegisterBlogCommentServices(
-                    this.commentBlogRepository,
+                    odmBlogRepositoryInstance,
                     this.userRepository,
                     this.blogRepository,
                     this.transactionHandler,
-                    this.idGenerator
+                    this.idGenerator,
+                    this.eventPublisher
                 ),
                 this.auditRepository
             ),

@@ -12,6 +12,7 @@ import { CommentBlog } from "src/comment/domain/comment-blog";
 import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
 import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
 import { OdmBlogCommentMapper } from "../mapper/odm-comment-blog.mapper";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 
 
 export class OdmBlogRepository implements IBlogRepository{
@@ -139,5 +140,13 @@ export class OdmBlogRepository implements IBlogRepository{
         const odmComment = await this.odmCommentMapper.toPersistence(comment);
         await this.commentModel.create(odmComment);
         return Result.success<CommentBlog>(comment);
+    }
+
+    async saveBlog(blog: Blog, comments: BlogCommentId[]): Promise<Result<Blog>>{ 
+        const odmBlog = await this.odmBlogMapper.toPersistence(blog);
+        let comment = comments.map(e => e.commentId);
+        odmBlog.comments = comment;
+        await this.commentModel.create(odmBlog);
+        return Result.success<Blog>(blog);
     }
 }

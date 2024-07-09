@@ -15,7 +15,6 @@ import { SearchResponseDto } from 'src/search/application/dtos/response/search-r
 import { SearchService } from 'src/search/application/services/search.service';
 import { SearchTagService } from '../../application/services/search-tag.service';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { OrmTagRepository } from 'src/tag/infraestructure/repositories/orm-tag-repository';
 import { SearchTagResponseDto } from 'src/search/application/dtos/response/search-tag-response.dto';
 import { ITagRepository } from 'src/tag/application/ITagRepository';
@@ -24,6 +23,7 @@ import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-categ
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 
 
 @ApiTags('Search')

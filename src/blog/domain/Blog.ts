@@ -36,16 +36,7 @@ export class Blog extends AggregateRoot<BlogId>{
         }
 
         if (event instanceof CommentBlogPosted){
-            const comment: CommentBlog = CommentBlog.create(
-                event.id,
-                event.publicationDate,
-                event.body,
-                event.userId,
-                event.BlogId,
-                event.userLiked,
-                event.userDisliked
-            );
-            
+            this.comments.push(event.id);
         }
     }
     protected validateState(): void {
@@ -95,7 +86,34 @@ constructor(
         userLiked: CommentBlogUserLiked,
         userDisliked: CommentBlogUserDisliked
     ){
-        this.apply(new CommentBlogPosted(id, publicationDate, body, userId, BlogId, userLiked, userDisliked));
+        const comment: CommentBlog = CommentBlog.create(
+            id,
+            publicationDate,
+            body,
+            userId,
+            BlogId,
+            userLiked,
+            userDisliked)
+        return comment;
+    }
+
+    PostComment(
+        id: BlogCommentId,
+        publicationDate: CommentBlogPublicationDate,
+        body: CommentBlogBody,
+        userId: CommentBlogUserId,
+        BlogId: BlogCommentBlogId,
+        userLiked: CommentBlogUserLiked,
+        userDisliked: CommentBlogUserDisliked
+    ){
+        this.apply(new CommentBlogPosted(
+            id, 
+            publicationDate, 
+            body, 
+            userId, 
+            BlogId, 
+            userLiked, 
+            userDisliked));
     }
 
     get Title(): BlogTitle{
