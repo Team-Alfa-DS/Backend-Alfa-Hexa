@@ -25,11 +25,10 @@ import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/o
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog.repository";
 import { OrmBlogCommentRepository } from "src/comment/infraestructure/repositories/blog/orm-comment.repository";
-import { OrmBlogCommentMapper } from "src/comment/infraestructure/mapper/blog/orm-comment-blog.mapper";
-import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/lesson/orm-comment.repository";
 import { Injectable } from "@nestjs/common";
 import { OrmTagRepository } from "src/tag/infraestructure/repositories/orm-tag-repository";
 import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
+import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 
 @Injectable()
 export class Synchronize {
@@ -67,8 +66,7 @@ export class Synchronize {
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly lessonCommentRepository = new OrmLessonCommentRepository(
-        new OrmLessonCommentMapper(),
+    private readonly lessonCommentRepository = new TOrmCourseRepository(
         PgDatabaseSingleton.getInstance()
     );
 
@@ -213,13 +211,15 @@ export class Synchronize {
         }
         console.log('blogComments terminado');
 
-        const lessonComments = await this.lessonCommentRepository.find();
-        for (const comment of lessonComments) {
-            const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-            const lesson = await this.lessonModel.findOne({id: lesson_id});
-            const user = await this.userModel.findOne({id: user_id});
-            await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
-        }
-        console.log('lessonComments terminado');
+        //const lessonComments = await this.lessonCommentRepository.find(
+        //    {relations: {lessons: true}}
+        //);
+        //for (const comment of lessonComments) {
+        //    const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
+        //    const lesson = await this.lessonModel.findOne({id: lesson_id});
+        //    const user = await this.userModel.findOne({id: user_id});
+        //    await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
+        //}
+        //console.log('lessonComments terminado');
     }
 } 

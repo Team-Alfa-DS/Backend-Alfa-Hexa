@@ -36,7 +36,6 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
 
     async toPersistence(Domain: CommentBlog): Promise<OdmBlogCommentEntity> {
         let odmUserMapper = new OdmUserMapper();
-        let odmBlogMapper = new OdmBlogMapper();
 
         let userModel = new Model<OdmUserEntity>;
         let blogModel = new Model<OdmBlogEntity>;
@@ -49,13 +48,13 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
         let blog = await blogRepo.getBlogById(Domain.BlogId.BlogId.value);
 
         let userPersistence = await odmUserMapper.toPersistence(user.Value);
-        let blogPersistence = await odmBlogMapper.toPersistence(blog.Value);
+        let blogPersistence = await OdmBlogMapper.toPersistence(blog.Value);
 
         const OrmComment = OdmBlogCommentEntity.create(
             Domain.Id.commentId,
             Domain.PublicationDate.PublicationDate,
             Domain.Body.Body,
-            lessonPersistence, //Aqui se agrega La leccion completa
+            blogPersistence,
             userPersistence,
             Domain.UserLiked.UserLiked,
             Domain.UserDisliked.UserDisliked

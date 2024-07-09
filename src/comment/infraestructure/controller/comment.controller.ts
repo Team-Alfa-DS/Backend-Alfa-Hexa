@@ -1,6 +1,5 @@
 import { Body, Controller, Get, HttpException, Post, Query, Request, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiQuery, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
-import { OrmBlogCommentMapper } from "../mapper/blog/orm-comment/orm-comment-blog.mapper";
 import { OrmUserMapper } from "src/user/infraestructure/mappers/orm-mappers/orm-user.mapper";
 import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-user.repository";
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
@@ -28,11 +27,10 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmBlogCommentRepository } from "../repositories/blog/orm-comment.repository";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 import { OrmLessonCommentMapper } from "../../../course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
-import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-blog.mapper";
+import { OdmBlogCommentMapper } from "../../../blog/infraestructure/mapper/odm-comment-blog.mapper";
 import { OdmLessonCommentEntity } from "../entities/odm-entities/odm-comment.lesson.entity";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
@@ -51,6 +49,7 @@ import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog.repository";
 import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
+import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 
 
 @ApiBearerAuth()
@@ -133,8 +132,7 @@ export class CommentController{
 
         this.getCommentBlogService = new LoggerDecorator(
             new GetCommentBlogService(
-                this.commentBlogRepository,
-                this.transactionHandler
+                odmBlogRepositoryInstance
             ),
             this.logger
         );

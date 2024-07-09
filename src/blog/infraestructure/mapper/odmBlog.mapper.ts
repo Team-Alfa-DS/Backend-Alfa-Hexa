@@ -11,6 +11,7 @@ import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 
 interface BlogFromODM {
     id: string;
@@ -23,7 +24,6 @@ interface BlogFromODM {
     images: string[],
     comments: string[]
 
-    
 }
 
 export class OdmBlogMapper {
@@ -43,18 +43,19 @@ export class OdmBlogMapper {
         );
     }
 
-    static toPersistence(blog: Blog): BlogFromODM {
-        return {
-            id: blog.Id.value,
-            name: blog.Title.value,
-            content: blog.Content.value,
-            date: blog.Publication_date.value,
-            trainer: blog.Trainer.trainerId,
-            category: blog.Category.value,
-            tag_id: blog.Tag.value,
-            images: blog.Images.map((image) => image.value),
-            comments: blog.Comments.map((comment) => comment.commentId)
-        };
+    static async toPersistence(blog: Blog): Promise<OdmBlogEntity> {
+        let odmBlog = OdmBlogEntity.create(
+            blog.Id.value,
+            blog.Title.value,
+            blog.Content.value,
+            blog.Publication_date.value,
+            blog.Trainer.trainerId,
+            blog.Category.value,
+            blog.Tag.value,
+            blog.Images.map((image) => image.value),
+            blog.Comments.map((comment) => comment.commentId)
+        );
+        return odmBlog;
     }
     
 }

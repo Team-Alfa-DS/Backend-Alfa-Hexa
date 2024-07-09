@@ -357,8 +357,6 @@ export class OdmCourseRepository implements ICourseRepository {
       return Result.success<CommentLesson>(comment);
     }
 
-  
-
   async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>> {
     try{
         const r = await this.commentModel.find<OdmLessonCommentEntity>();

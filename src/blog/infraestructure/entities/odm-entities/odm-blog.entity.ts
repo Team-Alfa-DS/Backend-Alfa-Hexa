@@ -34,6 +34,33 @@ export class OdmBlogEntity {
 
     @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
     comments: string[];
+    
+    
+    static create(
+        id: string,
+        title: string,
+        description: string,
+        date: Date,
+        category_id: string,
+        trainer_id: string,
+        tag_id: string,
+        images: string[],
+        comments: string[]
+    ){
+        const odmBlog = new OdmBlogEntity();
+        odmBlog.id = id;
+        odmBlog.title = title;
+        odmBlog.description = description;
+        odmBlog.date = date;
+        odmBlog.category_id = category_id
+        odmBlog.trainer_id = trainer_id;
+        odmBlog.tag_id = tag_id;
+        odmBlog.images = images;
+        odmBlog.comments = comments;
+        return odmBlog;
+    }
+
 }
+
 
 export const BlogSchema = SchemaFactory.createForClass(OdmBlogEntity);

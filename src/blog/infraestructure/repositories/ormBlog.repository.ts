@@ -6,17 +6,15 @@ import { BlogMapper } from '../mapper/blog.mapper';
 import { Result } from '../../../common/domain/result-handler/result';
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { BlogTag } from "src/blog/domain/valueObjects/blogTag";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { OrmBlogCommentMapper } from "../mapper/orm-comment-blog.mapper";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 
 export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
     constructor(dataBase: DataSource) {
         super(OrmBlogEntity, dataBase.manager);
-    }
-    findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
-        throw new Error("Method not implemented.");
     }
 
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
@@ -89,9 +87,48 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`));   
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog);
-           } catch (error) {
+        } catch (error) {
                 console.log(error);
                 return Result.fail(error); 
-           }
+        }
     }
+
+    async findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
+        try{
+            const ormCommentMapper = new OrmBlogCommentMapper();
+            const blog = await this.createQueryBuilder('blog')
+            .leftJoinAndSelect('blog.trainer', 'trainer')
+            .leftJoinAndSelect('blog.category', 'category')
+            .leftJoinAndSelect('blog.tags', 'tags')
+            .leftJoinAndSelect('blog.images', 'images')
+            .leftJoinAndSelect('blog.comments', 'comments')
+            .where('blog.id = :id', {id})
+            .getOne();
+
+            let commentsFound = blog.comments;
+
+            const ListMapper = []
+            commentsFound.forEach(async e => { 
+            ListMapper.push( 
+                await ormCommentMapper.toDomain(e ))  
+        });
+
+        }catch(error){
+            console.log(error);
+            return Result.fail(error);
+        }    
+    };
+
+    async saveComment(comment: CommentBlog): Promise<Result<CommentBlog>> {
+        try{
+            const ormCommentMapper = new OrmBlogCommentMapper();
+            const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+            const ormComment = await ormCommentMapper.toPersistence(comment);
+            await runnerTransaction.manager.save(ormComment);
+            return Result.success<CommentBlog>(comment);                                                    
+        }catch(err){
+            return Result.fail<CommentBlog>(new Error(err.message));
+        }
+
+    };
 }
