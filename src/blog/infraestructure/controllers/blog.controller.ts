@@ -26,6 +26,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { get } from "http";
 import { GetManyBlogsDTO } from "../dtos/getManyBlogsDTO";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -43,16 +44,18 @@ export class BlogController {
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
         const logger = new NestLogger();
-        this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getAllBlogService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-        this.getBlogByIdService = new LoggerDecorator(
-            new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
+        this.getBlogByIdService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
         );
-
-
     }
 
     @Get('one/:id')
@@ -65,9 +68,7 @@ export class BlogController {
     })
     async getBlogById(@Param('id', ParseUUIDPipe) blogId: string) {
         const result: Result<GetBlogByIdResponseDTO> =  await this.getBlogByIdService.execute(new GetBlogByIdRequestDTO(blogId));
-        if (result.Value)
-            return result.Value
-        return { message: result.Error.message};
+        return result.Value
     }
 
     @UseGuards(JwtAuthGuard)

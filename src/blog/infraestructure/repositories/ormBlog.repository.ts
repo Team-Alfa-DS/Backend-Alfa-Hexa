@@ -27,7 +27,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
-            console.log(error);
             return Result.fail(error);
             
         }
@@ -69,7 +68,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
         return Result.success(blogsResponse);
 
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
     }
@@ -89,7 +87,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog);
            } catch (error) {
-                console.log(error);
                 return Result.fail(error); 
            }
     }

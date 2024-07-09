@@ -62,6 +62,7 @@ import { Model } from 'mongoose';
 import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -108,35 +109,47 @@ export class AuthController {
         this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
-        this.registerUserService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.registerUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
-        this.loginUserService = new LoggerDecorator(
-            new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
-            this.logger
+        this.loginUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
+                this.logger
+            )
         );
-        this.currentUserService = new LoggerDecorator(
-            new CurrentUserService(this.odmUserRepository),
-            this.logger
+        this.currentUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new CurrentUserService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.forgetUserPasswordService = new LoggerDecorator(
-            new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
-            this.logger
+        this.forgetUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
+                this.logger
+            )
         );
-        this.validateUserCodeService = new LoggerDecorator(
-            new ValidateUserCodeService(this.odmUserRepository),
-            this.logger
+        this.validateUserCodeService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ValidateUserCodeService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.changeUserPasswordService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.changeUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
     }
 
@@ -152,9 +165,7 @@ export class AuthController {
         const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
 
         const response = await this.registerUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('login')
@@ -169,9 +180,7 @@ export class AuthController {
         const request = new LoginUserRequest(user.email, user.password);
 
         const response = await this.loginUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @ApiBearerAuth()
@@ -188,9 +197,7 @@ export class AuthController {
         const request = new CurrentUserRequest(req.user.tokenUser.id);
 
         const response = await this.currentUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('forget/password')
@@ -213,9 +220,7 @@ export class AuthController {
         const request = new ForgetUserPasswordRequest(user.email, code)
 
         const response = await this.forgetUserPasswordService.execute(request)
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Post('code/validate')
@@ -232,9 +237,7 @@ export class AuthController {
         const request = new ValidateUserCodeRequest(validate.email, validate.code, userCode.code);
 
         const response = await this.validateUserCodeService.execute(request)
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 
     @Put('change/password')
@@ -252,16 +255,11 @@ export class AuthController {
         const requestVal = new ValidateUserCodeRequest(newPassword.email, newPassword.code, userCode.code);
         const validate = await this.validateUserCodeService.execute(requestVal)
 
-        if (!validate.isSuccess) {
-            throw new HttpException('Codigo incorrecto', HttpStatus.BAD_REQUEST);
-        }
         this.userCodeList = this.userCodeList.filter(userCode => userCode.email != newPassword.email);
 
         const requestChange = new ChangeUserPasswordRequest(newPassword.email, newPassword.code, newPassword.password);
 
         const response = await this.changeUserPasswordService.execute(requestChange);
-        if (response.isSuccess) return response.Value;
-        // throw new HttpException(response.Message, response.StatusCode);
-        throw ExceptionMapper.toHttp(response.Error);
+        return response.Value;
     }
 }

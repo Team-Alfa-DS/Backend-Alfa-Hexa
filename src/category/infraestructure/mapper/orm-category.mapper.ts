@@ -26,11 +26,9 @@ export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
     }
 
     async toDomain(ormEntity: OrmCategoryEntity): Promise<Category> {
-        console.log({ormEntity});
         const id = CategoryId.create(ormEntity.id);
         const name = CategoryName.create(ormEntity.name);
         const icon = CategoryIcon.create(ormEntity.icon);
-        console.log({id, name, icon})
         return  Category.create(
             id,
             name,
@@ -42,11 +40,9 @@ export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity> {
 
     
     todomain(ormEntity: OrmCategoryEntity):Category {
-        console.log({ormEntity});
         const id = CategoryId.create(ormEntity.id);
         const name = CategoryName.create(ormEntity.name);
         const icon = CategoryIcon.create(ormEntity.icon);
-        console.log({id, name, icon})
         return  Category.create(
             id,
             name,

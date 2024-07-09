@@ -16,7 +16,6 @@ export class OdmBlogRepository implements IBlogRepository{
    async  getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
         try {
             const blogs = await this.blogModel.find();
-            console.log(blogs[0])
             if(!blogs) return Result.fail(new Error('Blogs not found'));
             let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
 
@@ -43,7 +42,6 @@ export class OdmBlogRepository implements IBlogRepository{
         return Result.success(blogsResponse);
 
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
         
@@ -55,7 +53,6 @@ export class OdmBlogRepository implements IBlogRepository{
         const domainBlog =  OdmBlogMapper.toDomain(blog);
         return Result.success(domainBlog);
        } catch (error) {
-            console.log(error);
             return Result.fail(error); 
        }
     }
@@ -66,7 +63,6 @@ export class OdmBlogRepository implements IBlogRepository{
             const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
-            console.log(error);
             return Result.fail(error);
             
         }

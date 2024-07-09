@@ -22,6 +22,7 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 
 @ApiTags('Category')
@@ -40,13 +41,17 @@ export class CategoryController {
     private readonly logger: ILogger = new NestLogger();
 
     constructor() {
-      this.getAllCategorysService = new LoggerDecorator(
-        new GetAllCategorysService(this.categoryRepository),
-        this.logger
+      this.getAllCategorysService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetAllCategorysService(this.categoryRepository),
+          this.logger
+        )
       );
-      this.getCategoryByIdService = new LoggerDecorator(
-        new GetCategoryByIdService(this.categoryRepository),
-        this.logger
+      this.getCategoryByIdService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetCategoryByIdService(this.categoryRepository),
+          this.logger
+        )
       );
     }
     
@@ -61,9 +66,7 @@ export class CategoryController {
     async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
       const request = new GetAllCategoriesRequest(page, perpage);
       const response = await this.getAllCategorysService.execute(request);
-      if (response.isSuccess) return response.Value
-      // // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+      return response.Value
     }
 
     @Get("/:id")
@@ -77,8 +80,6 @@ export class CategoryController {
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
-      if (response.isSuccess) return response.Value
-      // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+      return response.Value
     }
 }
