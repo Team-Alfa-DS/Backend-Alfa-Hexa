@@ -44,9 +44,7 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         try {
           const result = await this.findOne({where: {id: idCategory.value}
           });
-          console.log({result})
           const domainCategory = (this.ormCategoryMapper.toDomain(result));
-          console.log({domainCategory})
           return Result.success<Category>(domainCategory)
         } catch (error) {
           return Result.fail<Category>(new Error(error.message));

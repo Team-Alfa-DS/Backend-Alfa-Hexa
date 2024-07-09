@@ -23,7 +23,6 @@ export class OdmCategoryRepository implements ICategoryRepository{
     }
     async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
-            console.log('entra en el repository de mongo')
             const resp = await this.categoryModel.find();
             if(!resp) return Result.fail(new Error('Categories not found'));
             const domainCategories = resp.map(category => this.odmCategoryMapper.toDomain(category));
