@@ -10,6 +10,7 @@ import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception'
 import { TrainerFollowerUserId } from './valueObjects/trainer-userid';
 import { TrainerBlogId } from './valueObjects/trainer-blogid';
 import { TrainerCourseId } from './valueObjects/trainer-courseid';
+import { TrainerUsersUpdated } from './events/trainer-users-updated.event';
 
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
@@ -41,6 +42,10 @@ export class Trainer extends AggregateRoot<TrainerId> {
       this.courses = event.courses;
       this.blogs = event.blogs;
       this.users = event.users;
+    }
+
+    if (event instanceof TrainerUsersUpdated) {
+      this.users.push(event.user);
     }
   }
 
@@ -78,7 +83,11 @@ export class Trainer extends AggregateRoot<TrainerId> {
   get Blogs(): TrainerBlogId[] {
     return this.blogs;
   }
-  get Users(): TrainerFollowerUserId[] {
+  get User(): TrainerFollowerUserId[] {
     return this.users;
+  }
+
+  AddUserFollow (user: TrainerFollowerUserId) {
+    this.apply(TrainerUsersUpdated.create(this.Id, user));
   }
 }
