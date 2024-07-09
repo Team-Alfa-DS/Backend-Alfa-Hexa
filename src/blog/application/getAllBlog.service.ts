@@ -7,7 +7,8 @@ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repo
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
-import { GetManyBlogsDTO } from '../infraestructure/dtos/getManyBlogsDTO';
+import { GetManyBlogsDTO } from './interfaces/getManyBlogsDTO';
+;
 
 
 export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>{

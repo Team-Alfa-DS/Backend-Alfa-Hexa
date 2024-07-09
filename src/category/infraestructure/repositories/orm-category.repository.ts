@@ -20,7 +20,7 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         this.ormCategoryMapper = ormCategoryMapper;
     }
     
-    async getAllCategory(page: number, perpage: number): Promise<Result<Category[]>> {
+    async getAllCategory(page: number=0, perpage: number=0): Promise<Result<Category[]>> {
         try {
           const result = await this.find(
             {

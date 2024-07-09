@@ -12,6 +12,28 @@ export class OdmBlogRepository implements IBlogRepository{
     constructor(private odmBlogMapper: OdmBlogMapper, private blogModel: Model<OdmBlogEntity >) {
         
     }
+   async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
+       try {
+        const blogs = await this.blogModel.find();
+        if(!blogs) return Result.fail(new Error('Blogs not found'));
+        let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
+
+    
+        if (category){
+            domainBlogs = domainBlogs.filter(blog => blog.Category.equals(CategoryId.create(category)));
+        }
+
+        if (trainer){
+            domainBlogs = domainBlogs.filter(blog => blog.Trainer.equals(TrainerId.create(trainer)));
+        }
+
+        return Result.success(domainBlogs.length);
+       } catch (error) {
+        return Result.fail(error);
+       }
+
+
+    }
 
    async  getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
         try {

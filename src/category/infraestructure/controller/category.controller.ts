@@ -63,9 +63,8 @@ export class CategoryController {
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
   })
-    async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
-      const request = new GetAllCategoriesRequest(page, perpage);
-      const response = await this.getAllCategorysService.execute(request);
+    async getAllCategorys(@Query() getManyCategoriesDTO: GetAllCategoriesRequest): Promise<GetAllCategoriesResponse> {
+      const response = await this.getAllCategorysService.execute(getManyCategoriesDTO);
       return response.Value
     }
 

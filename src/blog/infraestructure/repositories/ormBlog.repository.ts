@@ -13,6 +13,31 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     constructor(dataBase: DataSource) {
         super(OrmBlogEntity, dataBase.manager);
     }
+   async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
+       try {
+        const resp = await this.createQueryBuilder('blog')
+        .leftJoinAndSelect('blog.trainer', 'trainer')
+        .leftJoinAndSelect('blog.category', 'category')
+        .leftJoinAndSelect('blog.tags', 'tags')
+        .leftJoinAndSelect('blog.images', 'images')
+        .leftJoinAndSelect('blog.comments', 'comments')
+        .getMany();
+        if(!resp) return Result.fail(new Error('Blogs not found'));
+        let domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
+        
+        
+        if (category){
+            domainBlogs = domainBlogs.filter(blog => blog.Category.equals(CategoryId.create(category)));
+        }
+
+        if (trainer){
+            domainBlogs = domainBlogs.filter(blog => blog.Trainer.equals(TrainerId.create(trainer)));
+        }
+        return Result.success(domainBlogs.length);
+       } catch (error) {
+            return Result.fail(error);
+       }
+    }
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try {
             const resp = await this.createQueryBuilder('blog')

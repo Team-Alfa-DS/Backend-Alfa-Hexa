@@ -25,7 +25,6 @@ import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { get } from "http";
-import { GetManyBlogsDTO } from "../dtos/getManyBlogsDTO";
 import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 import { OrmBlogCommentRepository } from '../../../comment/infraestructure/repositories/blog/orm-comment.repository';
 import { OrmBlogCommentMapper } from '../../../comment/infraestructure/mapper/blog/orm-comment-blog.mapper';
@@ -36,6 +35,10 @@ import { OdmTrainerMapper } from "src/trainer/infraestructure/mapper/odm-trainer
 import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
+import { GetManyBlogsDTO } from "src/blog/application/interfaces/getManyBlogsDTO";
+import { GetBlogsCountDTO } from "src/blog/application/interfaces/getBlogsCountDTO";
+import { GetBlogsCountResponseDTO } from "src/blog/application/interfaces/getBlogsCountResponseDTO.interface";
+import { GetBlogsCountService } from "src/blog/application/getBlogsCount.service";
 
 
 @ApiBearerAuth()
@@ -46,6 +49,7 @@ import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-e
 export class BlogController {
     private readonly getAllBlogService: IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>;
     private readonly getBlogByIdService: IService<GetBlogByIdRequestDTO, GetBlogByIdResponseDTO>;
+    private readonly getBlogsCountService: IService<GetBlogsCountDTO, GetBlogsCountResponseDTO>;
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
     constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
@@ -68,6 +72,12 @@ export class BlogController {
         this.getBlogByIdService = new ExceptionDecorator(
             new LoggerDecorator(
                 new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+                logger
+            )
+        );
+        this.getBlogsCountService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetBlogsCountService(odmBlogRepositoryInstance),
                 logger
             )
         );
@@ -106,4 +116,26 @@ export class BlogController {
             return result.Value.blogs
         return { message: result.Error.message };
     }
+
+    
+    @UseGuards(JwtAuthGuard)
+    @Get('count')
+    @ApiQuery({name: 'category', required:false})
+    @ApiQuery({name: 'trainer', required:false})
+    @ApiCreatedResponse({
+        description: 'se retorna la cantidad de blogs encontrados',
+        type: Number,
+    })
+    @ApiBadRequestResponse({
+        description: 'No se encontraron blogs con ese filtro.'
+    })
+    @ApiBearerAuth('token')
+    @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
+    async  getBlogsCount(@Query()getBlogsCountDTO: GetBlogsCountDTO) {
+        const result: Result<GetBlogsCountResponseDTO>  =  await this.getBlogsCountService.execute(getBlogsCountDTO);
+        if (result.Value)
+            return result.Value
+        return { message: result.Error.message };
+    }
+
 }
