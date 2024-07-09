@@ -18,19 +18,22 @@ export class OdmBlogEntity {
     description: string;
 
     @Prop({required: true, type: Date})
-    publication_date: Date;
+    date: Date;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
-    category: OdmCategoryEntity;
+    category_id: string;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
-    trainer: OdmTrainerEntity;
+    trainer_id: string;
 
-    @Prop({required: true, type: [{type: mongoose.Schema.Types.Mixed}]})
-    tags: OdmTagEntity[];
+    @Prop({required: true, type: mongoose.Schema.Types.Mixed})
+    tag_id: string;
 
     @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
-    images: OdmImageEntity[];
+    images: string[];
+
+    @Prop({type: [{type: mongoose.Schema.Types.Mixed}]})
+    comments: string[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(OdmBlogEntity);

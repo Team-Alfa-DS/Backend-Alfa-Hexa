@@ -4,7 +4,7 @@ import { Result } from '../../../common/domain/result-handler/result';
 
 export interface IBlogRepository {
 
-    getAllBLogs(): Promise<Result<Blog[]>>;
+    getAllBLogs(page?: number, perpage?: number, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>>;
 
     getBlogById(id: string): Promise<Result<Blog>>;
 

@@ -7,6 +7,9 @@ import { BlogTag } from "src/blog/domain/valueObjects/blogTag";
 import { BlogTitle } from "src/blog/domain/valueObjects/blogTitle";
 import { Category } from "src/category/domain/Category";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 
 interface Tag {
     id: string;
@@ -56,10 +59,10 @@ export class BlogMapper {
             BlogTitle.create(blog.title),
             BlogContent.create(blog.description),
             BlogPublicationDate.create(blog.publication_date),
-            blog.comments.map((comment: Comment) => comment.id),
+            blog.comments.map((comment: Comment) => BlogCommentId.create(comment.id)),
             CategoryId.create(blog.category.id),
-            blog.trainer.id,
-            blog.tags.map((tag: Tag) => BlogTag.create(tag.name)),
+            TrainerId.create(blog.trainer.id),
+            BlogTag.create(blog.tags[0].name),
             blog.images.map((image: Image) => BlogImage.create(image.url))
 
         );
