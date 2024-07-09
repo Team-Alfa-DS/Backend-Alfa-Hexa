@@ -5,13 +5,7 @@ import { UserId } from 'src/user/domain/value-objects/user-id';
 
 export interface ITrainerRepository {
   findTrainerById(id: TrainerId): Promise<Result<Trainer>>;
-  followTrainer(
-    idTrainer: TrainerId,
-    idUser: UserId
-  ): Promise<Result<Trainer>>;
-   findAllTrainers(userfollow?: boolean ,user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>>;
-   countnotreaded(): Promise<Result<number>>;
-  // updateTrainer(idTrainer: string, payload: string): Promise<Result<Trainer>>;
-  // saveTrainer(trainer: Trainer): Promise<Result<Trainer>>;
-  // deleteTrainer(trainer: Trainer): Promise<Result<Trainer>>;
+  followTrainer(trainer: Trainer): Promise<void>;
+  findAllTrainers(userfollow?: boolean ,user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>>;
+  countnotreaded(): Promise<Result<number>>;
 }

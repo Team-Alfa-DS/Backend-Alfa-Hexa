@@ -17,7 +17,7 @@ export class OrmTrainerRepository
   extends Repository<OrmTrainerEntity>
   implements ITrainerRepository
 {
-  private readonly ormTrainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
+  private readonly ormTrainerMapper: IMapper<Trainer, OrmTrainerEntity>;
   private userMapper: OrmUserMapper = new OrmUserMapper();
   private readonly userRepository: OrmUserRepository = new OrmUserRepository(
     this.userMapper,
@@ -28,10 +28,11 @@ export class OrmTrainerRepository
   );
 
   constructor(
-  
+    ormTrainerMapper: IMapper<Trainer, OrmTrainerEntity>,
     dataSource: DataSource,
   ) {
     super(OrmTrainerEntity, dataSource.manager);
+    this.ormTrainerMapper = ormTrainerMapper;
   }
 
   async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
@@ -57,52 +58,9 @@ export class OrmTrainerRepository
     return oneTrainer;
   }
 
-  async followTrainer(idTrainer: TrainerId, idUser: UserId): Promise<Result<Trainer>> {
-    try {
-      const trainer = await this.findTrainerById(idTrainer);  
-      if (!trainer.isSuccess) return trainer;
-
-      const user = await this.userRepository.findUserById(
-        idUser,
-        this.transactionHandler,
-      );
-
-      if (!user.isSuccess) return Result.fail(new Error('User not found'));
-
-      const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer.Value);
-
-      const ormUser = await this.userMapper.toPersistence(user.Value);
-
-      const trainersWithUsers = await this.find({
-        where: {
-          id: OrmTrainerEntity.id,
-        },
-        relations: {
-          users: true,
-        },
-      });
-      const a = trainersWithUsers[0].users.find((user) => {
-        if (user.id === ormUser.id) return true;
-      });
-      if (a) {
-        return Result.fail(
-          new Error('User already follow this trainer')
-        );
-      }
-      let array = [];
-      for (let x = 0; x < trainersWithUsers[0].users.length; x++) {
-        array.push(trainersWithUsers[0].users[x]);
-      }
-      array.push(ormUser);
-      OrmTrainerEntity.users = array;
-      await this.save(OrmTrainerEntity);
-      return Result.success<Trainer>(trainer.Value);
-      
-    } catch (err) {
-      return Result.fail<Trainer>(
-        new Error(err.message)
-      );
-    }
+  async followTrainer(trainer: Trainer): Promise<void> {
+    const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer);
+    await this.save(OrmTrainerEntity);
   }
 
   async findAllTrainers(userFollow?: boolean, user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>> {
@@ -125,16 +83,19 @@ export class OrmTrainerRepository
       if (!page) { page = 0; }
       trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
     }
-  
-    let trainerDomains = await this.ormTrainerMapper.arrayToDomain(trainers);
-    return Result.success<Trainer[]>(trainerDomains, 200);
+    const trainerDomains: Trainer[] = [];
+
+    for (const trainer of trainers) {
+      trainerDomains.push(await this.ormTrainerMapper.toDomain(trainer))
+    }
+    return Result.success<Trainer[]>(trainerDomains);
   }
 
   async countnotreaded(): Promise<Result<number>> {
     let count = await this.createQueryBuilder("trainer")
       .where("trainer.userFollow = 0")
       .getCount();
-    return Result.success<number>(count, 200);
+    return Result.success<number>(count);
    
   }
 }

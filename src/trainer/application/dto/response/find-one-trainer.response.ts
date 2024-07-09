@@ -3,9 +3,15 @@ import { Trainer } from "src/trainer/domain/trainer";
 
 export class FindOneTrainerResponse implements ServiceResponseDto {
 
-    constructor(readonly trainer: Trainer) {}
+    constructor(
+        readonly id: string,
+        readonly name: string,
+        readonly followers: number,
+        readonly userFollow: boolean,
+        readonly location: string
+    ) {}
 
     dataToString(): string {
-        return `FindOneTrainerRes: { name: ${this.trainer.Name} | id: ${this.trainer.Id} | followers: ${this.trainer.Followers} }`
+        return `FindOneTrainerRes: { name: ${this.name} | id: ${this.id} | followers: ${this.followers} | userFollow: ${this.userFollow} | location: ${this.location} }`
     }
 }

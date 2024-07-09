@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
-import { UserId } from "src/user/domain/value-objects/user-id";
 
 export class GetManyTrainerQueryDto {
   @ApiProperty({
@@ -11,14 +10,6 @@ export class GetManyTrainerQueryDto {
   @IsOptional()
   @IsBoolean()
   userfollow?: boolean;
-
-  @ApiProperty({
-    description: 'Usuario al que se le sigue el trainer',
-    example: 'false'
-  })
-  @IsOptional()
-  @IsString()
-  user?: UserId
 
   @ApiProperty({
     description: 'Desde donde se empiezan a contar los trainers',

@@ -35,13 +35,14 @@ export class SearchController {
     private searchService: IService<SearchRequestDto, SearchResponseDto>;
     private searchTagService: IService<SearchRequestDto, SearchTagResponseDto>;
     private transacctionHandler: ITransactionHandler;
+    private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
     constructor() {
         const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
         const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
-        const trainerRepo = new OrmTrainerRepository( PgDatabaseSingleton.getInstance());
+        const trainerRepo = new OrmTrainerRepository( this.trainerMapper, PgDatabaseSingleton.getInstance());
         const logger = new NestLogger();
 
         this.transacctionHandler = new TransactionHandler(
