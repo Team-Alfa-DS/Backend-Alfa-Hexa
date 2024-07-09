@@ -42,5 +42,19 @@ export class OdmBlogMapper {
 
         );
     }
+
+    static toPersistence(blog: Blog): BlogFromODM {
+        return {
+            id: blog.Id.value,
+            name: blog.Title.value,
+            content: blog.Content.value,
+            date: blog.Publication_date.value,
+            trainer: blog.Trainer.trainerId,
+            category: blog.Category.value,
+            tag_id: blog.Tag.value,
+            images: blog.Images.map((image) => image.value),
+            comments: blog.Comments.map((comment) => comment.commentId)
+        };
+    }
     
 }

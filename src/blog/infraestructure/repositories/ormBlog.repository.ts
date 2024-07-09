@@ -7,12 +7,18 @@ import { Result } from '../../../common/domain/result-handler/result';
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { BlogTag } from "src/blog/domain/valueObjects/blogTag";
+import { CommentBlog } from "src/comment/domain/comment-blog";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 
 export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
     constructor(dataBase: DataSource) {
         super(OrmBlogEntity, dataBase.manager);
     }
+    findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
+        throw new Error("Method not implemented.");
+    }
+
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try {
             const resp = await this.createQueryBuilder('blog')
@@ -34,7 +40,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     }
 
 
-    async getAllBLogs(): Promise<Result<Blog[]>> {
+    async getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
     try {
         const resp = await this.createQueryBuilder('blog')
         .leftJoinAndSelect('blog.trainer', 'trainer')
@@ -66,7 +72,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     } catch (error) {
             console.log(error);
             return Result.fail(error); 
-       }
+    }
     }
 
 

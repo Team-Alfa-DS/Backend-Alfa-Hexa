@@ -21,10 +21,33 @@ export class OdmBlogCommentEntity {
     body: string;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
-    blog: OdmBlogCommentEntity;
+    blog: OdmBlogEntity;
 
     @Prop({required: true, type: mongoose.Schema.Types.Mixed})
     user: OdmUserEntity;
+    
+    
+    static create(
+        id: string, 
+        publication_date: Date, 
+        body: string, 
+        blog: OdmBlogEntity, 
+        user: OdmUserEntity,
+        userLiked?: boolean,
+        userDisliked?: boolean
+    ) {
+        const odmCommentBlog = new OdmBlogCommentEntity();
+        odmCommentBlog.id = id;
+        odmCommentBlog.publication_date = publication_date;
+        odmCommentBlog.body = body;
+        odmCommentBlog.blog = blog;
+        odmCommentBlog.user = user;
+        odmCommentBlog.userLiked = userLiked;
+        odmCommentBlog.userDisliked = userDisliked;
+        return odmCommentBlog; 
+    }
 }
+
+
 
 export const BlogCommentSchema = SchemaFactory.createForClass(OdmBlogCommentEntity);

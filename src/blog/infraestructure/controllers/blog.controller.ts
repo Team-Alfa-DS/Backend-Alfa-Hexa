@@ -26,6 +26,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { get } from "http";
 import { GetManyBlogsDTO } from "../dtos/getManyBlogsDTO";
+import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
@@ -36,12 +37,14 @@ export class BlogController {
     private readonly getAllBlogService: IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>;
     private readonly getBlogByIdService: IService<GetBlogByIdRequestDTO, GetBlogByIdResponseDTO>;
 
-    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>) {
+    constructor(@InjectModel('blog') blogModel: Model<OdmBlogEntity>,
+                @InjectModel('commentBlog') commentBlogModel: Model<OdmBlogCommentEntity>) {
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper(), PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
-        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel);
+        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel,commentBlogModel);
         const logger = new NestLogger();
+        
         this.getAllBlogService = new ExceptionLoggerDecorator(
             new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger

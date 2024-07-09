@@ -32,7 +32,7 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmBlogCommentEntity } from "../entities/orm-entities/orm-comment.blog.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
 import { OrmLessonCommentMapper } from "../../../course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
-import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-lesson.mapper";
+import { OdmBlogCommentMapper } from "../mapper/blog/odm-comment/odm-comment-blog.mapper";
 import { OdmLessonCommentEntity } from "../entities/odm-entities/odm-comment.lesson.entity";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
@@ -47,6 +47,10 @@ import { OdmCourseRepository } from "src/course/infraestructure/repositories/Odm
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { CreateCommentLessonEvent } from "src/course/infraestructure/events/synchronize/create-commentLesson.event";
+import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog.repository";
+import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
+import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 
 
 @ApiBearerAuth()
@@ -60,8 +64,8 @@ export class CommentController{
     private readonly idGenerator: IIdGen = new UuidGen();
     
     //*Mappers
-    private OdmcommentBlogMapper: OdmBlogCommentMapper = new OdmBlogCommentMapper();
-    private OdmcommentLessonMapper: OdmLessonCommentMapper = new OdmLessonCommentMapper();
+    private OdmcommentBlogMapper = new OdmBlogCommentMapper();
+    private OdmcommentLessonMapper = new OdmLessonCommentMapper();
     private commentBlogMapper: OrmBlogCommentMapper = new OrmBlogCommentMapper();
     private commentLessonMapper: OrmLessonCommentMapper = new OrmLessonCommentMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
@@ -79,7 +83,7 @@ export class CommentController{
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly blogRepository = new OrmBlogRepository(
+    private readonly blogRepository: IBlogRepository = new OrmBlogRepository(
         PgDatabaseSingleton.getInstance()
     );
 
@@ -108,11 +112,14 @@ export class CommentController{
                 @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
                 @InjectModel('tag') tagModel: Model<OdmTagEntity>,
                 @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
-                @InjectModel('comment') commentLessonModel: Model<OdmLessonCommentEntity>,
-                @InjectModel('comment') commentBlogModel: Model<OdmBlogCommentEntity>){
+                @InjectModel('commentLesson') commentLessonModel: Model<OdmLessonCommentEntity>,
+                @InjectModel('commentBlog') commentBlogModel: Model<OdmBlogCommentEntity>,
+                @InjectModel('blog') blogModel: Model<OdmBlogEntity>){
 
-                    
-                    
+        
+        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(), blogModel, commentBlogModel);
+        
+        
         const OdmCourseRepositoryInstance = new OdmCourseRepository(
             courseModel, 
             categoryModel, 
