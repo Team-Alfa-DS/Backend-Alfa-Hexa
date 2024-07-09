@@ -13,6 +13,7 @@ import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-e
 import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
 import { OdmBlogCommentMapper } from "src/comment/infraestructure/mapper/blog/odm-comment/odm-comment-blog.mapper";
 
+
 export class OdmBlogRepository implements IBlogRepository{
     
     private odmCommentMapper: OdmBlogCommentMapper;
@@ -89,12 +90,51 @@ export class OdmBlogRepository implements IBlogRepository{
             return Result.fail(new Error(err.message));
         }
     }
+
     
-    getBlogById(id: string): Promise<Result<Blog>> {
-        throw new Error("Method not implemented.");
+   async getBlogById(id: string): Promise<Result<Blog>> {
+       try {
+        const blog = await this.blogModel.findById(id);
+        if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`));   
+        const domainBlog =  OdmBlogMapper.toDomain({
+            id: blog.id,
+            name: blog.title,
+            content: blog.description,
+            date: blog.date,
+            trainer: blog.trainer_id,
+            category: blog.category_id,
+            tag_id: blog.tag_id,
+            images: blog.images,
+            comments: blog.comments
+        });
+        return Result.success(domainBlog);
+       } catch (error) {
+            console.log(error);
+            return Result.fail(error); 
+       }
     }
-    getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
-        throw new Error("Method not implemented.");
-    }
+    async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
+        try{
+            const resp = await this.blogModel.find({tag_id: {$in: tagsName}});
+            if(!resp) return Result.fail(new Error(`Blogs with tags: ${tagsName} not found`));
+            const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain({
+                id: blog.id,
+                name: blog.title,
+                content: blog.description,
+                date: blog.date,
+                trainer: blog.trainer_id,
+                category: blog.category_id,
+                tag_id: blog.tag_id,
+                images: blog.images,
+                comments: blog.comments
+
+            }));
+            return Result.success(domainBlogs);   
+        } catch (error) {
+            console.log(error);
+            return Result.fail(error);
+            
+        }
     
+    }
 }
