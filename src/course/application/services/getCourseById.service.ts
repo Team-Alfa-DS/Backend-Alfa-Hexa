@@ -16,47 +16,42 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
   ) {super();}
 
   async execute(request: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {
-    try {
-      const r = await this.courseRepository.getCourseById(new CourseId(request.courseId));
+    const r = await this.courseRepository.getCourseById(new CourseId(request.courseId));
 
-      const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
-      if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio
-      const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Category.value);
-      if (!category.isSuccess) {return Result.fail(category.Error)}
+    const trainer: Result<Trainer> = await this.trainerRepository.findTrainerById(r.Trainer.value);
+    if (!trainer.isSuccess) {return Result.fail(trainer.Error)}; //TODO: Los chequeos se van cuando se termine de implementar el manejo de excepciones de dominio
+    const category: Result<Category> = await this.categoryRepository.getCategoryById(r.Category.value);
+    if (!category.isSuccess) {return Result.fail(category.Error)}
 
-        const lessons: {
-          id: string,
-          title: string,
-          content: string,
-          video: string
-        }[] = [];
-        for (let lesson of r.Lessons) {
-          lessons.push({
-            id: lesson.id.Value,
-            title: lesson.title.value,
-            content: lesson.content.value,
-            video: lesson.video.Value
-          });
-        }
+      const lessons: {
+        id: string,
+        title: string,
+        content: string,
+        video: string
+      }[] = [];
+      for (let lesson of r.Lessons) {
+        lessons.push({
+          id: lesson.id.Value,
+          title: lesson.title.value,
+          content: lesson.content.value,
+          video: lesson.video.Value
+        });
+      }
 
-      return Result.success(new GetCourseByIdResponse(
-        r.Id.Value,
-        r.Title.value,
-        r.Description.value,
-        category.Value.Name.value,
-        r.Image.Value,
-        {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-        r.Level.value,
-        r.DurationWeeks.value,
-        r.DurationMinutes.value,
-        r.Tags.map(tag => tag.name),
-        r.Date,
-        lessons
-      ));
-    } catch (error) {
-      return Result.fail(error);
-    }
-    
+    return Result.success(new GetCourseByIdResponse(
+      r.Id.Value,
+      r.Title.value,
+      r.Description.value,
+      category.Value.Name.value,
+      r.Image.Value,
+      {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
+      r.Level.value,
+      r.DurationWeeks.value,
+      r.DurationMinutes.value,
+      r.Tags.map(tag => tag.name),
+      r.Date,
+      lessons
+    ));
   }
 }
 

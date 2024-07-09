@@ -27,7 +27,6 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
   ) {}
   
   async execute(request: PostCourseRequestDto): Promise<Result<PostCourseResponseDto>> {
-    try {
       const generatedId = await this.idGen.genId();
 
       const domainTags: CourseTag[] = []
@@ -58,9 +57,6 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
       this.eventPublisher.publish(domainCourse.pullDomainEvents());
 
       return Result.success(new PostCourseResponseDto(generatedId));
-    } catch (error) {
-      return Result.fail(error);
-    }
   }
   
   get name(): string {

@@ -196,18 +196,12 @@ export class CommentController{
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-
-            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
-
             return result.Value;
 
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
-
-            if (!result.isSuccess) throw ExceptionMapper.toHttp(result.Error) //return new HttpException(result.Message, result.StatusCode);
-
             return result.Value;
         }
     }

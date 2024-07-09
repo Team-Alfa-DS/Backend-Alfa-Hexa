@@ -22,6 +22,12 @@ import { ILogger } from "src/common/application/logger/logger.interface";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
 import { ExceptionMapper } from "src/common/infraestructure/mappers/exception-mapper";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { OdmCategoryEntity } from '../entities/odm-entities/odm-category.entity';
+import { OdmCategoryRepository } from "../repositories/odm-category.repository";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { OdmCategoryMapper } from "../mapper/odm-mapperCategory";
 
 
 @ApiTags('Category')
@@ -37,16 +43,22 @@ export class CategoryController {
         this.categoryMapper,
         PgDatabaseSingleton.getInstance()
     );
+    private readonly OdmCategoryRepository: OdmCategoryRepository 
     private readonly logger: ILogger = new NestLogger();
 
-    constructor() {
-      this.getAllCategorysService = new LoggerDecorator(
-        new GetAllCategorysService(this.categoryRepository),
-        this.logger
+    constructor(@InjectModel('category')categoryModel: Model<OdmCategoryEntity>) {
+      this.OdmCategoryRepository = new OdmCategoryRepository(categoryModel, new OdmCategoryMapper());
+      this.getAllCategorysService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetAllCategorysService(this.OdmCategoryRepository),
+          this.logger
+        )
       );
-      this.getCategoryByIdService = new LoggerDecorator(
-        new GetCategoryByIdService(this.categoryRepository),
-        this.logger
+      this.getCategoryByIdService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new GetCategoryByIdService(this.OdmCategoryRepository),
+          this.logger
+        )
       );
     }
     
@@ -58,12 +70,9 @@ export class CategoryController {
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
   })
-    async getAllCategorys(@Query('page', ParseIntPipe) page: number, @Query('perpage', ParseIntPipe) perpage: number) {
-      const request = new GetAllCategoriesRequest(page, perpage);
-      const response = await this.getAllCategorysService.execute(request);
-      if (response.isSuccess) return response.Value
-      // // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+    async getAllCategorys(@Query() getManyCategoriesDTO: GetAllCategoriesRequest): Promise<GetAllCategoriesResponse> {
+      const response = await this.getAllCategorysService.execute(getManyCategoriesDTO);
+      return response.Value
     }
 
     @Get("/:id")
@@ -77,8 +86,6 @@ export class CategoryController {
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
-      if (response.isSuccess) return response.Value
-      // throw new HttpException(response.Message, response.StatusCode);
-      throw ExceptionMapper.toHttp(response.Error);
+      return response.Value
     }
 }

@@ -17,7 +17,6 @@ export class BlogTag extends ValueObject<BlogTag>{
     }
 
     public static create(Value: string): BlogTag {
-        console.log(Value)
         return new BlogTag(Value);
     }
 

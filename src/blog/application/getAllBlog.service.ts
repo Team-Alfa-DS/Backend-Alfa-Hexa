@@ -7,7 +7,8 @@ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repo
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
-import { GetManyBlogsDTO } from '../infraestructure/dtos/getManyBlogsDTO';
+import { GetManyBlogsDTO } from './interfaces/getManyBlogsDTO';
+;
 
 
 export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>{
@@ -32,11 +33,10 @@ export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResp
         const blogs: GeneralBlogDTO[] = await Promise.all(domainBlogs.map(async blog => {
             const trainerResult = await this.trainerRepository.findTrainerById(blog.Trainer);
             const categoryResult = await this.categoryRepository.getCategoryById(blog.Category)
-            console.log(categoryResult.Value)
             return {
                 id: blog.Id.value,
                 name: blog.Title.value,
-                image: blog.Images[0].value,
+                image: blog.Images[0] ? blog.Images[0].value : null,
                 date: blog.Publication_date.value,
                 category: categoryResult.Value ? categoryResult.Value.Name.value: null,
                 trainer: trainerResult.Value ? trainerResult.Value.Name.trainerName : null

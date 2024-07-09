@@ -12,7 +12,7 @@ export class GetBlogByIdResponseDTO implements ServiceResponseDto{
             id: string
             name: string
         },
-        public tag: string,
+        public tags: string[],
         public date: Date,
     ) {}
 

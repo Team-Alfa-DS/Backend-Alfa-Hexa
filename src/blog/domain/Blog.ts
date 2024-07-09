@@ -31,7 +31,7 @@ export class Blog extends AggregateRoot<BlogId>{
             this.comments = event.comments;
             this.category = event.category;
             this.trainer = event.trainer;
-            this.tag = event.tag;
+            this.tags = event.tags;
             this.images = event.images;
         }
 
@@ -40,7 +40,7 @@ export class Blog extends AggregateRoot<BlogId>{
         }
     }
     protected validateState(): void {
-        if(!this.title || !this.content || !this.publication_date || !this.comments || !this.category || !this.trainer || !this.tag || !this.images){ 
+        if(!this.title || !this.content || !this.publication_date || !this.comments || !this.category || !this.trainer || !this.tags || !this.images){ 
             throw new InvalidBlogException('Blog is invalid')
         }
     }
@@ -52,28 +52,28 @@ export class Blog extends AggregateRoot<BlogId>{
     private comments: BlogCommentId[]           
     private category: CategoryId
     private trainer: TrainerId
-    private tag: BlogTag
+    private tags: BlogTag[]
     private images: BlogImage[]
 
 constructor(
-    id: BlogId,
-    title: BlogTitle,
-    content: BlogContent,
-    publication_date: BlogPublicationDate,
-    comments: BlogCommentId[],              
-    category: CategoryId,
-    trainer: TrainerId, 
-    tag: BlogTag,
-    images: BlogImage[],
+     id: BlogId,
+     title: BlogTitle,
+     content: BlogContent,
+     publication_date: BlogPublicationDate,
+     comments: BlogCommentId[],              
+     category: CategoryId,
+     trainer: TrainerId, 
+     tags: BlogTag[],
+     images: BlogImage[],
     ){
-        super(id, BlogCreated.create(id, title, content, publication_date, comments, category, trainer, tag, images));
+        super(id, BlogCreated.create(id, title, content, publication_date, comments, category, trainer, tags, images));
         this.title = title
         this.content = content
         this.publication_date = publication_date
         this.comments = comments
         this.category = category
         this.trainer = trainer
-        this.tag = tag
+        this.tags = tags
         this.images =images
     }
 
@@ -134,8 +134,8 @@ constructor(
     get Trainer(): TrainerId{
         return this.trainer;
     }
-    get Tag(): BlogTag{
-        return this.tag;
+    get Tags(): BlogTag[]{
+        return this.tags;
     }
     get Images(): BlogImage[]{
         return this.images;

@@ -23,6 +23,8 @@ import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-categ
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 
 
@@ -49,14 +51,18 @@ export class SearchController {
             PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
-        this.searchService =  new LoggerDecorator(
-            new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
-            logger
+        this.searchService =  new ExceptionDecorator(
+            new LoggerDecorator(
+                new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
+                logger
+            )
         );
 
-        this.searchTagService = new LoggerDecorator(
-            new SearchTagService(tagRepo,this.transacctionHandler),
-            logger
+        this.searchTagService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new SearchTagService(tagRepo,this.transacctionHandler),
+                logger
+            )
         );
     }
 
@@ -71,7 +77,7 @@ export class SearchController {
     @ApiQuery({name: 'term', required:false})
     @ApiQuery({name: 'tag', required:false})
     async searchAll(
-        @Request() req, 
+        @Request() req: JwtRequest, 
         @Query('page', ParseIntPipe,) page: number,
         @Query('perpage', ParseIntPipe) perPage: number,
         @Query('term') term?: string, 
@@ -80,23 +86,19 @@ export class SearchController {
         const request = new SearchRequestDto(page, perPage, term, tag);
         const result = await this.searchService.execute(request);
 
-        if (result.isSuccess) {
-            return result.Value;
-        } else {
-            // throw new HttpException(result.Error, result.StatusCode);
-            throw ExceptionMapper.toHttp(result.Error);
-        }
+        return result.Value;
     }
 
     @Get( "/popular/tags" )
     async searchPopularTags(
-        @Request() req,
+        @Request() req: JwtRequest,
         @Query('page', ParseIntPipe,) page: number,
         @Query('perpage', ParseIntPipe) perPage: number,
     ) {
         const request = new SearchRequestDto(page, perPage);
         const result = await this.searchTagService.execute(request);
 
+        return result.Value;
         if (result.isSuccess) {
             return result.Value.tagNames;
         } else {

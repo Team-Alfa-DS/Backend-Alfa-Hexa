@@ -51,6 +51,7 @@ import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { SaveProgressEvent } from '../events/save-progress.event';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -103,51 +104,61 @@ export class ProgressController {
         this.eventPublisher.subscribe('ProgressRegister', [new SaveProgressEvent(this.odmprogressRepository)]);
         
         
-        this.markEndProgressService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new MarkEndProgressService(
-                    this.progressRepository,
-                    this.courseRepository,
-                    this.odmUserRepository,
-                    this.transactionHandler,
-                    this.eventPublisher
+        this.markEndProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new MarkEndProgressService(
+                        this.progressRepository,
+                        this.courseRepository,
+                        this.odmUserRepository,
+                        this.transactionHandler,
+                        this.eventPublisher
+                    ),
+                    this.auditRepository
                 ),
-                this.auditRepository
-            ),
-            this.logger
+                this.logger
+            )
         );
-        this.getOneProgressService = new LoggerDecorator(
-            new GetOneProgressService(
-                this.odmUserRepository,
-                this.odmprogressRepository,
-                this.courseRepository,
-                this.transactionHandler
-            ),
-            this.logger
+        this.getOneProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetOneProgressService(
+                    this.odmUserRepository,
+                    this.odmprogressRepository,
+                    this.courseRepository,
+                    this.transactionHandler
+                ),
+                this.logger
+            )
         );
-        this.trendingProgressService = new LoggerDecorator(
-            new TrendingProgressService(
-                this.odmUserRepository,
-                this.odmprogressRepository,
-                this.courseRepository
-            ),
-            this.logger
+        this.trendingProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new TrendingProgressService(
+                    this.odmUserRepository,
+                    this.odmprogressRepository,
+                    this.courseRepository
+                ),
+                this.logger
+            )
         );
-        this.coursesProgressService = new LoggerDecorator(
-            new CoursesProgressService(
-                this.odmprogressRepository,
-                this.courseRepository,
-                this.odmUserRepository
-            ),
-            this.logger
+        this.coursesProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new CoursesProgressService(
+                    this.odmprogressRepository,
+                    this.courseRepository,
+                    this.odmUserRepository
+                ),
+                this.logger
+            )
         );
-        this.profileProgressService = new LoggerDecorator(
-            new ProfileProgressService(
-                this.odmprogressRepository,
-                this.courseRepository,
-                this.odmUserRepository
-            ),
-            this.logger
+        this.profileProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ProfileProgressService(
+                    this.odmprogressRepository,
+                    this.courseRepository,
+                    this.odmUserRepository
+                ),
+                this.logger
+            )
         );
     }
 
@@ -163,43 +174,23 @@ export class ProgressController {
         const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
-        if (response.isSuccess) return response.Value;
-        // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
-        throw ExceptionMapper.toHttp(response.Error)
+        return response.Value;
     }
 
     @Get('one/:courseId')
-    @ApiCreatedResponse({
-        description: 'se retorno el curso correctamente',
-        // type: OrmCourseEntity,
-    })
-    @ApiBadRequestResponse({
-        description: 'No se pudo encontrar un curso con esa id. Intente de nuevo'
-    })
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.getOneProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
-        throw ExceptionMapper.toHttp(response.Error)
+        return response.Value;
     }
     
     @Get('trending')
-    @ApiCreatedResponse({
-        description: 'se retorno el ultimo curso correctamente',
-        
-    })
-    @ApiBadRequestResponse({
-        description: 'No se pudo retornar el ultimo curso. Intente de nuevo'
-    })
     async progressTrending(@Request() req: JwtRequest) {
         const request = new TrendingProgressRequest(req.user.tokenUser.id);
         const response = await this.trendingProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
-        throw ExceptionMapper.toHttp(response.Error)
+        return response.Value;
     }
 
     @Get('courses')
@@ -207,9 +198,7 @@ export class ProgressController {
         const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
         const response = await this.coursesProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value.courseProgress;
-        // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
-        throw ExceptionMapper.toHttp(response.Error)
+        return response.Value.courseProgress;
     }
 
     @Get('profile')
@@ -217,8 +206,6 @@ export class ProgressController {
         const request = new ProfileProgressRequest(req.user.tokenUser.id);
         const response = await this.profileProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        // HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
-        throw ExceptionMapper.toHttp(response.Error)
+        return response.Value;
     }
 }
