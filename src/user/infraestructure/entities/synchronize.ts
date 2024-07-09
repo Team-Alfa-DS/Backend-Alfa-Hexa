@@ -29,6 +29,7 @@ import { Injectable } from "@nestjs/common";
 import { OrmTagRepository } from "src/tag/infraestructure/repositories/orm-tag-repository";
 import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
+import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/orm-comment.repository";
 
 @Injectable()
 export class Synchronize {
@@ -66,7 +67,8 @@ export class Synchronize {
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly lessonCommentRepository = new TOrmCourseRepository(
+    private readonly lessonCommentRepository = new OrmLessonCommentRepository(
+        new OrmLessonCommentMapper(),
         PgDatabaseSingleton.getInstance()
     );
 
@@ -211,15 +213,13 @@ export class Synchronize {
         }
         console.log('blogComments terminado');
 
-        //const lessonComments = await this.lessonCommentRepository.find(
-        //    {relations: {lessons: true}}
-        //);
-        //for (const comment of lessonComments) {
-        //    const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-        //    const lesson = await this.lessonModel.findOne({id: lesson_id});
-        //    const user = await this.userModel.findOne({id: user_id});
-        //    await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
-        //}
-        //console.log('lessonComments terminado');
+        const lessonComments = await this.lessonCommentRepository.find();
+        for (const comment of lessonComments) {
+            const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
+            const lesson = await this.lessonModel.findOne({id: lesson_id});
+            const user = await this.userModel.findOne({id: user_id});
+            await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
+        }
+        console.log('lessonComments terminado');
     }
 } 
