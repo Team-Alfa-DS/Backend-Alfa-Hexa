@@ -19,14 +19,23 @@ export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> impl
     async findAllCommentsByBlogId(id: BlogCommentBlogId, runner: TransactionHandler): Promise<Result<CommentBlog[]>> {
         const runnerTransaction = runner.getRunner();
 
-        const commentsFound = await runnerTransaction.manager.createQueryBuilder(
-            BlogCommentEntity, "comment")
-            .leftJoinAndSelect("comment.blog", "blog")
-            .leftJoinAndSelect("comment.user", "user")
+        //const commentsFound = await runnerTransaction.manager.createQueryBuilder(
+        //    BlogCommentEntity, "comment")
+        //    .leftJoinAndSelect("comment.blog", "blog")
+        //    .leftJoinAndSelect("comment.user", "user")
             //.take(perPage)
             //.skip(page)
-            .where("comment.blog_id = :id", { id: id.BlogId })
-            .getMany();
+        //    .where("comment.blog_id = :id", { id: id.BlogId })
+        //    .getMany();
+        
+            const commentsFound = await this.find({
+                relations: {
+                    blog: true
+                },
+                where: {
+                    blog_id: id.BlogId
+                }
+            });
 
         // const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
         //     take: page,
