@@ -4,10 +4,10 @@ import { IUserRepository } from "src/user/domain/repositories/user-repository.in
 import { Result } from "src/common/domain/result-handler/result";
 import { User } from "src/user/domain/user";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class OrmUserRepository extends Repository<OrmUserEntity> implements IUserRepository {
 
