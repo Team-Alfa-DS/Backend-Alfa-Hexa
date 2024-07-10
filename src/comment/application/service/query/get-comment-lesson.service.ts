@@ -3,14 +3,14 @@ import { Result } from "src/common/domain/result-handler/result";
 import { IService } from "src/common/application/interfaces/IService";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
-    private readonly courseRepository: ICourseRepository
+    private readonly courseRepository: ICourseQueryRepository
 
     constructor(
-        courseRepository: ICourseRepository,
+        courseRepository: ICourseQueryRepository,
     ){
         super();
         this.courseRepository = courseRepository;

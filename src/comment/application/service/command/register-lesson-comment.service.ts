@@ -3,7 +3,6 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
@@ -15,26 +14,30 @@ import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { error } from 'console';
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { ICourseCommandRepository } from "src/course/domain/repositories/ICourseCommand.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
 
     private readonly userRepository: IUserRepository;
-    private readonly courseRepository: ICourseRepository;
+    private readonly courseCommandRepository: ICourseCommandRepository;
+    private readonly courseQueryRepository: ICourseQueryRepository;
     private readonly transactionHandler: ITransactionHandler;
     private eventPublisher: IEventPublisher;
     private readonly idGenerator: IIdGen
 
     constructor(
         userRepository: IUserRepository,
-        courseRepository: ICourseRepository,
+        courseCommandRepository: ICourseCommandRepository,
+        courseQueryRepository: ICourseQueryRepository,
         transactionHandler: ITransactionHandler,
         eventPublisher: IEventPublisher,
         idGenerator: IIdGen,
     ){
         super();
         this.userRepository = userRepository;
-        this.courseRepository = courseRepository;
+        this.courseCommandRepository = courseCommandRepository;
         this.transactionHandler = transactionHandler;
         this.eventPublisher = eventPublisher;
         this.idGenerator = idGenerator;
@@ -46,7 +49,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
             let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
             if (!user.isSuccess) {return Result.fail(user.Error)}
-            let course = await this.courseRepository.getCourseByLessonId( new LessonId(data.targetId) );
+            let course = await this.courseQueryRepository.getCourseByLessonId( new LessonId(data.targetId) );
 
             let publicationDate = CommentLessonPublicationDate.create( new Date() );
             let body = CommentLessonBody.create( data.body );
@@ -65,7 +68,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
 
             const comment = course.getComment(target.LessonId, commentID);
 
-            const result = await this.courseRepository.saveComment( comment );
+            const result = await this.courseCommandRepository.saveComment( comment );
             
             const response = new AddCommentToServiceResponseDto(commentID.commentId);
             

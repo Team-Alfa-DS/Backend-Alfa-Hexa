@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
@@ -61,10 +62,17 @@ import { IEventPublisher } from 'src/common/application/events/event-publisher.a
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { UpdateUsersTrainersEvent } from '../events/update-users-trainer.event';
 import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { CreateTrainerDto } from '../dto/create-trainer.dto';
+import { CreateTrainerRequest } from 'src/trainer/application/dto/request/create-trainer.request';
+import { CreateTrainerResponse } from 'src/trainer/application/dto/response/create-trainer.response';
+import { CreateTrainerService } from 'src/trainer/application/service/createTrainer.service';
+import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
+import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
+import { SaveTrainerEvent } from '../events/save-trainer.event';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
-
+@UseGuards(JwtAuthGuard)
 @ApiUnauthorizedResponse({
   description: 'Acceso no autorizado, no se pudo encontrar el Token',
 })
@@ -86,17 +94,20 @@ export class TrainerController {
 
     private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
     private readonly logger: ILogger = new NestLogger();
+    private readonly genId: IIdGen = new UuidGen();
 
     private findOneTrainerService: IService<FindOneTrainerRequest, FindOneTrainerResponse>;
     private followTrainerService: IService<FollowTrainerRequest, FollowTrainerResponse>;
     private findAllTrainersService: IService<GetAllTrainersRequest, GetAllTrainersResponse>;
     private countUserFollowTrainerService: IService<CountUserFollowRequest, CountUserFollowResponse>;
+    private createTrainerService: IService<CreateTrainerRequest, CreateTrainerResponse>;
 
   constructor(@InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('user') userModel: Model<OdmUserEntity>) {
 
     this.odmTrainerMapper = new OdmTrainerMapper(courseModel, blogModel, userModel);
     this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
+    this.eventPublisher.subscribe('TrainerRegister', [new SaveTrainerEvent(this.odmTrainerRepository)]);
 
     this.findOneTrainerService = new ExceptionDecorator(
       new LoggerDecorator(
@@ -137,11 +148,24 @@ export class TrainerController {
         this.logger
       )
     );
+    this.createTrainerService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new CreateTrainerService(
+            this.trainerRepository,
+            this.odmTrainerRepository,
+            this.genId,
+            this.eventPublisher
+          ),
+          this.auditRepository
+        ),
+        this.logger
+      )
+    )
   }
 
   @Get('one/:id')
   @ApiBearerAuth('token')
-  @UseGuards(JwtAuthGuard)
   async getTrainerById(@Param('id', ParseUUIDPipe) trainerId: string, @Request() req: JwtRequest) {
     const request = new FindOneTrainerRequest(trainerId, req.user.tokenUser.id);
     const oneTrainer = await this.findOneTrainerService.execute(request);
@@ -153,7 +177,6 @@ export class TrainerController {
   @Post('/toggle/follow/:id')
   @ApiParam({name:'trainer', required: true})
   @ApiBearerAuth('token')
-  @UseGuards(JwtAuthGuard)
   async followTrainer(
     @Request() req: JwtRequest,
     @Param('id', ParseUUIDPipe) idTrainer: string,
@@ -168,7 +191,6 @@ export class TrainerController {
   @Get('/many')
   @ApiQuery({name: 'filter', required:false})
   @ApiBearerAuth('token')
-  @UseGuards(JwtAuthGuard)
   async getAllTrainers(@Query() GetManyTrainerQueryDto: GetManyTrainerQueryDto, @Request() req: JwtRequest) {
     const request = new GetAllTrainersRequest(
       GetManyTrainerQueryDto.userfollow,
@@ -182,12 +204,18 @@ export class TrainerController {
   }
 
   @Get('/user/follow')
-  @UseGuards(JwtAuthGuard)
   async getCountFollowers (@Request() req: JwtRequest) {
     const request = new CountUserFollowRequest(req.user.tokenUser.id);
     const result = await this.countUserFollowTrainerService.execute(request);
 
     return result.Value;
+  }
+
+  @Post('create')
+  async createTrainer(@Body() body: CreateTrainerDto) {
+    const request = new CreateTrainerRequest(body.name, body.location);
+    const response = await this.createTrainerService.execute(request);
+    return response.Value
   }
 }
 

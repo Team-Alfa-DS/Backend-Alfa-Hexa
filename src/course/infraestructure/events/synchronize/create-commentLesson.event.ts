@@ -5,11 +5,11 @@ import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { CommentLessonPosted } from "src/course/domain/events/comment-lesson-posted.event";
 import { LessonPosted } from "src/course/domain/events/lesson-posted.event";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class CreateCommentLessonEvent implements IEventSubscriber<CommentLessonPosted> {
 
-    constructor(private odmCourseRepository: ICourseRepository) {}
+    constructor(private odmCourseRepository: ICourseQueryRepository) {}
 
     async on(event: CommentLessonPosted): Promise<void> {
         const comment = CommentLesson.create(
