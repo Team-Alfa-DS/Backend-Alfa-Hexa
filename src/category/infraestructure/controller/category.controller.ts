@@ -1,5 +1,5 @@
 
-import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Query } from "@nestjs/common";
+import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 //import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
@@ -29,11 +29,13 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { OdmCategoryMapper } from "../mapper/odm-mapperCategory";
 import { ManyCategoryDto } from "../dtos/many-category.dto";
+import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 
 
 @ApiTags('Category')
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el Token'})
+@UseGuards(JwtAuthGuard)
 @Controller('category')
 export class CategoryController {
     
@@ -64,13 +66,6 @@ export class CategoryController {
     }
     
     @Get("many")
-    @ApiCreatedResponse({
-      description: 'se retornaron todas las categorias de manera exitosa',
-      type: OrmCategoryEntity,
-  })
-  @ApiBadRequestResponse({
-      description: 'No existen categorias. Agregue'
-  })
     async getAllCategorys(@Query() getManyCategoriesDTO: ManyCategoryDto): Promise<GetAllCategoriesResponse> {
       const request = new GetAllCategoriesRequest(getManyCategoriesDTO.page, getManyCategoriesDTO.perpage)
       const response = await this.getAllCategorysService.execute(request);
@@ -78,16 +73,15 @@ export class CategoryController {
     }
 
     @Get("/:id")
-    @ApiCreatedResponse({
-      description: 'se retorno la categoria de manera exitosa',
-      type: OrmCategoryEntity,
-    })
-    @ApiBadRequestResponse({
-      description: 'No existe una categoria con esa id'
-    })
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
       return response.Value
+    }
+
+    @Post('create')
+
+    async createCategory() {
+
     }
 }
