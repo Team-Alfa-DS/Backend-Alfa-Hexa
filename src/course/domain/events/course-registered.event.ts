@@ -9,6 +9,7 @@ import { CourseLevel } from "../value-objects/course-level";
 import { CourseCategory } from "../value-objects/course-category";
 import { CourseTag } from "../value-objects/course-tag";
 import { CourseTrainer } from "../value-objects/course-trainer";
+import { CourseDate } from "../value-objects/course-date";
 
 export class CourseRegistered extends DomainEvent {
   constructor(
@@ -16,7 +17,7 @@ export class CourseRegistered extends DomainEvent {
     public title: CourseTitle,
     public description: CourseDescription,
     public image: CourseImage,
-    public date: Date,
+    public date: CourseDate,
     public durationMinutes: CourseDurationMinutes,
     public durationWeeks: CourseDurationWeeks,
     public level: CourseLevel,

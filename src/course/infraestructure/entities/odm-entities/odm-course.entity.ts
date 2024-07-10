@@ -55,7 +55,8 @@ export class OdmCourseEntity {
         image: string,
         tags: OdmTagEntity[],
         category: OdmCategoryEntity,
-        trainer: OdmTrainerEntity
+        trainer: OdmTrainerEntity,
+        lessons: OdmLessonEntity[]
       ): OdmCourseEntity {
         const odmCourse = new OdmCourseEntity();
         odmCourse.id = id;
@@ -69,7 +70,7 @@ export class OdmCourseEntity {
         odmCourse.tags = tags;
         odmCourse.category = category;
         odmCourse.trainer = trainer;
-        odmCourse.lessons = []
+        odmCourse.lessons = lessons;
         return odmCourse;
       }
 }
