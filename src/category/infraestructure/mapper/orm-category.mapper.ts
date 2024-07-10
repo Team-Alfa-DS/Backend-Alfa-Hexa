@@ -6,9 +6,9 @@ import { CategoryId } from '../../domain/valueObjects/categoryId';
 import { CategoryName } from '../../domain/valueObjects/categoryName';
 import { CategoryIcon } from '../../domain/valueObjects/categoryIcon';
 
-export class OrmCategoryMapper{
+export class OrmCategoryMapper implements IMapper<Category, OrmCategoryEntity>{
 
-    toPersistence(domainEntity: Category):OrmCategoryEntity {
+    async toPersistence(domainEntity: Category): Promise<OrmCategoryEntity> {
 
         const ormCategory : any = OrmCategoryEntity.create(
             domainEntity.Id.value,
@@ -20,7 +20,7 @@ export class OrmCategoryMapper{
 
     }
 
-    toDomain(ormEntity: OrmCategoryEntity): Category {
+    async toDomain(ormEntity: OrmCategoryEntity): Promise<Category> {
         const id = CategoryId.create(ormEntity.id);
         const name = CategoryName.create(ormEntity.name);
         const icon = CategoryIcon.create(ormEntity.icon);

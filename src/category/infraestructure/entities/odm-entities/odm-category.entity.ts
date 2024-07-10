@@ -11,6 +11,15 @@ export class OdmCategoryEntity {
 
     @Prop({required: true})
     icon: string;
+
+    static create(id: string, name: string, icon: string) {
+        const odm = new OdmCategoryEntity();
+        odm.id = id;
+        odm.name = name;
+        odm.icon = icon;
+
+        return odm;
+    }
 }
 
 export const CategorySchema = SchemaFactory.createForClass(OdmCategoryEntity);
