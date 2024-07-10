@@ -18,7 +18,7 @@ export class GetAllCategoriesRequest implements ServiceRequestDto {
       page?: number;
       
       @ApiProperty({
-        description: 'Cantidad de categorias que deseas recibir ',
+        description: 'Cantidad de categorias deseas recibir ',
         example: '1'
       })
       @IsNumber()

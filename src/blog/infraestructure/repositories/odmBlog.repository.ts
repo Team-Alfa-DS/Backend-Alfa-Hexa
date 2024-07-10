@@ -29,7 +29,7 @@ export class OdmBlogRepository implements IBlogRepository{
 
         return Result.success(domainBlogs.length);
        } catch (error) {
-        return Result.fail(error);
+          return Result.fail(error);
        }
 
 
