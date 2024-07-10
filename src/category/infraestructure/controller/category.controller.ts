@@ -1,5 +1,4 @@
-
-import { Controller, Get, HttpException, Param, ParseIntPipe, ParseUUIDPipe, Post, Query, UseGuards } from "@nestjs/common";
+import { Body, Controller, FileTypeValidator, Get, HttpException, Param, ParseFilePipe, ParseIntPipe, ParseUUIDPipe, Post, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 //import { GetAllCategorysService } from "src/category/application/services/getAllCategorys.service";
 //import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
@@ -30,6 +29,17 @@ import { Model } from "mongoose";
 import { OdmCategoryMapper } from "../mapper/odm-mapperCategory";
 import { ManyCategoryDto } from "../dtos/many-category.dto";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { CreateCategoryRequest } from "src/category/application/dtos/request/create-category.request";
+import { CreateCategoryResponse } from "src/category/application/dtos/response/create-category.response";
+import { CreateCategoryService } from "src/category/application/services/createCategory.service";
+import { CloudinaryService } from "src/common/infraestructure/file-uploader/cloudinary-uploader";
+import { IFileUploader } from "src/common/application/file-uploader/file-uploader.interface";
+import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
+import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
+import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
+import { SaveCategoryEvent } from "../events/save-category.event";
+import { CreateCategoryDto } from "../dtos/create-category.dto";
 
 
 @ApiTags('Category')
@@ -42,15 +52,23 @@ export class CategoryController {
     private categoryMapper: OrmCategoryMapper = new OrmCategoryMapper();
     private getAllCategorysService: IService<GetAllCategoriesRequest, GetAllCategoriesResponse>;
     private getCategoryByIdService: IService<GetCategoryRequest, GetCategoryResponse>;
+    private createCategoryService: IService<CreateCategoryRequest, CreateCategoryResponse>;
     private readonly categoryRepository: OrmCategoryRepository = new OrmCategoryRepository(
         this.categoryMapper,
         PgDatabaseSingleton.getInstance()
     );
-    private readonly OdmCategoryRepository: OdmCategoryRepository 
+    private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
+      PgDatabaseSingleton.getInstance()
+    );
+    private readonly OdmCategoryRepository: OdmCategoryRepository;
+    private readonly eventPublisher = EventManagerSingleton.getInstance();
     private readonly logger: ILogger = new NestLogger();
+    private readonly fileUploader: IFileUploader = new CloudinaryService();
+    private readonly genId: IIdGen = new UuidGen();
 
     constructor(@InjectModel('category')categoryModel: Model<OdmCategoryEntity>) {
       this.OdmCategoryRepository = new OdmCategoryRepository(categoryModel, new OdmCategoryMapper());
+      this.eventPublisher.subscribe('CategoryRegister', [new SaveCategoryEvent(this.OdmCategoryRepository)]);
       this.getAllCategorysService = new ExceptionDecorator(
         new LoggerDecorator(
           new GetAllCategorysService(this.OdmCategoryRepository),
@@ -63,6 +81,21 @@ export class CategoryController {
           this.logger
         )
       );
+      this.createCategoryService = new ExceptionDecorator(
+        new LoggerDecorator(
+          new ServiceDBLoggerDecorator(
+            new CreateCategoryService(
+              this.OdmCategoryRepository,
+              this.categoryRepository,
+              this.fileUploader,
+              this.genId,
+              this.eventPublisher
+            ),
+            this.auditRepository
+          ),
+          this.logger
+        )
+      )
     }
     
     @Get("many")
@@ -80,8 +113,14 @@ export class CategoryController {
     }
 
     @Post('create')
-
-    async createCategory() {
-
+    @UseInterceptors(FileInterceptor('icon'))
+    async createCategory(@UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({fileType: /(jpg|jpeg|png|webp)$/})]
+      }),
+    ) icon: Express.Multer.File, @Body() body: CreateCategoryDto) {
+      const request = new CreateCategoryRequest(icon, body.name);
+      const response = await this.createCategoryService.execute(request);
+      return response.Value;
     }
 }
