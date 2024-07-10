@@ -213,7 +213,7 @@ export class CourseController {
     return response.Value;
   }
 
-  @Post('lesson')
+  @Post('create/lesson')
   @ApiBearerAuth('token')
   @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
   @UseInterceptors(FileInterceptor('video'))
