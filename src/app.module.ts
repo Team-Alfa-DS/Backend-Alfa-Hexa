@@ -53,7 +53,7 @@ import { Synchronize } from './user/infraestructure/entities/synchronize';
       })
     }),
 
-    MongooseModule.forRoot(process.env.MONGO_DB_HOST, {dbName: process.env.MONGO_DB_NAME}),
+    MongooseModule.forRoot(process.env.MONGO_DB_HOST),
 
     MongooseModule.forFeature([
       {
