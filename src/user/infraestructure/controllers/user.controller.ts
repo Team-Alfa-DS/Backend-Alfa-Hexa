@@ -122,6 +122,9 @@ export class UserController {
             data.image
         )
         const result = await this.updateUserService.execute(dataUser);
+        
+        if (!result.isSuccess) { throw result.Error}
+
         return result.Value;
     }
 

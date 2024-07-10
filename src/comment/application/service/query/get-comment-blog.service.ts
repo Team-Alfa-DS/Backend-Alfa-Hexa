@@ -3,14 +3,15 @@ import { BlogComment, GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRe
 import { IService } from "src/common/application/interfaces/IService";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IBlogCommandRepository } from "src/blog/domain/repositories/IBlogCommand.repository";
+import { IBlogQueryRepository } from "src/blog/domain/repositories/IBlogQuery.repository";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
-    private readonly blogRepository: IBlogRepository;
+    private readonly blogRepository: IBlogQueryRepository;
 
     constructor(
-        blogRepository: IBlogRepository,
+        blogRepository: IBlogQueryRepository,
     ){
         super();
         this.blogRepository = blogRepository;

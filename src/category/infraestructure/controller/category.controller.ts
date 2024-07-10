@@ -102,14 +102,20 @@ export class CategoryController {
     async getAllCategorys(@Query() getManyCategoriesDTO: ManyCategoryDto): Promise<GetAllCategoriesResponse> {
       const request = new GetAllCategoriesRequest(getManyCategoriesDTO.page, getManyCategoriesDTO.perpage)
       const response = await this.getAllCategorysService.execute(request);
-      return response.Value
+
+      if (!response.isSuccess) { throw response.Error }
+        
+      return response.Value;
     }
 
     @Get("/:id")
     async getCategoryById(@Param('id', ParseUUIDPipe) idCategory: string): Promise<GetCategoryResponse> {
       const request = new GetCategoryRequest(idCategory);
       const response = await this.getCategoryByIdService.execute(request);
-      return response.Value
+      
+      if (!response.isSuccess) { throw response.Error }
+        
+      return response.Value;
     }
 
     @Post('create')
@@ -121,6 +127,9 @@ export class CategoryController {
     ) icon: Express.Multer.File, @Body() body: CreateCategoryDto) {
       const request = new CreateCategoryRequest(icon, body.name);
       const response = await this.createCategoryService.execute(request);
+      
+      if (!response.isSuccess) { throw response.Error }
+        
       return response.Value;
     }
 }

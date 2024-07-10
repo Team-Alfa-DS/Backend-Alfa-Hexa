@@ -1,42 +1,64 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Controller, Request, Get, Param, ParseUUIDPipe, Post, UseGuards, Headers} from "@nestjs/common";
+import { Body, Controller, Request, Get, Param, ParseUUIDPipe, Post, UseGuards, Headers, Logger} from "@nestjs/common";
 import { OrmNotifyRepository } from "../repository/orm-notify.repository";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { NotifyMapper } from "../mappers/notify-mapper";
 import { get } from "http";
-import { getfindNotifyById } from "../../application/service/getfindNotifyById";
-import { GetAllNotify } from "../../application/service/GetAllnotify";
-import { notifycountnotreaded } from "../../application/service/notify-countnotreaded";
+import { GetNotificationByIdRequest, GetNotificationByIdResponse, GetNotificationByIdService } from "../../application/service/getfindNotifyById";
+// import { GetAllNotify } from "../../application/service/GetAllnotify";
+import { CountUnreadNotificationRequest, CountUnreadNotificationService } from "../../application/service/notify-countnotreaded";
 import { NotifierDto } from "src/common/application/notification-handler/dto/entry/entry";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
 /*import { TokenRepository } from "../../domain/repositories/token-repository.interface";*/
 import { TokenDto } from "../dto/saveToken.dto";
-import { NotifierServiceSend } from "../../application/service/sendNotification";
+// import { NotifierServiceSend } from "../../application/service/sendNotification";
 import { FirebaseNotifier } from "src/common/infraestructure/Firebase-notification/firebase-notification";
-import { CreateNotify } from "../../application/service/createNotify";
-import { createNotificaciondto } from "../dto/createnotify.dto";
+// import { CreateNotify } from "../../application/service/createNotify";
+// import { createNotificaciondto } from "../dto/createnotify.dto";
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 import { NotifyEntity } from "../entities/notify.entity";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
+import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
+import { IService } from "src/common/application/interfaces/IService";
+import { CountUserFollowResponse } from "src/trainer/application/dto/response/count-user-follow-trainer.response";
 
 
 @ApiTags('Notify')
 @Controller('notify')
 export class notifycontroller{
    /* private readonly tokenrepository: TokenRepository;*/
-    private readonly notifyrepository: OrmNotifyRepository;
-    private readonly getfindNotifyById: getfindNotifyById;
-    private readonly GetAllNotify: GetAllNotify;
-    private readonly notifycountnotreaded: notifycountnotreaded;
-    private readonly notifierServiceSend: NotifierServiceSend;
-    private readonly createNotify: CreateNotify;
+    // private readonly notifyrepository: OrmNotifyRepository;
+    private readonly getNotificationByIdService: IService<GetNotificationByIdRequest, GetNotificationByIdResponse>;
+    // private readonly GetAllNotify: GetAllNotify;
+    private readonly countUnreadNotificationService: IService<CountUnreadNotificationRequest, CountUserFollowResponse>;
+    // private readonly notifierServiceSend: NotifierServiceSend;
+    // private readonly createNotify: CreateNotify;
 
 constructor(){
     const repositoryinstance = new OrmNotifyRepository(PgDatabaseSingleton.getInstance(), new NotifyMapper());
-    this.getfindNotifyById = new getfindNotifyById(repositoryinstance);
-    this.GetAllNotify = new GetAllNotify(repositoryinstance);
-    this.notifycountnotreaded = new notifycountnotreaded(repositoryinstance);
-    this.createNotify = new CreateNotify(repositoryinstance);
-    this.notifierServiceSend = new NotifierServiceSend(new FirebaseNotifier(repositoryinstance));
+    const logger = new NestLogger();
+    this.getNotificationByIdService = new ExceptionMapperDecorator(
+        new LoggerDecorator(
+            new GetNotificationByIdService(repositoryinstance),
+            logger
+        )
+    )
+
+    // this.GetAllNotify = new ExceptionMapperDecorator(
+    //     new LoggerDecorator(
+    //         new GetAllNotify(repositoryinstance),
+    //         logger
+    //     )
+    // )
+    this.countUnreadNotificationService = new ExceptionMapperDecorator(
+        new LoggerDecorator(
+            new CountUnreadNotificationService(repositoryinstance),
+            logger
+        )
+    )
+    // this.createNotify = new CreateNotify(repositoryinstance);
+    // this.notifierServiceSend = new NotifierServiceSend(new FirebaseNotifier(repositoryinstance));
 }
 
 @Get('one/:id')
@@ -48,7 +70,7 @@ constructor(){
     description: 'No se pudo retornar la notificacion. Intente de nuevo'
 })
 GetfindNotifyById(@Param('id', ParseUUIDPipe) id: string){
-    return this.getfindNotifyById.execute(id);
+    // return this.getNotificationByIdService.execute(id);
 }
 
 @Get('all')
@@ -60,7 +82,7 @@ GetfindNotifyById(@Param('id', ParseUUIDPipe) id: string){
     description: 'No posee notificaciones que retornar. Intente de nuevo'
 })
 getAllNotify(@Request() req){
-    return this.GetAllNotify.execute();
+    // return this.GetAllNotify.execute();
 }
 
 @Get('count')
@@ -72,7 +94,7 @@ getAllNotify(@Request() req){
     description: 'No se pudo contar las notificaciones. Intente de nuevo'
 })
 countNotReaded(@Request() req){
-    return this.notifycountnotreaded.execute();
+    // return this.countUnreadNotificationService.execute();
 }
 /*@Post('create')
 CreateNotify(@Request() req,  @Body() data: createNotificaciondto) {
@@ -91,6 +113,6 @@ CreateNotify(@Request() req,  @Body() data: createNotificaciondto) {
 })
 savetoken(@Request() req, @Body() data: TokenDto, @Headers('Authorization') token: string){
     token = token.replace('Bearer', '');    
-    return this.notifierServiceSend.execute(token);
+    // return this.notifierServiceSend.execute(token);
 }
 }

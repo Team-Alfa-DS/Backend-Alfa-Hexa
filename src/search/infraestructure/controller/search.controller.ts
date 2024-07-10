@@ -26,6 +26,14 @@ import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-ma
 import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
+import { OdmBlogRepository } from 'src/blog/infraestructure/repositories/odmBlog.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { OdmBlogEntity } from 'src/blog/infraestructure/entities/odm-entities/odm-blog.entity';
+import { Model } from 'mongoose';
+import { OdmBlogCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmTrainerEntity } from 'src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity';
+import { OdmBlogMapper } from 'src/blog/infraestructure/mapper/odmBlog.mapper';
 
 
 @ApiTags('Search')
@@ -39,9 +47,16 @@ export class SearchController {
     private transacctionHandler: ITransactionHandler;
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
-    constructor() {
+    constructor(
+        @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
+        @InjectModel('blog_comment') commentModel: Model<OdmBlogCommentEntity>,
+        @InjectModel('user') userModel: Model<OdmUserEntity>,
+        @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>
+        )
+     {
         const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-        const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        // const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        const blogRepo = new OdmBlogRepository(new OdmBlogMapper(userModel, blogModel, commentModel, trainerModel), blogModel, commentModel, userModel, trainerModel);
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
         const trainerRepo = new OrmTrainerRepository( this.trainerMapper, PgDatabaseSingleton.getInstance());
@@ -86,7 +101,9 @@ export class SearchController {
         const request = new SearchRequestDto(page, perPage, term, tag);
         const result = await this.searchService.execute(request);
 
-        return result.Value;
+        if (!result.isSuccess) { throw result.Error }
+
+        return result.Value
     }
 
     @Get( "/popular/tags" )
@@ -98,12 +115,12 @@ export class SearchController {
         const request = new SearchRequestDto(page, perPage);
         const result = await this.searchTagService.execute(request);
 
-        return result.Value;
+        // return result.Value;
         if (result.isSuccess) {
             return result.Value.tagNames;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
-            throw ExceptionMapper.toHttp(result.Error);
+            throw result.Error;
         }
     }
 

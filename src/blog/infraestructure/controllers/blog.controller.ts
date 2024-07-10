@@ -64,10 +64,10 @@ export class BlogController {
         //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
 
         const logger = new NestLogger();
-        this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
-        );
+        // this.getAllBlogService = new LoggerDecorator(
+        //     new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+        //     logger
+        // );
         this.getAllBlogService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
@@ -113,9 +113,10 @@ export class BlogController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async  getAllBlogs(@Query()getManyBlogsDTO: GetManyBlogsDTO) {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(getManyBlogsDTO);
-        if (result.Value)
-            return result.Value.blogs
-        return { message: result.Error.message };
+        
+        if (!result.isSuccess) {throw result.Error}
+
+        return result.Value;
     }
 
     
@@ -134,9 +135,10 @@ export class BlogController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async  getBlogsCount(@Query()getBlogsCountDTO: GetBlogsCountDTO) {
         const result: Result<GetBlogsCountResponseDTO>  =  await this.getBlogsCountService.execute(getBlogsCountDTO);
-        if (result.Value)
-            return result.Value
-        return { message: result.Error.message };
+        
+        if (!result.isSuccess) {throw result.Error}
+
+        return result.Value;
     }
 
 }

@@ -8,27 +8,27 @@ import { Notify } from "../../domain/notify";
 import { NotifierResponse } from "src/common/application/notification-handler/dto/response/response";
 import { Value } from "firebase-admin/lib/remote-config/remote-config-api";
 
-export class NotifierServiceSend implements IApplicationService<string, NotifierDto>{
-    /*private readonly repository: TokenRepository;*/
-    private readonly firebaseNotifier: FirebaseNotifier;
+// export class NotifierServiceSend implements IApplicationService<string, NotifierDto>{
+//     /*private readonly repository: TokenRepository;*/
+//     private readonly firebaseNotifier: FirebaseNotifier;
 
 
-    constructor(/*repository: TokenRepository*/ firebaseNotifier: FirebaseNotifier){
-        /*this.repository = repository;*/
-        this.firebaseNotifier = firebaseNotifier;
-    }
+//     constructor(/*repository: TokenRepository*/ firebaseNotifier: FirebaseNotifier){
+//         /*this.repository = repository;*/
+//         this.firebaseNotifier = firebaseNotifier;
+//     }
 
-    get name(): string{
-        return 'sendNotification'
-    }
+//     get name(): string{
+//         return 'sendNotification'
+//     }
 
-    async execute(token: string): Promise<Result<NotifierDto>>{
-        try {
-            const response = await this.firebaseNotifier.notify(token);
-            return response;    
-        } catch (error) {
-            return Result.fail(error);
-        }
-    }
+//     async execute(token: string): Promise<Result<NotifierDto>>{
+//         try {
+//             const response = await this.firebaseNotifier.notify(token);
+//             return response;    
+//         } catch (error) {
+//             return Result.fail(error);
+//         }
+//     }
     
-}
+// }

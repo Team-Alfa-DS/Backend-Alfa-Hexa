@@ -110,12 +110,14 @@ export class AuthController {
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
         this.registerUserService = new ExceptionMapperDecorator(
-            new LoggerDecorator(
-                new ServiceDBLoggerDecorator(
-                    new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
-                    this.auditRepository
-                ),
-                this.logger
+            new ExceptionMapperDecorator(
+                new LoggerDecorator(
+                    new ServiceDBLoggerDecorator(
+                        new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
+                        this.auditRepository
+                    ),
+                    this.logger
+                )
             )
         );
         this.loginUserService = new ExceptionMapperDecorator(
@@ -165,6 +167,9 @@ export class AuthController {
         const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
 
         const response = await this.registerUserService.execute(request);
+
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 
@@ -180,6 +185,8 @@ export class AuthController {
         const request = new LoginUserRequest(user.email, user.password);
 
         const response = await this.loginUserService.execute(request);
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 
@@ -197,6 +204,8 @@ export class AuthController {
         const request = new CurrentUserRequest(req.user.tokenUser.id);
 
         const response = await this.currentUserService.execute(request);
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 
@@ -220,6 +229,8 @@ export class AuthController {
         const request = new ForgetUserPasswordRequest(user.email, code)
 
         const response = await this.forgetUserPasswordService.execute(request)
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 
@@ -237,6 +248,8 @@ export class AuthController {
         const request = new ValidateUserCodeRequest(validate.email, validate.code, userCode.code);
 
         const response = await this.validateUserCodeService.execute(request)
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 
@@ -260,6 +273,8 @@ export class AuthController {
         const requestChange = new ChangeUserPasswordRequest(newPassword.email, newPassword.code, newPassword.password);
 
         const response = await this.changeUserPasswordService.execute(requestChange);
+        if (!response.isSuccess) { throw response.Error}
+        
         return response.Value;
     }
 }

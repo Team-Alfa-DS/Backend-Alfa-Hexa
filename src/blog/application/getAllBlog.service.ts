@@ -1,4 +1,4 @@
-import { IBlogRepository } from '../domain/repositories/IBlog.repository';
+import { IBlogCommandRepository } from '../domain/repositories/IBlogCommand.repository';
 import { Blog } from '../domain/Blog';
 import { IService } from 'src/common/application/interfaces/IService';
 import { GeneralBlogDTO, GetAllBlogsResponseDTO } from './interfaces/getAllBlogsResponseDTO.interface';
@@ -8,12 +8,13 @@ import { ICategoryRepository } from 'src/category/domain/repositories/category-r
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { GetManyBlogsDTO } from './interfaces/getManyBlogsDTO';
+import { IBlogQueryRepository } from '../domain/repositories/IBlogQuery.repository';
 ;
 
 
 export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>{
     constructor(
-        private readonly blogRepository: IBlogRepository,
+        private readonly blogRepository: IBlogQueryRepository,
         private readonly trainerRepository: ITrainerRepository,
         private readonly categoryRepository: ICategoryRepository
     ){

@@ -130,8 +130,10 @@ export class CourseController {
   })
   async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
-    const result = await this.getCourseByIdService.execute(request);
-    return result.Value;
+    const response = await this.getCourseByIdService.execute(request);
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -156,8 +158,11 @@ export class CourseController {
       manyCoursesQueryDto.page,
       manyCoursesQueryDto.perpage);
 
-    const result = await this.getManyCoursesService.execute(request);
-    return result.Value;
+    const response = await this.getManyCoursesService.execute(request);
+    
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @Get('/count')
@@ -169,8 +174,10 @@ export class CourseController {
       courseCountQueryDto.trainer
     )
 
-    const result = await this.getCourseCountService.execute(request);
-    return result.Value;
+    const response = await this.getCourseCountService.execute(request);
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @Post()
@@ -188,6 +195,8 @@ export class CourseController {
       postCourseBodyDto.trainerId
     ));
 
+    if (!response.isSuccess) { throw response.Error}
+
     return response.Value;
   }
 
@@ -202,6 +211,8 @@ export class CourseController {
       postLessonBodyDto.seconds,
       postLessonBodyDto.videoUrl
     ));
+    if (!response.isSuccess) { throw response.Error}
+
     return response.Value;
   }
 }

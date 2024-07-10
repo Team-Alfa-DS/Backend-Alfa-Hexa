@@ -145,6 +145,8 @@ export class TrainerController {
     const request = new FindOneTrainerRequest(trainerId, req.user.tokenUser.id);
     const oneTrainer = await this.findOneTrainerService.execute(request);
     
+    if (!oneTrainer.isSuccess) { throw oneTrainer.Error}
+
     return oneTrainer.Value;
   }
   
@@ -160,6 +162,8 @@ export class TrainerController {
     const request = new FollowTrainerRequest(idTrainer, req.user.tokenUser.id);
     const follow = await this.followTrainerService.execute(request);
     
+    if (!follow.isSuccess) { throw follow.Error}
+
     return follow.Value;
   }
 
@@ -177,6 +181,8 @@ export class TrainerController {
     );
     const result = await this.findAllTrainersService.execute(request);
     
+    if (!result.isSuccess) { throw result.Error }
+
     return result.Value.trainers;
   }
 
@@ -186,6 +192,8 @@ export class TrainerController {
     const request = new CountUserFollowRequest(req.user.tokenUser.id);
     const result = await this.countUserFollowTrainerService.execute(request);
 
+    if (!result.isSuccess) { throw result.Error }
+    
     return result.Value;
   }
 }

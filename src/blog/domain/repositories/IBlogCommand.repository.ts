@@ -5,7 +5,7 @@ import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 
 
-export interface IBlogRepository {
+export interface IBlogCommandRepository {
 
     getAllBLogs(page?: number, perpage?: number, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>>;
 

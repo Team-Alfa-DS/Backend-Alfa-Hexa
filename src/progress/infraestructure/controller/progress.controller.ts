@@ -193,6 +193,8 @@ export class ProgressController {
         const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -200,6 +202,8 @@ export class ProgressController {
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.getOneProgressService.execute(request);
+
+        if (!response.isSuccess) { throw response.Error }
 
         return response.Value;
     }
@@ -209,6 +213,8 @@ export class ProgressController {
         const request = new TrendingProgressRequest(req.user.tokenUser.id);
         const response = await this.trendingProgressService.execute(request);
 
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -216,6 +222,8 @@ export class ProgressController {
     async progressCourses(@Query() queryDto: CoursesProgressDto, @Request() req: JwtRequest) {
         const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
         const response = await this.coursesProgressService.execute(request);
+
+        if (!response.isSuccess) { throw response.Error }
 
         return response.Value.courseProgress;
     }
@@ -225,6 +233,8 @@ export class ProgressController {
         const request = new ProfileProgressRequest(req.user.tokenUser.id);
         const response = await this.profileProgressService.execute(request);
 
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -232,6 +242,9 @@ export class ProgressController {
     async startProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new StartCourseProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.startCourseProgressService.execute(request);
-        return response.Value
+        
+        if (!response.isSuccess) { throw response.Error }
+
+        return response.Value;
     }
 }
