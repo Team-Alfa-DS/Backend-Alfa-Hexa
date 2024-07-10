@@ -11,6 +11,7 @@ import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-
 import { OrmBlogCommentMapper } from "../mapper/orm-comment-blog.mapper";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { BlogNotFoundException } from "src/blog/domain/exceptions/blog-not-found.exception";
 
 export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
 
@@ -52,7 +53,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             .leftJoinAndSelect('blog.comments', 'comments')
             .where('LOWER(tags.name) IN (:...tagsName)', { tagsName: tagsName.map(tag => tag.toLowerCase()) })	
             .getMany();
-            if(!resp) return Result.fail(new Error(`Blogs with tags: ${tagsName} not found`));
+            if(!resp) return Result.fail(new BlogNotFoundException(`No se encuentran los Blogs con los tags: ${tagsName}`));
             const domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
@@ -71,7 +72,7 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
         .leftJoinAndSelect('blog.images', 'images')
         .leftJoinAndSelect('blog.comments', 'comments')
         .getMany();
-        if(!resp) return Result.fail(new Error('Blogs not found'));
+        if(!resp) return Result.fail(new BlogNotFoundException(`No se encuentran los Blogs`));
         let domainBlogs = resp.map(blog => BlogMapper.toDomain(blog));
         
         
@@ -112,11 +113,11 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
             .leftJoinAndSelect('blog.comments', 'comments')
             .where('blog.id = :id', {id})
             .getOne();
-            if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`));   
+            if(!blog) return Result.fail(new BlogNotFoundException(`Blog with id= ${id} not found`));   
             const domainBlog =  BlogMapper.toDomain(blog);
             return Result.success(domainBlog);
            } catch (error) {
-                return Result.fail(error); 
+                return Result.fail(new BlogNotFoundException(`Hubo un error al buscar el blog con id= ${id}`)); 
         }
     }
 
@@ -141,7 +142,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
         });
 
         }catch(error){
-            console.log(error);
             return Result.fail(error);
         }    
     };
@@ -164,7 +164,6 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     async saveBlog(blog: Blog): Promise<Result<Blog>>{
         const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
         const ormBlogEntity = await BlogMapper.toPersistence(blog);
-        console.log(ormBlogEntity);
         
         await runnerTransaction.manager.save(ormBlogEntity);
         return Result.success<Blog>(blog);

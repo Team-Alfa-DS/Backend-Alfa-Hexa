@@ -29,10 +29,10 @@ export type LessonComment = {
 export class GetLessonCommentServiceResponseDto implements ServiceResponseDto {
 
     constructor(
-    readonly blogComments: LessonComment[]
+    readonly lessonComments: LessonComment[]
     ) {}
 
     dataToString(): string {
-        return `GetLessonCommentRes: { ${JSON.stringify(this.blogComments)} }`
+        return `GetLessonCommentRes: { ${JSON.stringify(this.lessonComments)} }`
     }
 }

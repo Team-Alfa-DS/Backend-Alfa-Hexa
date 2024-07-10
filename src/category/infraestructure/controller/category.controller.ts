@@ -28,6 +28,7 @@ import { OdmCategoryRepository } from "../repositories/odm-category.repository";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { OdmCategoryMapper } from "../mapper/odm-mapperCategory";
+import { ManyCategoryDto } from "../dtos/many-category.dto";
 
 
 @ApiTags('Category')
@@ -70,8 +71,9 @@ export class CategoryController {
   @ApiBadRequestResponse({
       description: 'No existen categorias. Agregue'
   })
-    async getAllCategorys(@Query() getManyCategoriesDTO: GetAllCategoriesRequest): Promise<GetAllCategoriesResponse> {
-      const response = await this.getAllCategorysService.execute(getManyCategoriesDTO);
+    async getAllCategorys(@Query() getManyCategoriesDTO: ManyCategoryDto): Promise<GetAllCategoriesResponse> {
+      const request = new GetAllCategoriesRequest(getManyCategoriesDTO.page, getManyCategoriesDTO.perpage)
+      const response = await this.getAllCategorysService.execute(request);
       return response.Value
     }
 

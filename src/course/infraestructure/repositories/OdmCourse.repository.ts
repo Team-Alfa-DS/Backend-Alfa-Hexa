@@ -74,7 +74,6 @@ export class OdmCourseRepository implements ICourseRepository {
     // ]);
 
     if (result.length <= 0) {throw new CourseNotFoundException(`No hay cursos guardados`)}
-    console.log(result);
     
     let courses = await OdmCourseMapper.arrayToDomain(result, this.commentModel);
 
@@ -239,7 +238,6 @@ export class OdmCourseRepository implements ICourseRepository {
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
-    console.log(result); //Debug
     
     for (let course of result) { 
       for (let lesson of course.lessons) {
@@ -349,7 +347,11 @@ export class OdmCourseRepository implements ICourseRepository {
     const OdmLesson = await OdmLessonMapper.toPersistence(lesson);
     const OdmCourse = await OdmCourseMapper.toPersistence(course, this.categoryModel, this.trainerModel, this.tagModel)
     await this.lessonModel.create(OdmLesson);
+    // console.log(OdmCourse);
+
     OdmCourse.lessons.push(OdmLesson);
+    // console.log(OdmCourse);
+    
     await this.courseModel.findOneAndUpdate({id: OdmCourse.id}, OdmCourse);
     return lesson;
   }
@@ -358,7 +360,6 @@ export class OdmCourseRepository implements ICourseRepository {
     // console.log(comment); //Debug
     
       const odmComment = await OdmLessonCommentMapper.toPersistence(comment, this.userModel, this.lessonModel);
-      console.log(odmComment);
       await this.commentModel.create(odmComment);
       return comment;
   }

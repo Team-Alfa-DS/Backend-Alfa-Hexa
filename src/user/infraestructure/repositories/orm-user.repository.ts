@@ -4,10 +4,11 @@ import { IUserRepository } from "src/user/domain/repositories/user-repository.in
 import { Result } from "src/common/domain/result-handler/result";
 import { User } from "src/user/domain/user";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { UserEmail } from "src/user/domain/value-objects/user-email";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { UserNotFoundException } from "src/user/domain/exceptions/user-not-found-exception";
 
 export class OrmUserRepository extends Repository<OrmUserEntity> implements IUserRepository {
 
@@ -24,7 +25,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {id: id.Id});
 
         if (!userfound) {
-            return Result.fail<User>(new Error('User not found'));
+            return Result.fail<User>(new UserNotFoundException(`Usuario con el id ${id.Id} no encontrado`));
         }
 
         if (userfound.image) {
@@ -40,7 +41,7 @@ export class OrmUserRepository extends Repository<OrmUserEntity> implements IUse
         const userfound = await runnerTransaction.manager.findOneBy(OrmUserEntity, {email: email.Email});
 
         if (!userfound) {
-            return Result.fail<User>(new Error('User not found'));
+            return Result.fail<User>(new UserNotFoundException(`Usuario con el email ${email.Email} no encontrado`));
         }
 
         if (userfound.image) {

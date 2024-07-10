@@ -1,20 +1,17 @@
-import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { CountUserFollowRequest } from "../dto/request/count-user-follow-trainer.request";
 import { CountUserFollowResponse } from "../dto/response/count-user-follow-trainer.response";
 import { IOdmTrainerRepository } from "src/trainer/domain/repositories/odm-trainer-repository.interface";
 import { UserId } from "src/user/domain/value-objects/user-id";
+import { IService } from "src/common/application/interfaces/IService";
 
-export class CountUserFollowTrainerService implements IApplicationService<CountUserFollowRequest, CountUserFollowResponse>{
+export class CountUserFollowTrainerService extends IService<CountUserFollowRequest, CountUserFollowResponse>{
     private readonly repository: IOdmTrainerRepository
 
     constructor(repository: IOdmTrainerRepository) {
+        super();
         this.repository = repository;
-    }
-
-    get name(): string {
-        return 'notifycountnotreaded';
     }
 
     async execute(data: CountUserFollowRequest): Promise<Result<CountUserFollowResponse>> {

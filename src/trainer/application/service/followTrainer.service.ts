@@ -8,6 +8,7 @@ import { UserId } from 'src/user/domain/value-objects/user-id';
 import { IOdmTrainerRepository } from 'src/trainer/domain/repositories/odm-trainer-repository.interface';
 import { TrainerFollowerUserId } from 'src/trainer/domain/valueObjects/trainer-userid';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
+import { TrainerNotFoundException } from 'src/trainer/domain/exceptions/trainer-not-found-exception';
 
 export class FollowTrainerService extends IService<FollowTrainerRequest, FollowTrainerResponse>
 {
@@ -24,10 +25,18 @@ export class FollowTrainerService extends IService<FollowTrainerRequest, FollowT
     let userId = UserId.create(data.idUser);
     const trainer = await this.odmTrainerRepository.findTrainerById(trainerId);
 
-    if (!trainer.isSuccess) return Result.fail(new Error('No existe el trainer'));
+    if (!trainer.isSuccess) return Result.fail(new TrainerNotFoundException('No se encontro al trainer'));
     const trainerDomain = trainer.Value;
-    trainerDomain.AddUserFollow(TrainerFollowerUserId.create(userId));
-    await this.trainerRepository.followTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
+    const follower = await this.odmTrainerRepository.findFollowByUserId(trainerId, TrainerFollowerUserId.create(userId));
+    if (follower) {
+      trainerDomain.DelUserFollow(TrainerFollowerUserId.create(userId))
+      await this.trainerRepository.unFollowTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
+    }
+    else {
+      trainerDomain.AddUserFollow(TrainerFollowerUserId.create(userId));
+      await this.trainerRepository.followTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
+    }
+
     this.eventPublisher.publish(trainerDomain.pullDomainEvents());
     const response = new FollowTrainerResponse()
     return Result.success(response);

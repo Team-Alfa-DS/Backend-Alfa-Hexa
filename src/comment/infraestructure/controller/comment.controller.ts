@@ -5,7 +5,6 @@ import { OrmUserRepository } from "src/user/infraestructure/repositories/orm-use
 import { TOrmCourseRepository } from "src/course/infraestructure/repositories/TOrmCourse.repository";
 import { GetAllCommentsQueryDto } from "../dto/query-parameters/get-all-commets.query";
 import { GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
-import { TransactionHandler } from '../../../common/infraestructure/database/transaction-handler';
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
 import { GetCommentLessonService } from "src/comment/application/service/query/get-comment-lesson.service";
 import { AddCommentEntryDto } from "../dto/entry/add-commet.dto";
@@ -52,6 +51,7 @@ import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/od
 import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { CreateCommentBlogEvent } from "src/blog/infraestructure/events/synchronize/commenBlog-posted.event";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 
 @ApiBearerAuth()
@@ -204,13 +204,13 @@ export class CommentController{
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-            return result.Value;
+            return result.Value.blogComments;
 
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
-            return result.Value;
+            return result.Value.lessonComments;
         }
     }
 

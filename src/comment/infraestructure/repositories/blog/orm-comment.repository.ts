@@ -1,11 +1,11 @@
 import { DataSource, Repository } from "typeorm";
 import { Result } from "src/common/domain/result-handler/result";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { OrmBlogCommentEntity } from "../../entities/orm-entities/orm-comment.blog.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> implements IBlogCommentRepository{
     
@@ -20,14 +20,8 @@ export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> i
         const runnerTransaction = runner.getRunner();
 
         const commentsFound = await runnerTransaction.manager.createQueryBuilder(OrmBlogCommentEntity, "comment")
-            //.take(perPage)
-            //.skip(page)
-            .where("comment.blog_id = :id", { id })
-            .getMany();
-
-        // const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
-        //     take: page,
-        //     skip: perPage,});
+        .where("comment.blog_id = :id", { id })
+        .getMany();
 
         if (!commentsFound) return Result.fail<CommentBlog[]>(new Error('Comments not found'));
 

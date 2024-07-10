@@ -22,6 +22,7 @@ import { LessonContent } from "./value-objects/lesson-content";
 import { LessonDuration } from "./value-objects/lesson-duration";
 import { LessonVideo } from "./value-objects/lesson-video";
 import { LessonPosted } from "./events/lesson-posted.event";
+import { CourseDate } from "./value-objects/course-date";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLessonUserDisliked } from 'src/comment/domain/valueObjects/lesson/comment-lesson-userDisliked';
@@ -37,7 +38,7 @@ export class Course extends AggregateRoot<CourseId>{
   private title: CourseTitle;
   private description: CourseDescription;
   private image: CourseImage;
-  private date: Date;
+  private date: CourseDate;
   private durationMinutes: CourseDurationMinutes;
   private durationWeeks: CourseDurationWeeks;
   private level: CourseLevel;
@@ -51,7 +52,7 @@ export class Course extends AggregateRoot<CourseId>{
     title: CourseTitle,
     description: CourseDescription,
     image: CourseImage,
-    date: Date,
+    date: CourseDate,
     durationMinutes: CourseDurationMinutes,
     durationWeeks: CourseDurationWeeks,
     level: CourseLevel,
@@ -69,7 +70,7 @@ export class Course extends AggregateRoot<CourseId>{
     title: CourseTitle,
     description: CourseDescription,
     image: CourseImage,
-    date: Date,
+    date: CourseDate,
     durationMinutes: CourseDurationMinutes,
     durationWeeks: CourseDurationWeeks,
     level: CourseLevel,
@@ -86,7 +87,7 @@ export class Course extends AggregateRoot<CourseId>{
     title: CourseTitle,
     description: CourseDescription,
     image: CourseImage,
-    date: Date,
+    date: CourseDate,
     durationMinutes: CourseDurationMinutes,
     durationWeeks: CourseDurationWeeks,
     level: CourseLevel,
@@ -199,8 +200,8 @@ export class Course extends AggregateRoot<CourseId>{
     return new CourseImage(this.image.Value);
   }
 
-  get Date(): Date {
-    return new Date(this.date)
+  get Date(): CourseDate {
+    return new CourseDate(this.date.value)
   }
 
   get DurationMinutes(): CourseDurationMinutes {
