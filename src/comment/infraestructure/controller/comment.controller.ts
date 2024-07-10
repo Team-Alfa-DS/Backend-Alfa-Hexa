@@ -148,7 +148,7 @@ export class CommentController{
         );
         this.getCommentLessonService = new LoggerDecorator(
             new GetCommentLessonService(
-                this.courseRepository
+                OdmCourseRepositoryInstance
             ),
             this.logger
         );
@@ -157,6 +157,7 @@ export class CommentController{
                 new RegisterLessonCommentServices(
                     this.userRepository,
                     this.courseRepository,
+                    new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentLessonModel, userModel),
                     this.transactionHandler,
                     this.eventPublisher,
                     this.idGenerator

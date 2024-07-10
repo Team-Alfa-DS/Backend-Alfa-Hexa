@@ -3,7 +3,8 @@ import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { Lesson } from "src/course/domain/entities/Lesson";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
+import { ICourseCommandRepository } from "src/course/domain/repositories/ICourseCommand.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonContent } from "src/course/domain/value-objects/lesson-content";
 import { LessonDuration } from "src/course/domain/value-objects/lesson-duration";
@@ -13,7 +14,8 @@ import { LessonVideo } from "src/course/domain/value-objects/lesson-video";
 
 export class PostLessonService implements IService<PostLessonRequestDto, PostLessonResponseDto> {
   constructor(
-    private courseRepository: ICourseRepository,
+    private courseCommandRepository: ICourseCommandRepository,
+    private courseQueryRepository: ICourseQueryRepository,
     private idGen: IIdGen,
     // private transactionHandler: ITransactionHandler,
     private eventPublisher: IEventPublisher
@@ -22,7 +24,7 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
   async execute(request: PostLessonRequestDto): Promise<Result<PostLessonResponseDto>> {
       const generatedId = await this.idGen.genId();
       
-      const courseToPostIn = await this.courseRepository.getCourseById(new CourseId(request.courseId));
+      const courseToPostIn = await this.courseQueryRepository.getCourseById(new CourseId(request.courseId));
 
       courseToPostIn.postLesson(
         new LessonId(generatedId),
@@ -34,7 +36,7 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
 
       const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
 
-      await this.courseRepository.saveLesson(lesson, courseToPostIn);
+      await this.courseCommandRepository.saveLesson(lesson, courseToPostIn);
 
       this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
 

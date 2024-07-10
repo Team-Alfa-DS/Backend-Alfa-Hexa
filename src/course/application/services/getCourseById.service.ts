@@ -1,5 +1,4 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
@@ -7,11 +6,13 @@ import { Trainer } from "src/trainer/domain/trainer";
 import { Category } from "src/category/domain/Category";
 import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CourseId } from "src/course/domain/value-objects/course-id";
+import { IOdmTrainerRepository } from "src/trainer/domain/repositories/odm-trainer-repository.interface";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
-    private readonly courseRepository: ICourseRepository,
-    private readonly trainerRepository: ITrainerRepository,
+    private readonly courseRepository: ICourseQueryRepository,
+    private readonly trainerRepository: IOdmTrainerRepository,
     private readonly categoryRepository: ICategoryRepository,
   ) {super();}
 
