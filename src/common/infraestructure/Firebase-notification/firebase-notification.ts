@@ -26,7 +26,6 @@ export class FirebaseNotifier implements INotifier {
             },
             tokens: [token]
         };
-        console.log(message);
         const response = await admin.messaging().sendMulticast(message)
     } catch (error) {
 

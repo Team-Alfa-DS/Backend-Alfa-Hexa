@@ -10,7 +10,7 @@ export class CourseDate extends ValueObject<CourseDate> {
 
     if (!date) { throw new NullCourseDateException(`La fecha no puede ser nula`)}
 
-    if (date > new Date()) { throw new CourseDateOutOfRangeException(`Se proporcionó una fecha que no ha ocurrido`)}
+    // if (date > new Date()) { throw new CourseDateOutOfRangeException(`Se proporcionó una fecha que no ha ocurrido`)}
 
     this.value = date;
   }

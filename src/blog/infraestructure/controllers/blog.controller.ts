@@ -60,7 +60,7 @@ export class BlogController {
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
         const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(userModel,blogModel,commentModel,trainerModel), blogModel,commentModel, userModel, trainerModel);
-        const odmTrainerRepositoryInstance = new OdmTrainerRepository( trainerModel,  new OdmTrainerMapper(courseModel, blogModel, userModel), userModel);
+        const odmTrainerRepositoryInstance = new OdmTrainerRepository( trainerModel,  new OdmTrainerMapper(courseModel, blogModel, userModel));
         //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
 
         const logger = new NestLogger();
@@ -106,10 +106,6 @@ export class BlogController {
     @ApiQuery({name: 'filter', required:false})
     @ApiQuery({name: 'category', required:false})
     @ApiQuery({name: 'trainer', required:false})
-    @ApiCreatedResponse({
-        description: 'se retorno todos los blog',
-        type: OrmBlogEntity,
-    })
     @ApiBadRequestResponse({
         description: 'No se encontraron blogs. Agregue algunos'
     })

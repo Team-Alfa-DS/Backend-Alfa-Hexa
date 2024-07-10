@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as admin from 'firebase-admin';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -29,7 +30,8 @@ async function bootstrap() {
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     }),
   });
-
+  app.use(bodyParser.json({limit: '20mb'}));
+  app.use(bodyParser.urlencoded({limit: '20mb', extended: true}));
   app.enableCors();
   
   await app.listen(process.env.PORT || 3000);

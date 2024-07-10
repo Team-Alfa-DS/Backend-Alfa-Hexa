@@ -1,10 +1,11 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { EmptyCategoryIconException } from "../exceptions/empty-category-icon.exception";
 
 export class CategoryIcon extends ValueObject<CategoryIcon>{
     private constructor(public value: string) {
         super();
         if (!this.isValid(value)) {
-            throw new Error(`CategoryIcon ${value} is invalid`);
+            throw new EmptyCategoryIconException(`El CategoryIcon ${value} es invalido`);
         } 
 
         this.value = value;

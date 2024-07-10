@@ -9,6 +9,7 @@ import { HttpException, HttpStatus } from "@nestjs/common";
 import { Result } from "src/common/domain/result-handler/result";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
+import { CategoryName } from "src/category/domain/valueObjects/categoryName";
 //import { InjectRepository } from "@nestjs/typeorm";
 
 export class OrmCategoryRepository extends Repository<OrmCategoryEntity> implements ICategoryRepository {
@@ -19,6 +20,16 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         super(OrmCategoryEntity, dataSource.manager);
         this.ormCategoryMapper = ormCategoryMapper;
     }
+
+    async saveCategory(category: Category): Promise<void> {
+      const ormCategory = await this.ormCategoryMapper.toPersistence(category);
+      await this.save(ormCategory);
+    }
+
+
+    getCategoryByName(name: CategoryName): Promise<boolean> {
+      throw new Error("Method not implemented.");
+    }
     
     async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
@@ -27,7 +38,7 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
           let categories: Category[] = [];
           
           for (const category of result) {
-            categories.push(this.ormCategoryMapper.toDomain(category))
+            categories.push(await this.ormCategoryMapper.toDomain(category))
           }
           return Result.success<Category[]>(categories);
         } catch (error) {
@@ -39,7 +50,7 @@ export class OrmCategoryRepository extends Repository<OrmCategoryEntity> impleme
         try {
           const result = await this.findOne({where: {id: idCategory.value}
           });
-          const domainCategory = (this.ormCategoryMapper.toDomain(result));
+          const domainCategory = await (this.ormCategoryMapper.toDomain(result));
           return Result.success<Category>(domainCategory)
         } catch (error) {
           return Result.fail<Category>(new Error(error.message));

@@ -3,7 +3,6 @@ import { TrainerFollower } from './valueObjects/trainer-followers';
 import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
-import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 import { DomainEvent } from 'src/common/domain/domain-event';
 import { TrainerCreated } from './events/trainer-created.events';
 import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';
@@ -45,7 +44,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
     }
 
     if (event instanceof TrainerUsersUpdated) {
-      this.users.push(event.user);
+      this.users = event.users
     }
   }
 
@@ -88,6 +87,13 @@ export class Trainer extends AggregateRoot<TrainerId> {
   }
 
   AddUserFollow (user: TrainerFollowerUserId) {
-    this.apply(TrainerUsersUpdated.create(this.Id, user));
+    const users = this.users;
+    users.push(user)
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
+  }
+
+  DelUserFollow (user: TrainerFollowerUserId) {
+    const users = this.users.filter(u => u.trainerFollowerUserId.Id !== user.trainerFollowerUserId.Id);
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
   }
 }

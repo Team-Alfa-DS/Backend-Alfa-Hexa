@@ -1,11 +1,12 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { EmptyCategoryNameException } from "../exceptions/empty-category-name.exception";
 
 
 export class CategoryName extends ValueObject<CategoryName>{
     private constructor(public value: string) {
         super();
         if (!this.isValid(value)) {
-            throw new Error(`CategoryName ${value} is invalid`);
+            throw new EmptyCategoryNameException(`CategoryName no debe estar vacio`);
         } 
 
         this.value = value;

@@ -12,6 +12,7 @@ import { UserImage } from "src/user/domain/value-objects/user-image";
 import { UserName } from "src/user/domain/value-objects/user-name";
 import { UserPassword } from "src/user/domain/value-objects/user-password";
 import { UserPhone } from "src/user/domain/value-objects/user-phone";
+import { UserNotFoundException } from "src/user/domain/exceptions/user-not-found-exception";
 
 export class OdmUserRespository implements IOdmUserRepository {
 
@@ -34,7 +35,7 @@ export class OdmUserRespository implements IOdmUserRepository {
             const domainUser = await this.odmUserMapper.toDomain(user);
             return Result.success(domainUser);
         } catch(err) {
-            return Result.fail(new Error(err.message));
+            return Result.fail(new UserNotFoundException(`Usuario con el id ${id.Id} no encontrado`));
         }
     }
 
@@ -44,7 +45,7 @@ export class OdmUserRespository implements IOdmUserRepository {
             const domainUser = await this.odmUserMapper.toDomain(user);
             return Result.success(domainUser);
         } catch(err) {
-            return Result.fail(new Error(err.message));
+            return Result.fail(new UserNotFoundException(`Usuario con el email ${email.Email} no encontrado`));
         }
     }
 

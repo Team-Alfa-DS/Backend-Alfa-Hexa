@@ -8,21 +8,19 @@ import { CategoryIcon } from '../../domain/valueObjects/categoryIcon';
 import { OdmCategoryEntity } from "../entities/odm-entities/odm-category.entity";
 
 
-export class OdmCategoryMapper{
+export class OdmCategoryMapper implements IMapper<Category, OdmCategoryEntity>{
 
-    toPersistence(domainEntity: Category):OdmCategoryEntity {
+    async toPersistence(domainEntity: Category): Promise<OdmCategoryEntity> {
 
-        const ormCategory : any = OrmCategoryEntity.create(
+        const odmCategory : OdmCategoryEntity = OdmCategoryEntity.create(
             domainEntity.Id.value,
             domainEntity.Name.value,
             domainEntity.Icon.value
         );
-
-        return ormCategory;
-
+        return odmCategory;
     }
 
-    toDomain(odmEntity: OdmCategoryEntity): Category {
+    async toDomain(odmEntity: OdmCategoryEntity): Promise<Category> {
         const id = CategoryId.create(odmEntity.id);
         const name = CategoryName.create(odmEntity.name);
         const icon = CategoryIcon.create(odmEntity.icon);

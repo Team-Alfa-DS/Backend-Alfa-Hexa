@@ -90,7 +90,6 @@ export class OdmCourseRepository implements ICourseQueryRepository {
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
-    console.log(result); //Debug
     
     for (let course of result) { 
       for (let lesson of course.lessons) {

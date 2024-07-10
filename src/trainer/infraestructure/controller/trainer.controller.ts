@@ -36,7 +36,7 @@ import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
-import { GetManyTrainerQueryDto } from '../Dto/GetTrainerQuerydto';
+import { GetManyTrainerQueryDto } from '../dto/GetTrainerQuerydto';
 import { FindAllTrainersService, GetAllTrainersRequest, GetAllTrainersResponse} from 'src/trainer/application/service/findAllTrainer.service';
 import { GetUser } from '../decorador/decoradorGetUser';
 import { User } from 'src/user/domain/user';
@@ -94,7 +94,7 @@ export class TrainerController {
   constructor(@InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('user') userModel: Model<OdmUserEntity>) {
 
     this.odmTrainerMapper = new OdmTrainerMapper(courseModel, blogModel, userModel);
-    this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper, userModel);
+    this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
     this.findOneTrainerService = new ExceptionDecorator(
