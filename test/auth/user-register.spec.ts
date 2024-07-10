@@ -14,7 +14,7 @@ import { TransactionHandlerMock } from "test/common/transaction-handler-mock/tra
 
 describe('User Register', async () => {
     it('debe registrar un usuario', async () => {
-        const request = new RegisterUserRequest('dabortot.21@est.ucab.edu.ve', 'Daniel Bortot', '123456', '04142548764', UserRole.CLIENT);
+        const request = new RegisterUserRequest('dbcd@gmail.com', 'Daniel Bortot', '12345', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
@@ -28,7 +28,7 @@ describe('User Register', async () => {
     })
 
     it('debe fallar si no hay un email', async () => {
-        const request = new RegisterUserRequest('', 'Daniel Bortot', '123456', '04142548764', UserRole.CLIENT);
+        const request = new RegisterUserRequest('', 'Daniel Bortot', '12345', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
@@ -46,7 +46,7 @@ describe('User Register', async () => {
     })
 
     it('debe fallar si no hay un nombre', async () => {
-        const request = new RegisterUserRequest('dabortot.21@est.ucab.edu.ve', '', '123456', '04142548764', UserRole.CLIENT);
+        const request = new RegisterUserRequest('dbcd@gmail.com', '', '12345', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
@@ -64,7 +64,7 @@ describe('User Register', async () => {
     })
 
     it('debe fallar si no hay una contraseña', async () => {
-        const request = new RegisterUserRequest('dabortot.21@est.ucab.edu.ve', 'Daniel Bortot', '', '04142548764', UserRole.CLIENT);
+        const request = new RegisterUserRequest('dbcd@gmail.com', 'Daniel Bortot', '', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
@@ -82,7 +82,7 @@ describe('User Register', async () => {
     })
 
     it('debe fallar si no hay un numero de telefono', async () => {
-        const request = new RegisterUserRequest('dabortot.21@est.ucab.edu.ve', 'Daniel Bortot', '123456', '', UserRole.CLIENT);
+        const request = new RegisterUserRequest('dbcd@gmail.com', 'Daniel Bortot', '12345', '', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
@@ -100,7 +100,7 @@ describe('User Register', async () => {
     })
 
     it('debe fallar si no se cumple el formato del email', async () => {
-        const request = new RegisterUserRequest('dabortot.21@gmail', 'Daniel Bortot', '123456', '04142548764', UserRole.CLIENT);
+        const request = new RegisterUserRequest('dabortot.21@gmail', 'Daniel Bortot', '123456', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(
             new OrmUserRepositoryMock(),
             new OdmUserRepositoryMock(),
