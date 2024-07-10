@@ -14,8 +14,6 @@ export class UpdateUsersTrainersEvent implements IEventSubscriber<TrainerUsersUp
     async on(event: TrainerUsersUpdated): Promise<void> {
         try {
             const trainer = await this.odmTrainerRepository.findTrainerById(event.id);
-            const newFollow = trainer.Value.User
-            newFollow.push(event.user);
             const updatedTrainer = Trainer.create(
                 trainer.Value.Id,
                 trainer.Value.Name,
@@ -23,7 +21,7 @@ export class UpdateUsersTrainersEvent implements IEventSubscriber<TrainerUsersUp
                 trainer.Value.Location,
                 trainer.Value.Courses,
                 trainer.Value.Blogs,
-                newFollow
+                event.users
             );
             await this.odmTrainerRepository.followTrainer(updatedTrainer);
         } catch (err) {

@@ -25,11 +25,11 @@ import { OrmTrainerRepository } from "src/trainer/infraestructure/repositories/o
 import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 import { OrmBlogRepository } from "src/blog/infraestructure/repositories/ormBlog.repository";
 import { OrmBlogCommentRepository } from "src/comment/infraestructure/repositories/blog/orm-comment.repository";
-import { OrmBlogCommentMapper } from "src/comment/infraestructure/mapper/blog/orm-comment-blog.mapper";
-import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/lesson/orm-comment.repository";
-import { OrmLessonCommentMapper } from "src/comment/infraestructure/mapper/lesson/orm-comment-lesson.mapper";
 import { Injectable } from "@nestjs/common";
 import { OrmTagRepository } from "src/tag/infraestructure/repositories/orm-tag-repository";
+import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
+import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-comment-blog.mapper";
+import { OrmLessonCommentRepository } from "src/comment/infraestructure/repositories/orm-comment.repository";
 
 @Injectable()
 export class Synchronize {
@@ -67,10 +67,10 @@ export class Synchronize {
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly lessonCommentRepository = new OrmLessonCommentRepository(
-        new OrmLessonCommentMapper(),
-        PgDatabaseSingleton.getInstance()
-    );
+    // private readonly lessonCommentRepository = new OrmLessonCommentRepository(
+    //     new OrmLessonCommentMapper(),
+    //     PgDatabaseSingleton.getInstance()
+    // );
 
     private readonly tagRepository = new OrmTagRepository(
         PgDatabaseSingleton.getInstance()
@@ -117,15 +117,6 @@ export class Synchronize {
             await this.trainerModel.create({followers: usersOdm, id, location, name})
         }
         console.log('trainers terminados');
-
-        const follows = await this.userRepository.find({relations: {trainers: true}});
-        for (const user of follows) {
-            let odmTrainers: OdmTrainerEntity[] = []
-            for (const trainer of user.trainers) {
-                odmTrainers.push(await this.trainerModel.findOne({id: trainer.id}))
-            }
-            await this.userModel.updateOne({id: user.id}, {trainers: odmTrainers});
-        }
 
         const tags = await this.tagRepository.find();
         for (const tag of tags) {
@@ -213,12 +204,16 @@ export class Synchronize {
         }
         console.log('blogComments terminado');
 
-        const lessonComments = await this.lessonCommentRepository.find();
-        for (const comment of lessonComments) {
-            const {id, lesson_id, user_id, body, publication_date, userDisliked, userLiked} = comment;
-            const lesson = await this.lessonModel.findOne({id: lesson_id});
-            const user = await this.userModel.findOne({id: user_id});
-            await this.lessonCommentModel.create({lesson, body, id, publication_date, user, userDisliked, userLiked});
+        const commentCourses = await this.courseRepository.getAllCourses();
+        for (let commentCourse of commentCourses) {
+            for (let lessons of commentCourse.Lessons) {
+                for (let comment of lessons.comments) {
+                    const {Id, LessonId, UserId, Body, PublicationDate} = comment;
+                    const lesson = await this.lessonModel.findOne({id: LessonId});
+                    const user = await this.userModel.findOne({id: UserId});
+                    await this.lessonCommentModel.create({lesson, Body, Id, PublicationDate, user});
+                }
+            }
         }
         console.log('lessonComments terminado');
     }

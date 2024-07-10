@@ -8,11 +8,9 @@ import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-use
 import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
-import { FollowTrainerDto } from 'src/trainer/application/dto/followTrainer.dto';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
-import { UserId } from 'src/user/domain/value-objects/user-id';
-import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { TrainerFollowerUserId } from 'src/trainer/domain/valueObjects/trainer-userid';
+import { TrainerNotFoundException } from 'src/trainer/domain/exceptions/trainer-not-found-exception';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainerEntity>
@@ -50,7 +48,7 @@ export class OrmTrainerRepository
   }});
     if (!trainer) {
       return Result.fail<Trainer>(
-        new Error('Trainer not found')
+        new TrainerNotFoundException('Trainer not found')
       );
     }
 
@@ -64,6 +62,15 @@ export class OrmTrainerRepository
     const followers = (await this.findOne({relations: {users: true}, where: {id: OrmTrainerEntity.id}})).users;
     const userOrm = await this.userRepository.findOneBy({id: user.trainerFollowerUserId.Id})
     followers.push(userOrm);
+    OrmTrainerEntity.users = followers;
+    await this.save(OrmTrainerEntity);
+  }
+
+  async unFollowTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void> {
+    const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer);
+    let followers = (await this.findOne({relations: {users: true}, where: {id: OrmTrainerEntity.id}})).users;
+    const userOrm = await this.userRepository.findOneBy({id: user.trainerFollowerUserId.Id})
+    followers = followers.filter(u => u.id !== user.trainerFollowerUserId.Id);
     OrmTrainerEntity.users = followers;
     await this.save(OrmTrainerEntity);
   }
@@ -103,47 +110,10 @@ export class OrmTrainerRepository
     return Result.success<number>(count);
    
   }
+
+  async saveTrainer(trainer: Trainer): Promise<void> {
+    const trainerPers = await this.ormTrainerMapper.toPersistence(trainer);
+    await this.save(trainerPers);
+  }
+
 }
-
- /* async updateTrainer(
-    idTrainer: string,
-    payload: string,
-  ): Promise<Result<Trainer>> {
-    const trainer = await this.findOneBy({ id: idTrainer });
-    if (!trainer)
-      return Result.fail<Trainer>(
-        new Error('Trainer not found'),
-        404,
-        'Trainer not found',
-      );
-    const updatedTrainer = await this.save({ ...trainer, payload });
-    const trainerDomain = await this.ormTrainerMapper.toDomain(updatedTrainer);
-    return Result.success<Trainer>(trainerDomain, 200);
-  }
-
-  async saveTrainer(trainer: Trainer): Promise<Result<Trainer>> {
-    try {
-      const ormUser = await this.ormTrainerMapper.toPersistence(trainer);
-      await this.save(ormUser);
-      return Result.success<Trainer>(trainer, 200);
-    } catch (err) {
-      return Result.fail<Trainer>(
-        new Error(err.message),
-        err.code,
-        err.message,
-      );
-    }
-  }
-
-  async deleteTrainer(trainer: Trainer): Promise<Result<Trainer>> {
-    const deleted = await this.delete({ id: trainer.Id });
-    if (deleted.affected == 0) {
-      return Result.fail<Trainer>(
-        new Error('Trainer not found'),
-        404,
-        'Trainer not found',
-      );
-    }
-    return Result.success<Trainer>(trainer, 200);
-  }*/
-

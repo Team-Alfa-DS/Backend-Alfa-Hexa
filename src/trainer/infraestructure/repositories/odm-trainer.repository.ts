@@ -7,17 +7,18 @@ import { UserId } from "src/user/domain/value-objects/user-id";
 import { OdmTrainerEntity } from "../entities/odm-entities/odm-trainer.entity";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { TrainerNotFoundException } from "src/trainer/domain/exceptions/trainer-not-found-exception";
+import { TrainerFollowerUserId } from "src/trainer/domain/valueObjects/trainer-userid";
+import { TrainerName } from "src/trainer/domain/valueObjects/trainer-name";
 
 export class OdmTrainerRepository implements IOdmTrainerRepository{
 
     private readonly trainerModel: Model<OdmTrainerEntity>;
-    private readonly userModel: Model<OdmUserEntity>;
     private readonly odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>;
 
-    constructor(trainerModel: Model<OdmTrainerEntity>, odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>, userModel: Model<OdmUserEntity>) {
+    constructor(trainerModel: Model<OdmTrainerEntity>, odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>) {
         this.trainerModel = trainerModel;
         this.odmTrainerMapper = odmTrainerMapper;
-        this.userModel = userModel;
     }
 
     async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
@@ -25,7 +26,7 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
 
         const trainer = await this.trainerModel.findOne({id: trainerId});
         if (!trainer) {
-            return Result.fail<Trainer>(new Error('Trainer not found'));
+            return Result.fail<Trainer>(new TrainerNotFoundException(`No se encontro al entrenador con el id ${trainerId}`));
         }
 
         const trainerDomain = await this.odmTrainerMapper.toDomain(trainer);
@@ -33,24 +34,28 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
         return oneTrainer;
     }
 
+    async findTrainerByName(name: TrainerName): Promise<boolean> {
+        const trainer = await this.trainerModel.findOne({name: name.trainerName});
+        if (trainer) return true;
+        return false;
+    }
+
+    async findFollowByUserId(trainerId: TrainerId, userId: TrainerFollowerUserId): Promise<boolean> {
+        const trainer = await this.trainerModel.findOne({id: trainerId.trainerId, 'followers.id': userId.trainerFollowerUserId.Id});
+        if (trainer) return true;
+        return false;
+    }
+
     async followTrainer(trainer: Trainer): Promise<void> {
         const trainerOdm = await this.odmTrainerMapper.toPersistence(trainer);
-
-        const users: OdmUserEntity[] = [];
-        for (const user of trainer.User) {
-            const userFound = await this.userModel.findOne({id: user.trainerFollowerUserId.Id})
-            users.push(userFound);
-            await this.userModel.updateOne({id: user.trainerFollowerUserId.Id}, {trainers: [...userFound.trainers, trainerOdm]})
-        }
-
-        await this.trainerModel.updateOne({id: trainer.Id.trainerId}, {followers: users});
+        await this.trainerModel.updateOne({id: trainer.Id.trainerId}, {followers: trainerOdm.followers});
     }
 
     async findAllTrainers(userfollow?: boolean, userId?: string, page?: number, perpage?: number): Promise<Result<Trainer[]>> {
         let trainers = []
 
         if (userfollow) {
-            trainers = (await this.userModel.findOne({id: userId})).trainers;
+            trainers = await this.trainerModel.find({'followers.id': userId})
         } else {
             const trainerList = await this.trainerModel.find();
             for (const trainer of trainerList) {
@@ -65,7 +70,7 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
             trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
         }
 
-        if (trainers.length == 0) return Result.fail(new Error('No hay entrenadores'));
+        if (trainers.length == 0) return Result.fail(new TrainerNotFoundException('No hay entrenadores'));
 
         const trainersDomain: Trainer[] = [];
 
@@ -77,8 +82,13 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
     }
 
     async countFollows(userId: UserId): Promise<Result<number>> {
-        let user = await this.userModel.findOne({id: userId.Id});
-        return Result.success<number>(user.trainers.length);
+        let trainers = await this.trainerModel.find({'followers.id': userId.Id});
+        return Result.success<number>(trainers.length);
+    }
+
+    async saveTrainer(trainer: Trainer): Promise<void> {
+        const trainerPers = await this.odmTrainerMapper.toPersistence(trainer);
+        await this.trainerModel.create(trainerPers);
     }
 
 }

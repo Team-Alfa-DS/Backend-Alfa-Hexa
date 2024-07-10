@@ -16,12 +16,14 @@ import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-ent
 import { Model } from "mongoose";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { CourseDate } from "src/course/domain/value-objects/course-date";
+import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
 
 export class OdmCourseMapper {
-  static toDomain(entity: OdmCourseEntity): Course {
+  static async toDomain(entity: OdmCourseEntity, commentModel: Model<OdmLessonCommentEntity>): Promise<Course> {
     const domainLessons: Lesson[] = [];
     for( let lesson of entity.lessons ) {
-      domainLessons.push(OdmLessonMapper.toDomain(lesson));
+      domainLessons.push(await OdmLessonMapper.toDomain(lesson, commentModel));
     }
     const domainTags: CourseTag[] = [];
     for (let tag of entity.tags) {
@@ -32,7 +34,7 @@ export class OdmCourseMapper {
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
       new CourseImage(entity.image),
-      entity.publication_date,
+      new CourseDate(entity.publication_date),
       new CourseDurationMinutes(entity.minutes),
       new CourseDurationWeeks(entity.weeks),
       new CourseLevel(entity.level),
@@ -43,10 +45,10 @@ export class OdmCourseMapper {
     );
   }
 
-  static arrayToDomain(entities: OdmCourseEntity[]): Course[] {
+  static async arrayToDomain(entities: OdmCourseEntity[], commentModel: Model<OdmLessonCommentEntity>): Promise<Course[]> {
     const courses: Course[] = [];
       for (let entity of entities) {
-        courses.push(OdmCourseMapper.toDomain(entity));
+        courses.push(await OdmCourseMapper.toDomain(entity, commentModel));
       }
     return courses;
   }
@@ -63,15 +65,15 @@ export class OdmCourseMapper {
       domainCourse.Id.Value,
       domainCourse.Title.value,
       domainCourse.Description.value,
-      domainCourse.Date,
+      domainCourse.Date.value,
       domainCourse.DurationMinutes.value,
       domainCourse.DurationWeeks.value,
       domainCourse.Level.value,
       domainCourse.Image.Value,
       tags,
       category,
-      trainer
+      trainer,
+      domainCourse.Lessons.map(lesson => OdmLessonMapper.toPersistence(lesson))
     );
-    // return odmCourse; //FIXME: No está implementado
   }
 }

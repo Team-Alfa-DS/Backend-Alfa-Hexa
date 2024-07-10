@@ -49,7 +49,7 @@ export class OrmLessonEntity {
     ormLesson.seconds = seconds;
     ormLesson.video = video;
     ormLesson.course_id = course_id;
-
+    ormLesson.comments = []
     return ormLesson;
   }
 }

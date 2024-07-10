@@ -15,7 +15,6 @@ import { SearchResponseDto } from 'src/search/application/dtos/response/search-r
 import { SearchService } from 'src/search/application/services/search.service';
 import { SearchTagService } from '../../application/services/search-tag.service';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { OrmTagRepository } from 'src/tag/infraestructure/repositories/orm-tag-repository';
 import { SearchTagResponseDto } from 'src/search/application/dtos/response/search-tag-response.dto';
 import { ITagRepository } from 'src/tag/application/ITagRepository';
@@ -26,6 +25,17 @@ import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
+import { OdmCourseRepository } from 'src/course/infraestructure/repositories/OdmCourse.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { OdmCourseEntity } from 'src/course/infraestructure/entities/odm-entities/odm-course.entity';
+import { Model } from 'mongoose';
+import { OdmCategoryEntity } from 'src/category/infraestructure/entities/odm-entities/odm-category.entity';
+import { OdmTrainerEntity } from 'src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity';
+import { OdmTagEntity } from 'src/tag/infraestructure/entities/odm-entities/odm-tag.entity';
+import { OdmLessonEntity } from 'src/course/infraestructure/entities/odm-entities/odm-lesson.entity';
+import { OdmLessonCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
 
 
 @ApiTags('Search')
@@ -39,8 +49,17 @@ export class SearchController {
     private transacctionHandler: ITransactionHandler;
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
-    constructor() {
-        const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+    constructor(
+        @InjectModel('course') courseModel: Model<OdmCourseEntity>,
+        @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+        @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+        @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+        @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
+        @InjectModel('lesson_comment') commentModel: Model<OdmLessonCommentEntity>,
+        @InjectModel('user') userModel: Model<OdmUserEntity>
+    ) {
+        // const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+        const courseRepo = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel) 
         const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
@@ -99,6 +118,12 @@ export class SearchController {
         const result = await this.searchTagService.execute(request);
 
         return result.Value;
+        if (result.isSuccess) {
+            return result.Value.tagNames;
+        } else {
+            // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
+        }
     }
 
 }

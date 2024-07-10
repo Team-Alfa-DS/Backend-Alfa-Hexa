@@ -11,6 +11,14 @@ import { BlogCreated } from './events/blogCreated.event';
 import { InvalidBlogException } from "./exceptions/invalidBlogException";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { CommentBlogBody } from "src/comment/domain/valueObjects/blog/comment-blog-body";
+import { CommentBlogPublicationDate } from "src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
+import { CommentBlogUserDisliked } from "src/comment/domain/valueObjects/blog/comment-blog-userDisliked";
+import { CommentBlogUserLiked } from "src/comment/domain/valueObjects/blog/comment-blog-userLiked";
+import { CommentBlogPosted } from "./events/comment-blog-posted.event";
+import { CommentBlog } from "src/comment/domain/comment-blog";
 
 
 
@@ -27,6 +35,9 @@ export class Blog extends AggregateRoot<BlogId>{
             this.images = event.images;
         }
 
+        if (event instanceof CommentBlogPosted){
+            this.comments.push(event.id);
+        }
     }
     protected validateState(): void {
         if(!this.title || !this.content || !this.publication_date || !this.comments || !this.category || !this.trainer || !this.tags || !this.images){ 
@@ -43,6 +54,7 @@ export class Blog extends AggregateRoot<BlogId>{
     private trainer: TrainerId
     private tags: BlogTag[]
     private images: BlogImage[]
+
 constructor(
      id: BlogId,
      title: BlogTitle,
@@ -64,7 +76,53 @@ constructor(
         this.tags = tags
         this.images =images
     }
-    
+
+    createComment(
+        id: BlogCommentId,
+        publicationDate: CommentBlogPublicationDate,
+        body: CommentBlogBody,
+        userId: CommentBlogUserId,
+        BlogId: BlogCommentBlogId,
+        userLiked: CommentBlogUserLiked,
+        userDisliked: CommentBlogUserDisliked
+    ){
+        
+        const comment: CommentBlog = CommentBlog.create(
+            id,
+            publicationDate,
+            body,
+            userId,
+            BlogId,
+            userLiked,
+            userDisliked)
+            
+        return comment;
+    }
+
+    PostComment(
+        id: BlogCommentId,
+        publicationDate: CommentBlogPublicationDate,
+        body: CommentBlogBody,
+        userId: CommentBlogUserId,
+        BlogId: BlogCommentBlogId,
+        //userLiked: CommentBlogUserLiked,
+        //userDisliked: CommentBlogUserDisliked
+    ){
+        this.apply(new CommentBlogPosted(
+            id, 
+            publicationDate, 
+            body, 
+            userId, 
+            BlogId, 
+            //userLiked, 
+            //userDisliked
+        ));
+    }
+
+    getComments():BlogCommentId[]{
+        return this.comments;
+    }
+
     get Title(): BlogTitle{
         return this.title;
     }

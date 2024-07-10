@@ -6,10 +6,7 @@ import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } fro
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
-import { ServiceLoggerDecorator } from "src/common/application/aspects/serviceLoggerDecorator";
-import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLogger";
 import { IService } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
 import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
@@ -33,7 +30,6 @@ import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-ent
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { SaveCourseEvent } from "../events/synchronize/save-course.event";
@@ -41,7 +37,14 @@ import { PostLesonBodyDto } from "../dtos/postLessonBody.dto";
 import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
 import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
+import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { OdmTrainerRepository } from "src/trainer/infraestructure/repositories/odm-trainer.repository";
+import { OdmTrainerMapper } from "src/trainer/infraestructure/mapper/odm-trainer.mapper";
+import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
+import { OdmCategoryRepository } from "src/category/infraestructure/repositories/odm-category.repository";
+import { OdmCategoryMapper } from "src/category/infraestructure/mapper/odm-mapperCategory";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -60,12 +63,17 @@ export class CourseController {
               @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
               @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
               @InjectModel('tag') tagModel: Model<OdmTagEntity>,
-              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>
+              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
+              @InjectModel('lesson_comment') commentModel: Model<OdmLessonCommentEntity>,
+              @InjectModel('user') userModel: Model<OdmUserEntity>,
+              @InjectModel('blog') blogModel: Model<OdmBlogEntity>
   ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel);
-    const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() , PgDatabaseSingleton.getInstance());
-    const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel);
+    // const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
+    // const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
+    const trainerRepositoryInstance = new OdmTrainerRepository(trainerModel, new OdmTrainerMapper(courseModel, blogModel, userModel));
+    const categoryRepositoryInstance = new OdmCategoryRepository(categoryModel, new OdmCategoryMapper());
     const logger = new NestLogger();
     
     this.eventPublisher.subscribe('CourseRegistered', [new SaveCourseEvent(OdmCourseRepositoryInstance)]);
@@ -109,6 +117,7 @@ export class CourseController {
         new ServiceDBLoggerDecorator(
           new PostLessonService(
             OrmCourseRepositoryInstance,
+            OdmCourseRepositoryInstance,
             new UuidGen(),
             EventManagerSingleton.getInstance()
           ),

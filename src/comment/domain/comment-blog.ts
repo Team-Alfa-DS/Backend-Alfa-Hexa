@@ -1,8 +1,6 @@
 import { Entity } from "src/common/domain/entity";
 import { BlogCommentBlogId } from "./valueObjects/blog/comment-blog-blogId";
 import { CommentBlogBody } from "./valueObjects/blog/comment-blog-body";
-import { CommentBlogCountDislike } from "./valueObjects/blog/comment-blog-countDislikes";
-import { CommentBlogCountLike } from "./valueObjects/blog/comment-blog-countLikes";
 import { BlogCommentId } from "./valueObjects/blog/comment-blog-id";
 import { CommentBlogPublicationDate } from "./valueObjects/blog/comment-blog-publicationDate";
 import { CommentBlogUserDisliked } from "./valueObjects/blog/comment-blog-userDisliked";
@@ -15,8 +13,6 @@ export class CommentBlog extends Entity<BlogCommentId> {
     private body: CommentBlogBody;
     private userId: CommentBlogUserId;
     private blogId: BlogCommentBlogId;
-    private countLikes?: CommentBlogCountLike;
-    private countDislikes?: CommentBlogCountDislike;
     private userLiked?: CommentBlogUserLiked;
     private userDisliked?: CommentBlogUserDisliked;
     
@@ -26,8 +22,6 @@ export class CommentBlog extends Entity<BlogCommentId> {
         body: CommentBlogBody,
         userId: CommentBlogUserId,
         blogId: BlogCommentBlogId,
-        countLikes?: CommentBlogCountLike,
-        countDislikes?: CommentBlogCountDislike,
         userLiked?: CommentBlogUserLiked,
         userDisliked?: CommentBlogUserDisliked,
     ){
@@ -37,22 +31,12 @@ export class CommentBlog extends Entity<BlogCommentId> {
         this.body = body
         this.userId = userId;
         this.blogId = blogId;
-        this.countLikes = countLikes,
-        this.countDislikes = countDislikes,
         this.userDisliked = userDisliked;
         this.userLiked = userLiked;
     }
 
     get PublicationDate(): CommentBlogPublicationDate {
         return this.publicationDate;
-    }
-    
-    get CountLikes(): CommentBlogCountLike | undefined {
-        return this.countLikes;
-    }
-    
-    get CountDislikes(): CommentBlogCountDislike | undefined {
-        return this.countDislikes;
     }
     
     get UserLiked(): CommentBlogUserLiked | undefined {
@@ -81,8 +65,6 @@ export class CommentBlog extends Entity<BlogCommentId> {
         body: CommentBlogBody,
         userId: CommentBlogUserId,
         blogId: BlogCommentBlogId,
-        countLikes?: CommentBlogCountLike,
-        countDislikes?: CommentBlogCountDislike,
         userLiked?: CommentBlogUserLiked,
         userDisliked?: CommentBlogUserDisliked,
     ){
@@ -92,8 +74,6 @@ export class CommentBlog extends Entity<BlogCommentId> {
             body,
             userId,
             blogId,
-            countLikes,
-            countDislikes,
             userLiked,
             userDisliked
         );        

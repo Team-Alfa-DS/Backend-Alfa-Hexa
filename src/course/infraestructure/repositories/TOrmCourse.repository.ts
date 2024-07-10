@@ -1,4 +1,3 @@
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { Course } from "src/course/domain/Course";
 import { DataSource, Repository } from "typeorm";
 import { OrmCourseEntity } from "../entities/orm-entities/orm-course.entity";
@@ -16,11 +15,39 @@ import { TransactionHandler } from "src/common/infraestructure/database/transact
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { OrmLessonMapper } from "../mappers/orm-mappers/orm-lesson.mapper";
 import { Lesson } from "src/course/domain/entities/Lesson";
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
+import { OrmLessonCommentEntity } from "src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity";
+import { OrmLessonCommentMapper } from "src/course/infraestructure/mappers/orm-mappers/orm-comment-lesson.mapper";
+import { CommentLesson } from "src/course/domain/entities/comment-lesson";
+import { ICourseCommandRepository } from "src/course/domain/repositories/ICourseCommand.repository";
 
-export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseRepository {
+export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements ICourseCommandRepository {
+  // private readonly ormCommentMapper: OrmLessonCommentMapper;
+  
   constructor(database: DataSource){
     super(OrmCourseEntity, database.manager)
   }
+
+  async saveCourse(course: Course): Promise<Course> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+    const ormCourseEntity = OrmCourseMapper.toPersistence(course);
+    await runnerTransaction.manager.save(ormCourseEntity);
+    return course;
+  }
+
+  async saveLesson(lesson: Lesson, course: Course): Promise<Lesson> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+    const ormLessonEntity = OrmLessonMapper.toPersistence(lesson, course);
+    await runnerTransaction.manager.save(ormLessonEntity);
+    return lesson;
+  }
+
+  async saveComment(comment: CommentLesson): Promise<CommentLesson> {
+    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
+    const ormLessonComment = OrmLessonCommentMapper.toPersistence(comment);
+    await runnerTransaction.manager.save(ormLessonComment);
+    return comment;
+  };
 
   async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
     let result = await this.find({
@@ -42,22 +69,14 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
           courses = courses.filter((course) => course.containsTag(tag)); //Tags.includes(new CourseTag(tag))
         } 
       }
-      // courses = courses.filter((course) => course.tags.includes(filter))
     }
     if (category) {courses = courses.filter((course) => course.Category.equals(category))} //Aplicar los filtros que correspondan
     if (trainer) {courses = courses.filter((course) => course.Trainer.equals(trainer))}
-
-    // if (perpage) { 
-    //   if (!page) {page = 0};
-
-    //   courses = courses.slice((page*perpage), ((perpage) + page*perpage));
-    // }
 
     if (courses.length > 0) {
       return courses;
     } else {
       throw new CourseNotFoundException(`No se encontraron cursos con la búsqueda: ${filter} | ${category} | ${trainer}`);
-      // return Result.fail(new Error(`No se encontraron Cursos con la búsqueda: ${filter} | ${category} | ${trainer} | page: ${page} | perpage: ${perpage}`))
     }
   }
 
@@ -77,13 +96,6 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     if (!result) {throw new CourseNotFoundException(`No se encontró un curso con el id: ${courseId}`)}
 
     return OrmCourseMapper.toDomain(result);
-
-    // if (result) {
-    //   const course = CourseMapper.toDomain(result);
-    //   return Result.success(course);
-    // } else {
-    //   return Result.fail(new Error(`No se encontró el Curso con el id: ${courseId}`));
-    // }
   }
 
 
@@ -121,8 +133,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
-
+    
     for (let course of result) {
+      
       for (let lesson of course.lessons) {
         if (lessonId.equals(new LessonId(lesson.id))) {
           return OrmCourseMapper.toDomain(course);
@@ -142,23 +155,9 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
       }
     });
 
-    // if (result.length <= 0) {
-    //   // throw new CourseNotFoundException(`No hay cursos guardados`);
-    // }
-
-    // if (perpage) { 
-    //   if (!page) {page = 0};
-
-    //   result = result.slice((page*perpage), ((perpage) + page*perpage));
-    // }
-
     if (result.length <= 0) {
-      // return Result.fail(new Error(`No se encontraron cursos`));
       throw new CourseNotFoundException(`No hay cursos guardados`);
-      // throw new CourseNotFoundException("No se encontraron cursos para la página");
     } else {
-      // const courses = CourseMapper.arrayToDomain(result);
-      // return courses;
       return OrmCourseMapper.arrayToDomain(result);
     }
   }
@@ -179,17 +178,27 @@ export class TOrmCourseRepository extends Repository<OrmCourseEntity> implements
     return courses.length;
   }
 
-  async saveCourse(course: Course): Promise<Course> {
-    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
-    const ormCourseEntity = OrmCourseMapper.toPersistence(course);
-    await runnerTransaction.manager.save(ormCourseEntity);
-    return course;
-  }
+  async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]> {
+    const result = await this.find({
+      relations: {
+        lessons: {
+          comments: true
+        }
+      }
+    });
 
-  async saveLesson(lesson: Lesson, course: Course): Promise<Lesson> {
-    const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
-    const ormLessonEntity = OrmLessonMapper.toPersistence(lesson, course);
-    await runnerTransaction.manager.save(ormLessonEntity);
-    return lesson;
-  }
+    if (result.length == 0) {throw new CourseNotFoundException(`No hay cursos guardados`);}
+
+    for (let course of result) {
+      for (let lesson of course.lessons) {
+        if (id.equals(LessonCommentLessonId.create(new LessonId(lesson.id)))) {
+          return OrmLessonCommentMapper.arrayToDomain(lesson.comments);
+        }
+      }
+    }
+
+    return [];
+  } 
+
+  
 }

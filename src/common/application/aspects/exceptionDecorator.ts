@@ -11,6 +11,7 @@ export class ExceptionDecorator<I extends ServiceRequestDto, O extends ServiceRe
             if (!res.isSuccess) throw ExceptionMapper.toHttp(res.Error);
             return res;
         } catch (err) {
+            console.log(err);
             throw ExceptionMapper.toHttp(err);
         }
     }

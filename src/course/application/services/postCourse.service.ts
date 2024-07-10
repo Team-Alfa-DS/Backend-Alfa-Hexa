@@ -5,8 +5,9 @@ import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/appl
 import { Result } from "src/common/domain/result-handler/result";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
+import { ICourseCommandRepository } from "src/course/domain/repositories/ICourseCommand.repository";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseDate } from "src/course/domain/value-objects/course-date";
 import { CourseDescription } from "src/course/domain/value-objects/course-description";
 import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
@@ -20,7 +21,7 @@ import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repo
 
 export class PostCourseService implements IService<PostCourseRequestDto, PostCourseResponseDto> {
   constructor(
-    private courseRepository: ICourseRepository,
+    private courseRepository: ICourseCommandRepository,
     private idGen: IIdGen,
     // private transactionHandler: ITransactionHandler,
     private eventPublisher: IEventPublisher
@@ -39,7 +40,7 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
         new CourseTitle(request.title),
         new CourseDescription(request.description),
         new CourseImage(request.imageUrl),
-        new Date(),
+        new CourseDate(new Date()),
         new CourseDurationMinutes(0),
         new CourseDurationWeeks(request.durationWeeks),
         new CourseLevel(request.level),

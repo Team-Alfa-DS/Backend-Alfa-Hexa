@@ -7,6 +7,8 @@ import { TrainerFollowerUserId } from '../valueObjects/trainer-userid';
 export interface ITrainerRepository {
   findTrainerById(id: TrainerId): Promise<Result<Trainer>>;
   followTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void>;
+  unFollowTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void>;
   findAllTrainers(userfollow?: boolean ,user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>>;
   countnotreaded(): Promise<Result<number>>;
+  saveTrainer(trainer: Trainer): Promise<void>;
 }

@@ -3,7 +3,6 @@ import { TrainerFollower } from './valueObjects/trainer-followers';
 import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
-import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 import { DomainEvent } from 'src/common/domain/domain-event';
 import { TrainerCreated } from './events/trainer-created.events';
 import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';
@@ -11,6 +10,7 @@ import { TrainerFollowerUserId } from './valueObjects/trainer-userid';
 import { TrainerBlogId } from './valueObjects/trainer-blogid';
 import { TrainerCourseId } from './valueObjects/trainer-courseid';
 import { TrainerUsersUpdated } from './events/trainer-users-updated.event';
+import { TrainerRegister } from './events/trainer-Register.event';
 
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
@@ -31,7 +31,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   ) {
     const Trainercreated = TrainerCreated.create(id, name, followers, location, courses, blogs, users);
     super(id, Trainercreated)
-   
+  
   }
 
   protected when(event: DomainEvent): void {
@@ -45,7 +45,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
     }
 
     if (event instanceof TrainerUsersUpdated) {
-      this.users.push(event.user);
+      this.users = event.users
     }
   }
 
@@ -88,6 +88,17 @@ export class Trainer extends AggregateRoot<TrainerId> {
   }
 
   AddUserFollow (user: TrainerFollowerUserId) {
-    this.apply(TrainerUsersUpdated.create(this.Id, user));
+    const users = this.users;
+    users.push(user)
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
+  }
+
+  DelUserFollow (user: TrainerFollowerUserId) {
+    const users = this.users.filter(u => u.trainerFollowerUserId.Id !== user.trainerFollowerUserId.Id);
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
+  }
+
+  Register() {
+    this.apply(TrainerRegister.create(this.Id, this.name, this.followers, this.location, this.courses, this.blogs, this.users));
   }
 }

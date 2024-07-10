@@ -12,6 +12,7 @@ import { CourseCategory } from "src/course/domain/value-objects/course-category"
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { CourseImage } from "src/course/domain/value-objects/course-image";
+import { CourseDate } from "src/course/domain/value-objects/course-date";
 
 export class OrmCourseMapper {
   static toDomain(entity: OrmCourseEntity): Course {
@@ -29,7 +30,7 @@ export class OrmCourseMapper {
       new CourseTitle(entity.name),
       new CourseDescription(entity.description),
       new CourseImage(entity.image),
-      entity.publication_date,
+      new CourseDate(entity.publication_date),
       new CourseDurationMinutes(entity.minutes),
       new CourseDurationWeeks(entity.weeks),
       new CourseLevel(entity.level),
@@ -55,7 +56,7 @@ export class OrmCourseMapper {
       domainCourse.Id.Value,
       domainCourse.Title.value,
       domainCourse.Description.value,
-      domainCourse.Date,
+      domainCourse.Date.value,
       domainCourse.DurationMinutes.value,
       domainCourse.DurationWeeks.value,
       domainCourse.Level.value,
