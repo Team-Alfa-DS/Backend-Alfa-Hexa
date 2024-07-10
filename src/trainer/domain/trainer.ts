@@ -44,7 +44,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
     }
 
     if (event instanceof TrainerUsersUpdated) {
-      this.users.push(event.user);
+      this.users = event.users
     }
   }
 
@@ -87,6 +87,13 @@ export class Trainer extends AggregateRoot<TrainerId> {
   }
 
   AddUserFollow (user: TrainerFollowerUserId) {
-    this.apply(TrainerUsersUpdated.create(this.Id, user));
+    const users = this.users;
+    users.push(user)
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
+  }
+
+  DelUserFollow (user: TrainerFollowerUserId) {
+    const users = this.users.filter(u => u.trainerFollowerUserId.Id !== user.trainerFollowerUserId.Id);
+    this.apply(TrainerUsersUpdated.create(this.Id, users));
   }
 }
