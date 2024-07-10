@@ -94,7 +94,7 @@ export class TrainerController {
   constructor(@InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('blog') blogModel: Model<OdmBlogEntity>, @InjectModel('user') userModel: Model<OdmUserEntity>) {
 
     this.odmTrainerMapper = new OdmTrainerMapper(courseModel, blogModel, userModel);
-    this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper, userModel);
+    this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
     this.findOneTrainerService = new ExceptionDecorator(

@@ -69,6 +69,15 @@ export class OrmTrainerRepository
     await this.save(OrmTrainerEntity);
   }
 
+  async unFollowTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void> {
+    const OrmTrainerEntity = await this.ormTrainerMapper.toPersistence(trainer);
+    let followers = (await this.findOne({relations: {users: true}, where: {id: OrmTrainerEntity.id}})).users;
+    const userOrm = await this.userRepository.findOneBy({id: user.trainerFollowerUserId.Id})
+    followers = followers.filter(u => u.id !== user.trainerFollowerUserId.Id);
+    OrmTrainerEntity.users = followers;
+    await this.save(OrmTrainerEntity);
+  }
+
   async findAllTrainers(userFollow?: boolean, user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>> {
     let queryBuilder = this.createQueryBuilder("trainer")
       //.leftJoinAndSelect("trainer.courses", "courses")

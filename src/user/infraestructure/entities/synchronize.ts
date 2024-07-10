@@ -118,15 +118,6 @@ export class Synchronize {
         }
         console.log('trainers terminados');
 
-        const follows = await this.userRepository.find({relations: {trainers: true}});
-        for (const user of follows) {
-            let odmTrainers: OdmTrainerEntity[] = []
-            for (const trainer of user.trainers) {
-                odmTrainers.push(await this.trainerModel.findOne({id: trainer.id}))
-            }
-            await this.userModel.updateOne({id: user.id}, {trainers: odmTrainers});
-        }
-
         const tags = await this.tagRepository.find();
         for (const tag of tags) {
             const {id, name} = tag;
