@@ -339,7 +339,11 @@ export class OdmCourseRepository implements ICourseRepository {
     const OdmLesson = await OdmLessonMapper.toPersistence(lesson);
     const OdmCourse = await OdmCourseMapper.toPersistence(course, this.categoryModel, this.trainerModel, this.tagModel)
     await this.lessonModel.create(OdmLesson);
+    // console.log(OdmCourse);
+
     OdmCourse.lessons.push(OdmLesson);
+    // console.log(OdmCourse);
+    
     await this.courseModel.findOneAndUpdate({id: OdmCourse.id}, OdmCourse);
     return lesson;
   }

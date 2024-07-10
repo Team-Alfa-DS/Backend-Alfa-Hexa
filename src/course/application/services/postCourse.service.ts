@@ -7,6 +7,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { Course } from "src/course/domain/Course";
 import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseDate } from "src/course/domain/value-objects/course-date";
 import { CourseDescription } from "src/course/domain/value-objects/course-description";
 import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
@@ -40,7 +41,7 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
         new CourseTitle(request.title),
         new CourseDescription(request.description),
         new CourseImage(request.imageUrl),
-        new Date(),
+        new CourseDate(new Date()),
         new CourseDurationMinutes(0),
         new CourseDurationWeeks(request.durationWeeks),
         new CourseLevel(request.level),

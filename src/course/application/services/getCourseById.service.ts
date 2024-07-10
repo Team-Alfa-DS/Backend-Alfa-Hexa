@@ -50,7 +50,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
         r.DurationWeeks.value,
         r.DurationMinutes.value,
         r.Tags.map(tag => tag.name),
-        r.Date,
+        r.Date.value,
         lessons
       ));
     } catch (error) {
