@@ -1,4 +1,6 @@
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { TypeFile } from "src/common/application/file-uploader/enums/type-file.enum";
+import { IFileUploader } from "src/common/application/file-uploader/file-uploader.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
@@ -18,20 +20,22 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
     private courseQueryRepository: ICourseQueryRepository,
     private idGen: IIdGen,
     // private transactionHandler: ITransactionHandler,
-    private eventPublisher: IEventPublisher
+    private eventPublisher: IEventPublisher,
+    private fileUploader: IFileUploader,
   ) {}
 
   async execute(request: PostLessonRequestDto): Promise<Result<PostLessonResponseDto>> {
       const generatedId = await this.idGen.genId();
       
       const courseToPostIn = await this.courseQueryRepository.getCourseById(new CourseId(request.courseId));
-
+      const video = await this.fileUploader.uploadFile(request.video, TypeFile.video);
+      if (!video.isSuccess) return Result.fail(video.Error)
       courseToPostIn.postLesson(
         new LessonId(generatedId),
         new LessonTitle(request.title),
         new LessonContent(request.content),
         new LessonDuration(request.seconds),
-        new LessonVideo(request.videoUrl)
+        new LessonVideo(video.Value)
       );
 
       const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
@@ -54,7 +58,7 @@ export class PostLessonRequestDto implements ServiceRequestDto {
     readonly title: string,
     readonly content: string,
     readonly seconds: number,
-    readonly videoUrl: string
+    readonly video: Express.Multer.File
   ) {}
   
   dataToString(): string {

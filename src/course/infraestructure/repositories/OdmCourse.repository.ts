@@ -22,6 +22,7 @@ import { OdmLessonCommentMapper } from "../mappers/odm-mappers/odm-comment-lesso
 import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
+import { CourseTitle } from "src/course/domain/value-objects/course-title";
 
 export class OdmCourseRepository implements ICourseQueryRepository {
   private odmCommentMapper: OdmLessonCommentMapper;
@@ -121,6 +122,12 @@ export class OdmCourseRepository implements ICourseQueryRepository {
     if (trainerId) {courses = courses.filter((course) => course.Trainer.equals(trainerId))}
     
     return courses.length;
+  }
+
+  async getCourseByTitle(title: CourseTitle): Promise<boolean> {
+    const course = this.courseModel.findOne({name: title.value})
+    if (course) return true;
+    return false;
   }
 
   async saveCourse(course: Course): Promise<Course> {
