@@ -10,4 +10,5 @@ export interface ITrainerRepository {
   unFollowTrainer(trainer: Trainer, user: TrainerFollowerUserId): Promise<void>;
   findAllTrainers(userfollow?: boolean ,user?: string, page?: number, perpage?: number, ): Promise<Result<Trainer[]>>;
   countnotreaded(): Promise<Result<number>>;
+  saveTrainer(trainer: Trainer): Promise<void>;
 }

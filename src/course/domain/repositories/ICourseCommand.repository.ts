@@ -12,21 +12,15 @@ import { CommentBlog } from "src/comment/domain/comment-blog";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { CommentLesson } from "../entities/comment-lesson";
 
-export interface ICourseRepository {
-  // getManyCourses(filter?: string[], category?: string, trainer?: string, page?: number, perpage?: number): Promise<Result<Course[]>>;
-  // getCourseById(courseId: string): Promise<Result<Course>>;
-  // getCoursesByTag(tag: string): Promise<Result<Course[]>>;
-  // getCourseByLessonId(lessonId: string): Promise<Result<Course>>;
-  // getAllCourses(page?: number, perpage?: number): Promise<Result<Course[]>>;
-  // getCourseCount(category: string, trainerId: string): Promise<Result<number>>;
+export interface ICourseCommandRepository {
+  saveCourse(course: Course): Promise<Course>;
+  saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
+  saveComment(comment: CommentLesson): Promise<CommentLesson>;
   getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]>;
   getCourseById(courseId: CourseId): Promise<Course>;
   getCoursesByTag(tag: CourseTag): Promise<Course[]>;
   getCourseByLessonId(lessonId: LessonId): Promise<Course>;
   getAllCourses(): Promise<Course[]>;
   getCourseCount(category: CourseCategory, trainerId: CourseTrainer): Promise<number>;
-  saveCourse(course: Course): Promise<Course>;
-  saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
   findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]>;
-  saveComment(comment: CommentLesson): Promise<CommentLesson>;
 }
