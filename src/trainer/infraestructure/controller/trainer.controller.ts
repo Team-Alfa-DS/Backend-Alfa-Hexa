@@ -36,7 +36,7 @@ import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
 import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { OrmTrainerEntity } from '../entities/orm-entities/orm-trainer.entity';
-import { GetManyTrainerQueryDto } from '../Dto/GetTrainerQuerydto';
+import { GetManyTrainerQueryDto } from '../dto/GetTrainerQuerydto';
 import { FindAllTrainersService, GetAllTrainersRequest, GetAllTrainersResponse} from 'src/trainer/application/service/findAllTrainer.service';
 import { GetUser } from '../decorador/decoradorGetUser';
 import { User } from 'src/user/domain/user';
