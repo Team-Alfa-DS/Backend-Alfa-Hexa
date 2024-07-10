@@ -21,7 +21,6 @@ export class OdmUserRepositoryMock implements IOdmUserRepository {
             name: 'Daniel Bortot',
             password: '12345',
             phone: '12345678910',
-            trainers: [],
             type: UserRole.CLIENT,
             image: null
         }

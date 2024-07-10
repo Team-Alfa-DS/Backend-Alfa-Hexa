@@ -27,8 +27,7 @@ export class OdmProgressRepositoryMock implements IOdmProgressRepository {
                 password: '12345',
                 phone: '12345678910',
                 type: UserRole.CLIENT,
-                image: null,
-                trainers: []
+                image: null
             },
             lesson: {
                 id: '62d3f486-3563-4525-acc4-4c0b22998c65',

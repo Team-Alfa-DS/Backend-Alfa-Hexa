@@ -1,7 +1,10 @@
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { Course } from "src/course/domain/Course";
+import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
+import { CourseDate } from "src/course/domain/value-objects/course-date";
 import { CourseDescription } from "src/course/domain/value-objects/course-description";
 import { CourseDurationMinutes } from "src/course/domain/value-objects/course-durationMinutes";
 import { CourseDurationWeeks } from "src/course/domain/value-objects/course-durationWeeks";
@@ -19,6 +22,7 @@ import { LessonVideo } from "src/course/domain/value-objects/lesson-video";
 import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
 
 export class OdmCourseRepositoryMock implements ICourseRepository {
+    
 
     private readonly coursesOdm: OdmCourseEntity[] = [
         {
@@ -52,6 +56,13 @@ export class OdmCourseRepositoryMock implements ICourseRepository {
         }
     ]
 
+    findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]> {
+        throw new Error("Method not implemented.");
+    }
+    saveComment(comment: CommentLesson): Promise<CommentLesson> {
+        throw new Error("Method not implemented.");
+    }
+    
     getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
         throw new Error("Method not implemented.");
     }
@@ -76,6 +87,7 @@ export class OdmCourseRepositoryMock implements ICourseRepository {
                     seconds: new LessonDuration(lesson.seconds),
                     title: new LessonTitle(lesson.title),
                     video: new LessonVideo(lesson.video),
+                    comments: []
                 }
             )
         }
@@ -85,7 +97,7 @@ export class OdmCourseRepositoryMock implements ICourseRepository {
             new CourseTitle(course.name),
             new CourseDescription(course.description),
             new CourseImage(course.image),
-            course.publication_date,
+            new CourseDate(course.publication_date), // Pass a CourseDate object instead of a Date object
             new CourseDurationMinutes(course.minutes),
             new CourseDurationWeeks(course.weeks),
             new CourseLevel(course.level),
