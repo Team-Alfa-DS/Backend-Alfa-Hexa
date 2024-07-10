@@ -1,4 +1,4 @@
-import { Result } from "src/common/domain/result-handler/result";
+/*import { Result } from "src/common/domain/result-handler/result";
 import { Notify } from "../notify";
 
 export interface INotifyRepository {
@@ -6,5 +6,5 @@ export interface INotifyRepository {
     findNotifyById(id: string): Promise<Result<Notify>>;
     saveNotify(notify: Notify): Promise<Result<Notify>>;
     deleteAllNotify(): Promise<Result<void>>;
-    countnotreaded(): Promise<Result<number>>;
-}
+    countnotreaded(): Promise<Result<number>>;*/
+//}

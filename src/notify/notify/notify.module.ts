@@ -6,11 +6,11 @@ import { getfindNotifyById } from './application/service/getfindNotifyById';
 import { notifycountnotreaded } from './application/service/notify-countnotreaded';
 import { GetAllNotify } from './application/service/GetAllnotify';
 import { NotifierServiceSend } from './application/service/sendNotification';
-import { CreateNotify } from './application/service/createNotify';
+import { NotifierServiceSave } from './application/service/savetoken';
 
 @Module({
     imports: [TypeOrmModule.forFeature([NotifyEntity])],
     controllers: [notifycontroller],
-    providers: [getfindNotifyById, notifycountnotreaded, GetAllNotify,NotifierServiceSend, CreateNotify]
+    providers: [getfindNotifyById, notifycountnotreaded, GetAllNotify,NotifierServiceSend,NotifierServiceSave]
 })
 export class NotifyModule {}

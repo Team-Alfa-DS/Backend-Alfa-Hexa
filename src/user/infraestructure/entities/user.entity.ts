@@ -10,6 +10,7 @@ import { UserRole } from 'src/user/domain/enums/role-user.type';
 import { ProgressEntity } from 'src/progress/infraestructure/entities/progress.entity';
 import { OrmTrainer } from 'src/trainer/infraestructure/entities/trainer.entity';
 import { NotifyEntity } from 'src/notify/notify/Infraestructure/entities/notify.entity';
+import {  TokenEntity } from 'src/notify/notify/Infraestructure/entities/token.entity';
 
 @Entity('user')
 export class UserEntity {
@@ -45,6 +46,9 @@ export class UserEntity {
 
   @OneToMany(() => NotifyEntity, notify => notify.user)
   notify: NotifyEntity[];
+
+  @OneToMany(() => TokenEntity, token => token.user)
+  token: TokenEntity[];
 
   static create(
     id: string,

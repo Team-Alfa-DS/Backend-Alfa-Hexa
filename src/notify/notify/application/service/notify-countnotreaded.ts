@@ -1,7 +1,7 @@
-import { Notify } from "src/notify/notify/domain/notify";
+
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
+import { INotifyRepository } from "../repository/INotifyrepository";
 
 export class notifycountnotreaded implements IApplicationService<void, number>{
     private readonly repository: INotifyRepository;

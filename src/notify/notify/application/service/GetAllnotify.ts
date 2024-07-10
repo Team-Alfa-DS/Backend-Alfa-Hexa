@@ -1,9 +1,9 @@
-import { Notify } from "src/notify/notify/domain/notify";
-import { IApplicationService } from "../application-service/application-service.interface";
+import { IService, ServiceRequestDto, ServiceResponseDto} from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
-import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
+import { INotifyRepository } from "../repository/INotifyrepository";
+import { NotifyEntity } from "../../Infraestructure/entities/notify.entity";
 
-export class GetAllNotify implements IApplicationService<void, Notify[]> {
+export class GetAllNotify implements IService<getAllNotifyRequest, getAllNotifyResponse> {
     private readonly repository: INotifyRepository;
 
     constructor(repository: INotifyRepository) {
@@ -14,17 +14,67 @@ export class GetAllNotify implements IApplicationService<void, Notify[]> {
         return 'GetAllNotify';
     }
 
-    async execute(): Promise<Result<Notify[]>> {
-        try {
-            const result = await this.repository.getAllNotify();
-            if (result.Error) {
-                return Result.fail<Notify[]>(result.Error, result.StatusCode, result.Message);
+    async execute(request: getAllNotifyRequest): Promise<Result<getAllNotifyResponse>> {
+        let result = await this.repository.getAllNotify();
+        let n = result.Value;
+        let page = 0;
+        if(request.page){
+            if(request.page){
+                page = request.page;
             }
-            return Result.success<Notify[]>(result.Value, result.StatusCode);
-        } catch(err) {
-            return Result.fail<Notify[]>(new Error(err.message), 500, err.message);
+            n = n.slice((page*request.perpage), ((request.perpage) + page*request.perpage));
+    }
+
+    const response = n.map(NotifyEntity => ({
+        id: NotifyEntity.id,
+        title: NotifyEntity.title,
+        description: NotifyEntity.body,
+        date: NotifyEntity.date,
+        readed: NotifyEntity.userReaded
+    }));
+    return Result.success<getAllNotifyResponse>(new getAllNotifyResponse(response), 200);
+    }
+}
+
+export class getAllNotifyRequest implements ServiceRequestDto{
+    readonly page: number;
+    readonly perpage: number;
+
+    constructor(
+        page: number,
+        perpage: number
+    ) {
+        if(page){
+            if(!page){page = 0}
+            this.page = page;
+            this.perpage = perpage;
         }
     }
 
+    dataToString(): string {
+        return `Query: {page: ${this.page} | perpage: ${this.perpage} }`;
+    }
+}
 
+export class getAllNotifyResponse implements ServiceResponseDto {
+    readonly notify:{
+        id: string;
+        title: string;
+        description: string;
+        date: Date;
+        readed: boolean;
+    }[];
+    constructor(notify: {
+        id: string;
+        title: string;
+        description: string;
+        date: Date;
+        readed: boolean;
+    }[]) {
+        this.notify = notify;
+    }
+    
+    dataToString(): string {
+        return `getAllNotifyResponse: ${JSON.stringify(this)}`;
+    }
 }

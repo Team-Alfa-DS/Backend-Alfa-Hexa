@@ -1,35 +1,35 @@
 import { IMapper } from "src/common/application/mappers/mappers.interface";
-import { Notify } from "src/notify/notify/domain/notify";
 import { NotifyEntity } from "../entities/notify.entity";
+import { NotifyDTO } from "../dto/notifydto";
 
 export  class NotifyMapper {
     
-    static toDomain(Entity: NotifyEntity): Notify {
-      const notify = new Notify(
+    static toDomain(Entity: NotifyDTO): NotifyEntity {
+      const dto = NotifyEntity.create(
         Entity.id,
         Entity.title,
         Entity.body,
         Entity.date,
-        Entity.userReaded
+        Entity.userReaded,
       );
-      return notify;
+      return dto;
     }
 
-    static arrayToDomain(Entity: NotifyEntity[]): Notify[] {
-        const notify: Notify[] = [];
+    static arrayToDomain(Entity: NotifyDTO[]): NotifyEntity[] {
+        const notify: NotifyEntity[] = [];
         for (const entity of Entity) {
           notify.push(this.toDomain(entity));
         }
         return notify;
     }
 
-    async toOrm(domainEntity: Notify): Promise<NotifyEntity> {
+    async toOrm(domainEntity: NotifyEntity): Promise<NotifyEntity> {
         const ormUser = NotifyEntity.create(
-            domainEntity.Id,
-            domainEntity.Title,
-            domainEntity.Body,
-            domainEntity.Date,
-            domainEntity.UserReaded,
+            domainEntity.id,
+            domainEntity.title,
+            domainEntity.body,
+            domainEntity.date,
+            domainEntity.userReaded,
         )
         return ormUser;
 }   

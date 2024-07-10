@@ -1,10 +1,8 @@
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
 import { NotifierDto } from "src/common/application/notification-handler/dto/entry/entry";
 import { FirebaseNotifier } from "src/common/infraestructure/Firebase-notification/firebase-notification";
 import { pushNotifydto } from "../../Infraestructure/dto/pushNotify.dto";
-import { Notify } from "../../domain/notify";
 import { NotifierResponse } from "src/common/application/notification-handler/dto/response/response";
 import { Value } from "firebase-admin/lib/remote-config/remote-config-api";
 
