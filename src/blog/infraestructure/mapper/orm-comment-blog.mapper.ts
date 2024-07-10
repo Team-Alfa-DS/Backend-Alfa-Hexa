@@ -14,14 +14,17 @@ import { OrmBlogCommentEntity } from "src/comment/infraestructure/entities/orm-e
 export class OrmBlogCommentMapper implements IMapper<CommentBlog,OrmBlogCommentEntity> {
 
     async toPersistence(DomainEntity: CommentBlog): Promise<OrmBlogCommentEntity> {
+        // console.log('before create Ormblogentity');
+        // console.log(DomainEntity);
+        
         const ormComment = OrmBlogCommentEntity.create(
             DomainEntity.Id.commentId,
             DomainEntity.PublicationDate.PublicationDate,
             DomainEntity.Body.Body,
             DomainEntity.UserId.UserId,
             DomainEntity.BlogId.BlogId.value,
-            DomainEntity.UserLiked.UserLiked,
-            DomainEntity.UserDisliked.UserDisliked
+            // DomainEntity.UserLiked.UserLiked,
+            // DomainEntity.UserDisliked.UserDisliked
         )
         return ormComment;
     }
@@ -33,8 +36,8 @@ export class OrmBlogCommentMapper implements IMapper<CommentBlog,OrmBlogCommentE
             CommentBlogBody.create(OrmEntity.Body),
             CommentBlogUserId.create(OrmEntity.UserId),
             BlogCommentBlogId.create(BlogId.create(OrmEntity.BlogId)),
-            CommentBlogUserLiked.create(OrmEntity.UserLiked),
-            CommentBlogUserDisliked.create(OrmEntity.UserDisliked),
+            // CommentBlogUserLiked.create(OrmEntity.UserLiked),
+            // CommentBlogUserDisliked.create(OrmEntity.UserDisliked),
         )
         return domainComment;
     }

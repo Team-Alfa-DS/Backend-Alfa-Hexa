@@ -70,6 +70,8 @@ export class BlogMapper {
     }
 
     static async toPersistence(blog: Blog): Promise<OrmBlogEntity> {
+        // console.log(blog);
+        
         let ormBlog = OrmBlogEntity.create(
             blog.Id.value,
             blog.Title.value,
@@ -81,6 +83,7 @@ export class BlogMapper {
             blog.Images.map((image) => image.value),
             blog.Comments.map((comment) => comment.commentId)
         );
+
         return ormBlog;
     } 
     

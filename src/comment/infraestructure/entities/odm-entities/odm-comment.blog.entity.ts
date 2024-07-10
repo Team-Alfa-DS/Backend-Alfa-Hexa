@@ -33,8 +33,8 @@ export class OdmBlogCommentEntity {
         body: string, 
         blog: OdmBlogEntity, 
         user: OdmUserEntity,
-        userLiked?: boolean,
-        userDisliked?: boolean
+        // userLiked?: boolean,
+        // userDisliked?: boolean
     ) {
         const odmCommentBlog = new OdmBlogCommentEntity();
         odmCommentBlog.id = id;
@@ -42,8 +42,10 @@ export class OdmBlogCommentEntity {
         odmCommentBlog.body = body;
         odmCommentBlog.blog = blog;
         odmCommentBlog.user = user;
-        odmCommentBlog.userLiked = userLiked;
-        odmCommentBlog.userDisliked = userDisliked;
+        // odmCommentBlog.userLiked = userLiked;
+        // odmCommentBlog.userDisliked = userDisliked;
+        // console.log(odmCommentBlog);
+        
         return odmCommentBlog; 
     }
 }

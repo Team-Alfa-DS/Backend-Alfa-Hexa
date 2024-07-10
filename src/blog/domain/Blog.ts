@@ -86,6 +86,7 @@ constructor(
         userLiked: CommentBlogUserLiked,
         userDisliked: CommentBlogUserDisliked
     ){
+        
         const comment: CommentBlog = CommentBlog.create(
             id,
             publicationDate,
@@ -94,6 +95,7 @@ constructor(
             BlogId,
             userLiked,
             userDisliked)
+            
         return comment;
     }
 

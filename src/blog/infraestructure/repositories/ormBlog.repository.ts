@@ -147,11 +147,13 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     };
 
     async saveComment(comment: CommentBlog): Promise<Result<CommentBlog>> {
-        try{
+        try{            
             const ormCommentMapper = new OrmBlogCommentMapper();
             const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
             const ormComment = await ormCommentMapper.toPersistence(comment);
             await runnerTransaction.manager.save(ormComment);
+            // console.log(ormComment);
+            
             return Result.success<CommentBlog>(comment);                                                    
         }catch(err){
             return Result.fail<CommentBlog>(new Error(err.message));
@@ -162,6 +164,8 @@ export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlo
     async saveBlog(blog: Blog): Promise<Result<Blog>>{
         const runnerTransaction = PgDatabaseSingleton.getInstance().createQueryRunner();
         const ormBlogEntity = await BlogMapper.toPersistence(blog);
+        console.log(ormBlogEntity);
+        
         await runnerTransaction.manager.save(ormBlogEntity);
         return Result.success<Blog>(blog);
     }

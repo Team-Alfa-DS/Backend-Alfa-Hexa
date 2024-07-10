@@ -122,7 +122,7 @@ export class CommentController{
         const odmBlogRepositoryInstance = new OdmBlogRepository(
             new OdmBlogMapper(userModel,blogModel,commentBlogModel,trainerModel), 
             blogModel, 
-            commentBlogModel);
+            commentBlogModel, userModel, trainerModel);
 
 
                     

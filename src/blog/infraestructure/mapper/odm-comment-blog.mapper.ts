@@ -58,29 +58,38 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
         let odmBlogMapper = new OdmBlogMapper(this.userModel,this.blogModel,this.commentModel, this.trainerModel);
 
         let userRepo: OdmUserRespository = new OdmUserRespository(odmUserMapper, this.userModel);
-        let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel);
+        let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel, this.userModel, this.trainerModel);
         
         let user = await userRepo.findUserById(UserId.create(Domain.UserId.UserId));
 
         let userPersistence = await odmUserMapper.toPersistence(user.Value);
 
-        const blog = await this.blogModel.aggregate<OdmBlogEntity>([
-            {
-                $match: {
-                    'id': Domain.BlogId.BlogId
-                }
-            }
-        ]);
+        // const blog = await this.blogModel.aggregate<OdmBlogEntity>([
+        //     {
+        //         $match: {
+        //             'id': Domain.BlogId.BlogId
+        //         }
+        //     }
+        // ]);
+        const blog = await this.blogModel.findOne<OdmBlogEntity>({id: Domain.BlogId.BlogId.value});
 
         const OrmComment = OdmBlogCommentEntity.create(
             Domain.Id.commentId,
             Domain.PublicationDate.PublicationDate,
             Domain.Body.Body,
-            blog[0],
-            userPersistence,
-            Domain.UserLiked.UserLiked,
-            Domain.UserDisliked.UserDisliked
-        );
+            blog,
+            userPersistence
+        )
+
+        // const OrmComment = OdmBlogCommentEntity.create(
+        //     Domain.Id.commentId,
+        //     Domain.PublicationDate.PublicationDate,
+        //     Domain.Body.Body,
+        //     blog,
+        //     userPersistence,
+        //     // Domain.UserLiked.UserLiked,
+        //     // Domain.UserDisliked.UserDisliked
+        // );
         return Promise.resolve(OrmComment);
     }
 }

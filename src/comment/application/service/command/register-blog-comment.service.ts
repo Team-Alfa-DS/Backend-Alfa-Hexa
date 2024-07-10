@@ -63,13 +63,15 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
             null,
             null,
         );
-
+        // console.log(comment);
+        
         let comments = blog.Value.getComments();
 
         comments.push(commentID);
 
         await this.blogRepository.saveComment( comment );
-        await this.blogRepository.saveBlog( blog.Value );
+
+        // await this.blogRepository.saveBlog( blog.Value );
 
         blog.Value.PostComment(
             commentID,
@@ -80,7 +82,7 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
         );
         
         this.eventPublisher.publish(blog.Value.pullDomainEvents());
-
+        
         const response = new AddCommentToServiceResponseDto(commentID.commentId);
 
         return Result.success<AddCommentToServiceResponseDto>( response );

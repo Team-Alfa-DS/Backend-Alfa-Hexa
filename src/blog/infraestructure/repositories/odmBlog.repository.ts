@@ -13,6 +13,8 @@ import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-e
 import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
 import { OdmBlogCommentMapper } from "../mapper/odm-comment-blog.mapper";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 
 
 export class OdmBlogRepository implements IBlogRepository{
@@ -22,9 +24,10 @@ export class OdmBlogRepository implements IBlogRepository{
     constructor(
         private odmBlogMapper: OdmBlogMapper, 
         private blogModel: Model<OdmBlogEntity >,
-        private commentModel: Model<OdmBlogCommentEntity>) {
-        
-    }
+        private commentModel: Model<OdmBlogCommentEntity>,
+        private userModel: Model<OdmUserEntity>,
+        private trainerModel: Model<OdmTrainerEntity>
+    ) {}
    async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
        try {
         const blogs = await this.blogModel.find();
@@ -127,8 +130,12 @@ export class OdmBlogRepository implements IBlogRepository{
     }
 
     async saveComment (comment: CommentBlog): Promise<Result<CommentBlog>>{ 
+        this.odmCommentMapper = new OdmBlogCommentMapper(this.userModel, this.blogModel, this.commentModel, this.trainerModel)
         const odmComment = await this.odmCommentMapper.toPersistence(comment);
+        // console.log(odmComment); //Debug
+        
         await this.commentModel.create(odmComment);
+        
         return Result.success<CommentBlog>(comment);
     }
 

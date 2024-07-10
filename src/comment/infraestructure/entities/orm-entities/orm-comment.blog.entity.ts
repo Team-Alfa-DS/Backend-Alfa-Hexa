@@ -41,17 +41,20 @@ export class OrmBlogCommentEntity {
         body: string,
         userId: string,
         blogId: string,
-        userLiked?: boolean,
-        userDisliked?: boolean,
+        // userLiked?: boolean,
+        // userDisliked?: boolean,
     ){
+        // console.log('just before new ormBlog');
+        
         const comment = new OrmBlogCommentEntity()
+        // console.log('just after new ormBlog');
         comment.id = id;
         comment.publication_date = publication_date;
         comment.body = body;
         comment.user_id = userId;
         comment.blog_id = blogId;
-        comment.userLiked = userLiked;
-        comment.userDisliked = userDisliked;
+        // comment.userLiked = userLiked;
+        // comment.userDisliked = userDisliked;
         return comment
     }
 
@@ -75,12 +78,12 @@ export class OrmBlogCommentEntity {
         return this.blog_id;
     }
 
-    get UserLiked(): boolean | undefined {
-        return this.userLiked;
-    }
+    // get UserLiked(): boolean | undefined {
+    //     return this.userLiked;
+    // }
 
-    get UserDisliked(): boolean | undefined {
-        return this.userDisliked;
-    }
+    // get UserDisliked(): boolean | undefined {
+    //     return this.userDisliked;
+    // }
 
 }

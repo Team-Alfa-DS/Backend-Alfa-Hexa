@@ -25,9 +25,15 @@ export class OrmBlogEntity {
     @OneToMany(() => OrmImageEntity, image => image.blog)
     images: OrmImageEntity[];
 
+    @Column({ type: 'uuid'})
+    category_id: string;
+
     @ManyToOne(() => OrmCategoryEntity, category => category.blogs)
     @JoinColumn({name: 'category_id'})
     category: OrmCategoryEntity;
+
+    @Column({ type: "uuid"})
+    trainer_id: string;
 
   @ManyToOne(() => OrmTrainerEntity, (trainer) => trainer.blogs)
   @JoinColumn({ name: 'trainer_id' })
@@ -48,13 +54,13 @@ static create(
   images: string[], 
   comments: string[]
 ) {
-    const blog = new OrmBlogEntity();
+    const blog = new OrmBlogEntity();    
     blog.id = id;
     blog.title = title;
     blog.description = description;
     blog.publication_date = publication_date;
-    blog.category.id = category;
-    blog.trainer.id = trainer;
+    blog.category_id = category;
+    blog.trainer_id = trainer;
     blog.tags = tags.map(tagId => {
       const tag = new OrmTagEntity();
       tag.id = tagId;
@@ -72,6 +78,7 @@ static create(
       comment.id = commentId;
       return comment;
     });
+    
     return blog;
   }
 

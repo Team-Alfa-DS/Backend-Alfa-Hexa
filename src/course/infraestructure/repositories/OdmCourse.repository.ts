@@ -355,7 +355,7 @@ export class OdmCourseRepository implements ICourseRepository {
   }
 
   async saveComment (comment: CommentLesson): Promise<CommentLesson>{ 
-    console.log(comment); //Debug
+    // console.log(comment); //Debug
     
       const odmComment = await OdmLessonCommentMapper.toPersistence(comment, this.userModel, this.lessonModel);
       console.log(odmComment);
