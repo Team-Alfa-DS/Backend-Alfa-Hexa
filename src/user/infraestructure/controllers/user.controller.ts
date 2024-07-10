@@ -125,8 +125,8 @@ export class UserController {
         return result.Value;
     }
 
-    // @Get('synchronize')
-    // sync() {
-    //     this.syncro.execute()
-    // }
+    @Get('synchronize')
+    sync() {
+        this.syncro.execute()
+    }
 }

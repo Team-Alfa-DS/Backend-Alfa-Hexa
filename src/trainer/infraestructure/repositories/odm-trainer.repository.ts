@@ -13,13 +13,11 @@ import { TrainerFollowerUserId } from "src/trainer/domain/valueObjects/trainer-u
 export class OdmTrainerRepository implements IOdmTrainerRepository{
 
     private readonly trainerModel: Model<OdmTrainerEntity>;
-    private readonly userModel: Model<OdmUserEntity>;
     private readonly odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>;
 
-    constructor(trainerModel: Model<OdmTrainerEntity>, odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>, userModel: Model<OdmUserEntity>) {
+    constructor(trainerModel: Model<OdmTrainerEntity>, odmTrainerMapper: IMapper<Trainer, OdmTrainerEntity>) {
         this.trainerModel = trainerModel;
         this.odmTrainerMapper = odmTrainerMapper;
-        this.userModel = userModel;
     }
 
     async findTrainerById(id: TrainerId): Promise<Result<Trainer>> {
@@ -43,11 +41,6 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
 
     async followTrainer(trainer: Trainer): Promise<void> {
         const trainerOdm = await this.odmTrainerMapper.toPersistence(trainer);
-        for (const user of trainer.User) {
-            const userFound = await this.userModel.findOne({id: user.trainerFollowerUserId.Id})
-            await this.userModel.updateOne({id: user.trainerFollowerUserId.Id}, {trainers: [...userFound.trainers, trainerOdm]})
-        }
-
         await this.trainerModel.updateOne({id: trainer.Id.trainerId}, {followers: trainerOdm.followers});
     }
 
@@ -55,7 +48,7 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
         let trainers = []
 
         if (userfollow) {
-            trainers = (await this.userModel.findOne({id: userId})).trainers;
+            trainers = await this.trainerModel.find({'followers.id': userId})
         } else {
             const trainerList = await this.trainerModel.find();
             for (const trainer of trainerList) {
@@ -82,8 +75,8 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
     }
 
     async countFollows(userId: UserId): Promise<Result<number>> {
-        let user = await this.userModel.findOne({id: userId.Id});
-        return Result.success<number>(user.trainers.length);
+        let trainers = await this.trainerModel.find({'followers.id': userId.Id});
+        return Result.success<number>(trainers.length);
     }
 
 }
