@@ -16,12 +16,6 @@ export class OrmLessonCommentEntity {
 
     @Column()
     publication_date: Date;
-
-    @Column({nullable: true})
-    count_likes?: number;
-
-    @Column({nullable: true})
-    count_dislikes?: number;
     
     @Column({nullable: true})
     userLiked?: boolean;
@@ -46,8 +40,6 @@ export class OrmLessonCommentEntity {
         body: string,
         userId: string,
         lessonId: string,
-        count_likes?: number,
-        count_dislikes?: number,
         userLiked?: boolean,
         userDisliked?: boolean,
     ){
@@ -57,8 +49,6 @@ export class OrmLessonCommentEntity {
         comment.body = body;
         comment.user_id = userId;
         comment.lesson_id = lessonId;
-        comment.count_likes = count_likes;
-        comment.count_dislikes = count_dislikes;
         comment.userLiked = userLiked;
         comment.userDisliked = userDisliked;
         return comment
@@ -82,14 +72,6 @@ export class OrmLessonCommentEntity {
 
     get LessonId(): string {
         return this.lesson_id;
-    }
-
-    get CountLikes(): number | undefined {
-        return this.count_likes;
-    }
-
-    get CountDislikes(): number | undefined {
-        return this.count_dislikes;
     }
 
     get UserLiked(): boolean | undefined {

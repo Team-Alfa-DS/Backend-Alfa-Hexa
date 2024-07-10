@@ -1,8 +1,8 @@
 import { ITagRepository } from "../../application/ITagRepository";
 import { Result } from "src/common/domain/result-handler/result";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { OrmTagEntity } from "../entities/orm-entities/orm-tag.entity";
 import { DataSource, Repository } from "typeorm";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
 export class OrmTagRepository extends Repository<OrmTagEntity> implements ITagRepository {
     

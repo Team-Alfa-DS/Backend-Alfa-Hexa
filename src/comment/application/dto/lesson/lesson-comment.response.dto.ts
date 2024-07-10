@@ -21,8 +21,6 @@ export type LessonComment = {
     id: string,
     user: string,
     body: string,
-    countLikes: number,
-    countDislikes: number,
     userLiked: boolean,
     userDisliked: boolean,
     date: Date

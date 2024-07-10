@@ -6,12 +6,28 @@ import { Model } from "mongoose";
 import { OdmBlogMapper } from "../mapper/odmBlog.mapper";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { find } from "rxjs";
+import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { CommentBlog } from "src/comment/domain/comment-blog";
+import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
+import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
+import { OdmBlogCommentMapper } from "../mapper/odm-comment-blog.mapper";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 
 
 export class OdmBlogRepository implements IBlogRepository{
-    constructor(private odmBlogMapper: OdmBlogMapper, private blogModel: Model<OdmBlogEntity >) {
-        
-    }
+    
+    private odmCommentMapper: OdmBlogCommentMapper;
+    
+    constructor(
+        private odmBlogMapper: OdmBlogMapper, 
+        private blogModel: Model<OdmBlogEntity >,
+        private commentModel: Model<OdmBlogCommentEntity>,
+        private userModel: Model<OdmUserEntity>,
+        private trainerModel: Model<OdmTrainerEntity>
+    ) {}
    async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
        try {
         const blogs = await this.blogModel.find();
@@ -65,8 +81,7 @@ export class OdmBlogRepository implements IBlogRepository{
 
        } catch (error) {
             return Result.fail(error); 
-       }
-        
+        }
     }
    async getBlogById(id: string): Promise<Result<Blog>> {
        try {
@@ -76,8 +91,9 @@ export class OdmBlogRepository implements IBlogRepository{
         return Result.success(domainBlog);
        } catch (error) {
             return Result.fail(error); 
-       }
     }
+    }
+
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try{
             const resp = await this.blogModel.find({tag_id: {$in: tagsName}});
@@ -89,5 +105,44 @@ export class OdmBlogRepository implements IBlogRepository{
             
         }
     
+    }
+
+    async findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
+        try{
+            const r = await this.commentModel.find<OdmBlogCommentEntity>();
+            
+            if (!r) return Result.fail<CommentBlog[]>(new CommentsBlogNotFoundException( 
+                `Ha ocurrido un error al encontrar los comentarios` ));
+            
+            const comment = r.filter(e => e.blog.id === id.BlogId.value);
+
+            const ListMapper = []
+            comment.forEach(async e => {
+                ListMapper.push( 
+                    await this.odmCommentMapper.toDomain(e ))
+            });
+        
+            
+            return Result.success<CommentBlog[]>(ListMapper);
+        }catch(err){
+            return Result.fail(new Error(err.message));
+        }
+    }
+
+    async saveComment (comment: CommentBlog): Promise<Result<CommentBlog>>{ 
+        this.odmCommentMapper = new OdmBlogCommentMapper(this.userModel, this.blogModel, this.commentModel, this.trainerModel)
+        const odmComment = await this.odmCommentMapper.toPersistence(comment);
+        // console.log(odmComment); //Debug
+        
+        await this.commentModel.create(odmComment);
+        
+        return Result.success<CommentBlog>(comment);
+    }
+
+    async saveBlog(blog: Blog): Promise<Result<Blog>>{ 
+        //const odmBlog = await this.odmBlogMapper.toPersistence(blog);
+        //let comment = comments.map(e => e.commentId);
+        //await this.commentModel.create(odmBlog);
+        return Result.success<Blog>(blog);
     }
 }

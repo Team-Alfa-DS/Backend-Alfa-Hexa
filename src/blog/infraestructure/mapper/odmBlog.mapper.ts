@@ -12,6 +12,11 @@ import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
+import { Model } from "mongoose";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { OdmBlogRepository } from "../repositories/odmBlog.repository";
 
 interface BlogFromODM {
     id: string;
@@ -24,10 +29,28 @@ interface BlogFromODM {
     images: string[],
     comments: string[]
 
-    
 }
 
 export class OdmBlogMapper {
+
+    private readonly userModel: Model<OdmUserEntity>;
+    private readonly blogModel: Model<OdmBlogEntity>;
+    private readonly commentModel: Model<OdmBlogCommentEntity>;
+    private readonly trainerModel: Model<OdmTrainerEntity>;
+
+    constructor(
+        userModel: Model<OdmUserEntity>,
+        blogModel: Model<OdmBlogEntity>,
+        commentModel: Model<OdmBlogCommentEntity>,
+        trainerModel: Model<OdmTrainerEntity>
+    ){
+        this.userModel = userModel;
+        this.blogModel = blogModel;
+        this.commentModel = commentModel;
+        this.trainerModel = trainerModel;
+    }
+
+
     static toDomain(blog: OdmBlogEntity): Blog {
         return new Blog(
             BlogId.create(blog.id),
@@ -38,9 +61,10 @@ export class OdmBlogMapper {
             CategoryId.create(blog.category.id),
             TrainerId.create(blog.trainer.id),
             blog.tags.map((tag) => BlogTag.create(tag.name)),
-            blog.images.map((image) => BlogImage.create(image.url))
+            blog.images.map((image) => BlogImage.create(image.id))
 
         );
     }
+
     
 }

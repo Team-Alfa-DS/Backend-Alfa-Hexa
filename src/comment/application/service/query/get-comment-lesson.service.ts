@@ -1,59 +1,57 @@
 import { GetLessonCommentServiceResponseDto, GetLessonCommentsServiceRequestDto, LessonComment } from "../../dto/lesson/lesson-comment.response.dto";
 import { Result } from "src/common/domain/result-handler/result";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
-import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 
 export class GetCommentLessonService extends IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>{
     
-    private readonly commentLessonRepository: ILessonCommentRepository;
-    private readonly transactionHandler: ITransactionHandler;
+    private readonly courseRepository: ICourseRepository
 
     constructor(
-        commentLessonRepository: ILessonCommentRepository,
-        transactionHandler: ITransactionHandler,
+        courseRepository: ICourseRepository,
     ){
         super();
-        this.commentLessonRepository = commentLessonRepository;
-        this.transactionHandler = transactionHandler;
+        this.courseRepository = courseRepository;
     }
     
     async execute(data: GetLessonCommentsServiceRequestDto): Promise<Result<GetLessonCommentServiceResponseDto>> {
 
-        if (!data.pagination.page) data.pagination.page = 0;
+        try {
+            if (!data.pagination.page) data.pagination.page = 0;
         
-        let lessonId = LessonCommentLessonId.create( data.lessonId );
+            let lessonId = LessonCommentLessonId.create(LessonId.create(data.lessonId));
 
-        const comments = await this.commentLessonRepository.findAllCommentsByLessonId(
-            lessonId,
-            this.transactionHandler
-        );
-        
-        if (!comments.isSuccess)  return Result.fail(comments.Error);
+            const comments = await this.courseRepository.findAllCommentsByLessonId(
+                lessonId
+            );
+            
+            // if (!comments.isSuccess)  return Result.fail(comments.Error);
 
-        let commentsRes: LessonComment[] = [];
-        for (const comment of comments.Value) {
-            commentsRes.push({
-                id: comment.Id.commentId, 
-                user: comment.UserId.UserId, 
-                body: comment.Body.Body, 
-                countLikes: comment.CountLikes.CountLike, 
-                countDislikes: comment.CountDislikes.CountDislike, 
-                userLiked: comment.UserLiked.UserLiked, 
-                userDisliked: comment.UserDisliked.UserDisliked, 
-                date: comment.PublicationDate.PublicationDate})
-        };
+            let commentsRes: LessonComment[] = [];
+            for (const comment of comments) {
+                commentsRes.push({
+                    id: comment.Id.commentId, 
+                    user: comment.UserId.UserId, 
+                    body: comment.Body.Body, 
+                    userLiked: false, //TODO: Por ahora se manda falso, armar calculo de si le dió like o no //comment.UserLiked.UserLiked,
+                    userDisliked: false,  //comment.UserDisliked.UserDisliked,
+                    date: comment.PublicationDate.PublicationDate})
+            };
 
-        if (data.pagination.perPage) {
-            let page = data.pagination.page;
-            if (!page) {page = 0}
+            if (data.pagination.perPage) {
+                let page = data.pagination.page;
+                if (!page) {page = 0}
 
-            commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+                commentsRes = commentsRes.slice((page*data.pagination.perPage), (data.pagination.perPage) + (page*data.pagination.perPage));
+            }
+
+            const response = new GetLessonCommentServiceResponseDto(commentsRes)
+            return Result.success<GetLessonCommentServiceResponseDto>(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        const response = new GetLessonCommentServiceResponseDto(commentsRes)
-        return Result.success<GetLessonCommentServiceResponseDto>(response);
     }
 
 }

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Body, Controller, FileTypeValidator, Get, HttpException, Inject, ParseFilePipe, Put, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { OrmUserRepository } from "../repositories/orm-user.repository";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { OrmUserMapper } from "../mappers/orm-mappers/orm-user.mapper";
 import { UpdateUserService } from "src/user/application/services/update-user.application.service";
@@ -41,6 +40,7 @@ import { UpdateUserImageEvent } from "../events/synchronize/update-user-image.ev
 import { UpdateUserNameEvent } from "../events/synchronize/update-user-name.event";
 import { UpdateUserPhoneEvent } from "../events/synchronize/update-user-phone.event";
 import { Synchronize } from "../entities/synchronize";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiTags('User')

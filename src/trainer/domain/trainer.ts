@@ -31,7 +31,7 @@ export class Trainer extends AggregateRoot<TrainerId> {
   ) {
     const Trainercreated = TrainerCreated.create(id, name, followers, location, courses, blogs, users);
     super(id, Trainercreated)
-   
+  
   }
 
   protected when(event: DomainEvent): void {

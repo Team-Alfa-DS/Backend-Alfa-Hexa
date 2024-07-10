@@ -15,7 +15,6 @@ import { SearchResponseDto } from 'src/search/application/dtos/response/search-r
 import { SearchService } from 'src/search/application/services/search.service';
 import { SearchTagService } from '../../application/services/search-tag.service';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { OrmTagRepository } from 'src/tag/infraestructure/repositories/orm-tag-repository';
 import { SearchTagResponseDto } from 'src/search/application/dtos/response/search-tag-response.dto';
 import { ITagRepository } from 'src/tag/application/ITagRepository';
@@ -26,6 +25,7 @@ import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
 import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
+import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 
 
 @ApiTags('Search')
@@ -99,6 +99,12 @@ export class SearchController {
         const result = await this.searchTagService.execute(request);
 
         return result.Value;
+        if (result.isSuccess) {
+            return result.Value.tagNames;
+        } else {
+            // throw new HttpException(result.Error, result.StatusCode);
+            throw ExceptionMapper.toHttp(result.Error);
+        }
     }
 
 }
