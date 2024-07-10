@@ -68,7 +68,7 @@ export class CoursesProgressService extends IService<CoursesProgressRequest, Cou
                 id: courses[i].Id.Value,
                 title: courses[i].Title.value,
                 image: courses[i].Image.Value,
-                date: courses[i].Date,
+                date: courses[i].Date.value,
                 category: courses[i].Category.value.value,
                 trainer: courses[i].Trainer.value.trainerId, //FIXME: !Trainer en curso es un Id de trainer
                 percent: calc.percent

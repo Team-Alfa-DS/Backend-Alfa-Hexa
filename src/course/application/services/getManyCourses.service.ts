@@ -59,7 +59,7 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
           id: course.Id.Value,
           title: course.Title.value,
           image: course.Image.Value,
-          date: course.Date,
+          date: course.Date.value,
           category: category.Value.Name.value,
           trainer: trainer.Value.Name.trainerName
         })
