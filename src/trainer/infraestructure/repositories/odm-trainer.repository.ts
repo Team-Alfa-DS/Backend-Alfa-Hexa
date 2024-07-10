@@ -8,6 +8,7 @@ import { OdmTrainerEntity } from "../entities/odm-entities/odm-trainer.entity";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { TrainerNotFoundException } from "src/trainer/domain/exceptions/trainer-not-found-exception";
+import { TrainerFollowerUserId } from "src/trainer/domain/valueObjects/trainer-userid";
 
 export class OdmTrainerRepository implements IOdmTrainerRepository{
 
@@ -34,17 +35,20 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
         return oneTrainer;
     }
 
+    async findFollowByUserId(trainerId: TrainerId, userId: TrainerFollowerUserId): Promise<boolean> {
+        const trainer = await this.trainerModel.findOne({id: trainerId.trainerId, 'followers.id': userId.trainerFollowerUserId.Id});
+        if (trainer) return true;
+        return false;
+    }
+
     async followTrainer(trainer: Trainer): Promise<void> {
         const trainerOdm = await this.odmTrainerMapper.toPersistence(trainer);
-
-        const users: OdmUserEntity[] = [];
         for (const user of trainer.User) {
             const userFound = await this.userModel.findOne({id: user.trainerFollowerUserId.Id})
-            users.push(userFound);
             await this.userModel.updateOne({id: user.trainerFollowerUserId.Id}, {trainers: [...userFound.trainers, trainerOdm]})
         }
 
-        await this.trainerModel.updateOne({id: trainer.Id.trainerId}, {followers: users});
+        await this.trainerModel.updateOne({id: trainer.Id.trainerId}, {followers: trainerOdm.followers});
     }
 
     async findAllTrainers(userfollow?: boolean, userId?: string, page?: number, perpage?: number): Promise<Result<Trainer[]>> {

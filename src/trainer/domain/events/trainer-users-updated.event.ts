@@ -6,12 +6,12 @@ export class TrainerUsersUpdated extends DomainEvent {
 
     private constructor(
         public id: TrainerId,
-        public user: TrainerFollowerUserId
+        public users: TrainerFollowerUserId[]
     ) {
         super()
     }
 
-    static create(id: TrainerId, user: TrainerFollowerUserId) {
-        return new TrainerUsersUpdated(id, user);
+    static create(id: TrainerId, users: TrainerFollowerUserId[]) {
+        return new TrainerUsersUpdated(id, users);
     }
 }
