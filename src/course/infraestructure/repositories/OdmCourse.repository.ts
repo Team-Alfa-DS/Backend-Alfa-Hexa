@@ -38,7 +38,6 @@ export class OdmCourseRepository implements ICourseQueryRepository {
 
   async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
     const result = await this.courseModel.find<OdmCourseEntity>();
-    console.log(result);
     if (result.length <= 0) {throw new CourseNotFoundException(`No hay cursos guardados`)}
     
     let courses = await OdmCourseMapper.arrayToDomain(result, this.commentModel);
