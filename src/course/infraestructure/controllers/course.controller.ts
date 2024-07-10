@@ -72,7 +72,7 @@ export class CourseController {
     const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel);
     // const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     // const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
-    const trainerRepositoryInstance = new OdmTrainerRepository(trainerModel, new OdmTrainerMapper(courseModel, blogModel, userModel), userModel);
+    const trainerRepositoryInstance = new OdmTrainerRepository(trainerModel, new OdmTrainerMapper(courseModel, blogModel, userModel));
     const categoryRepositoryInstance = new OdmCategoryRepository(categoryModel, new OdmCategoryMapper());
     const logger = new NestLogger();
     
