@@ -39,7 +39,7 @@ import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
 import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
-import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -72,25 +72,25 @@ export class CourseController {
     this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
-    this.getManyCoursesService = new ExceptionDecorator(
+    this.getManyCoursesService = new ExceptionMapperDecorator(
       new LoggerDecorator( 
         new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
         logger
       )
     );
-    this.getCourseByIdService = new ExceptionDecorator(
+    this.getCourseByIdService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
         logger
       )
     );
-    this.getCourseCountService = new ExceptionDecorator(
+    this.getCourseCountService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new GetCourseCountService(OdmCourseRepositoryInstance),
         logger
       )
     );
-    this.postCourseService = new ExceptionDecorator(
+    this.postCourseService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new ServiceDBLoggerDecorator(
           new PostCourseService(
@@ -104,7 +104,7 @@ export class CourseController {
         logger
       )
     );
-    this.postLessonService = new ExceptionDecorator(
+    this.postLessonService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new ServiceDBLoggerDecorator(
           new PostLessonService(

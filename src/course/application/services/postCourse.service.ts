@@ -28,36 +28,40 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
   ) {}
   
   async execute(request: PostCourseRequestDto): Promise<Result<PostCourseResponseDto>> {
-      const generatedId = await this.idGen.genId();
+      try {
+        const generatedId = await this.idGen.genId();
 
-      const domainTags: CourseTag[] = []
-      for (let tag of request.tags) {
-        domainTags.push(new CourseTag(tag));
+        const domainTags: CourseTag[] = []
+        for (let tag of request.tags) {
+          domainTags.push(new CourseTag(tag));
+        }
+
+        const domainCourse = Course.create(
+          new CourseId(generatedId),
+          new CourseTitle(request.title),
+          new CourseDescription(request.description),
+          new CourseImage(request.imageUrl),
+          new CourseDate(new Date()),
+          new CourseDurationMinutes(0),
+          new CourseDurationWeeks(request.durationWeeks),
+          new CourseLevel(request.level),
+          [],
+          domainTags,
+          new CourseCategory(request.categoryId),
+          new CourseTrainer(request.trainerId)
+        );
+
+        const createdCourse = await this.courseRepository.saveCourse(
+          domainCourse
+        );
+
+        domainCourse.register(domainCourse.Id, domainCourse.Title, domainCourse.Description, domainCourse.Image, domainCourse.Date, domainCourse.DurationMinutes, domainCourse.DurationWeeks, domainCourse.Level, domainCourse.Lessons, domainCourse.Tags, domainCourse.Category, domainCourse.Trainer);
+        this.eventPublisher.publish(domainCourse.pullDomainEvents());
+
+        return Result.success(new PostCourseResponseDto(generatedId));
+      } catch (error) {
+        return Result.fail(error);
       }
-
-      const domainCourse = Course.create(
-        new CourseId(generatedId),
-        new CourseTitle(request.title),
-        new CourseDescription(request.description),
-        new CourseImage(request.imageUrl),
-        new CourseDate(new Date()),
-        new CourseDurationMinutes(0),
-        new CourseDurationWeeks(request.durationWeeks),
-        new CourseLevel(request.level),
-        [],
-        domainTags,
-        new CourseCategory(request.categoryId),
-        new CourseTrainer(request.trainerId)
-      );
-
-      const createdCourse = await this.courseRepository.saveCourse(
-        domainCourse
-      );
-
-      domainCourse.register(domainCourse.Id, domainCourse.Title, domainCourse.Description, domainCourse.Image, domainCourse.Date, domainCourse.DurationMinutes, domainCourse.DurationWeeks, domainCourse.Level, domainCourse.Lessons, domainCourse.Tags, domainCourse.Category, domainCourse.Trainer);
-      this.eventPublisher.publish(domainCourse.pullDomainEvents());
-
-      return Result.success(new PostCourseResponseDto(generatedId));
   }
   
   get name(): string {

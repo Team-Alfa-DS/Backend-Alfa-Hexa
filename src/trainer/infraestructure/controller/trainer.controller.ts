@@ -59,7 +59,7 @@ import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/od
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { UpdateUsersTrainersEvent } from '../events/update-users-trainer.event';
-import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 
 @ApiTags('Trainer')
 @ApiBearerAuth()
@@ -97,7 +97,7 @@ export class TrainerController {
     this.odmTrainerRepository = new OdmTrainerRepository(trainerModel, this.odmTrainerMapper);
     this.eventPublisher.subscribe('TrainerUsersUpdated', [new UpdateUsersTrainersEvent(this.odmTrainerRepository)]);
 
-    this.findOneTrainerService = new ExceptionDecorator(
+    this.findOneTrainerService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new FindOneTrainerService(
           this.odmTrainerRepository,
@@ -106,7 +106,7 @@ export class TrainerController {
         this.logger
       )
     );
-    this.followTrainerService = new ExceptionDecorator(
+    this.followTrainerService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new ServiceDBLoggerDecorator(
           new FollowTrainerService(
@@ -120,7 +120,7 @@ export class TrainerController {
         this.logger
       )
     );
-    this.countUserFollowTrainerService = new ExceptionDecorator(
+    this.countUserFollowTrainerService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new CountUserFollowTrainerService(
           this.odmTrainerRepository
@@ -128,7 +128,7 @@ export class TrainerController {
         this.logger
       )
     );
-    this.findAllTrainersService = new ExceptionDecorator(
+    this.findAllTrainersService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new FindAllTrainersService(
           this.odmTrainerRepository

@@ -24,7 +24,7 @@ import { OdmBlogMapper } from "../mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 import { OdmTrainerRepository } from '../../../trainer/infraestructure/repositories/odm-trainer.repository';
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
@@ -68,19 +68,19 @@ export class BlogController {
             new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
             logger
         );
-        this.getAllBlogService = new ExceptionDecorator(
+        this.getAllBlogService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
                 logger
             )
         );
-        this.getBlogByIdService = new ExceptionDecorator(
+        this.getBlogByIdService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
                 logger
             )
         );
-        this.getBlogsCountService = new ExceptionDecorator(
+        this.getBlogsCountService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetBlogsCountService(odmBlogRepositoryInstance),
                 logger

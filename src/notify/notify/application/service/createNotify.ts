@@ -17,10 +17,14 @@ export class CreateNotify implements IApplicationService<Notify, Notify>{
     }
 
     async execute(notify: Notify): Promise<Result<Notify>> {
-        const notifyCreated = await this.repository.saveNotify(notify);
-        if(!notifyCreated.isSuccess) {
-            return Result.fail<Notify>(notifyCreated.Error)
+        try {
+            const notifyCreated = await this.repository.saveNotify(notify);
+            if(!notifyCreated.isSuccess) {
+                return Result.fail<Notify>(notifyCreated.Error)
+            }
+            return Result.success<Notify>(notifyCreated.Value);
+        } catch (error) {
+            return Result.fail(error);
         }
-        return Result.success<Notify>(notifyCreated.Value);
     }
 }

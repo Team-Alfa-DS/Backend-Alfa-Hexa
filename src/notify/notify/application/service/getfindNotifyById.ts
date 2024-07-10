@@ -11,14 +11,18 @@ export class getfindNotifyById implements IApplicationService<string, Notify> {
     }
 
     get name(): string {
-        return 'getfindNotifyById';
+        return this.constructor.name;
     }
 
     async execute(id: string): Promise<Result<Notify>> {
-        const notify = await this.repository.findNotifyById(id);
-        if(!notify) {
-            return Result.fail<Notify>(notify.Error)
+        try {
+            const notify = await this.repository.findNotifyById(id);
+            if(!notify.isSuccess) {
+                return Result.fail<Notify>(notify.Error)
+            }
+            return Result.success<Notify>(notify.Value);
+        } catch (error) {
+            return Result.fail(error);
         }
-        return Result.success<Notify>(notify.Value);
     }
 }

@@ -32,21 +32,25 @@ export class TrendingProgressService extends IService<TrendingProgressRequest, T
     }
 
     async execute(value: TrendingProgressRequest): Promise<Result<TrendingProgressResponse>> {
-        const user = await this.userRepository.findUserById(UserId.create(value.userId));
-        if (!user.isSuccess) return Result.fail(user.Error);
+        try {
+            const user = await this.userRepository.findUserById(UserId.create(value.userId));
+            if (!user.isSuccess) return Result.fail(user.Error);
 
-        const progress = await this.progressRepository.findLastProgressByUser(UserId.create(value.userId));
-        if (!progress.isSuccess) return Result.fail(progress.Error);
-        
-        const course = await this.courseRepository.getCourseByLessonId(new LessonId(progress.Value.Id.LessonId));
-        // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
+            const progress = await this.progressRepository.findLastProgressByUser(UserId.create(value.userId));
+            if (!progress.isSuccess) return Result.fail(progress.Error);
+            
+            const course = await this.courseRepository.getCourseByLessonId(new LessonId(progress.Value.Id.LessonId));
+            // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
 
-        const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
-        if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error);
+            const totalProgress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
+            if (!totalProgress.isSuccess) return Result.fail(totalProgress.Error);
 
-        const result = this.calcPercentService.execute(course.Lessons, totalProgress.Value);
+            const result = this.calcPercentService.execute(course.Lessons, totalProgress.Value);
 
-        const response = new TrendingProgressResponse(result.percent, course.Title.value, course.Id.Value, progress.Value.LastTime?.LastTime);
-        return Result.success(response);
+            const response = new TrendingProgressResponse(result.percent, course.Title.value, course.Id.Value, progress.Value.LastTime?.LastTime);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 }

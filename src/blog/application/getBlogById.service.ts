@@ -19,22 +19,26 @@ export class GetBlogByIdService extends IService<GetBlogByIdRequestDTO,  GetBlog
     }
 
     async execute({id}: GetBlogByIdRequestDTO): Promise<Result<GetBlogByIdResponseDTO>>{
-        const domainBlogResult = await this.blogRepository.getBlogById(id);
-        if (domainBlogResult.Error)
-            return Result.fail(domainBlogResult.Error);
-        const domainBlog = domainBlogResult.Value;
-        const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.Trainer);
-        const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.Category)
-        const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
-            domainBlog.Title.value,
-            domainBlog.Content.value,
-            categoryResult.Value ? categoryResult.Value.Name.value : null,    
-            domainBlog.Images.map(image => image.value),
-            trainerResult.Value ? {id: trainerResult.Value.Id.trainerId, name: trainerResult.Value.Name.trainerName} : {id: null, name: null},
-            domainBlog.Tags.map(tag => tag.value),
-            domainBlog.Publication_date.value
-        )
-        return Result.success(blogResponse);
+        try {
+            const domainBlogResult = await this.blogRepository.getBlogById(id);
+            if (domainBlogResult.Error)
+                return Result.fail(domainBlogResult.Error);
+            const domainBlog = domainBlogResult.Value;
+            const trainerResult = await this.trainerRepository.findTrainerById(domainBlog.Trainer);
+            const categoryResult = await this.categoryRepository.getCategoryById(domainBlog.Category)
+            const blogResponse: GetBlogByIdResponseDTO = new GetBlogByIdResponseDTO(
+                domainBlog.Title.value,
+                domainBlog.Content.value,
+                categoryResult.Value ? categoryResult.Value.Name.value : null,    
+                domainBlog.Images.map(image => image.value),
+                trainerResult.Value ? {id: trainerResult.Value.Id.trainerId, name: trainerResult.Value.Name.trainerName} : {id: null, name: null},
+                domainBlog.Tags.map(tag => tag.value),
+                domainBlog.Publication_date.value
+            )
+            return Result.success(blogResponse);
+        } catch (error) {
+            return Result.fail(error);
+        }
         
 
     }

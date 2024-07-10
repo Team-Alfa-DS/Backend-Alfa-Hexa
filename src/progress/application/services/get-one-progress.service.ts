@@ -33,19 +33,23 @@ export class GetOneProgressService extends IService<GetOneProgressRequest, GetOn
     }
 
     async execute(value: GetOneProgressRequest): Promise<Result<GetOneProgressResponse>> {
-        const user = await this.userRepository.findUserById(UserId.create(value.userId));
-        const course = await this.courseRepository.getCourseById(new CourseId(value.courseId)); //TODO: el retorno deberia de ser un Result
+        try {
+            const user = await this.userRepository.findUserById(UserId.create(value.userId));
+            const course = await this.courseRepository.getCourseById(new CourseId(value.courseId)); //TODO: el retorno deberia de ser un Result
 
-        if (!user.isSuccess) return Result.fail(user.Error);
-        // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
+            if (!user.isSuccess) return Result.fail(user.Error);
+            // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
 
-        const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
-        if (!progress.isSuccess) return Result.fail(progress.Error);
+            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
+            if (!progress.isSuccess) return Result.fail(progress.Error);
 
-        const calc = this.calcPercentService.execute(course.Lessons, progress.Value);
-        const response = new GetOneProgressResponse(calc.percent, calc.lessons);
+            const calc = this.calcPercentService.execute(course.Lessons, progress.Value);
+            const response = new GetOneProgressResponse(calc.percent, calc.lessons);
 
-        return Result.success(response);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 
     // get name(): string {

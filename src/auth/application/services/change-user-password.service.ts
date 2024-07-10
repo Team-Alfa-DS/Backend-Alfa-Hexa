@@ -28,24 +28,29 @@ export class ChangeUserPasswordService extends IService<ChangeUserPasswordReques
     }
 
     async execute(value: ChangeUserPasswordRequest): Promise<Result<ChangeUserPasswordResponse>> {
-        const user = await this.odmUserRepository.findUserByEmail(UserEmail.create(value.email));
+        try {
+            const user = await this.odmUserRepository.findUserByEmail(UserEmail.create(value.email));
 
-        if (!user.isSuccess) {
-            return Result.fail(user.Error);
+            if (!user.isSuccess) {
+                return Result.fail(user.Error);
+            }
+            const userDomain = user.Value;
+            const hashPassword = await this.encryptor.hash(value.password);
+            userDomain.UpdatePassword(UserPassword.create(hashPassword));
+
+            const updatedUser = await this.userRepository.saveUser(user.Value, this.transactionHandler);
+
+            if (!updatedUser.isSuccess) {
+                return Result.fail(user.Error);
+            }
+
+            this.eventPublisher.publish(userDomain.pullDomainEvents());
+
+            const response = new ChangeUserPasswordResponse();
+            return Result.success(response);
+            
+        } catch (error) {
+            return Result.fail(error);
         }
-        const userDomain = user.Value;
-        const hashPassword = await this.encryptor.hash(value.password);
-        userDomain.UpdatePassword(UserPassword.create(hashPassword));
-
-        const updatedUser = await this.userRepository.saveUser(user.Value, this.transactionHandler);
-
-        if (!updatedUser.isSuccess) {
-            return Result.fail(user.Error);
-        }
-
-        this.eventPublisher.publish(userDomain.pullDomainEvents());
-
-        const response = new ChangeUserPasswordResponse();
-        return Result.success(response);
     }
 }

@@ -23,8 +23,12 @@ export class NotifierServiceSend implements IApplicationService<string, Notifier
     }
 
     async execute(token: string): Promise<Result<NotifierDto>>{
-        const response = await this.firebaseNotifier.notify(token);
-        return response;
+        try {
+            const response = await this.firebaseNotifier.notify(token);
+            return response;    
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
     
 }

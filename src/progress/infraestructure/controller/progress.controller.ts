@@ -51,7 +51,7 @@ import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { SaveProgressEvent } from '../events/save-progress.event';
-import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 import { StartCourseProgressRequest } from 'src/progress/application/dtos/request/start-course-progress.request';
 import { StartCourseProgressResponse } from 'src/progress/application/dtos/response/start-course-progress.response';
 import { StartCourseProgressService } from 'src/progress/application/services/start-course-progress.service';
@@ -108,7 +108,7 @@ export class ProgressController {
         this.eventPublisher.subscribe('ProgressRegister', [new SaveProgressEvent(this.odmprogressRepository)]);
         
         
-        this.markEndProgressService = new ExceptionDecorator(
+        this.markEndProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new MarkEndProgressService(
@@ -123,7 +123,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.getOneProgressService = new ExceptionDecorator(
+        this.getOneProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetOneProgressService(
                     this.odmUserRepository,
@@ -134,7 +134,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.trendingProgressService = new ExceptionDecorator(
+        this.trendingProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new TrendingProgressService(
                     this.odmUserRepository,
@@ -144,7 +144,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.coursesProgressService = new ExceptionDecorator(
+        this.coursesProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new CoursesProgressService(
                     this.odmprogressRepository,
@@ -154,7 +154,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.profileProgressService = new ExceptionDecorator(
+        this.profileProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ProfileProgressService(
                     this.odmprogressRepository,
@@ -164,7 +164,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.startCourseProgressService = new ExceptionDecorator(
+        this.startCourseProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new StartCourseProgressService(

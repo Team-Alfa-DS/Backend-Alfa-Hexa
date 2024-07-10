@@ -13,10 +13,14 @@ export class GetCategoryByIdService extends IService<GetCategoryRequest, GetCate
     constructor (private readonly categoryRepository: ICategoryRepository){super()}
     
     async execute(value: GetCategoryRequest): Promise<Result<GetCategoryResponse>>{
-        const result = await this.categoryRepository.getCategoryById(CategoryId.create(value.categoryId));
-        if (!result.isSuccess) return Result.fail(result.Error);
+        try {
+            const result = await this.categoryRepository.getCategoryById(CategoryId.create(value.categoryId));
+            if (!result.isSuccess) return Result.fail(result.Error);
 
-        const response = new GetCategoryResponse(result.Value.Icon.value, result.Value.Id.value, result.Value.Name.value);
-        return Result.success(response);
+            const response = new GetCategoryResponse(result.Value.Icon.value, result.Value.Id.value, result.Value.Name.value);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 }

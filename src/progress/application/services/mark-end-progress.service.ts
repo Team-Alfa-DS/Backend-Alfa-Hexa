@@ -42,30 +42,34 @@ export class MarkEndProgressService extends IService<MarkEndProgressRequest, Mar
     }
 
     async execute(value: MarkEndProgressRequest): Promise<Result<MarkEndProgressResponse>> {
-        const course = await this.courseRepository.getCourseById(new CourseId(value.courseId)); //TODO: el retorno deberia de ser un Result
-        const user = await this.userRepository.findUserById(UserId.create(value.userId));
+        try {
+            const course = await this.courseRepository.getCourseById(new CourseId(value.courseId)); //TODO: el retorno deberia de ser un Result
+            const user = await this.userRepository.findUserById(UserId.create(value.userId));
 
-        // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
-        if (!user.isSuccess) return Result.fail(user.Error);
+            // if (!course.isSuccess) return Result.fail(course.Error); //FIXME: Necesita un try-catch
+            if (!user.isSuccess) return Result.fail(user.Error);
 
-        const lesson = course.Lessons.find(lesson => lesson.id.equals(new LessonId(value.lessonId)) ) 
-        if (!lesson) return Result.fail(new Error('No existe la leccion'));
+            const lesson = course.Lessons.find(lesson => lesson.id.equals(new LessonId(value.lessonId)) ) 
+            if (!lesson) return Result.fail(new Error('No existe la leccion'));
 
-        const progressDomain = Progress.create(
-            ProgressId.create(value.userId, value.lessonId),
-            ProgressMarkAsCompleted.create(value.markAsCompleted),
-            UserId.create(value.userId),
-            new CourseId(value.courseId),
-            value.time > value.totalTime ? ProgressTime.create(value.totalTime) : ProgressTime.create(value.time),
-            ProgressLastTime.create(new Date())
-        );
+            const progressDomain = Progress.create(
+                ProgressId.create(value.userId, value.lessonId),
+                ProgressMarkAsCompleted.create(value.markAsCompleted),
+                UserId.create(value.userId),
+                new CourseId(value.courseId),
+                value.time > value.totalTime ? ProgressTime.create(value.totalTime) : ProgressTime.create(value.time),
+                ProgressLastTime.create(new Date())
+            );
 
-        await this.progressRepository.saveProgress(progressDomain, this.transactionHandler);
-        progressDomain.Register();
-        this.eventPublisher.publish(progressDomain.pullDomainEvents());
+            await this.progressRepository.saveProgress(progressDomain, this.transactionHandler);
+            progressDomain.Register();
+            this.eventPublisher.publish(progressDomain.pullDomainEvents());
 
-        const response = new MarkEndProgressResponse()
+            const response = new MarkEndProgressResponse()
 
-        return Result.success(response);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 }

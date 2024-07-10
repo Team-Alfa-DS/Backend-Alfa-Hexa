@@ -62,7 +62,7 @@ import { Model } from 'mongoose';
 import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
-import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -109,7 +109,7 @@ export class AuthController {
         this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
-        this.registerUserService = new ExceptionDecorator(
+        this.registerUserService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
@@ -118,31 +118,31 @@ export class AuthController {
                 this.logger
             )
         );
-        this.loginUserService = new ExceptionDecorator(
+        this.loginUserService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
                 this.logger
             )
         );
-        this.currentUserService = new ExceptionDecorator(
+        this.currentUserService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new CurrentUserService(this.odmUserRepository),
                 this.logger
             )
         );
-        this.forgetUserPasswordService = new ExceptionDecorator(
+        this.forgetUserPasswordService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
                 this.logger
             )
         );
-        this.validateUserCodeService = new ExceptionDecorator(
+        this.validateUserCodeService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ValidateUserCodeService(this.odmUserRepository),
                 this.logger
             )
         );
-        this.changeUserPasswordService = new ExceptionDecorator(
+        this.changeUserPasswordService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),

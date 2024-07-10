@@ -11,23 +11,27 @@ export class FindAllTrainersService extends  IService<GetAllTrainersRequest, Get
     ){super()}
 
     async execute(request: GetAllTrainersRequest): Promise<Result<GetAllTrainersResponse>> {
-        const trainersResult = await this.trainerRepository.findAllTrainers(
-            request.userFollow, // Pasar el nuevo filtro
-            request.user,
-            request.page,
-            request.perpage,
-        );
-
-        const trainersList: Trainer[] = []
-
-        for (const trainer of trainersResult.Value) {
-            let userFollow = false;
-            if (trainer.User.findIndex(user => user.trainerFollowerUserId.equals(UserId.create(request.user))) != -1) userFollow = true
-            trainersList.push({id: trainer.Id.trainerId, followers: trainer.Followers.trainerFollower, location: trainer.Location.trainerLocation, name: trainer.Name.trainerName, userFollow})
+        try {
+            const trainersResult = await this.trainerRepository.findAllTrainers(
+                request.userFollow, // Pasar el nuevo filtro
+                request.user,
+                request.page,
+                request.perpage,
+            );
+    
+            const trainersList: Trainer[] = []
+    
+            for (const trainer of trainersResult.Value) {
+                let userFollow = false;
+                if (trainer.User.findIndex(user => user.trainerFollowerUserId.equals(UserId.create(request.user))) != -1) userFollow = true
+                trainersList.push({id: trainer.Id.trainerId, followers: trainer.Followers.trainerFollower, location: trainer.Location.trainerLocation, name: trainer.Name.trainerName, userFollow})
+            }
+            
+            const response = new GetAllTrainersResponse(trainersList)
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-        
-        const response = new GetAllTrainersResponse(trainersList)
-        return Result.success(response);
     }
 }
 

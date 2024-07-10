@@ -11,7 +11,11 @@ export class GetBlogsCountService implements IService<GetBlogsCountDTO, GetBlogs
     }
 
     async execute(request: GetBlogsCountDTO): Promise<Result<GetBlogsCountResponseDTO>> {
-        const blogsCount = await this.blogRepository.getBlogsCount(request.category, request.trainer);
-        return Result.success(new GetBlogsCountResponseDTO(blogsCount.Value));
+        try {
+            const blogsCount = await this.blogRepository.getBlogsCount(request.category, request.trainer);
+            return Result.success(new GetBlogsCountResponseDTO(blogsCount.Value));
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 }

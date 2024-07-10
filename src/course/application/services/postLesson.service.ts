@@ -20,25 +20,29 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
   ) {}
 
   async execute(request: PostLessonRequestDto): Promise<Result<PostLessonResponseDto>> {
-      const generatedId = await this.idGen.genId();
+      try {
+        const generatedId = await this.idGen.genId();
       
-      const courseToPostIn = await this.courseRepository.getCourseById(new CourseId(request.courseId));
+        const courseToPostIn = await this.courseRepository.getCourseById(new CourseId(request.courseId));
 
-      courseToPostIn.postLesson(
-        new LessonId(generatedId),
-        new LessonTitle(request.title),
-        new LessonContent(request.content),
-        new LessonDuration(request.seconds),
-        new LessonVideo(request.videoUrl)
-      );
+        courseToPostIn.postLesson(
+          new LessonId(generatedId),
+          new LessonTitle(request.title),
+          new LessonContent(request.content),
+          new LessonDuration(request.seconds),
+          new LessonVideo(request.videoUrl)
+        );
 
-      const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
+        const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
 
-      await this.courseRepository.saveLesson(lesson, courseToPostIn);
+        await this.courseRepository.saveLesson(lesson, courseToPostIn);
 
-      this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
+        this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
 
-      return Result.success(new PostLessonResponseDto(generatedId));
+        return Result.success(new PostLessonResponseDto(generatedId));
+      } catch (error) {
+        return Result.fail(error);
+      }
   }
 
   get name(): string {
