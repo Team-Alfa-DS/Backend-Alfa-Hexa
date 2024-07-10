@@ -61,7 +61,7 @@ export class OdmBlogMapper {
             CategoryId.create(blog.category.id),
             TrainerId.create(blog.trainer.id),
             blog.tags.map((tag) => BlogTag.create(tag.name)),
-            blog.images.map((image) => BlogImage.create(image.id))
+            blog.images.map((image) => BlogImage.create(image.url))
 
         );
     }
