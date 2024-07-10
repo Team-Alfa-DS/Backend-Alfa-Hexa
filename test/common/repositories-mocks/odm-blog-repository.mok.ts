@@ -1,7 +1,11 @@
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 import { Blog } from "src/blog/domain/Blog";
 import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
+import { OdmBlogCommentMapper } from "src/blog/infraestructure/mapper/odm-comment-blog.mapper";
+import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { CommentBlogBody } from "src/comment/domain/valueObjects/blog/comment-blog-body";
@@ -9,12 +13,19 @@ import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog
 import { CommentBlogPublicationDate } from "src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
 import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
 import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
+import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
 import { Result } from "src/common/domain/result-handler/result";
+import { OdmCourseEntity } from "src/course/infraestructure/entities/odm-entities/odm-course.entity";
+import { OdmLessonEntity } from "src/course/infraestructure/entities/odm-entities/odm-lesson.entity";
+import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
+import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { UserRole } from "src/user/domain/enums/role-user.type";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
 export class OdmBlogRepositoryMock implements IBlogRepository{
     
+
     private readonly blogs: OdmBlogEntity[] = [
         {
             id: '17ae64e6-6ac4-4ca9-9272-9726578b83cf',
@@ -239,6 +250,9 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
             image: null
         }
     }]
+
+    private readonly Domaincomments: CommentBlog[] = []
+    private readonly DomainBlogs: Blog[] = []
     
     getAllBLogs(page?: number, perpage?: number, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
         throw new Error("Method not implemented.");
@@ -249,28 +263,32 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
     getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         throw new Error("Method not implemented.");
     }
-    saveBlog(comment: Blog): Promise<Result<Blog>> {
-        throw new Error("Method not implemented.");
+    async saveBlog(blog: Blog): Promise<Result<Blog>> {
+        this.DomainBlogs.push(blog);
+        return Result.success<Blog>(blog);
     }
     
     async findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
         let comment = this.odmComments.filter(comment => comment.blog.id === id.BlogId.value);
 
-        let DomainComment = comment.map(comment => {
-                return CommentBlog.create(
-                BlogCommentId.create(comment.id),
-                CommentBlogPublicationDate.create(comment.publication_date),
-                CommentBlogBody.create(comment.body),
-                CommentBlogUserId.create(comment.user.id),
-                BlogCommentBlogId.create(BlogId.create(comment.blog.id))
-            );
-        });
+        const DomainComment: CommentBlog[] = []
+            comment.forEach(async e => {
+                const commentBlog = CommentBlog.create(
+                    BlogCommentId.create(e.id),
+                    CommentBlogPublicationDate.create(e.publication_date),
+                    CommentBlogBody.create(e.body),
+                    CommentBlogUserId.create(e.user.id),
+                    BlogCommentBlogId.create(BlogId.create(e.blog.id))
+                );
+                return commentBlog;
+            });
 
         return Result.success<CommentBlog[]>(DomainComment);
 
     }
-    saveComment(comment: CommentBlog): Promise<Result<CommentBlog>> {
-        throw new Error("Method not implemented.");
+    async saveComment(comment: CommentBlog): Promise<Result<CommentBlog>> {
+        this.Domaincomments.push(comment);
+        return Result.success<CommentBlog>(comment);
     }
     getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
         throw new Error("Method not implemented.");

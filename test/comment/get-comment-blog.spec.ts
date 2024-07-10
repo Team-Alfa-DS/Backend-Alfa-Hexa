@@ -1,6 +1,6 @@
 import { GetBlogCommentsServiceRequestDto } from "src/comment/application/dto/blog/blog-comment.response.dto";
 import { GetCommentBlogService } from "src/comment/application/service/query/get-comment-blog.service";
-import { EmptyBlogCommentIdException } from "src/comment/domain/exceptions/blog/empty-comment-blog-id-exception";
+import { EmptyBlogCommentBlogIdException } from "src/comment/domain/exceptions/blog/empty-comment-blog-blogid-exception";
 import { EmptyBlogCommentUserIdException } from "src/comment/domain/exceptions/blog/empty-comment-blog-userid-exception";
 import { OdmBlogRepositoryMock } from "test/common/repositories-mocks/odm-blog-repository.mok";
 
@@ -28,7 +28,7 @@ describe('Comment get CommentBlog', async () => {
         try {
             await getCommentBlogService.execute(request);
         } catch (err) {
-            expect(err).toBeInstanceOf(EmptyBlogCommentIdException);
+            expect(err).toBeInstanceOf(EmptyBlogCommentBlogIdException);
         }
         expect.assertions(1)
     })
