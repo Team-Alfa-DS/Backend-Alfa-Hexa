@@ -6,15 +6,14 @@ import { Model } from "mongoose";
 import { OdmBlogMapper } from "../mapper/odmBlog.mapper";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { find } from "rxjs";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { OdmBlogCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity";
 import { CommentsBlogNotFoundException } from "src/comment/domain/exceptions/blog/comments-blog-not-found-exception";
 import { OdmBlogCommentMapper } from "../mapper/odm-comment-blog.mapper";
-import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
+import { BlogNotFoundException } from "src/blog/domain/exceptions/blog-not-found.exception";
 
 
 export class OdmBlogRepository implements IBlogRepository{
@@ -31,7 +30,7 @@ export class OdmBlogRepository implements IBlogRepository{
    async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
        try {
         const blogs = await this.blogModel.find();
-        if(!blogs) return Result.fail(new Error('Blogs not found'));
+        if(!blogs) return Result.fail(new BlogNotFoundException(`No se puede conseguir el conteo de Blogs, ya que no existen blogs`));
         let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
 
     
@@ -54,7 +53,7 @@ export class OdmBlogRepository implements IBlogRepository{
    async  getAllBLogs(page: number=0, perpage: number=5, filter?: string, category?: string, trainer?: string): Promise<Result<Blog[]>> {
         try {
             const blogs = await this.blogModel.find();
-            if(!blogs) return Result.fail(new Error('Blogs not found'));
+            if(!blogs) return Result.fail(new BlogNotFoundException(`No hay existencia de blogs`));
             let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
 
         
@@ -80,7 +79,7 @@ export class OdmBlogRepository implements IBlogRepository{
         return Result.success(blogsResponse);
 
        } catch (error) {
-            return Result.fail(error); 
+            return Result.fail(new BlogNotFoundException(`No hay existencia de blogs`)); 
         }
     }
    async getBlogById(id: string): Promise<Result<Blog>> {
@@ -97,7 +96,7 @@ export class OdmBlogRepository implements IBlogRepository{
     async getBlogsTagsNames(tagsName: string[]): Promise<Result<Blog[]>> {
         try{
             const resp = await this.blogModel.find({tag_id: {$in: tagsName}});
-            if(!resp) return Result.fail(new Error(`Blogs with tags: ${tagsName} not found`));
+            if(!resp) return Result.fail(new BlogNotFoundException(`No existen Blogs con el tag: ${tagsName}`));
             const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain(blog));
             return Result.success(domainBlogs);   
         } catch (error) {
@@ -110,10 +109,7 @@ export class OdmBlogRepository implements IBlogRepository{
     async findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
         try{
             const r = await this.commentModel.find<OdmBlogCommentEntity>();
-            
-            if (!r) return Result.fail<CommentBlog[]>(new CommentsBlogNotFoundException( 
-                `Ha ocurrido un error al encontrar los comentarios` ));
-            
+
             const comment = r.filter(e => e.blog.id === id.BlogId.value);
 
             const ListMapper = []
@@ -125,7 +121,7 @@ export class OdmBlogRepository implements IBlogRepository{
             
             return Result.success<CommentBlog[]>(ListMapper);
         }catch(err){
-            return Result.fail(new Error(err.message));
+            return Result.fail(new CommentsBlogNotFoundException(`Ha ocurrido un error al encontrar los comentarios`));
         }
     }
 
