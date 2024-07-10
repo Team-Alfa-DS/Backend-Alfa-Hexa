@@ -7,6 +7,7 @@ import { UserId } from "src/user/domain/value-objects/user-id";
 import { OdmTrainerEntity } from "../entities/odm-entities/odm-trainer.entity";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { TrainerNotFoundException } from "src/trainer/domain/exceptions/trainer-not-found-exception";
 
 export class OdmTrainerRepository implements IOdmTrainerRepository{
 
@@ -25,7 +26,7 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
 
         const trainer = await this.trainerModel.findOne({id: trainerId});
         if (!trainer) {
-            return Result.fail<Trainer>(new Error('Trainer not found'));
+            return Result.fail<Trainer>(new TrainerNotFoundException(`No se encontro al entrenador con el id ${trainerId}`));
         }
 
         const trainerDomain = await this.odmTrainerMapper.toDomain(trainer);
@@ -65,7 +66,7 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
             trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
         }
 
-        if (trainers.length == 0) return Result.fail(new Error('No hay entrenadores'));
+        if (trainers.length == 0) return Result.fail(new TrainerNotFoundException('No hay entrenadores'));
 
         const trainersDomain: Trainer[] = [];
 

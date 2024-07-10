@@ -3,7 +3,6 @@ import { TrainerFollower } from './valueObjects/trainer-followers';
 import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
-import { TrainerUserFollow } from './valueObjects/trainer-userFollow';
 import { DomainEvent } from 'src/common/domain/domain-event';
 import { TrainerCreated } from './events/trainer-created.events';
 import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';

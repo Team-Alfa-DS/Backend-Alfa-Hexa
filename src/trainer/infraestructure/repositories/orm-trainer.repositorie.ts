@@ -13,6 +13,7 @@ import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
 import { UserId } from 'src/user/domain/value-objects/user-id';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
 import { TrainerFollowerUserId } from 'src/trainer/domain/valueObjects/trainer-userid';
+import { TrainerNotFoundException } from 'src/trainer/domain/exceptions/trainer-not-found-exception';
 
 export class OrmTrainerRepository
   extends Repository<OrmTrainerEntity>
@@ -50,7 +51,7 @@ export class OrmTrainerRepository
   }});
     if (!trainer) {
       return Result.fail<Trainer>(
-        new Error('Trainer not found')
+        new TrainerNotFoundException('Trainer not found')
       );
     }
 
