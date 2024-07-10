@@ -19,11 +19,11 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
             try{
              const result = await this.find();
              const notify = NotifyMapper.arrayToDomain(result);
-             return Result.success<Notify[]>(notify, 200)
+             return Result.success<Notify[]>(notify)
                
         }
         catch(error){
-            return Result.fail<Notify[]>(new Error('Notifys not found'), 404, "Notifys not found");
+            return Result.fail<Notify[]>(new Error('Notifys not found'));
         }
     }
 
@@ -31,22 +31,22 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
         try{
             const notifyfound = await this.findOne({where: {id: id}});
             if(!notifyfound)
-                return Result.fail<Notify>(null, 404, 'Notify not found');
+                return Result.fail<Notify>(null);
             const notify = NotifyMapper.toDomain(notifyfound);
-            return Result.success<Notify>(notify, 200);
+            return Result.success<Notify>(notify);
         }
         catch(err){
-            return Result.fail<Notify>(new Error(err.message), 500, err.message);
+            return Result.fail<Notify>(new Error(err.message));
         }
 }
 
     async saveNotify(notify: Notify): Promise<Result<Notify>> {
         try {
-            const ormNotify = await this.Notifymapper.toOrm(notify);
-            return Result.success<Notify>(notify, 200);
+            const ormNotify = await this.Notifymapper.toPersistence(notify);
+            return Result.success<Notify>(notify);
         }
         catch(err){
-            return Result.fail<Notify>(new Error(err.mensage), err.code, err.mensage);
+            return Result.fail<Notify>(new Error(err.mensage));
         }
 
     }
@@ -54,10 +54,10 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
    async deleteAllNotify(): Promise<Result<void>> {
         try {
             this.clear();
-            return Result.success<void>(null, 200);
+            return Result.success<void>(null);
         }
         catch(err){
-            return Result.fail<void>(new Error(err.mensage), err.code, err.mensage);
+            return Result.fail<void>(new Error(err.mensage));
         }
     }
 
@@ -66,8 +66,8 @@ export class OrmNotifyRepository extends Repository<NotifyEntity> implements INo
         .where('notify.userReaded = :userReaded',{ userReaded : false})
         .getCount();
         if(!count){
-           return Result.fail<number>(null, 404, 'Notify not found')
+           return Result.fail<number>(null)
         }
-        return Result.success<number>(count, 200)    
+        return Result.success<number>(count)    
 }
 }

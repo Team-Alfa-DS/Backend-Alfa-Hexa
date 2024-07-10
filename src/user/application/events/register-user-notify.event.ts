@@ -4,23 +4,16 @@ import { IMailer } from "src/common/application/mailer/mailer.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { UserRegister } from "src/user/domain/events/user-register.event";
 
-export class RegisterUserNotify implements IEventSubscriber {
+export class RegisterUserNotify implements IEventSubscriber<UserRegister> {
     private readonly mailer: IMailer;
 
     constructor(mailer: IMailer) {
         this.mailer = mailer;
     }
 
-    async on(event: UserRegister): Promise<Result<EventResponseDto>> {
+    async on(event: UserRegister): Promise<void> {
 
         await this.mailer.sendUserMail(`Bienvenido ${event.name.Name}`, 'Creacion de cuenta', event.email.Email);
 
-        const response: EventResponseDto = {
-            user: event.id.Id,
-            event: this.constructor.name,
-            data: {}
-        }
-
-        return Result.success(response, 200);
     }
 }

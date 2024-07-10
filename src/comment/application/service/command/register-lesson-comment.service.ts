@@ -3,76 +3,78 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
-import { ICourseRepository } from "src/course/application/repositories/ICourse.repository";
+import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson/comment-lesson-repository.interface";
-import { CommentLesson } from "src/comment/domain/comment-lesson";
 import { CommentLessonPublicationDate } from "src/comment/domain/valueObjects/lesson/comment-lesson-publicationDate";
 import { CommentLessonBody } from "src/comment/domain/valueObjects/lesson/comment-lesson-body";
 import { CommentLessonUserId } from "src/comment/domain/valueObjects/lesson/comment-lesson-userId";
 import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
 import { LessonCommentId } from "src/comment/domain/valueObjects/lesson/comment-lesson-id";
+import { LessonId } from "src/course/domain/value-objects/lesson-id";
+import { error } from 'console';
+import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 
 
 export class RegisterLessonCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
-    
-    private readonly commentLessonRepository: ILessonCommentRepository;
+
     private readonly userRepository: IUserRepository;
     private readonly courseRepository: ICourseRepository;
     private readonly transactionHandler: ITransactionHandler;
+    private eventPublisher: IEventPublisher;
     private readonly idGenerator: IIdGen
 
     constructor(
-        commentLessonRepository: ILessonCommentRepository,
         userRepository: IUserRepository,
         courseRepository: ICourseRepository,
         transactionHandler: ITransactionHandler,
+        eventPublisher: IEventPublisher,
         idGenerator: IIdGen,
     ){
         super();
-        this.commentLessonRepository = commentLessonRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.transactionHandler = transactionHandler;
+        this.eventPublisher = eventPublisher;
         this.idGenerator = idGenerator;
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
-        const commentID = LessonCommentId.create(await this.idGenerator.genId());
+        try{
+            const commentID = LessonCommentId.create(await this.idGenerator.genId());
 
-        let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
+            let user = await this.userRepository.findUserById( UserId.create(data.userId), this.transactionHandler );
+            if (!user.isSuccess) {return Result.fail(user.Error)}
+            let course = await this.courseRepository.getCourseByLessonId( new LessonId(data.targetId) );
 
-        if ( !user.isSuccess ) return Result.fail( user.Error, user.StatusCode,user.Message  );
+            let publicationDate = CommentLessonPublicationDate.create( new Date() );
+            let body = CommentLessonBody.create( data.body );
+            let userId = CommentLessonUserId.create( data.userId );
+            let target = LessonCommentLessonId.create(LessonId.create(data.targetId));
 
-        let course = await this.courseRepository.getCourseByLessonId( data.targetId );
+            course.createComment(
+                commentID,
+                publicationDate,
+                body,
+                userId,
+                target,
+                // null,
+                // null
+            );
 
-        if ( !course.isSuccess ) return Result.fail( course.Error, course.StatusCode,course.Message  );
+            const comment = course.getComment(target.LessonId, commentID);
 
-        let publicationDate = CommentLessonPublicationDate.create( new Date() );
-        let body = CommentLessonBody.create( data.body );
-        let userId = CommentLessonUserId.create( data.userId );
-        let target = LessonCommentLessonId.create( data.targetId );
-
-        const comment: CommentLesson = CommentLesson.create(
-            commentID,
-            publicationDate,
-            body,
-            userId,
-            target,
-            null,
-            null,
-            null,
-            null,
-        );
-
-        const result = await this.commentLessonRepository.saveComment( comment, this.transactionHandler )
-        
-        if ( !result.isSuccess ) return Result.fail( result.Error, result.StatusCode,result.Message  );
-        
-        const response = new AddCommentToServiceResponseDto();
-
-        return Result.success<AddCommentToServiceResponseDto>( response, 200 )
+            const result = await this.courseRepository.saveComment( comment );
+            
+            const response = new AddCommentToServiceResponseDto(commentID.commentId);
+            
+            this.eventPublisher.publish(course.pullDomainEvents());
+            
+            return Result.success<AddCommentToServiceResponseDto>( response );
+        }catch(error){
+            return Result.fail<AddCommentToServiceResponseDto>(error);
+        }
     }
 
 }

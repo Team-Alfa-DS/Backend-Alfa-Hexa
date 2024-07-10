@@ -3,10 +3,10 @@ import { IEncryptor } from 'src/auth/application/encryptor/encryptor.interface';
 import { RegisterUserService } from 'src/auth/application/services/register-user.service';
 import { IIdGen } from 'src/common/application/id-gen/id-gen.interface';
 import { ITransactionHandler } from 'src/common/domain/transaction-handler/transaction-handler.interface';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { UuidGen } from 'src/common/infraestructure/id-gen/uuid-gen';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { BcryptEncryptor } from '../encryptor/bcrypt';
 import { LoginUserService } from 'src/auth/application/services/login-user.service';
@@ -45,16 +45,24 @@ import { ValidateUserCodeResponse } from 'src/auth/application/dtos/response/val
 import { MailjetService } from 'nest-mailjet';
 import { MailJet } from 'src/common/infraestructure/mailer/mailjet';
 import { IMailer } from 'src/common/application/mailer/mailer.interface';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
-import { UserEntity } from 'src/user/infraestructure/entities/user.entity';
+import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-entities/orm-user.entity';
 import { RegisterUserResponseDto } from '../dtos/register-user.response';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { RegisterUserNotify } from 'src/user/application/events/register-user-notify.event';
 import { UpdatedUserPasswordNotify } from 'src/user/application/events/updated-user-password-notify.event';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
+import { saveUserEvent } from 'src/user/infraestructure/events/synchronize/save-user.event';
+import { OdmUserMapper } from 'src/user/infraestructure/mappers/odm-mappers/odm-user.mapper';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { Model } from 'mongoose';
+import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
+import { InjectModel } from '@nestjs/mongoose';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -63,13 +71,18 @@ export class AuthController {
     private userMapper: OrmUserMapper = new OrmUserMapper();
     private readonly jwtGen: JwtGen;
     private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, DatabaseSingleton.getInstance());
+        this.userMapper, PgDatabaseSingleton.getInstance());
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        DatabaseSingleton.getInstance().createQueryRunner()
+        PgDatabaseSingleton.getInstance().createQueryRunner()
     );
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
+
+    private odmUserMapper: OdmUserMapper = new OdmUserMapper();
+    private userModel: Model<OdmUserEntity>;
+    private readonly odmUserRepository: OdmUserRespository;
+
     private readonly idGenerator: IIdGen = new UuidGen();
     private readonly encryptor: IEncryptor = new BcryptEncryptor();
     private readonly mailer: IMailer;
@@ -85,41 +98,58 @@ export class AuthController {
     private validateUserCodeService: IService<ValidateUserCodeRequest, ValidateUserCodeResponse>;
     private changeUserPasswordService: IService<ChangeUserPasswordRequest, ChangeUserPasswordResponse>;
 
-    constructor(private jwtService: JwtService, private mailerService: MailjetService) {
+    constructor(private jwtService: JwtService, private mailerService: MailjetService, @InjectModel('user') userModel: Model<OdmUserEntity>) {
+        this.userModel = userModel;
         this.jwtGen = new JwtGen(jwtService);
         this.mailer = new MailJet(mailerService);
-        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer)]);
+        this.odmUserRepository = new OdmUserRespository(
+            this.odmUserMapper,
+            this.userModel
+        );
+        this.eventPublisher.subscribe('UserRegister', [new RegisterUserNotify(this.mailer), new saveUserEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPasswordUpdated', [new UpdatedUserPasswordNotify(this.mailer, this.userRepository, this.transactionHandler)]);
 
-        this.registerUserService = new ExceptionLoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterUserService(this.userRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.registerUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterUserService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.idGenerator, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
-        this.loginUserService = new ExceptionLoggerDecorator(
-            new LoginUserService(this.userRepository, this.transactionHandler, this.encryptor, this.jwtGen),
-            this.logger
+        this.loginUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new LoginUserService(this.odmUserRepository, this.encryptor, this.jwtGen),
+                this.logger
+            )
         );
-        this.currentUserService = new ExceptionLoggerDecorator(
-            new CurrentUserService(this.userRepository, this.transactionHandler),
-            this.logger
+        this.currentUserService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new CurrentUserService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.forgetUserPasswordService = new ExceptionLoggerDecorator(
-            new ForgetUserPasswordService(this.userRepository, this.transactionHandler, this.mailer),
-            this.logger
+        this.forgetUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ForgetUserPasswordService(this.odmUserRepository, this.mailer),
+                this.logger
+            )
         );
-        this.validateUserCodeService = new ExceptionLoggerDecorator(
-            new ValidateUserCodeService(this.userRepository, this.transactionHandler),
-            this.logger
+        this.validateUserCodeService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ValidateUserCodeService(this.odmUserRepository),
+                this.logger
+            )
         );
-        this.changeUserPasswordService = new ExceptionLoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new ChangeUserPasswordService(this.userRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
-                this.auditRepository
-            ),
-            this.logger
+        this.changeUserPasswordService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new ChangeUserPasswordService(this.userRepository, this.odmUserRepository, this.transactionHandler, this.encryptor, this.eventPublisher),
+                    this.auditRepository
+                ),
+                this.logger
+            )
         );
     }
 
@@ -135,14 +165,13 @@ export class AuthController {
         const request = new RegisterUserRequest(newUser.email, newUser.name, newUser.password, newUser.phone, newUser.type);
 
         const response = await this.registerUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 
     @Post('login')
     @ApiCreatedResponse({
         description: 'A iniciado sesion de manera exitosa',
-        //type: UserEntity,
+        //type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'Las credenciales son incorrectas. Intente de nuevo'
@@ -151,8 +180,7 @@ export class AuthController {
         const request = new LoginUserRequest(user.email, user.password);
 
         const response = await this.loginUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 
     @ApiBearerAuth()
@@ -169,14 +197,13 @@ export class AuthController {
         const request = new CurrentUserRequest(req.user.tokenUser.id);
 
         const response = await this.currentUserService.execute(request);
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 
     @Post('forget/password')
     @ApiCreatedResponse({
         description: 'Se ha enviado un codigo de verifiacion al correo ingresado',
-        //type: UserEntity,
+        //type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'El correo ingresado no coincide con algun usuario. Intente de nuevo'
@@ -193,8 +220,7 @@ export class AuthController {
         const request = new ForgetUserPasswordRequest(user.email, code)
 
         const response = await this.forgetUserPasswordService.execute(request)
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 
     @Post('code/validate')
@@ -211,14 +237,13 @@ export class AuthController {
         const request = new ValidateUserCodeRequest(validate.email, validate.code, userCode.code);
 
         const response = await this.validateUserCodeService.execute(request)
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 
     @Put('change/password')
     @ApiCreatedResponse({
         description: 'se cambio la contraseña de manera exitosa',
-        type: UserEntity,
+        type: OrmUserEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo cambiar la contraseña. Intente de nuevo'
@@ -230,15 +255,11 @@ export class AuthController {
         const requestVal = new ValidateUserCodeRequest(newPassword.email, newPassword.code, userCode.code);
         const validate = await this.validateUserCodeService.execute(requestVal)
 
-        if (!validate.isSuccess) {
-            throw new HttpException('Codigo incorrecto', HttpStatus.BAD_REQUEST);
-        }
         this.userCodeList = this.userCodeList.filter(userCode => userCode.email != newPassword.email);
 
         const requestChange = new ChangeUserPasswordRequest(newPassword.email, newPassword.code, newPassword.password);
 
         const response = await this.changeUserPasswordService.execute(requestChange);
-        if (response.isSuccess) return response.Value;
-        throw new HttpException(response.Message, response.StatusCode);
+        return response.Value;
     }
 }

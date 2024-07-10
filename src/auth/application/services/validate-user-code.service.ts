@@ -1,32 +1,29 @@
 import { Result } from "src/common/domain/result-handler/result";
-import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { ValidateUserCodeRequest } from "../dtos/request/validate-user-code.request";
 import { ValidateUserCodeResponse } from "../dtos/response/validate-user-code.response";
 import { UserEmail } from "src/user/domain/value-objects/user-email";
+import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 
 export class ValidateUserCodeService extends IService<ValidateUserCodeRequest, ValidateUserCodeResponse> {
 
-    private readonly userRepository: IUserRepository;
-    private readonly transactionHandler: ITransactionHandler;
+    private readonly userRepository: IOdmUserRepository;
 
-    constructor(userRepository: IUserRepository, transactionHandler: ITransactionHandler) {
+    constructor(userRepository: IOdmUserRepository) {
         super();
         this.userRepository = userRepository;
-        this.transactionHandler = transactionHandler;
     }
 
     async execute(value: ValidateUserCodeRequest): Promise<Result<ValidateUserCodeResponse>> {
-        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email), this.transactionHandler);
+        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email));
         if (!user.isSuccess) {
-            return Result.fail(user.Error, user.StatusCode, user.Message)
+            return Result.fail(user.Error)
         }
         
         if (value.code != value.codeSaved) {
-            return Result.fail(new Error('El codigo no es correcto'), 500, 'El codigo no es correcto');
+            return Result.fail(new Error('El codigo no es correcto'));
         }
         const response = new ValidateUserCodeResponse();
-        return Result.success(response, 200);
+        return Result.success(response);
     }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Body, Controller, Request, Get, Param, ParseUUIDPipe, Post, UseGuards, Headers} from "@nestjs/common";
 import { OrmNotifyRepository } from "../repository/orm-notify.repository";
-import { DatabaseSingleton } from "src/common/infraestructure/database/database.singleton";
+import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { NotifyMapper } from "../mappers/notify-mapper";
 import { get } from "http";
 import { getfindNotifyById } from "../../application/service/getfindNotifyById";
@@ -31,7 +31,7 @@ export class notifycontroller{
     private readonly createNotify: CreateNotify;
 
 constructor(){
-    const repositoryinstance = new OrmNotifyRepository(DatabaseSingleton.getInstance(), new NotifyMapper());
+    const repositoryinstance = new OrmNotifyRepository(PgDatabaseSingleton.getInstance(), new NotifyMapper());
     this.getfindNotifyById = new getfindNotifyById(repositoryinstance);
     this.GetAllNotify = new GetAllNotify(repositoryinstance);
     this.notifycountnotreaded = new notifycountnotreaded(repositoryinstance);

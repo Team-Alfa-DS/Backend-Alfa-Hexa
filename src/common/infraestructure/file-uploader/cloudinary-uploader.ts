@@ -22,6 +22,6 @@ export class CloudinaryService implements IFileUploader {
                 createReadStream(file.buffer).pipe(uploadStream);
         })
 
-        return Result.success(result.url, 200);
+        return Result.success(result.url);
     }
 }

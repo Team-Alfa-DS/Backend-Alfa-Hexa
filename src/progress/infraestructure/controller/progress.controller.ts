@@ -3,9 +3,9 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiCreatedResponse, ApiTags, ApiU
 import { JwtAuthGuard } from 'src/auth/infraestructure/guards/jwt-guard.guard';
 import { MarkEndProgressDto } from '../dtos/mark-end-progress.dto';
 import { OrmProgressMapper } from '../mappers/orm-progress.mapper';
-import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-user.mapper';
+import { OrmUserMapper } from 'src/user/infraestructure/mappers/orm-mappers/orm-user.mapper';
 import { OrmProgressRepository } from '../repositories/orm-progress.repository';
-import { DatabaseSingleton } from 'src/common/infraestructure/database/database.singleton';
+import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { TOrmCourseRepository } from 'src/course/infraestructure/repositories/TOrmCourse.repository';
 import { OrmUserRepository } from 'src/user/infraestructure/repositories/orm-user.repository';
 import { MarkEndProgressService } from 'src/progress/application/services/mark-end-progress.service';
@@ -29,13 +29,32 @@ import { CoursesProgressService } from 'src/progress/application/services/course
 import { CoursesProgressDto } from '../dtos/courses-progress.dto';
 import { ILogger } from 'src/common/application/logger/logger.interface';
 import { NestLogger } from 'src/common/infraestructure/logger/nest-logger';
-import { ExceptionLoggerDecorator } from 'src/common/application/aspects/exceptionLoggerDecorator';
-import { ProgressEntity } from '../entities/progress.entity';
-import { CourseEntity } from 'src/course/infraestructure/entities/course.entity';
+import { LoggerDecorator } from 'src/common/application/aspects/loggerDecorator';
+import { OrmProgressEntity } from '../entities/orm-entities/orm-progress.entity';
+import { OrmCourseEntity } from 'src/course/infraestructure/entities/orm-entities/orm-course.entity';
 import { ProfileProgressRequest } from 'src/progress/application/dtos/request/profile-progress.request';
 import { ProfileProgressResponse } from 'src/progress/application/dtos/response/profile-progress.response';
 import { ProfileProgressService } from 'src/progress/application/services/profile-progress.service';
 import { HttpResponseHandler } from 'src/common/infraestructure/handlers/http-response.handler';
+import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
+import { OdmProgressRepository } from '../repositories/odm-progress.repository';
+import { Model } from 'mongoose';
+import { OdmProgressEntity } from '../entities/odm-entities/odm-progress.entity';
+import { OdmProgressMapper } from '../mappers/odm-progress.mapper';
+import { OdmUserMapper } from 'src/user/infraestructure/mappers/odm-mappers/odm-user.mapper';
+import { InjectModel } from '@nestjs/mongoose';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmCourseEntity } from 'src/course/infraestructure/entities/odm-entities/odm-course.entity';
+import { OdmLessonEntity } from 'src/course/infraestructure/entities/odm-entities/odm-lesson.entity';
+import { OdmUserRespository } from 'src/user/infraestructure/repositories/odm-user.repository';
+import { EventBus } from 'src/common/infraestructure/events/event-bus';
+import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
+import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
+import { SaveProgressEvent } from '../events/save-progress.event';
+import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { StartCourseProgressRequest } from 'src/progress/application/dtos/request/start-course-progress.request';
+import { StartCourseProgressResponse } from 'src/progress/application/dtos/response/start-course-progress.response';
+import { StartCourseProgressService } from 'src/progress/application/services/start-course-progress.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -46,26 +65,29 @@ export class ProgressController {
 
     private progressMapper: OrmProgressMapper = new OrmProgressMapper();
     private userMapper: OrmUserMapper = new OrmUserMapper();
+    private odmProgressMapper: OdmProgressMapper;
+    private odmUserMapper: OdmUserMapper;
 
     private readonly transactionHandler: ITransactionHandler = new TransactionHandler(
-        DatabaseSingleton.getInstance().createQueryRunner()
+        PgDatabaseSingleton.getInstance().createQueryRunner()
     );
 
     private readonly progressRepository: OrmProgressRepository = new OrmProgressRepository(
-        this.progressMapper, DatabaseSingleton.getInstance()
+        this.progressMapper, PgDatabaseSingleton.getInstance()
     );
+
+    private readonly odmprogressRepository: OdmProgressRepository;
+    private readonly odmUserRepository: OdmUserRespository;
 
     private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        DatabaseSingleton.getInstance()
-    );
-
-    private readonly userRepository: OrmUserRepository = new OrmUserRepository(
-        this.userMapper, DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
 
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
-        DatabaseSingleton.getInstance()
+        PgDatabaseSingleton.getInstance()
     );
+
+    private readonly eventPublisher: IEventPublisher = EventManagerSingleton.getInstance();
 
     private readonly logger: ILogger = new NestLogger();
 
@@ -74,62 +96,95 @@ export class ProgressController {
     private trendingProgressService: IService<TrendingProgressRequest, TrendingProgressResponse>;
     private coursesProgressService: IService<CoursesProgressRequest, CoursesProgressResponse>;
     private profileProgressService: IService<ProfileProgressRequest, ProfileProgressResponse>;
+    private startCourseProgressService: IService<StartCourseProgressRequest, StartCourseProgressResponse>;
 
-    constructor() {
-        this.markEndProgressService = new ExceptionLoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new MarkEndProgressService(
-                    this.progressRepository,
+    constructor(@InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('progress') progressModel: Model<OdmProgressEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>) {
+        this.odmUserMapper = new OdmUserMapper();
+        this.odmProgressMapper = new OdmProgressMapper(courseModel, userModel, lessonModel);
+
+        this.odmUserRepository = new OdmUserRespository(this.odmUserMapper, userModel);
+        this.odmprogressRepository = new OdmProgressRepository(progressModel, this.odmProgressMapper);
+
+        this.eventPublisher.subscribe('ProgressRegister', [new SaveProgressEvent(this.odmprogressRepository)]);
+        
+        
+        this.markEndProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new MarkEndProgressService(
+                        this.progressRepository,
+                        this.courseRepository,
+                        this.odmUserRepository,
+                        this.transactionHandler,
+                        this.eventPublisher
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        );
+        this.getOneProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new GetOneProgressService(
+                    this.odmUserRepository,
+                    this.odmprogressRepository,
                     this.courseRepository,
-                    this.userRepository,
                     this.transactionHandler
                 ),
-                this.auditRepository
-            ),
-            this.logger
+                this.logger
+            )
         );
-        this.getOneProgressService = new ExceptionLoggerDecorator(
-            new GetOneProgressService(
-                this.userRepository,
-                this.progressRepository,
-                this.courseRepository,
-                this.transactionHandler
-            ),
-            this.logger
+        this.trendingProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new TrendingProgressService(
+                    this.odmUserRepository,
+                    this.odmprogressRepository,
+                    this.courseRepository
+                ),
+                this.logger
+            )
         );
-        this.trendingProgressService = new ExceptionLoggerDecorator(
-            new TrendingProgressService(
-                this.userRepository,
-                this.progressRepository,
-                this.courseRepository,
-                this.transactionHandler
-            ),
-            this.logger
+        this.coursesProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new CoursesProgressService(
+                    this.odmprogressRepository,
+                    this.courseRepository,
+                    this.odmUserRepository
+                ),
+                this.logger
+            )
         );
-        this.coursesProgressService = new ExceptionLoggerDecorator(
-            new CoursesProgressService(
-                this.progressRepository,
-                this.courseRepository,
-                this.userRepository,
-                this.transactionHandler
-            ),
-            this.logger
+        this.profileProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ProfileProgressService(
+                    this.odmprogressRepository,
+                    this.courseRepository,
+                    this.odmUserRepository
+                ),
+                this.logger
+            )
         );
-        this.profileProgressService = new ExceptionLoggerDecorator(
-            new ProfileProgressService(
-                this.progressRepository,
-                this.courseRepository,
-                this.userRepository,
-                this.transactionHandler
-            ),
-            this.logger
-        );
+        this.startCourseProgressService = new ExceptionDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new StartCourseProgressService(
+                        this.progressRepository,
+                        this.odmUserRepository,
+                        this.courseRepository,
+                        this.transactionHandler,
+                        this.eventPublisher
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        )
     }
 
     @Post('mark/end')
     @ApiCreatedResponse({
         description: 'se guardo el progreso correctamente',
-        // type: ProgressEntity,
+        // type: OrmProgressEntity,
     })
     @ApiBadRequestResponse({
         description: 'No se pudo guardar el progreso. Intente de nuevo'
@@ -138,40 +193,23 @@ export class ProgressController {
         const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
-        if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        return response.Value;
     }
 
     @Get('one/:courseId')
-    @ApiCreatedResponse({
-        description: 'se retorno el curso correctamente',
-        // type: CourseEntity,
-    })
-    @ApiBadRequestResponse({
-        description: 'No se pudo encontrar un curso con esa id. Intente de nuevo'
-    })
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.getOneProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        return response.Value;
     }
     
     @Get('trending')
-    @ApiCreatedResponse({
-        description: 'se retorno el ultimo curso correctamente',
-        
-    })
-    @ApiBadRequestResponse({
-        description: 'No se pudo retornar el ultimo curso. Intente de nuevo'
-    })
     async progressTrending(@Request() req: JwtRequest) {
         const request = new TrendingProgressRequest(req.user.tokenUser.id);
         const response = await this.trendingProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        return response.Value;
     }
 
     @Get('courses')
@@ -179,8 +217,7 @@ export class ProgressController {
         const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
         const response = await this.coursesProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value.courseProgress;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        return response.Value.courseProgress;
     }
 
     @Get('profile')
@@ -188,7 +225,13 @@ export class ProgressController {
         const request = new ProfileProgressRequest(req.user.tokenUser.id);
         const response = await this.profileProgressService.execute(request);
 
-        if (response.isSuccess) return response.Value;
-        HttpResponseHandler.HandleException(response.StatusCode, response.Message, response.Error);
+        return response.Value;
+    }
+
+    @Get('start/:courseId')
+    async startProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
+        const request = new StartCourseProgressRequest(courseId, req.user.tokenUser.id);
+        const response = await this.startCourseProgressService.execute(request);
+        return response.Value
     }
 }

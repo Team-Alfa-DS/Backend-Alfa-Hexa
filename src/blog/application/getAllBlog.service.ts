@@ -7,9 +7,11 @@ import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repo
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';
 import { TrainerId } from 'src/trainer/domain/valueObjects/trainer-id';
+import { GetManyBlogsDTO } from './interfaces/getManyBlogsDTO';
+;
 
 
-export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlogsResponseDTO>{
+export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResponseDTO>{
     constructor(
         private readonly blogRepository: IBlogRepository,
         private readonly trainerRepository: ITrainerRepository,
@@ -22,26 +24,26 @@ export class GetAllBlogService extends IService<GetAllBlogsRequestDTO, GetAllBlo
     }
     
 
-    async execute(value: GetAllBlogsRequestDTO): Promise<Result<GetAllBlogsResponseDTO>>{
-        const domainBlogsResult =  await this.blogRepository.getAllBLogs();
+    async execute(value: GetManyBlogsDTO): Promise<Result<GetAllBlogsResponseDTO>>{
+        const domainBlogsResult =  await this.blogRepository.getAllBLogs( value.page, value.perpage, value.filter, value.category, value.trainer);
         if (domainBlogsResult.Error) 
-            return Result.fail(domainBlogsResult.Error, domainBlogsResult.StatusCode, domainBlogsResult.Message);
+            return Result.fail(domainBlogsResult.Error);
 
         const domainBlogs = domainBlogsResult.Value; 
-        const blogs = await Promise.all(domainBlogs.map(async blog => {
-            const trainerResult = await this.trainerRepository.findTrainerById(TrainerId.create(blog.Trainer));
-            const categoryResult = await this.categoryRepository.getCategoryById(blog.Category);
+        const blogs: GeneralBlogDTO[] = await Promise.all(domainBlogs.map(async blog => {
+            const trainerResult = await this.trainerRepository.findTrainerById(blog.Trainer);
+            const categoryResult = await this.categoryRepository.getCategoryById(blog.Category)
             return {
                 id: blog.Id.value,
                 name: blog.Title.value,
                 image: blog.Images[0] ? blog.Images[0].value : null,
                 date: blog.Publication_date.value,
-                category: categoryResult.Value ? categoryResult.Value.Name.value : null,
+                category: categoryResult.Value ? categoryResult.Value.Name.value: null,
                 trainer: trainerResult.Value ? trainerResult.Value.Name.trainerName : null
             }
         }
     ))
         const blogResponse: GetAllBlogsResponseDTO = new GetAllBlogsResponseDTO(blogs)
-        return Result.success(blogResponse, 200)
+        return Result.success(blogResponse)
     }
 }

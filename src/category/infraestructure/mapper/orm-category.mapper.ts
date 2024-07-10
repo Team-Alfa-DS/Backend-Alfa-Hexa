@@ -1,24 +1,16 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 
 import { IMapper } from "src/category/application/mapper/mapper.interface";
 import { Category } from "src/category/domain/Category";
-import { CategoryEntity } from "../entities/category.entity";
+import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
 import { CategoryId } from '../../domain/valueObjects/categoryId';
 import { CategoryName } from '../../domain/valueObjects/categoryName';
 import { CategoryIcon } from '../../domain/valueObjects/categoryIcon';
 
-/* eslint-disable prettier/prettier */
+export class OrmCategoryMapper{
 
-export class OrmCategoryMapper implements IMapper<Category, CategoryEntity> {
-    static toDomain(result: CategoryEntity): Category | PromiseLike<Category> {
-      throw new Error("Method not implemented.");
-    }
+    toPersistence(domainEntity: Category):OrmCategoryEntity {
 
-    async toOrm(domainEntity: Category):Promise<CategoryEntity> {
-
-        const ormCategory : any = CategoryEntity.create(
+        const ormCategory : any = OrmCategoryEntity.create(
             domainEntity.Id.value,
             domainEntity.Name.value,
             domainEntity.Icon.value
@@ -28,14 +20,14 @@ export class OrmCategoryMapper implements IMapper<Category, CategoryEntity> {
 
     }
 
-    async toDomain(ormEntity: CategoryEntity): Promise<Category> {
-        const domainCategory = Category.Create(
-            CategoryId.create(ormEntity.id),
-            CategoryName.create(ormEntity.name),
-            CategoryIcon.create(ormEntity.icon)
-
+    toDomain(ormEntity: OrmCategoryEntity): Category {
+        const id = CategoryId.create(ormEntity.id);
+        const name = CategoryName.create(ormEntity.name);
+        const icon = CategoryIcon.create(ormEntity.icon);
+        return  Category.create(
+            id,
+            name,
+            icon
         );
-        return domainCategory;
     }
-
 }

@@ -7,7 +7,7 @@ import { ITransactionHandler } from "src/common/domain/transaction-handler/trans
 import { UserPasswordUpdated } from "src/user/domain/events/user-password-updated.event";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 
-export class UpdatedUserPasswordNotify implements IEventSubscriber {
+export class UpdatedUserPasswordNotify implements IEventSubscriber<UserPasswordUpdated> {
     private readonly mailer: IMailer;
     private readonly userRepository: IUserRepository;
     private readonly transactionHandler: ITransactionHandler;
@@ -18,20 +18,8 @@ export class UpdatedUserPasswordNotify implements IEventSubscriber {
         this.transactionHandler = transactionHandler;
     }
 
-    async on(event: UserPasswordUpdated): Promise<Result<EventResponseDto>> {
+    async on(event: UserPasswordUpdated): Promise<void> {
         const user = await this.userRepository.findUserById(event.id, this.transactionHandler);
-
-        if (!user.isSuccess) return Result.fail(user.Error, user.StatusCode, user.Message);
-
-
         await this.mailer.sendUserMail(`Feliz dia ${user.Value.Name.Name} su contraseña ha sido actualizada con exito`, 'Actualizacion de contraseña', user.Value.Email.Email);
-
-        const response: EventResponseDto = {
-            user: user.Value.Id.Id,
-            event: this.constructor.name,
-            data: {}
-        }
-
-        return Result.success(response, user.StatusCode);
     }
 }

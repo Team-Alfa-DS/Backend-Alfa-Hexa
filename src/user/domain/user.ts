@@ -13,7 +13,6 @@ import { UserEmailUpdated } from "./events/user-email-updated.event";
 import { UserNameUpdated } from "./events/user-name-updated.event";
 import { UserPasswordUpdated } from "./events/user-password-updated.event";
 import { UserPhoneUpdated } from "./events/user-phone-updated.event";
-import { UserTypeUpdated } from "./events/user-type-updated.event";
 import { UserImageUpdated } from "./events/user-image-updated.event";
 import { UserType } from "./value-objects/user-type";
 import { UserRegister } from "./events/user-register.event";
@@ -55,10 +54,6 @@ export class User extends AggregateRoot<UserId> {
 
         if (event instanceof UserPhoneUpdated) {
             this.phone = event.phone;
-        }
-
-        if (event instanceof UserTypeUpdated) {
-            this.type = event.type;
         }
 
         if (event instanceof UserImageUpdated) {
@@ -114,15 +109,11 @@ export class User extends AggregateRoot<UserId> {
         this.apply(UserPhoneUpdated.create(this.Id, phone));
     }
 
-    UpdateType(type: UserType): void {
-        this.apply(UserTypeUpdated.create(this.Id, type));
-    }
-
     UpdateImage(image: UserImage): void {
         this.apply(UserImageUpdated.create(this.Id, image));
     }
 
-    Register(id: UserId, email: UserEmail, name: UserName): void {
-        this.apply(UserRegister.create(id, email, name));
+    Register(id: UserId, email: UserEmail, name: UserName, password: UserPassword, phone: UserPhone, type: UserType, image: UserImage): void {
+        this.apply(UserRegister.create(id, email, name, password, phone, type, image));
     }
 }

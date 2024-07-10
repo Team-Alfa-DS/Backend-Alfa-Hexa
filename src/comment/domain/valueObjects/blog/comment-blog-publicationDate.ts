@@ -12,7 +12,8 @@ export class CommentBlogPublicationDate extends ValueObject<CommentBlogPublicati
         super();
         
         if (!publicationDate ) throw new EmptyBlogCommentPublicationDateException(`La fecha no puede ser vacia`);
-        if (publicationDate > new Date() ) throw new InvalidBlogCommentPublicationDateException(`La fecha ${publicationDate} no es valida`);
+        
+        if (publicationDate > new Date()) throw new InvalidBlogCommentPublicationDateException(`La fecha ${publicationDate} no es valida`);
         this.publicationDate = Object.freeze(publicationDate); //*Esto funciona para que no pueda ser modificado el id
     }
 

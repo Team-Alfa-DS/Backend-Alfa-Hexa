@@ -2,46 +2,28 @@ import { DataSource, Repository } from "typeorm";
 import { Result } from "src/common/domain/result-handler/result";
 import { IMapper } from "src/common/application/mappers/mapper.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
-import { BlogCommentEntity } from "../../entities/blog/comment.blog.entity";
+import { OrmBlogCommentEntity } from "../../entities/orm-entities/orm-comment.blog.entity";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
-export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> implements IBlogCommentRepository{
+export class OrmBlogCommentRepository extends Repository<OrmBlogCommentEntity> implements IBlogCommentRepository{
     
-    private ormCommentMapper: IMapper<CommentBlog, BlogCommentEntity>;
+    private ormCommentMapper: IMapper<CommentBlog, OrmBlogCommentEntity>;
 
-    constructor(ormCommentMapper: IMapper<CommentBlog,BlogCommentEntity>, dataSource: DataSource){
-        super(BlogCommentEntity,dataSource.manager);
+    constructor(ormCommentMapper: IMapper<CommentBlog,OrmBlogCommentEntity>, dataSource: DataSource){
+        super(OrmBlogCommentEntity,dataSource.manager);
         this.ormCommentMapper = ormCommentMapper;
     }
     
     async findAllCommentsByBlogId(id: BlogCommentBlogId, runner: TransactionHandler): Promise<Result<CommentBlog[]>> {
         const runnerTransaction = runner.getRunner();
 
-        //const commentsFound = await runnerTransaction.manager.createQueryBuilder(
-        //    BlogCommentEntity, "comment")
-        //    .leftJoinAndSelect("comment.blog", "blog")
-        //    .leftJoinAndSelect("comment.user", "user")
-            //.take(perPage)
-            //.skip(page)
-        //    .where("comment.blog_id = :id", { id: id.BlogId })
-        //    .getMany();
-        
-            const commentsFound = await this.find({
-                relations: {
-                    blog: true
-                },
-                where: {
-                    blog_id: id.BlogId
-                }
-            });
+        const commentsFound = await runnerTransaction.manager.createQueryBuilder(OrmBlogCommentEntity, "comment")
+        .where("comment.blog_id = :id", { id })
+        .getMany();
 
-        // const commentsFound = await runnerTransaction.manager.find(CommentEntity,{ where: { blog_id: id },
-        //     take: page,
-        //     skip: perPage,});
-
-        if (!commentsFound) return Result.fail<CommentBlog[]>(new Error('Comments not found'), 404, 'Comments not found');
+        if (!commentsFound) return Result.fail<CommentBlog[]>(new Error('Comments not found'));
 
         const ListMapper = []
         commentsFound.forEach(async e => { 
@@ -49,17 +31,17 @@ export class OrmBlogCommentRepository extends Repository<BlogCommentEntity> impl
                 await this.ormCommentMapper.toDomain(e ))  
         });
 
-        return Result.success<CommentBlog[]>(ListMapper,200);
+        return Result.success<CommentBlog[]>(ListMapper);
     }
 
     async saveComment(comment: CommentBlog, runner: TransactionHandler): Promise<Result<CommentBlog>> {
         const runnerTransaction = runner.getRunner();
         try{
-            const ormComment = await this.ormCommentMapper.toOrm(comment);
+            const ormComment = await this.ormCommentMapper.toPersistence(comment);
             await runnerTransaction.manager.save(ormComment);
-            return Result.success<CommentBlog>(comment, 200);                                                    
+            return Result.success<CommentBlog>(comment);                                                    
         }catch(err){
-            return Result.fail<CommentBlog>(new Error(err.message), err.code, err.message);
+            return Result.fail<CommentBlog>(new Error(err.message));
         }
 
     };

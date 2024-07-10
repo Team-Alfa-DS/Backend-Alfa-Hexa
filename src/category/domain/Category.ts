@@ -9,13 +9,15 @@ export class Category{
     private name: CategoryName
     private icon: CategoryIcon
 
+    
     private constructor (id: CategoryId, name: CategoryName, icon: CategoryIcon){
         this.id= id;
         this.name= name;
         this.icon=icon;
+       
     }
 
-    static Create(id: CategoryId, name: CategoryName, icon: CategoryIcon) {
+    static create(id: CategoryId, name: CategoryName, icon: CategoryIcon): Category {
         return new Category(id, name, icon);
     }
 

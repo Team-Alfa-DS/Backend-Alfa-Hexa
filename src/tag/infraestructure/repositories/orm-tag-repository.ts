@@ -1,26 +1,26 @@
 import { ITagRepository } from "../../application/ITagRepository";
 import { Result } from "src/common/domain/result-handler/result";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
-import { Tag } from "../entities/tag.entity";
+import { OrmTagEntity } from "../entities/orm-entities/orm-tag.entity";
 import { DataSource, Repository } from "typeorm";
+import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 
-export class OrmTagRepository extends Repository<Tag> implements ITagRepository {
+export class OrmTagRepository extends Repository<OrmTagEntity> implements ITagRepository {
     
     constructor(dataSource: DataSource){
-        super(Tag,dataSource.manager);
+        super(OrmTagEntity,dataSource.manager);
     }
 
     async getAllTags(runner: TransactionHandler): Promise<Result<string[]>> {
         const runnerTransaction = runner.getRunner();
     
-        const result: Tag[] = await runnerTransaction.manager.createQueryBuilder(Tag, "tag").getMany();
+        const result: OrmTagEntity[] = await runnerTransaction.manager.createQueryBuilder(OrmTagEntity, "tag").getMany();
         
         if (!result) {
-            return Result.fail<string[]>(new Error('Tags not found'), 404, 'Tags not found');
+            return Result.fail<string[]>(new Error('Tags not found'));
         }
 
         const tagNames: string[] = result.map(tag => tag.name);
     
-        return Result.success<string[]>(tagNames, 200);
+        return Result.success<string[]>(tagNames);
     }
 }	
