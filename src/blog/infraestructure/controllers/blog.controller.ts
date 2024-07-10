@@ -106,10 +106,6 @@ export class BlogController {
     @ApiQuery({name: 'filter', required:false})
     @ApiQuery({name: 'category', required:false})
     @ApiQuery({name: 'trainer', required:false})
-    @ApiCreatedResponse({
-        description: 'se retorno todos los blog',
-        type: OrmBlogEntity,
-    })
     @ApiBadRequestResponse({
         description: 'No se encontraron blogs. Agregue algunos'
     })
