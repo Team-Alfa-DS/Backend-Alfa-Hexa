@@ -18,20 +18,23 @@ import { BlogNotFoundException } from "src/blog/domain/exceptions/blog-not-found
 
 export class OdmBlogRepository implements IBlogRepository{
     
-    private odmCommentMapper: OdmBlogCommentMapper;
-    
     constructor(
         private odmBlogMapper: OdmBlogMapper, 
         private blogModel: Model<OdmBlogEntity >,
         private commentModel: Model<OdmBlogCommentEntity>,
         private userModel: Model<OdmUserEntity>,
-        private trainerModel: Model<OdmTrainerEntity>
+        private trainerModel: Model<OdmTrainerEntity>,
+        private odmCommentMapper: OdmBlogCommentMapper
     ) {}
    async  getBlogsCount(category?: string, trainer?: string): Promise<Result<number>> {
        try {
         const blogs = await this.blogModel.find();
         if(!blogs) return Result.fail(new BlogNotFoundException(`No se puede conseguir el conteo de Blogs, ya que no existen blogs`));
-        let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
+        let domainBlogs: Blog[] = [];
+
+            for (const blog of blogs) {
+                domainBlogs.push(await this.odmBlogMapper.toDomain(blog))
+            }
 
     
         if (category){
@@ -54,7 +57,11 @@ export class OdmBlogRepository implements IBlogRepository{
         try {
             const blogs = await this.blogModel.find();
             if(!blogs) return Result.fail(new BlogNotFoundException(`No hay existencia de blogs`));
-            let domainBlogs = blogs.map(blog => OdmBlogMapper.toDomain(blog));
+            let domainBlogs: Blog[] = [];
+
+            for (const blog of blogs) {
+                domainBlogs.push(await this.odmBlogMapper.toDomain(blog))
+            }
 
         
         if (category){
@@ -86,7 +93,7 @@ export class OdmBlogRepository implements IBlogRepository{
        try {
         const blog = await this.blogModel.findOne({id: id});
         if(!blog) return Result.fail(new Error(`Blog with id= ${id} not found`));   
-        const domainBlog =  OdmBlogMapper.toDomain(blog);
+        const domainBlog =  await this.odmBlogMapper.toDomain(blog);
         return Result.success(domainBlog);
        } catch (error) {
             return Result.fail(error); 
@@ -97,7 +104,11 @@ export class OdmBlogRepository implements IBlogRepository{
         try{
             const resp = await this.blogModel.find({tag_id: {$in: tagsName}});
             if(!resp) return Result.fail(new BlogNotFoundException(`No existen Blogs con el tag: ${tagsName}`));
-            const domainBlogs = resp.map(blog => OdmBlogMapper.toDomain(blog));
+            const domainBlogs: Blog[] = [];
+
+            for (const blog of resp) {
+                domainBlogs.push(await this.odmBlogMapper.toDomain(blog))
+            }
             return Result.success(domainBlogs);   
         } catch (error) {
             return Result.fail(error);

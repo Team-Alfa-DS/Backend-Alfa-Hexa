@@ -55,10 +55,8 @@ export class OdmBlogCommentMapper implements IMapper<CommentBlog,OdmBlogCommentE
 
     async toPersistence(Domain: CommentBlog): Promise<OdmBlogCommentEntity> {
         let odmUserMapper = new OdmUserMapper();
-        let odmBlogMapper = new OdmBlogMapper(this.userModel,this.blogModel,this.commentModel, this.trainerModel);
 
         let userRepo: OdmUserRespository = new OdmUserRespository(odmUserMapper, this.userModel);
-        let blogRepo = new OdmBlogRepository(odmBlogMapper, this.blogModel, this.commentModel, this.userModel, this.trainerModel);
         
         let user = await userRepo.findUserById(UserId.create(Domain.UserId.UserId));
 
