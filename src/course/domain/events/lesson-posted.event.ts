@@ -15,5 +15,6 @@ export class LessonPosted extends DomainEvent {
     public seconds: LessonDuration,
     public video: LessonVideo,
     public courseId: CourseId
+    // public comments: CommentLesson[]
   ) {super()}
 }

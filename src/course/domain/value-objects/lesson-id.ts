@@ -18,6 +18,10 @@ export class LessonId extends ValueObject<LessonId> {
     return this.value.equals(obj.value);
   }
 
+  public static create(value: string): LessonId {
+    return new LessonId(value);
+  }
+
   get Value() {
     return this.value.value;
   }

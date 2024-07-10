@@ -1,5 +1,6 @@
 import { ValueObject } from "src/common/domain/value-object";
 import { InvalidBlogTag } from "../exceptions/invalidBlogTag";
+import { Value } from 'firebase-admin/lib/remote-config/remote-config-api';
 
 export class BlogTag extends ValueObject<BlogTag>{
     private constructor(public value: string) {
@@ -15,8 +16,8 @@ export class BlogTag extends ValueObject<BlogTag>{
         return this.value === blogTag.value;
     }
 
-    public static create(blogTag: string): BlogTag {
-        return new BlogTag(blogTag);
+    public static create(Value: string): BlogTag {
+        return new BlogTag(Value);
     }
 
     private isValid(value: string): boolean {

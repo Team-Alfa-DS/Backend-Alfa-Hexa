@@ -3,7 +3,7 @@ import { IService, ServiceRequestDto, ServiceResponseDto } from "../interfaces/I
 import { IServiceDecorator } from "../interfaces/IServiceDecorator";
 import { ILogger } from "../logger/logger.interface";
 
-export class ExceptionLoggerDecorator<I extends ServiceRequestDto, O extends ServiceResponseDto> extends IServiceDecorator<I, O> {
+export class LoggerDecorator<I extends ServiceRequestDto, O extends ServiceResponseDto> extends IServiceDecorator<I, O> {
 
   private readonly logger: ILogger;
 

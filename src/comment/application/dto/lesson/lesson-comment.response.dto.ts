@@ -21,8 +21,6 @@ export type LessonComment = {
     id: string,
     user: string,
     body: string,
-    countLikes: number,
-    countDislikes: number,
     userLiked: boolean,
     userDisliked: boolean,
     date: Date
@@ -31,10 +29,10 @@ export type LessonComment = {
 export class GetLessonCommentServiceResponseDto implements ServiceResponseDto {
 
     constructor(
-    readonly blogComments: LessonComment[]
+    readonly lessonComments: LessonComment[]
     ) {}
 
     dataToString(): string {
-        return `GetLessonCommentRes: { ${JSON.stringify(this.blogComments)} }`
+        return `GetLessonCommentRes: { ${JSON.stringify(this.lessonComments)} }`
     }
 }

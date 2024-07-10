@@ -5,8 +5,12 @@ import { BlogImage } from "src/blog/domain/valueObjects/blogImage";
 import { BlogPublicationDate } from "src/blog/domain/valueObjects/blogPublicationDate";
 import { BlogTag } from "src/blog/domain/valueObjects/blogTag";
 import { BlogTitle } from "src/blog/domain/valueObjects/blogTitle";
-import { Category } from "src/category/domain/Category";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
+import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
+import { OrmCategoryMapper } from "src/category/infraestructure/mapper/orm-category.mapper";
+import { OrmTrainerMapper } from "src/trainer/infraestructure/mapper/orm-trainer.mapper";
 
 interface Tag {
     id: string;
@@ -56,13 +60,31 @@ export class BlogMapper {
             BlogTitle.create(blog.title),
             BlogContent.create(blog.description),
             BlogPublicationDate.create(blog.publication_date),
-            blog.comments.map((comment: Comment) => comment.id),
+            blog.comments.map((comment: Comment) => BlogCommentId.create(comment.id)),
             CategoryId.create(blog.category.id),
-            blog.trainer.id,
+            TrainerId.create(blog.trainer.id),
             blog.tags.map((tag: Tag) => BlogTag.create(tag.name)),
             blog.images.map((image: Image) => BlogImage.create(image.url))
 
         );
     }
+
+    static async toPersistence(blog: Blog): Promise<OrmBlogEntity> {
+        // console.log(blog);
+        
+        let ormBlog = OrmBlogEntity.create(
+            blog.Id.value,
+            blog.Title.value,
+            blog.Content.value,
+            blog.Publication_date.value,
+            blog.Category.value,
+            blog.Trainer.trainerId,
+            blog.Tags.map((tag) => tag.value),
+            blog.Images.map((image) => image.value),
+            blog.Comments.map((comment) => comment.commentId)
+        );
+
+        return ormBlog;
+    } 
     
 }

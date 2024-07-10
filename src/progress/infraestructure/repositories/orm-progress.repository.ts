@@ -37,12 +37,12 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
     async findLastProgressByUser(userId: UserId, runner: TransactionHandler): Promise<Result<Progress>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progress = await runnerTransaction.manager
+            const progressInc = await runnerTransaction.manager
             .createQueryBuilder(OrmProgressEntity, "progress")
             .where("progress.lastTime = (SELECT MAX(progress.lastTime) from progress) AND progress.user_id = :userId", {userId: userId.Id})
             .getOne();
-            
-            if (!progress) return Result.fail(new Error('El usuario no posee progreso'));
+            if (!progressInc) return Result.fail(new Error('El usuario no posee progreso'));
+            const progress = await this.findOne({relations: {lesson: true}, where: {user_id: userId.Id, lesson_id: progressInc.lesson_id}})
 
             const progressDomain = await this.ormProgressMapper.toDomain(progress);
             return Result.success(progressDomain);
@@ -65,15 +65,15 @@ export class OrmProgressRepository extends Repository<OrmProgressEntity> impleme
     async findProgressByUserCourse(userId: UserId, lessons: Lesson[], runner: TransactionHandler): Promise<Result<Progress[]>> {
         const runnerTransaction = runner.getRunner();
         try {
-            const progressList = await runnerTransaction.manager.findBy(OrmProgressEntity, {user_id: userId.Id});
+            const progressList = await runnerTransaction.manager.find(OrmProgressEntity, {relations: {lesson: true}, where: {user_id: userId.Id}});
             const progressCourse = progressList.filter(pro => lessons.findIndex(lesson => lesson.id.equals(new LessonId(pro.lesson_id))) != -1);
             const progressDomainList: Progress[] = [];
             
-            // for (const progress of progressCourse) {
-            //     progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
-            // }
+            for (const progress of progressCourse) {
+                progressDomainList.push(await this.ormProgressMapper.toDomain(progress))
+            }
 
-            return Result.success(progressDomainList)
+            return Result.success(progressDomainList);
         } catch(err) {
             return Result.fail(new Error(err.message));
         }

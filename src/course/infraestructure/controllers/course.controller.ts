@@ -6,12 +6,9 @@ import { GetCourseByIdService, GetCourseByIdRequest, GetCourseByIdResponse } fro
 import { TOrmCourseRepository } from "../repositories/TOrmCourse.repository";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { JwtAuthGuard } from "src/auth/infraestructure/guards/jwt-guard.guard";
-import { ServiceLoggerDecorator } from "src/common/application/aspects/serviceLoggerDecorator";
-import { FsPromiseLogger } from "src/common/infraestructure/adapters/FsPromiseLogger";
 import { IService } from "src/common/application/interfaces/IService";
-import { Course } from "src/course/domain/Course";
 import { GetManyCoursesQueryDto } from "../dtos/getManyCoursesQuery.dto";
-import { ExceptionLoggerDecorator } from "src/common/application/aspects/exceptionLoggerDecorator";
+import { LoggerDecorator } from "src/common/application/aspects/loggerDecorator";
 import { NestLogger } from "src/common/infraestructure/logger/nest-logger";
 import { ServiceDBLoggerDecorator } from "src/common/application/aspects/serviceDBLoggerDecorator";
 import { OrmAuditRepository } from "src/common/infraestructure/repository/orm-audit.repository";
@@ -33,7 +30,6 @@ import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-ent
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 import { UuidGen } from "src/common/infraestructure/id-gen/uuid-gen";
-import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { SaveCourseEvent } from "../events/synchronize/save-course.event";
@@ -41,6 +37,9 @@ import { PostLesonBodyDto } from "../dtos/postLessonBody.dto";
 import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
 import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "src/course/application/services/postLesson.service";
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
+import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
+import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
 
 @ApiTags('Course')
 @ApiBearerAuth()
@@ -59,10 +58,12 @@ export class CourseController {
               @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
               @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
               @InjectModel('tag') tagModel: Model<OdmTagEntity>,
-              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>
+              @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
+              @InjectModel('lesson_comment') commentModel: Model<OdmLessonCommentEntity>,
+              @InjectModel('user') userModel: Model<OdmUserEntity>
   ) {
     const OrmCourseRepositoryInstance = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel);
+    const OdmCourseRepositoryInstance = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel);
     const trainerRepositoryInstance = new OrmTrainerRepository(new OrmTrainerMapper() ,PgDatabaseSingleton.getInstance());
     const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
     const logger = new NestLogger();
@@ -71,40 +72,50 @@ export class CourseController {
     this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
-    this.getManyCoursesService = new ExceptionLoggerDecorator( 
-      new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
-      logger
+    this.getManyCoursesService = new ExceptionDecorator(
+      new LoggerDecorator( 
+        new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        logger
+      )
     );
-    this.getCourseByIdService = new ExceptionLoggerDecorator(
-      new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
-      logger
+    this.getCourseByIdService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        logger
+      )
     );
-    this.getCourseCountService = new ExceptionLoggerDecorator(
-      new GetCourseCountService(OdmCourseRepositoryInstance),
-      logger
+    this.getCourseCountService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new GetCourseCountService(OdmCourseRepositoryInstance),
+        logger
+      )
     );
-    this.postCourseService = new ExceptionLoggerDecorator(
-      new ServiceDBLoggerDecorator(
-        new PostCourseService(
-          OrmCourseRepositoryInstance, 
-          new UuidGen(),
-          // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
-          EventManagerSingleton.getInstance()
+    this.postCourseService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new PostCourseService(
+            OrmCourseRepositoryInstance, 
+            new UuidGen(),
+            // new TransactionHandler(PgDatabaseSingleton.getInstance().createQueryRunner()),
+            EventManagerSingleton.getInstance()
+          ),
+          new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
         ),
-        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
-      ),
-      logger
+        logger
+      )
     );
-    this.postLessonService = new ExceptionLoggerDecorator(
-      new ServiceDBLoggerDecorator(
-        new PostLessonService(
-          OrmCourseRepositoryInstance,
-          new UuidGen(),
-          EventManagerSingleton.getInstance()
+    this.postLessonService = new ExceptionDecorator(
+      new LoggerDecorator(
+        new ServiceDBLoggerDecorator(
+          new PostLessonService(
+            OrmCourseRepositoryInstance,
+            new UuidGen(),
+            EventManagerSingleton.getInstance()
+          ),
+          new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
         ),
-        new OrmAuditRepository(PgDatabaseSingleton.getInstance()),
-      ),
-      logger
+        logger
+      )
     )
   }
 
@@ -120,13 +131,7 @@ export class CourseController {
   async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
     const result = await this.getCourseByIdService.execute(request);
-    
-    if (result.isSuccess)
-    {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
+    return result.Value;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -152,14 +157,7 @@ export class CourseController {
       manyCoursesQueryDto.perpage);
 
     const result = await this.getManyCoursesService.execute(request);
-    
-    if (result.isSuccess)
-    {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
-    
+    return result.Value;
   }
 
   @Get('/count')
@@ -172,12 +170,7 @@ export class CourseController {
     )
 
     const result = await this.getCourseCountService.execute(request);
-
-    if (result.isSuccess) {
-      return result.Value;
-    } else {
-      throw ExceptionMapper.toHttp(result.Error);
-    }
+    return result.Value;
   }
 
   @Post()
@@ -195,11 +188,7 @@ export class CourseController {
       postCourseBodyDto.trainerId
     ));
 
-    if (response.isSuccess) {
-      return response.Value;
-    } else {
-      return ExceptionMapper.toHttp(response.Error);
-    }
+    return response.Value;
   }
 
   @Post('lesson')
@@ -213,11 +202,6 @@ export class CourseController {
       postLessonBodyDto.seconds,
       postLessonBodyDto.videoUrl
     ));
-
-    if (response.isSuccess) {
-      return response.Value;
-    } else {
-      return ExceptionMapper.toHttp(response.Error);
-    }
+    return response.Value;
   }
 }

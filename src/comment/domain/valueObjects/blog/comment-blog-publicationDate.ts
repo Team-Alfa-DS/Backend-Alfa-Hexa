@@ -12,10 +12,8 @@ export class CommentBlogPublicationDate extends ValueObject<CommentBlogPublicati
         super();
         
         if (!publicationDate ) throw new EmptyBlogCommentPublicationDateException(`La fecha no puede ser vacia`);
-        if (!/^\d{2}\/\d{2}\/\d{4}$/.test(publicationDate.toLocaleDateString())) {
-            throw new BadFormaBlogCommentPublicationDateException(`La fecha ${publicationDate} no tiene el formato correcto`);
-        }
-        if (publicationDate > new Date() || publicationDate < new Date()) throw new InvalidBlogCommentPublicationDateException(`La fecha ${publicationDate} no es valida`);
+        
+        if (publicationDate > new Date()) throw new InvalidBlogCommentPublicationDateException(`La fecha ${publicationDate} no es valida`);
         this.publicationDate = Object.freeze(publicationDate); //*Esto funciona para que no pueda ser modificado el id
     }
 

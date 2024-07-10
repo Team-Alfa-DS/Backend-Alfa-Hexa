@@ -7,7 +7,7 @@ export class UserEmail extends ValueObject<UserEmail> {
     private constructor(email: string) {
         super();
         let valid: boolean = true
-        const regex = /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/gim;
+        const regex = /^[A-Za-z0-9._+\-\']+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
 
         if (!regex.test(email)) {
             valid = false

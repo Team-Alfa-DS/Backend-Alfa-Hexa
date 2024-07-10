@@ -1,32 +1,26 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { BlogComment, GetBlogCommentServiceResponseDto, GetBlogCommentsServiceRequestDto } from "../../dto/blog/blog-comment.response.dto";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IService } from "src/common/application/interfaces/IService";
-import { IBlogCommentRepository } from "src/comment/domain/repositories/blog/comment-blog-repository.interface";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { BlogId } from "src/blog/domain/valueObjects/blogId";
+import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 
 export class GetCommentBlogService extends IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>{
     
-    private readonly commentBlogRepository: IBlogCommentRepository;
-    private readonly transactionHandler: ITransactionHandler;
+    private readonly blogRepository: IBlogRepository;
 
     constructor(
-        commentBlogRepository: IBlogCommentRepository,
-        transactionHandler: ITransactionHandler,
+        blogRepository: IBlogRepository,
     ){
         super();
-        this.commentBlogRepository = commentBlogRepository;
-        this.transactionHandler = transactionHandler;
+        this.blogRepository = blogRepository;
     }
     
     async execute(data : GetBlogCommentsServiceRequestDto): Promise<Result<GetBlogCommentServiceResponseDto>> {
-        if (!data.pagination.page) data.pagination.page = 0;
-        
-        const blogId = BlogCommentBlogId.create( data.blogId );
+        const blogId = BlogCommentBlogId.create( BlogId.create(data.blogId) );
 
-        const comments = await this.commentBlogRepository.findAllCommentsByBlogId(
-            blogId, 
-            this.transactionHandler
+        const comments = await this.blogRepository.findAllCommentsByBlogId(
+            blogId
         );
                 
         if (!comments.isSuccess)  return Result.fail(comments.Error);
@@ -36,8 +30,6 @@ export class GetCommentBlogService extends IService<GetBlogCommentsServiceReques
                 id: comment.Id.commentId, 
                 user: comment.UserId.UserId, 
                 body: comment.Body.Body, 
-                countLikes: comment.CountLikes.CountLike, 
-                countDislikes: comment.CountDislikes.CountDislike, 
                 userLiked: comment.UserLiked.UserLiked, 
                 userDisliked: comment.UserDisliked.UserDisliked, 
                 date: comment.PublicationDate.PublicationDate})

@@ -9,22 +9,31 @@ import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
-import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmTagEntity } from "src/tag/infraestructure/entities/odm-entities/odm-tag.entity";
 import { Lesson } from "src/course/domain/entities/Lesson";
 import { OdmLessonMapper } from "../mappers/odm-mappers/odm-lesson.mapper";
 import { OdmLessonEntity } from "../entities/odm-entities/odm-lesson.entity";
+import { Result } from "src/common/domain/result-handler/result";
+import { LessonCommentLessonId } from "src/comment/domain/valueObjects/lesson/comment-lesson-lessonId";
+import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
+import { CommentsLessonNotFoundException } from "src/comment/domain/exceptions/lesson/comments-lesson-not-found-exception";
+import { OdmLessonCommentMapper } from "../mappers/odm-mappers/odm-comment-lesson.mapper";
+import { CommentLesson } from "src/course/domain/entities/comment-lesson";
+import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 export class OdmCourseRepository implements ICourseRepository {
-  
+  private odmCommentMapper: OdmLessonCommentMapper;
+
   constructor(
     private courseModel: Model<OdmCourseEntity>,
     private categoryModel: Model<OdmCategoryEntity>,
     private trainerModel: Model<OdmTrainerEntity>,
     private tagModel: Model<OdmTagEntity>,
-    private lessonModel: Model<OdmLessonEntity>
+    private lessonModel: Model<OdmLessonEntity>,
+    private commentModel: Model<OdmLessonCommentEntity>,
+    private userModel: Model<OdmUserEntity>
   ){}
 
   async getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]> {
@@ -67,7 +76,7 @@ export class OdmCourseRepository implements ICourseRepository {
     if (result.length <= 0) {throw new CourseNotFoundException(`No hay cursos guardados`)}
     console.log(result);
     
-    let courses = OdmCourseMapper.arrayToDomain(result);
+    let courses = await OdmCourseMapper.arrayToDomain(result, this.commentModel);
 
     if (filter) {
       for (let tag of filter) {
@@ -138,7 +147,7 @@ export class OdmCourseRepository implements ICourseRepository {
 
     if (!result) {throw new CourseNotFoundException(`No se encontró un curso con el id: ${courseId}`)}
 
-    return OdmCourseMapper.toDomain(result);
+    return OdmCourseMapper.toDomain(result, this.commentModel);
   }
   async getCoursesByTag(tag: CourseTag): Promise<Course[]> {
     const result = await this.courseModel.find<OdmCourseEntity>();
@@ -181,7 +190,7 @@ export class OdmCourseRepository implements ICourseRepository {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
 
-    let courses = OdmCourseMapper.arrayToDomain(result);
+    let courses = await OdmCourseMapper.arrayToDomain(result, this.commentModel);
     courses = courses.filter((course) => course.containsTag(tag));
     
     if (courses.length <= 0) {
@@ -230,11 +239,12 @@ export class OdmCourseRepository implements ICourseRepository {
     if (result.length <= 0) {
       throw new CourseNotFoundException(`No hay cursos guardados`);
     }
-
+    console.log(result); //Debug
+    
     for (let course of result) { 
       for (let lesson of course.lessons) {
         if (lessonId.equals(new LessonId(lesson.id))) {
-          return OdmCourseMapper.toDomain(course);
+          return OdmCourseMapper.toDomain(course, this.commentModel);
         }
       }
     }
@@ -295,7 +305,7 @@ export class OdmCourseRepository implements ICourseRepository {
     } else {
       // const courses = CourseMapper.arrayToDomain(result);
       // return courses;
-      return OdmCourseMapper.arrayToDomain(result);
+      return OdmCourseMapper.arrayToDomain(result, this.commentModel);
     }
   }
 
@@ -321,7 +331,7 @@ export class OdmCourseRepository implements ICourseRepository {
     // ]);
 
     if (result.length == 0) {return 0}   //{return Result.fail(new Error('No se encontraron Cursos'), HttpStatus.BAD_REQUEST, `No se encontraron Cursos`)}
-    let courses = OdmCourseMapper.arrayToDomain(result);
+    let courses = await OdmCourseMapper.arrayToDomain(result, this.commentModel);
     
     if (category) {courses = courses.filter((course) => course.Category.equals(category))}
     if (trainerId) {courses = courses.filter((course) => course.Trainer.equals(trainerId))}
@@ -347,4 +357,52 @@ export class OdmCourseRepository implements ICourseRepository {
     await this.courseModel.findOneAndUpdate({id: OdmCourse.id}, OdmCourse);
     return lesson;
   }
+
+  async saveComment (comment: CommentLesson): Promise<CommentLesson>{ 
+    // console.log(comment); //Debug
+    
+      const odmComment = await OdmLessonCommentMapper.toPersistence(comment, this.userModel, this.lessonModel);
+      console.log(odmComment);
+      await this.commentModel.create(odmComment);
+      return comment;
+  }
+
+  
+
+  async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]> {
+    const r = await this.commentModel.find<OdmLessonCommentEntity>();
+
+    if (r.length == 0) { throw new CommentsLessonNotFoundException('No se encontraron comentarios de lecciones') }
+    
+    
+    let comments = await OdmLessonCommentMapper.arrayToDomain(r);
+    
+    comments = comments.filter((comment) => comment.LessonId.equals(id));
+    if (comments.length == 0) {throw new CommentsLessonNotFoundException(`No se encontraron comentarios para la lección con Id: ${id}`)}
+    return comments;
+  }
+
+  // async findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<Result<CommentLesson[]>> {
+  //   try{
+  //       const r = await this.commentModel.find<OdmLessonCommentEntity>();
+        
+  //       if (!r) return Result.fail<CommentLesson[]>(new CommentsLessonNotFoundException( 
+  //           `Ha ocurrido un error al encontrar los comentarios` ));
+        
+  //       const comment = r.filter(e => e.lesson.id === id.LessonId.Value)
+
+  //       const ListMapper = []
+  //       comment.forEach(async e => {
+  //           ListMapper.push( 
+  //               await this.odmCommentMapper.toDomain(e ))
+  //       });
+    
+        
+  //       return Result.success<CommentLesson[]>(ListMapper);
+  //   }catch(err){
+  //       return Result.fail(new Error(err.message));
+  //   }
+  // }
+
+
 }

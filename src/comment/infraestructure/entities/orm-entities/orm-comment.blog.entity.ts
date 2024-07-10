@@ -17,12 +17,6 @@ export class OrmBlogCommentEntity {
 
     @Column()
     publication_date: Date;
-
-    @Column({nullable: true})
-    count_likes?: number;
-
-    @Column({nullable: true})
-    count_dislikes?: number;
     
     @Column({nullable: true})
     userLiked?: boolean;
@@ -47,21 +41,20 @@ export class OrmBlogCommentEntity {
         body: string,
         userId: string,
         blogId: string,
-        count_likes?: number,
-        count_dislikes?: number,
-        userLiked?: boolean,
-        userDisliked?: boolean,
+        // userLiked?: boolean,
+        // userDisliked?: boolean,
     ){
+        // console.log('just before new ormBlog');
+        
         const comment = new OrmBlogCommentEntity()
+        // console.log('just after new ormBlog');
         comment.id = id;
         comment.publication_date = publication_date;
         comment.body = body;
         comment.user_id = userId;
         comment.blog_id = blogId;
-        comment.count_likes = count_likes;
-        comment.count_dislikes = count_dislikes;
-        comment.userLiked = userLiked;
-        comment.userDisliked = userDisliked;
+        // comment.userLiked = userLiked;
+        // comment.userDisliked = userDisliked;
         return comment
     }
 
@@ -85,20 +78,12 @@ export class OrmBlogCommentEntity {
         return this.blog_id;
     }
 
-    get CountLikes(): number | undefined {
-        return this.count_likes;
-    }
+    // get UserLiked(): boolean | undefined {
+    //     return this.userLiked;
+    // }
 
-    get CountDislikes(): number | undefined {
-        return this.count_dislikes;
-    }
-
-    get UserLiked(): boolean | undefined {
-        return this.userLiked;
-    }
-
-    get UserDisliked(): boolean | undefined {
-        return this.userDisliked;
-    }
+    // get UserDisliked(): boolean | undefined {
+    //     return this.userDisliked;
+    // }
 
 }
