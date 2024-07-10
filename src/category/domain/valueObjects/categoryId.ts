@@ -1,11 +1,15 @@
 import { ValueObject } from "src/common/domain/value-object";
+import { NotCorrectFormatCategoryIDException } from "../exceptions/not-correct-format-category-id.exception";
+import { EmptyCategoryIdException } from "../exceptions/empty-category-id.exception";
 
 
 export class CategoryId extends ValueObject<CategoryId> {
     private constructor(public value: string) {
         super();
+
+        if (!value) new EmptyCategoryIdException(`El CategoryId no debe estar vacio`);
         if (!this.isValid(value)) {
-            throw new Error(`CategoryId ${value} is invalid`);
+            throw new NotCorrectFormatCategoryIDException(`El CategoryId ${value} no tiene el formato correcto, debe ser de tipo UUID`);
         } 
 
         this.value = value;
