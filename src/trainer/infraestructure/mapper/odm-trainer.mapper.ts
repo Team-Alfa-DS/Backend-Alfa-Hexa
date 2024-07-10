@@ -31,9 +31,11 @@ export class OdmTrainerMapper implements IMapper<Trainer, OdmTrainerEntity> {
 
     async toPersistence(DomainEntity: Trainer): Promise<OdmTrainerEntity> {
         const users: OdmUserEntity[] = [];
-        for (const user of DomainEntity.User) {
-            const userFound = await this.userModel.findOne({id: user.trainerFollowerUserId.Id})
-            if (userFound) users.push(userFound);
+        if (DomainEntity.User) {
+            for (const user of DomainEntity.User) {
+                const userFound = await this.userModel.findOne({id: user.trainerFollowerUserId.Id})
+                if (userFound) users.push(userFound);
+            }
         }
         const trainerPersistence = OdmTrainerEntity.create(
             DomainEntity.Id.trainerId,

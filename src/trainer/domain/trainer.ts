@@ -10,6 +10,7 @@ import { TrainerFollowerUserId } from './valueObjects/trainer-userid';
 import { TrainerBlogId } from './valueObjects/trainer-blogid';
 import { TrainerCourseId } from './valueObjects/trainer-courseid';
 import { TrainerUsersUpdated } from './events/trainer-users-updated.event';
+import { TrainerRegister } from './events/trainer-Register.event';
 
 export class Trainer extends AggregateRoot<TrainerId> {
   private name: TrainerName;
@@ -95,5 +96,9 @@ export class Trainer extends AggregateRoot<TrainerId> {
   DelUserFollow (user: TrainerFollowerUserId) {
     const users = this.users.filter(u => u.trainerFollowerUserId.Id !== user.trainerFollowerUserId.Id);
     this.apply(TrainerUsersUpdated.create(this.Id, users));
+  }
+
+  Register() {
+    this.apply(TrainerRegister.create(this.Id, this.name, this.followers, this.location, this.courses, this.blogs, this.users));
   }
 }
