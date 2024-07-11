@@ -39,13 +39,13 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
             video: lesson.video.Value
           });
         }
-        let levelNum = 1;
-        switch(r.Level.value) {
-          case('Principiante'): levelNum = 1;
-          case('Intermedio'): levelNum = 2;
-          case('Avanzado'): levelNum = 3;
-          case('Todos los Niveles'): levelNum = 4;
-        }
+        // let levelNum = 1;
+        // switch(r.Level.value) {
+        //   case('Principiante'): levelNum = 1;
+        //   case('Intermedio'): levelNum = 2;
+        //   case('Avanzado'): levelNum = 3;
+        //   case('Todos los Niveles'): levelNum = 4;
+        // }
 
       return Result.success(new GetCourseByIdResponse(
         r.Id.Value,
@@ -54,7 +54,7 @@ export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCour
         category.Value.Name.value,
         r.Image.Value,
         {id: trainer.Value.Id.trainerId, name: trainer.Value.Name.trainerName},
-        levelNum,
+        r.Level.value,
         r.DurationWeeks.value,
         r.DurationMinutes.value,
         r.Tags.map(tag => tag.name),
@@ -83,7 +83,7 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
   readonly category: string;
   readonly image: string;
   readonly trainer: {id: string, name: string};
-  readonly level: number;
+  readonly level: string;
   readonly durationWeeks: number;
   readonly durationMinutes: number;
   readonly tags: string[] = [];
@@ -102,7 +102,7 @@ export class GetCourseByIdResponse implements ServiceResponseDto {
     category: string,
     image: string,
     trainer: {id: string, name: string},
-    level: number,
+    level: string,
     durationWeeks: number,
     durationMinutes: number,
     tags: string[],
