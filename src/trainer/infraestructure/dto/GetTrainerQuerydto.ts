@@ -10,7 +10,7 @@ export class GetManyTrainerQueryDto {
   @IsOptional()
   @IsBoolean()
   @Transform(({value})=> value === 'true')
-  userfollow?: boolean;
+  userFollow?: boolean;
 
   @ApiProperty({
     description: 'Desde donde se empiezan a contar los trainers',
@@ -28,5 +28,5 @@ export class GetManyTrainerQueryDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  perpage?: number;
+  perPage?: number;
 }

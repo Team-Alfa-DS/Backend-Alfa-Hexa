@@ -22,7 +22,7 @@ import { NotifierServiceSave } from "src/notify/notify/application/service/savet
 
 
 
-@Controller('notify')
+@Controller('notifications')
 export class notifycontroller{
    /* private readonly tokenrepository: TokenRepository;*/
     private readonly notifyrepository: OrmNotifyRepository;
@@ -59,11 +59,11 @@ constructor(){
     }
 }
 
-@Get('/many')
+@Get('many')
  async getAllNotify(@Query() manynotifyquerydto: GetManyNotifyQueryDto){
     const request =  new getAllNotifyRequest(
         manynotifyquerydto.page,
-        manynotifyquerydto.perpage
+        manynotifyquerydto.perPage
     );
     const result =  await this.GetAllNotify.execute(request);
     if(result.isSuccess){

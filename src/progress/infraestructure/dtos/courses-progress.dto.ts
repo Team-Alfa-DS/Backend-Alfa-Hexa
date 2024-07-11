@@ -18,5 +18,5 @@ export class CoursesProgressDto {
     @IsOptional()
     @IsNumber()
     @Type(() => Number)
-    perpage?: number;
+    perPage?: number;
 }

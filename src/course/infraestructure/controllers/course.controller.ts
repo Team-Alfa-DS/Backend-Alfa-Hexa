@@ -171,7 +171,7 @@ export class CourseController {
       manyCoursesQueryDto.category,
       manyCoursesQueryDto.trainer,
       manyCoursesQueryDto.page,
-      manyCoursesQueryDto.perpage);
+      manyCoursesQueryDto.perPage);
 
     const result = await this.getManyCoursesService.execute(request);
     return result.Value;

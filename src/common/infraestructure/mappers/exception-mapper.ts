@@ -83,102 +83,102 @@ export class ExceptionMapper {
     switch (error.constructor) {
 
       //user Exceptions
-      case (UserNotFoundException): return new HttpException(error.message, 410);
-      case (InvalidUserEmailException): return new HttpException(error.message, 410);
-      case (InvalidUserIdException): return new HttpException(error.message, 410);
-      case (InvalidUserImageException): return new HttpException(error.message, 410);
-      case (InvalidUserNameException): return new HttpException(error.message, 410);
-      case (InvalidUserPasswordException): return new HttpException(error.message, 410);
-      case (InvalidUserPhoneException): return new HttpException(error.message, 410);
-      case (InvalidUserTypeException): return new HttpException(error.message, 410);
-      case (InvalidUserException): return new HttpException(error.message, 410);
+      case (UserNotFoundException): return new HttpException(error.message, 404);
+      case (InvalidUserEmailException): return new HttpException(error.message, 404);
+      case (InvalidUserIdException): return new HttpException(error.message, 404);
+      case (InvalidUserImageException): return new HttpException(error.message, 404);
+      case (InvalidUserNameException): return new HttpException(error.message, 404);
+      case (InvalidUserPasswordException): return new HttpException(error.message, 404);
+      case (InvalidUserPhoneException): return new HttpException(error.message, 404);
+      case (InvalidUserTypeException): return new HttpException(error.message, 404);
+      case (InvalidUserException): return new HttpException(error.message, 404);
 
       //Course Exceptions
       case (CourseNotFoundException): return new HttpException(error.message, HttpStatus.NOT_FOUND);
-      case (InvalidCourseException): return new HttpException(error.message, 420);
-      case (NegativeCourseMinutesException): return new HttpException(error.message, 420);
-      case (NegativeCourseWeeksException): return new HttpException(error.message, 420);
-      case (NullCourseCategoryException): return new HttpException(error.message, 420);
-      case (NullCourseDescriptionException): return new HttpException(error.message, 420);
-      case (NullCourseIdException): return new HttpException(error.message, 420);
-      case (NullCourseImageException): return new HttpException(error.message, 420);
-      case (NullCourseLevelException): return new HttpException(error.message, 420);
-      case (NullCourseMinutesException): return new HttpException(error.message, 420);
-      case (NullCourseTagException): return new HttpException(error.message, 420);
-      case (NullCourseTitleException): return new HttpException(error.message, 420);
-      case (NullCourseTrainerException): return new HttpException(error.message, 420);
-      case (NullCourseWeekException): return new HttpException(error.message, 420);
+      case (InvalidCourseException): return new HttpException(error.message, 404);
+      case (NegativeCourseMinutesException): return new HttpException(error.message, 404);
+      case (NegativeCourseWeeksException): return new HttpException(error.message, 404);
+      case (NullCourseCategoryException): return new HttpException(error.message, 404);
+      case (NullCourseDescriptionException): return new HttpException(error.message, 404);
+      case (NullCourseIdException): return new HttpException(error.message, 404);
+      case (NullCourseImageException): return new HttpException(error.message, 404);
+      case (NullCourseLevelException): return new HttpException(error.message, 404);
+      case (NullCourseMinutesException): return new HttpException(error.message, 404);
+      case (NullCourseTagException): return new HttpException(error.message, 404);
+      case (NullCourseTitleException): return new HttpException(error.message, 404);
+      case (NullCourseTrainerException): return new HttpException(error.message, 404);
+      case (NullCourseWeekException): return new HttpException(error.message, 404);
       
       //Lesson Exceptions
-      case (NegativeLessonSecondsException): return new HttpException(error.message, 430);
-      case (NullLessonContentException): return new HttpException(error.message, 430);
-      case (NullLessonIdException): return new HttpException(error.message, 430);
-      case (NullLessonSecondsException): return new HttpException(error.message, 430);
-      case (NullLessonTitleException): return new HttpException(error.message, 430);
-      case (NullLessonVideoException): return new HttpException(error.message, 430);
+      case (NegativeLessonSecondsException): return new HttpException(error.message, 404);
+      case (NullLessonContentException): return new HttpException(error.message, 404);
+      case (NullLessonIdException): return new HttpException(error.message, 404);
+      case (NullLessonSecondsException): return new HttpException(error.message, 404);
+      case (NullLessonTitleException): return new HttpException(error.message, 404);
+      case (NullLessonVideoException): return new HttpException(error.message, 404);
 
       //CommentLesson Exceptions
-      case (BadFormatLessonCommentPublicationDateException): return new HttpException(error.message, 440);
-      case (CommentsLessonNotFoundException): return new HttpException(error.message, 440);
-      case (EmptyLessonCommentIdException): return new HttpException(error.message, 440);
-      case (EmptyLessonCommentLessonIdException): return new HttpException(error.message, 440);
-      case (EmptyLessonCommentPublicationDateException): return new HttpException(error.message, 440);
-      case (EmptyLessonCommentUserIdException): return new HttpException(error.message, 440);
-      case (ExceededLessonCommentPublicationDateException): return new HttpException(error.message, 440);
-      case (InvalidLessonCommentBodyException): return new HttpException(error.message, 440);
+      case (BadFormatLessonCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (CommentsLessonNotFoundException): return new HttpException(error.message, 404);
+      case (EmptyLessonCommentIdException): return new HttpException(error.message, 404);
+      case (EmptyLessonCommentLessonIdException): return new HttpException(error.message, 404);
+      case (EmptyLessonCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (EmptyLessonCommentUserIdException): return new HttpException(error.message, 404);
+      case (ExceededLessonCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (InvalidLessonCommentBodyException): return new HttpException(error.message, 404);
 
       //CommentBlog Exceptions
-      case (BadFormaBlogCommentPublicationDateException): return new HttpException(error.message, 450);
-      case (CommentsBlogNotFoundException): return new HttpException(error.message, 450);
-      case (EmptyBlogCommentBlogIdException): return new HttpException(error.message, 450);
-      case (EmptyBlogCommentIdException): return new HttpException(error.message, 450);
-      case (EmptyBlogCommentPublicationDateException): return new HttpException(error.message, 450);
-      case (EmptyBlogCommentUserIdException): return new HttpException(error.message, 450);
-      case (ExceededBlogCommentPublicationDateException): return new HttpException(error.message, 450);
-      case (InvalidBlogCommentBodyException): return new HttpException(error.message, 450);
+      case (BadFormaBlogCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (CommentsBlogNotFoundException): return new HttpException(error.message, 404);
+      case (EmptyBlogCommentBlogIdException): return new HttpException(error.message, 404);
+      case (EmptyBlogCommentIdException): return new HttpException(error.message, 404);
+      case (EmptyBlogCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (EmptyBlogCommentUserIdException): return new HttpException(error.message, 404);
+      case (ExceededBlogCommentPublicationDateException): return new HttpException(error.message, 404);
+      case (InvalidBlogCommentBodyException): return new HttpException(error.message, 404);
 
       //Blog Exceptions
-      case (BlogNotFoundException): return new HttpException(error.message, 460);
-      case (InvalidBlogContent): return new HttpException(error.message, 460);
-      case (InvalidBlogException): return new HttpException(error.message, 460);
-      case (InvalidBlogId): return new HttpException(error.message, 460);
-      case (InvalidBlogImage): return new HttpException(error.message, 460);
-      case (InvalidBlogPublicationDate): return new HttpException(error.message, 460);
-      case (InvalidBlogTag): return new HttpException(error.message, 460);
-      case (InvalidBlogTitle): return new HttpException(error.message, 460);
+      case (BlogNotFoundException): return new HttpException(error.message, 404);
+      case (InvalidBlogContent): return new HttpException(error.message, 404);
+      case (InvalidBlogException): return new HttpException(error.message, 404);
+      case (InvalidBlogId): return new HttpException(error.message, 404);
+      case (InvalidBlogImage): return new HttpException(error.message, 404);
+      case (InvalidBlogPublicationDate): return new HttpException(error.message, 404);
+      case (InvalidBlogTag): return new HttpException(error.message, 404);
+      case (InvalidBlogTitle): return new HttpException(error.message, 404);
 
       //Category Exceptions
-      case (CategoryNotFoundException): return new HttpException(error.message, 470);
-      case (EmptyCategoryIconException): return new HttpException(error.message, 470);
-      case (EmptyCategoryIdException): return new HttpException(error.message, 470);
-      case (EmptyCategoryNameException): return new HttpException(error.message, 470);
-      case (NotCorrectFormatCategoryIDException): return new HttpException(error.message, 470);
+      case (CategoryNotFoundException): return new HttpException(error.message, 404);
+      case (EmptyCategoryIconException): return new HttpException(error.message, 404);
+      case (EmptyCategoryIdException): return new HttpException(error.message, 404);
+      case (EmptyCategoryNameException): return new HttpException(error.message, 404);
+      case (NotCorrectFormatCategoryIDException): return new HttpException(error.message, 404);
 
       //Progress Exceptions
-      case (InvalidProgressIdException): return new HttpException(error.message, 480);
-      case (InvalidProgressLastTimeException): return new HttpException(error.message, 480);
-      case (InvalidProgressLessonIdException): return new HttpException(error.message, 480);
-      case (InvalidProgressMarkAsCompletedException): return new HttpException(error.message, 480);
-      case (InvalidProgressTimeException): return new HttpException(error.message, 480);
-      case (InvalidProgressUserIdException): return new HttpException(error.message, 480);
-      case (InvalidProgressException): return new HttpException(error.message, 480);
-      case (ProgressNotFoundException): return new HttpException(error.message, 480);
+      case (InvalidProgressIdException): return new HttpException(error.message, 404);
+      case (InvalidProgressLastTimeException): return new HttpException(error.message, 404);
+      case (InvalidProgressLessonIdException): return new HttpException(error.message, 404);
+      case (InvalidProgressMarkAsCompletedException): return new HttpException(error.message, 404);
+      case (InvalidProgressTimeException): return new HttpException(error.message, 404);
+      case (InvalidProgressUserIdException): return new HttpException(error.message, 404);
+      case (InvalidProgressException): return new HttpException(error.message, 404);
+      case (ProgressNotFoundException): return new HttpException(error.message, 404);
 
       //Trainer Exceptions
-      case (EmptyTrainerBlogIdException): return new HttpException(error.message, 490);
-      case (EmptyTrainerCourseException): return new HttpException(error.message, 490);
-      case (EmptyTrainerFollowerException): return new HttpException(error.message, 490);
-      case (EmptyTrainerIdException): return new HttpException(error.message, 490);
-      case (EmptyTrainerLocationException): return new HttpException(error.message, 490);
-      case (EmptyTrainerNameException): return new HttpException(error.message, 490);
-      case (EmptyuserIdExceptionTrainer): return new HttpException(error.message, 490);
-      case (InvalidTrainerException): return new HttpException(error.message, 490);
-      case (InvalidTrainerLocationException): return new HttpException(error.message, 490);
-      case (InvalidTrainerNameException): return new HttpException(error.message, 490);
-      case (TrainerNotFoundException): return new HttpException(error.message, 490);
+      case (EmptyTrainerBlogIdException): return new HttpException(error.message, 404);
+      case (EmptyTrainerCourseException): return new HttpException(error.message, 404);
+      case (EmptyTrainerFollowerException): return new HttpException(error.message, 404);
+      case (EmptyTrainerIdException): return new HttpException(error.message, 404);
+      case (EmptyTrainerLocationException): return new HttpException(error.message, 404);
+      case (EmptyTrainerNameException): return new HttpException(error.message, 404);
+      case (EmptyuserIdExceptionTrainer): return new HttpException(error.message, 404);
+      case (InvalidTrainerException): return new HttpException(error.message, 404);
+      case (InvalidTrainerLocationException): return new HttpException(error.message, 404);
+      case (InvalidTrainerNameException): return new HttpException(error.message, 404);
+      case (TrainerNotFoundException): return new HttpException(error.message, 404);
 
 
-      default: return new HttpException('Ocurrió un error desconocido', HttpStatus.INTERNAL_SERVER_ERROR);
+      default: return new HttpException('Ocurrió un error desconocido', 404);
     }
   }
 }

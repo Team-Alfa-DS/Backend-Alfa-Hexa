@@ -8,7 +8,7 @@ export class PaginationDto {
     @ApiProperty( { required: false, default: 10, minimum: 1 })
     @IsOptional()
     @Type( () => Number ) // enableImplicitConversions: true
-    perpage?: number;
+    perPage?: number;
     
     @ApiProperty( { required: false, default: 0, minimum: 0 })
     @IsOptional()

@@ -46,5 +46,5 @@ export class GetManyCoursesQueryDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  perpage?: number;
+  perPage?: number;
 }

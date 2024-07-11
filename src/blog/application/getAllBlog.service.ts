@@ -25,7 +25,7 @@ export class GetAllBlogService extends IService<GetManyBlogsDTO, GetAllBlogsResp
     
 
     async execute(value: GetManyBlogsDTO): Promise<Result<GetAllBlogsResponseDTO>>{
-        const domainBlogsResult =  await this.blogRepository.getAllBLogs( value.page, value.perpage, value.filter, value.category, value.trainer);
+        const domainBlogsResult =  await this.blogRepository.getAllBLogs( value.page, value.perPage, value.filter, value.category, value.trainer);
         if (domainBlogsResult.Error) 
             return Result.fail(domainBlogsResult.Error);
         const domainBlogs = domainBlogsResult.Value; 

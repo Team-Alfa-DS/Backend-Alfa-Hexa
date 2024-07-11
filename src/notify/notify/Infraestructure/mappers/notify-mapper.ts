@@ -1,6 +1,6 @@
 import { IMapper } from "src/common/application/mappers/mappers.interface";
 import { NotifyEntity } from "../entities/notify.entity";
-import { NotifyDTO } from "../dto/notifydto";
+import { NotifyDTO } from "../dto/Notifydto";
 
 export  class NotifyMapper {
     
