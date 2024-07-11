@@ -1,16 +1,17 @@
 /* eslint-disable prettier/prettier */
 
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { GetCategoryRequest } from "../dtos/request/get-category.request";
 import { GetCategoryResponse } from "../dtos/response/get-category.response";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetCategoryByIdService extends IService<GetCategoryRequest, GetCategoryResponse>{
     OrmCategoryRepository: any;
-    constructor (private readonly categoryRepository: ICategoryRepository){super()}
+    constructor (private readonly categoryRepository: ICategoryQueryRepository){super()}
     
     async execute(value: GetCategoryRequest): Promise<Result<GetCategoryResponse>>{
         try {

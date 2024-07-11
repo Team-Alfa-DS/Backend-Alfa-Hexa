@@ -30,23 +30,27 @@ export class OdmUserRespository implements IOdmUserRepository {
     }
 
     async findUserById(id: UserId): Promise<Result<User>> {
-        try {
-            const user = await this.userModel.findOne({id: id.Id});
-            const domainUser = await this.odmUserMapper.toDomain(user);
-            return Result.success(domainUser);
-        } catch(err) {
-            return Result.fail(new UserNotFoundException(`Usuario con el id ${id.Id} no encontrado`));
-        }
+        // try {
+            
+        // } catch(err) {
+            // return Result.fail(new UserNotFoundException(`Usuario con el id ${id.Id} no encontrado`));
+        // }
+        const user = await this.userModel.findOne({id: id.Id});
+        if (!user) { throw new UserNotFoundException(`Usuario con el id ${id.Id} no encontrado`)}
+        const domainUser = await this.odmUserMapper.toDomain(user);
+        return Result.success(domainUser);
     }
 
     async findUserByEmail(email: UserEmail): Promise<Result<User>> {
-        try {
-            const user = await this.userModel.findOne({email: email.Email});
-            const domainUser = await this.odmUserMapper.toDomain(user);
-            return Result.success(domainUser);
-        } catch(err) {
-            return Result.fail(new UserNotFoundException(`Usuario con el email ${email.Email} no encontrado`));
-        }
+        // try {
+            
+        // } catch(err) {
+        //     return Result.fail(new UserNotFoundException(`Usuario con el email ${email.Email} no encontrado`));
+        // }
+        const user = await this.userModel.findOne({email: email.Email});
+        if (!user) { new UserNotFoundException(`Usuario con el email ${email.Email} no encontrado`) }
+        const domainUser = await this.odmUserMapper.toDomain(user);
+        return Result.success(domainUser);
     }
 
     async updateUserImage(image: UserImage, user: User): Promise<void> {

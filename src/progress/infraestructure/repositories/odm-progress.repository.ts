@@ -35,15 +35,18 @@ export class OdmProgressRepository implements IOdmProgressRepository {
             progressDomainList.push(await this.odmProgressMapper.toDomain(progress))
         }
 
-        if (progressDomainList.length == 0) return Result.fail(new ProgressNotFoundException('El usuario no posee progreso en ningun curso'));
+        // if (progressDomainList.length == 0) return Result.fail(new ProgressNotFoundException('El usuario no posee progreso en ningun curso'));
+        if (progressDomainList.length == 0) { throw new ProgressNotFoundException('El usuario no posee progreso en ningun curso')}
         return Result.success(progressDomainList)
     }
 
     async findLastProgressByUser(userId: UserId): Promise<Result<Progress>> {
         const progress = await this.progressModel.findOne({'user.id': userId.Id}).sort({'lastTime': -1});
 
-        if (!progress) return Result.fail(new ProgressNotFoundException(`
-            No se encuentra el ultimo progreso del usuario, ya que no tiene progreso`));
+        // if (!progress) return Result.fail(new ProgressNotFoundException(`
+        //     No se encuentra el ultimo progreso del usuario, ya que no tiene progreso`));
+        if (!progress) { throw new ProgressNotFoundException(`No se encuentra el ultimo progreso del usuario, ya que no tiene progreso`)}
+        
         const progressDomain = await this.odmProgressMapper.toDomain(progress)
         return Result.success(progressDomain);
     }
@@ -55,8 +58,9 @@ export class OdmProgressRepository implements IOdmProgressRepository {
         for (const progress of progressUser) {
             progressDomainList.push(await this.odmProgressMapper.toDomain(progress))
         }
-        if (progressDomainList.length == 0) return Result.fail(new ProgressNotFoundException(`
-            El usuario con el id ${userId.Id} no posee progreso`));
+        // if (progressDomainList.length == 0) return Result.fail(new ProgressNotFoundException(`
+        //     El usuario con el id ${userId.Id} no posee progreso`));
+        if (progressDomainList.length == 0) { throw new ProgressNotFoundException(`El usuario con el id ${userId.Id} no posee progreso`)}
         return Result.success(progressDomainList);
     }
     

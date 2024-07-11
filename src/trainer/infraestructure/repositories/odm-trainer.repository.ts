@@ -25,7 +25,8 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
 
         const trainer = await this.trainerModel.findOne({id: trainerId});
         if (!trainer) {
-            return Result.fail<Trainer>(new TrainerNotFoundException(`No se encontro al entrenador con el id ${trainerId}`));
+            // return Result.fail<Trainer>(new TrainerNotFoundException(`No se encontro al entrenador con el id ${trainerId}`));
+            throw new TrainerNotFoundException(`No se encontro al entrenador con el id ${trainerId}`);
         }
 
         const trainerDomain = await this.odmTrainerMapper.toDomain(trainer);
@@ -63,7 +64,8 @@ export class OdmTrainerRepository implements IOdmTrainerRepository{
             trainers = trainers.slice((page * perpage), ((page + perpage) * perpage));
         }
 
-        if (trainers.length == 0) return Result.fail(new TrainerNotFoundException('No hay entrenadores'));
+        // if (trainers.length == 0) return Result.fail(new TrainerNotFoundException('No hay entrenadores'));
+        if (trainers.length == 0) {throw new TrainerNotFoundException('No hay entrenadores')}
 
         const trainersDomain: Trainer[] = [];
 

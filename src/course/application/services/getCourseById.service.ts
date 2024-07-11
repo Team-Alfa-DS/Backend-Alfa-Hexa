@@ -5,14 +5,15 @@ import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
 import { Trainer } from "src/trainer/domain/trainer";
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CourseId } from "src/course/domain/value-objects/course-id";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetCourseByIdService extends IService<GetCourseByIdRequest, GetCourseByIdResponse> {
   constructor(
     private readonly courseRepository: ICourseRepository,
     private readonly trainerRepository: ITrainerRepository,
-    private readonly categoryRepository: ICategoryRepository,
+    private readonly categoryRepository: ICategoryQueryRepository,
   ) {super();}
 
   async execute(request: GetCourseByIdRequest): Promise<Result<GetCourseByIdResponse>> {

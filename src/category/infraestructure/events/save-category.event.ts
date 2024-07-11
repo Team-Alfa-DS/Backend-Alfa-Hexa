@@ -1,12 +1,12 @@
 import { Category } from "src/category/domain/Category";
 import { CategoryRegister } from "src/category/domain/events/category-register.event";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IEventSubscriber } from "src/common/application/events/event-subscriber.interface";
 
 export class SaveCategoryEvent implements IEventSubscriber<CategoryRegister> {
-    private readonly odmCategoryRepository: ICategoryRepository;
+    private readonly odmCategoryRepository: ICategoryCommandRepository;
 
-    constructor(odmCategoryRepository: ICategoryRepository) {
+    constructor(odmCategoryRepository: ICategoryCommandRepository) {
         this.odmCategoryRepository = odmCategoryRepository;
     }
 

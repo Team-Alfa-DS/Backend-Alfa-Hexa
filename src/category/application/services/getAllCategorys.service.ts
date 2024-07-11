@@ -1,13 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { GetAllCategoriesRequest } from "../dtos/request/get-all-categories.request";
 import { GetAllCategoriesResponse } from "../dtos/response/get-all-categories.response";
 import { Result } from "src/common/domain/result-handler/result";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetAllCategorysService extends IService<GetAllCategoriesRequest, GetAllCategoriesResponse>{
-    constructor (private readonly categoryRepository: ICategoryRepository){super()}
+    constructor (private readonly categoryRepository: ICategoryQueryRepository){super()}
     
     async execute(value: GetAllCategoriesRequest): Promise<Result<GetAllCategoriesResponse>>{
         try {

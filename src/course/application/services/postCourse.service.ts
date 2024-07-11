@@ -1,4 +1,4 @@
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";

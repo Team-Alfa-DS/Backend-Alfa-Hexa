@@ -6,6 +6,7 @@ import { ILessonCommentRepository } from "src/comment/domain/repositories/lesson
 import { OrmLessonCommentEntity } from "../entities/orm-entities/orm-comment.lesson.entity";
 import { CommentLesson } from "src/course/domain/entities/comment-lesson";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { CommentsLessonNotFoundException } from "src/comment/domain/exceptions/lesson/comments-lesson-not-found-exception";
 
 export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntity> implements ILessonCommentRepository{
     
@@ -31,13 +32,14 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
         //     skip: perPage 
         // });
 
-        if (!commentsFound) return Result.fail<CommentLesson[]>(new Error( 
-            `Ha ocurrido un error al encontrar los coemtarios por id` ));
+        // if (!commentsFound) return Result.fail<CommentLesson[]>(new Error( 
+        //     `Ha ocurrido un error al encontrar los coemtarios por id` ));
+        if (!commentsFound) { throw new CommentsLessonNotFoundException(`Ha ocurrido un error al encontrar los coemtarios por id` ) }
 
         const ListMapper = []
         commentsFound.forEach(async e => {
             ListMapper.push( 
-                await this.ormCommentMapper.toDomain(e ))
+                await this.ormCommentMapper.toDomain(e))
         });
 
         return Result.success<CommentLesson[]>(ListMapper);
@@ -45,14 +47,14 @@ export class OrmLessonCommentRepository extends Repository<OrmLessonCommentEntit
 
     async saveComment(comment: CommentLesson, runner: TransactionHandler): Promise<Result<CommentLesson>> {
         const runnerTransaction = runner.getRunner();
-        try{
-            const ormComment = await this.ormCommentMapper.toPersistence(comment);
-            await runnerTransaction.manager.save(ormComment);
-            return Result.success<CommentLesson>(comment);                                                    
-        }catch(err){
-            return Result.fail<CommentLesson>(new Error(err.message));
-        }
-
+        // try{
+                                                              
+        // }catch(err){
+        //     return Result.fail<CommentLesson>(new Error(err.message));
+        // }
+        const ormComment = await this.ormCommentMapper.toPersistence(comment);
+        await runnerTransaction.manager.save(ormComment);
+        return Result.success<CommentLesson>(comment);  
     };
 
 }
