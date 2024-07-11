@@ -102,7 +102,7 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
 
     private readonly odmComments: OdmBlogCommentEntity[] = [{
         id: `a13d98ec-31b2-4f47-b40a-731b4b4c4c77`,
-        publication_date: new Date(),
+        publication_date: new Date('Tue Jul 10 2024 12:30:00 GMT-0400 (Eastern Daylight Time)'),
         userLiked: false,
         userDisliked: false,
         body: `Excelente postura, la recomiendo`,
@@ -111,7 +111,7 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
             title: 'Postura de la media luna',
             description: `La postura de la media luna tiene muchos beneficios, 
             ya que es una postura de equilibrio y un asana de apertura de cadera.`,
-            publication_date: new Date(),
+            publication_date: new Date('Tue Jul 10 2024 12:30:00 GMT-0400 (Eastern Daylight Time)'),
             category: {
                 id: '675495bb-8f05-4171-8140-7f9e75e8b2d8',
                 name: 'Estiramiento',
@@ -151,7 +151,7 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
     },
     {
         id: `a13d98ec-31b2-4f47-b40a-731b4b4c4c78`,
-        publication_date: new Date(),
+        publication_date: new Date('Tue Jul 10 2024 12:30:00 GMT-0400 (Eastern Daylight Time)'),
         userLiked: false,
         userDisliked: false,
         body: `Temia de la media luna, pero con esta explicación me siento más seguro de hacerla`,
@@ -200,7 +200,7 @@ export class OdmBlogRepositoryMock implements IBlogRepository{
     },
     {
         id: `a13d98ec-31b2-4f47-b40a-731b4b4c4c79`,
-        publication_date: new Date(),
+        publication_date: new Date('Tue Jul 10 2024 12:30:00 GMT-0400 (Eastern Daylight Time)'),
         userLiked: false,
         userDisliked: false,
         body: `Si es verdad! Es una postura que ayuda a la apertura de cadera`,

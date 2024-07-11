@@ -82,13 +82,19 @@ export class CourseController {
 
     this.getManyCoursesService = new ExceptionDecorator(
       new LoggerDecorator( 
-        new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        new GetManyCoursesService(
+          OdmCourseRepositoryInstance, 
+          trainerRepositoryInstance, 
+          categoryRepositoryInstance), 
         logger
       )
     );
     this.getCourseByIdService = new ExceptionDecorator(
       new LoggerDecorator(
-        new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
+        new GetCourseByIdService(
+          OdmCourseRepositoryInstance, 
+          trainerRepositoryInstance, 
+          categoryRepositoryInstance), 
         logger
       )
     );

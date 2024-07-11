@@ -41,7 +41,7 @@ export class OdmCourseRepositoryMock implements ICourseQueryRepository{
             level: 'Principiante',
             minutes: 30,
             name: 'Yoga para Principiantes',
-            publication_date: new Date(),
+            publication_date: new Date('Tue Jul 10 2024 12:30:00 GMT-0400 (Eastern Daylight Time)'),
             weeks: 1,
             category: {
                 id: 'ca701b5b-0e6b-41a8-99d5-c1faeef6d5cf',
