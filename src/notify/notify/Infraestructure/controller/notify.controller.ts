@@ -1,4 +1,4 @@
-import { Body, Controller, Request, Get, Param, ParseUUIDPipe, Post, UseGuards, Headers, Query} from "@nestjs/common";
+import { Body, Controller, Request, Get, Param, ParseUUIDPipe, Post, UseGuards, Headers, Query, Delete} from "@nestjs/common";
 import { OrmNotifyRepository } from "../repository/orm-notify.repository";
 import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-database.singleton";
 import { NotifyMapper } from "../mappers/notify-mapper";
@@ -41,7 +41,7 @@ constructor(){
 }
 
 @UseGuards(JwtAuthGuard)
-  @Get('one/:id')
+  @Get('/one/:id')
   @ApiCreatedResponse({
     description: 'se encontro la notificacion correctamente',
     type: NotifyEntity,
@@ -59,7 +59,7 @@ constructor(){
     }
 }
 
-@Get('all')
+@Get('/many')
  async getAllNotify(@Query() manynotifyquerydto: GetManyNotifyQueryDto){
     const request =  new getAllNotifyRequest(
         manynotifyquerydto.page,
@@ -71,7 +71,7 @@ constructor(){
     }
 }
 
-@Get('count')
+@Get('/count/not-readed')
 countNotReaded(@Request() req){
     return this.notifycountnotreaded.execute();
 }
@@ -79,6 +79,12 @@ countNotReaded(@Request() req){
 CreateNotify(@Request() req,  @Body() data: createNotificaciondto) {
     return this.createNotify.execute(data);*/
 //}
+
+@UseGuards(JwtAuthGuard)
+@Delete('/delete/all')
+deleteAllNotify(@Request() req){
+    return this.notifyrepository.deleteAllNotify();
+}
 
 
 @UseGuards(JwtAuthGuard)
