@@ -33,26 +33,30 @@ export class StartCourseProgressService extends IService<StartCourseProgressRequ
     }
 
     async execute(value: StartCourseProgressRequest): Promise<Result<StartCourseProgressResponse>> {
-        const course = await this.courseRepository.getCourseById(new CourseId(value.courseId));
-        const user = await this.odmUserRepository.findUserById(UserId.create(value.userId));
-        if (!user.isSuccess) return Result.fail(user.Error);
-        const lesson = course.Lessons[0];
-        if (!lesson) return Result.fail(new Error('No existen lecciones para este curso'));
+        try {
+            const course = await this.courseRepository.getCourseById(new CourseId(value.courseId));
+            const user = await this.odmUserRepository.findUserById(UserId.create(value.userId));
+            if (!user.isSuccess) return Result.fail(user.Error);
+            const lesson = course.Lessons[0];
+            if (!lesson) return Result.fail(new Error('No existen lecciones para este curso'));
 
-        const progressDomain = Progress.create(
-            ProgressId.create(value.userId, lesson.id.Value),
-            ProgressMarkAsCompleted.create(false),
-            UserId.create(value.userId),
-            new CourseId(value.courseId),
-            ProgressTime.create(0),
-            ProgressLastTime.create(new Date())
-        )
-        await this.progressRepository.saveProgress(progressDomain, this.transactionHandler);
-        progressDomain.Register();
-        this.eventPublisher.publish(progressDomain.pullDomainEvents());
+            const progressDomain = Progress.create(
+                ProgressId.create(value.userId, lesson.id.Value),
+                ProgressMarkAsCompleted.create(false),
+                UserId.create(value.userId),
+                new CourseId(value.courseId),
+                ProgressTime.create(0),
+                ProgressLastTime.create(new Date())
+            )
+            await this.progressRepository.saveProgress(progressDomain, this.transactionHandler);
+            progressDomain.Register();
+            this.eventPublisher.publish(progressDomain.pullDomainEvents());
 
-        const response = new StartCourseProgressResponse()
-        return Result.success(response);
+            const response = new StartCourseProgressResponse()
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 
 }

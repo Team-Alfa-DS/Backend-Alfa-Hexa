@@ -39,35 +39,39 @@ export class ProfileProgressService extends IService<ProfileProgressRequest, Pro
     }
 
     async execute(value: ProfileProgressRequest): Promise<Result<ProfileProgressResponse>> {
-        const user = await this.userRepository.findUserById(UserId.create(value.userId));
+        try {
+            const user = await this.userRepository.findUserById(UserId.create(value.userId));
 
-        if (!user.isSuccess) return Result.fail(user.Error);
+            if (!user.isSuccess) return Result.fail(user.Error);
 
-        const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId));
+            const progressUser = await this.progressRepository.findProgressByUser(UserId.create(value.userId));
 
-        if (!progressUser.isSuccess) return Result.fail(progressUser.Error);
+            if (!progressUser.isSuccess) return Result.fail(progressUser.Error);
 
-        let courses: Course[] = [];
-        for (const pro of progressUser.Value) {
-            const course = await this.courseRepository.getCourseByLessonId(new LessonId(pro.Id.LessonId));
-            if (courses.findIndex(c => c.Id.equals(course.Id) /*c.id == course.Value.id*/) == -1) courses.push(course);
+            let courses: Course[] = [];
+            for (const pro of progressUser.Value) {
+                const course = await this.courseRepository.getCourseByLessonId(new LessonId(pro.Id.LessonId));
+                if (courses.findIndex(c => c.Id.equals(course.Id) /*c.id == course.Value.id*/) == -1) courses.push(course);
+            }
+
+            let progressUserList: Progress[][] = [];
+            for (const course of courses) {
+                const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
+                progressUserList.push(progress.Value);
+            }
+
+            let progressCourseUser: CalcPercentProgressResponse[] = [];
+            for (let i=0; i < progressUserList.length; i++) {
+                const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
+                progressCourseUser.push(calc);
+            }
+            const totalCoursesPercent = this.calcTotalCoursesPercent.execute(progressCourseUser);
+            
+            const response = new ProfileProgressResponse(totalCoursesPercent.percent, totalCoursesPercent.time);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        let progressUserList: Progress[][] = [];
-        for (const course of courses) {
-            const progress = await this.progressRepository.findProgressByUserCourse(UserId.create(value.userId), course.Lessons);
-            progressUserList.push(progress.Value);
-        }
-
-        let progressCourseUser: CalcPercentProgressResponse[] = [];
-        for (let i=0; i < progressUserList.length; i++) {
-            const calc = this.calcPercent.execute(courses[i].Lessons, progressUserList[i]);
-            progressCourseUser.push(calc);
-        }
-        const totalCoursesPercent = this.calcTotalCoursesPercent.execute(progressCourseUser);
-        
-        const response = new ProfileProgressResponse(totalCoursesPercent.percent, totalCoursesPercent.time);
-        return Result.success(response);
     }
 
 }

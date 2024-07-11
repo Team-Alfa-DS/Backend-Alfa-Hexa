@@ -41,7 +41,7 @@ import { UpdateUserNameEvent } from "../events/synchronize/update-user-name.even
 import { UpdateUserPhoneEvent } from "../events/synchronize/update-user-phone.event";
 import { Synchronize } from "../entities/synchronize";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
-import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -86,7 +86,7 @@ export class UserController {
         this.eventPublisher.subscribe('UserNameUpdated', [new UpdateUserNameEvent(this.odmUserRepository)]);
         this.eventPublisher.subscribe('UserPhoneUpdated', [new UpdateUserPhoneEvent(this.odmUserRepository)]);
 
-        this.updateUserService = new ExceptionDecorator(
+        this.updateUserService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new UpdateUserService(
@@ -122,6 +122,9 @@ export class UserController {
             data.image
         )
         const result = await this.updateUserService.execute(dataUser);
+        
+        if (!result.isSuccess) { throw result.Error}
+
         return result.Value;
     }
 

@@ -3,7 +3,7 @@ import { Result } from "src/common/domain/result-handler/result";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IIdGen } from "src/common/application/id-gen/id-gen.interface";
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IBlogCommandRepository } from "src/blog/domain/repositories/IBlogCommand.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
@@ -13,21 +13,22 @@ import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { IBlogQueryRepository } from "src/blog/domain/repositories/IBlogQuery.repository";
 
 
 export class RegisterBlogCommentServices extends IService<AddCommentToServiceRequestDto,AddCommentToServiceResponseDto>{
     
-    private readonly odmBlogRepository: IBlogRepository;
+    private readonly odmBlogRepository: IBlogQueryRepository;
     private readonly userRepository: IUserRepository;
-    private readonly blogRepository: IBlogRepository;
+    private readonly blogRepository: IBlogCommandRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly idGenerator: IIdGen;
     private readonly eventPublisher: IEventPublisher;
 
     constructor(
-        odmBlogRepository: IBlogRepository,
+        odmBlogRepository: IBlogQueryRepository,
         userRepository: IUserRepository,
-        blogRepository: IBlogRepository,
+        blogRepository: IBlogCommandRepository,
         transactionHandler: ITransactionHandler,
         idGenerator: IIdGen,
         eventPublisher: IEventPublisher
@@ -63,15 +64,12 @@ export class RegisterBlogCommentServices extends IService<AddCommentToServiceReq
             null,
             null,
         );
-        // console.log(comment);
         
         let comments = blog.Value.getComments();
 
         comments.push(commentID);
 
         await this.blogRepository.saveComment( comment );
-
-        // await this.blogRepository.saveBlog( blog.Value );
 
         blog.Value.PostComment(
             commentID,

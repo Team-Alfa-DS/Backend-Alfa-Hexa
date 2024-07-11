@@ -36,38 +36,42 @@ export class RegisterUserService extends IService<RegisterUserRequest, RegisterU
     }
 
     async execute(newUser: RegisterUserRequest): Promise<Result<RegisterUserResponse>> {
-        // await this.transactionHandler.startTransaction();
-        const userFound = await this.odmUserRepository.findUserByEmail(UserEmail.create(newUser.email));
+        try {
+            // await this.transactionHandler.startTransaction();
+            const userFound = await this.odmUserRepository.findUserByEmail(UserEmail.create(newUser.email));
 
-        if (userFound.isSuccess) {
-            return Result.fail(new Error('El usuario ya existe'));
+            if (userFound.isSuccess) {
+                return Result.fail(new Error('El usuario ya existe'));
+            }
+
+            const hashPassword = await this.encryptor.hash(newUser.password);
+            const id = await this.idGenerator.genId();
+            const userDomain = User.Create(
+                UserId.create(id),
+                UserEmail.create(newUser.email),
+                UserName.create(newUser.name),
+                UserPassword.create(hashPassword),
+                UserPhone.create(newUser.phone),
+                UserType.create(newUser.type),
+                null
+            );
+
+            const userCreate = await this.ormUserRepository.saveUser(
+                userDomain,
+                this.transactionHandler
+            );
+            if (!userCreate.isSuccess) {
+                return Result.fail(userCreate.Error);
+            }
+            // await this.transactionHandler.commitTransaction();
+            userDomain.Register(userDomain.Id, userDomain.Email, userDomain.Name, userDomain.Password, userDomain.Phone, userDomain.Type, userDomain.Image);
+            this.eventPublisher.publish(userDomain.pullDomainEvents());
+
+            const response = new RegisterUserResponse(id);
+
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        const hashPassword = await this.encryptor.hash(newUser.password);
-        const id = await this.idGenerator.genId();
-        const userDomain = User.Create(
-            UserId.create(id),
-            UserEmail.create(newUser.email),
-            UserName.create(newUser.name),
-            UserPassword.create(hashPassword),
-            UserPhone.create(newUser.phone),
-            UserType.create(newUser.type),
-            null
-        );
-
-        const userCreate = await this.ormUserRepository.saveUser(
-            userDomain,
-            this.transactionHandler
-        );
-        if (!userCreate.isSuccess) {
-            return Result.fail(userCreate.Error);
-        }
-        // await this.transactionHandler.commitTransaction();
-        userDomain.Register(userDomain.Id, userDomain.Email, userDomain.Name, userDomain.Password, userDomain.Phone, userDomain.Type, userDomain.Image);
-        this.eventPublisher.publish(userDomain.pullDomainEvents());
-
-        const response = new RegisterUserResponse(id);
-
-        return Result.success(response);
     }
 }

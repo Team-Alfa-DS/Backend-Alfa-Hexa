@@ -4,7 +4,7 @@ import { Category } from "../Category";
 import { CategoryId } from "../valueObjects/categoryId";
 import { CategoryName } from "../valueObjects/categoryName";
 
-export interface ICategoryRepository{
+export interface ICategoryCommandRepository{
     getCategoryById(id: CategoryId): Promise<Result<Category>>;
     getAllCategory(page: number, perpage: number): Promise<Result<Category[]>>;
     getCategoryByName(name: CategoryName): Promise<boolean>;

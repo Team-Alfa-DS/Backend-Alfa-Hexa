@@ -1,36 +1,41 @@
 /* eslint-disable prettier/prettier */
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IService } from "src/common/application/interfaces/IService";
 import { GetAllCategoriesRequest } from "../dtos/request/get-all-categories.request";
 import { GetAllCategoriesResponse } from "../dtos/response/get-all-categories.response";
 import { Result } from "src/common/domain/result-handler/result";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetAllCategorysService extends IService<GetAllCategoriesRequest, GetAllCategoriesResponse>{
-    constructor (private readonly categoryRepository: ICategoryRepository){super()}
+    constructor (private readonly categoryRepository: ICategoryQueryRepository){super()}
     
     async execute(value: GetAllCategoriesRequest): Promise<Result<GetAllCategoriesResponse>>{
+        try {
+            
+            const result = await this.categoryRepository.getAllCategory(value.page, value.perpage);
+            if (!result.isSuccess) return Result.fail(result.Error);
 
-        const result = await this.categoryRepository.getAllCategory(value.page, value.perpage);
-        if (!result.isSuccess) return Result.fail(result.Error);
+            let categories = result.Value;
 
-        let categories = result.Value;
+            if (value.perpage) {
+                let page = value.page;
+                if (!page) {page = 0}
 
-        if (value.perpage) {
-            let page = value.page;
-            if (!page) {page = 0}
-
-            categories = categories.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
-        }
-
-        const response = new GetAllCategoriesResponse(categories.map(category => {
-            return {
-                id: category.Id.value,
-                name: category.Name.value,
-                icon: category.Icon.value
+                categories = categories.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
             }
-        })
-        );
-        return Result.success(response);
+
+            const response = new GetAllCategoriesResponse(categories.map(category => {
+                return {
+                    id: category.Id.value,
+                    name: category.Name.value,
+                    icon: category.Icon.value
+                }
+            })
+            );
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
+        }
     }
 }

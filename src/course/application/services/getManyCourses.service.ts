@@ -5,19 +5,20 @@ import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repo
 import { Trainer } from "src/trainer/domain/trainer";
 import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 import { IOdmTrainerRepository } from "src/trainer/domain/repositories/odm-trainer-repository.interface";
 import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
     private readonly courseRepository: ICourseQueryRepository,
     private readonly trainerRepository: IOdmTrainerRepository,
-    private readonly categoryRepository: ICategoryRepository,
+    private readonly categoryRepository: ICategoryQueryRepository,
   ){super()}
 
   async execute(request: GetManyCoursesRequest): Promise<Result<GetManyCoursesResponse>> {

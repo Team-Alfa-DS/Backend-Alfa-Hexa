@@ -1,4 +1,4 @@
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IBlogCommandRepository } from "src/blog/domain/repositories/IBlogCommand.repository";
 import { DataSource, Repository } from "typeorm";
 import { OrmBlogEntity } from "../entities/orm-entities/orm-blog.entity";
 import { Blog } from "src/blog/domain/Blog";
@@ -13,7 +13,7 @@ import { PgDatabaseSingleton } from "src/common/infraestructure/database/pg-data
 import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
 import { BlogNotFoundException } from "src/blog/domain/exceptions/blog-not-found.exception";
 
-export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogRepository {
+export class OrmBlogRepository extends Repository<OrmBlogEntity> implements IBlogCommandRepository {
 
     constructor(dataBase: DataSource) {
         super(OrmBlogEntity, dataBase.manager);

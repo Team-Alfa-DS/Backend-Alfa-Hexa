@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable prefer-const */
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { OrmCategoryEntity } from "../entities/orm-entities/orm-category.entity";
 import { DataSource, Repository } from "typeorm";
 import { Category } from "src/category/domain/Category";
@@ -12,7 +12,7 @@ import { OrmCategoryMapper } from "../mapper/orm-category.mapper";
 import { CategoryName } from "src/category/domain/valueObjects/categoryName";
 //import { InjectRepository } from "@nestjs/typeorm";
 
-export class OrmCategoryRepository extends Repository<OrmCategoryEntity> implements ICategoryRepository {
+export class OrmCategoryRepository extends Repository<OrmCategoryEntity> implements ICategoryCommandRepository {
 
     private readonly ormCategoryMapper: OrmCategoryMapper;
 

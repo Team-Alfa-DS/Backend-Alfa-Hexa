@@ -73,7 +73,7 @@ constructor(){
 
 @Get('/count/not-readed')
 countNotReaded(@Request() req){
-    return this.notifycountnotreaded.execute();
+    // return this.countUnreadNotificationService.execute();
 }
 /*@Post('create')
 CreateNotify(@Request() req,  @Body() data: createNotificaciondto) {
