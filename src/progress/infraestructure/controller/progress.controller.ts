@@ -235,7 +235,7 @@ export class ProgressController {
 
     @Get('courses')
     async progressCourses(@Query() queryDto: CoursesProgressDto, @Request() req: JwtRequest) {
-        const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
+        const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perPage);
         const response = await this.coursesProgressService.execute(request);
 
         if (!response.isSuccess) { throw response.Error }

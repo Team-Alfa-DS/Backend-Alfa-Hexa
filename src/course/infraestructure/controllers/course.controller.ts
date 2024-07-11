@@ -179,13 +179,13 @@ export class CourseController {
       manyCoursesQueryDto.category,
       manyCoursesQueryDto.trainer,
       manyCoursesQueryDto.page,
-      manyCoursesQueryDto.perpage);
+      manyCoursesQueryDto.perPage);
 
     const response = await this.getManyCoursesService.execute(request);
     
     if (!response.isSuccess) { throw response.Error}
 
-    return response.Value;
+    return response.Value.courses;
   }
 
   @Get('/count')

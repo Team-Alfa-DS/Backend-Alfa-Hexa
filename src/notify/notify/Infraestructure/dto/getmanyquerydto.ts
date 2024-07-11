@@ -19,5 +19,5 @@ export class GetManyNotifyQueryDto {
     @IsOptional()
     @Type(() => Number)
     @IsNumber()
-    perpage: number;
+    perPage: number;
 }

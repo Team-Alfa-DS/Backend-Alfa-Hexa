@@ -99,13 +99,11 @@ export class CategoryController {
     }
     
     @Get("many")
-    async getAllCategorys(@Query() getManyCategoriesDTO: ManyCategoryDto): Promise<GetAllCategoriesResponse> {
-      const request = new GetAllCategoriesRequest(getManyCategoriesDTO.page, getManyCategoriesDTO.perpage)
+    async getAllCategorys(@Query() getManyCategoriesDTO: ManyCategoryDto) {
+      const request = new GetAllCategoriesRequest(getManyCategoriesDTO.page, getManyCategoriesDTO.perPage)
       const response = await this.getAllCategorysService.execute(request);
-
       if (!response.isSuccess) { throw response.Error }
-        
-      return response.Value;
+      return response.Value.categories
     }
 
     @Get("/:id")

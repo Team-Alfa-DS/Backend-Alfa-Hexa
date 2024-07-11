@@ -106,7 +106,7 @@ export class SearchController {
     async searchAll(
         @Request() req: JwtRequest, 
         @Query('page', ParseIntPipe,) page: number,
-        @Query('perpage', ParseIntPipe) perPage: number,
+        @Query('perPage', ParseIntPipe) perPage: number,
         @Query('term') term?: string, 
         @Query('tag', new ParseArrayPipe({items: String, separator: ',', optional: true})) tag?: string[]
     ) {
@@ -122,7 +122,7 @@ export class SearchController {
     async searchPopularTags(
         @Request() req: JwtRequest,
         @Query('page', ParseIntPipe,) page: number,
-        @Query('perpage', ParseIntPipe) perPage: number,
+        @Query('perPage', ParseIntPipe) perPage: number,
     ) {
         const request = new SearchRequestDto(page, perPage);
         const result = await this.searchTagService.execute(request);

@@ -45,7 +45,7 @@ export class OdmCategoryRepository implements ICategoryQueryRepository{
         // } catch (error) {
         //     return Result.fail(new CategoryNotFoundException('Categoria no encontrada'));
         // }
-        const resp = await this.categoryModel.find().skip(page * perpage).limit(perpage);
+        const resp = await this.categoryModel.find();
         // if(!resp) return Result.fail(new CategoryNotFoundException('Categoria no encontrada'));
         if (!resp) { throw new CategoryNotFoundException('Categoria no encontrada') }
         const domainCategories: Category[] = []

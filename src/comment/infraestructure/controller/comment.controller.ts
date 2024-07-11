@@ -211,16 +211,17 @@ export class CommentController{
         }
         
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
-            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id)
+            const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-            
+
             if (!result.isSuccess) { throw result.Error }
 
             return result.Value.blogComments;
         }else {
-            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id);
+            const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
+
             if (!result.isSuccess) { throw result.Error }
 
             return result.Value.lessonComments;

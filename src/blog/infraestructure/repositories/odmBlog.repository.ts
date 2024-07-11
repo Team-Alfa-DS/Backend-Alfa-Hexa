@@ -70,14 +70,14 @@ export class OdmBlogRepository implements IBlogQueryRepository{
         }
 
         const filteredBlogs: Blog[] = [];
-        if(filter && filter.length > 0){
-            domainBlogs.forEach(blog => {
-                if(blog.Tags.some(tag => tag.value.toLowerCase().includes(filter.toLowerCase()))){
-                    filteredBlogs.push(blog);
-                }
-            });
-            domainBlogs = filteredBlogs;
-        }
+        // if(filter && filter.length > 0){
+        //     domainBlogs.forEach(blog => {
+        //         if(blog.Tags.some(tag => tag.value.toLowerCase().includes(filter.toLowerCase()))){
+        //             filteredBlogs.push(blog);
+        //         }
+        //     });
+        //     domainBlogs = filteredBlogs;
+        // }
 
         const blogsResponse = domainBlogs.slice(page * perpage, page * perpage + perpage)
         return Result.success(blogsResponse);
