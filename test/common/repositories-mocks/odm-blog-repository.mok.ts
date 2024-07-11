@@ -1,7 +1,7 @@
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Blog } from "src/blog/domain/Blog";
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IBlogQueryRepository } from "src/blog/domain/repositories/IBlogQuery.repository";
 import { BlogId } from "src/blog/domain/valueObjects/blogId";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
 import { OdmBlogCommentMapper } from "src/blog/infraestructure/mapper/odm-comment-blog.mapper";
@@ -23,7 +23,7 @@ import { UserRole } from "src/user/domain/enums/role-user.type";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 
 
-export class OdmBlogRepositoryMock implements IBlogRepository{
+export class OdmBlogRepositoryMock implements IBlogQueryRepository{
     
 
     private readonly blogs: OdmBlogEntity[] = [

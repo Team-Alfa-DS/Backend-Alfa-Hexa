@@ -1,11 +1,11 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { Blog } from "src/blog/domain/Blog";
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
 import { CommentBlog } from "src/comment/domain/comment-blog";
 import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { IBlogQueryRepository } from "src/blog/domain/repositories/IBlogQuery.repository";
 
 
-export class OrmBlogRepositoryMock implements IBlogRepository {
+export class OrmBlogRepositoryMock implements IBlogQueryRepository {
 
     private readonly blog: Blog
     private readonly blogs: Blog[]

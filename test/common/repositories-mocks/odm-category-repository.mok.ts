@@ -1,13 +1,13 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { Category } from "src/category/domain/Category";
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
 import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { CategoryName } from "src/category/domain/valueObjects/categoryName";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
 import { CategoryIcon } from "src/category/domain/valueObjects/categoryIcon";
+import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 
-export class OdmCategoryRepositoryMock implements ICategoryRepository {
+export class OdmCategoryRepositoryMock implements ICategoryQueryRepository {
     private categories: Category[] = [];
     private readonly categoryOdm: OdmCategoryEntity[] = [
         {
