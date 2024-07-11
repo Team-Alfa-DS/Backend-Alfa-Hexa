@@ -101,7 +101,6 @@ export class CommentController{
     );
     private readonly logger: ILogger = new NestLogger();
     
-    
     private readonly getCommentBlogService: IService<GetBlogCommentsServiceRequestDto, GetBlogCommentServiceResponseDto>;
     private readonly getCommentLessonService: IService<GetLessonCommentsServiceRequestDto, GetLessonCommentServiceResponseDto>;
     private readonly registerLessonCommentService: IService<AddCommentToServiceRequestDto, AddCommentToServiceResponseDto>;
@@ -122,7 +121,7 @@ export class CommentController{
         const odmBlogRepositoryInstance = new OdmBlogRepository(
             new OdmBlogMapper(userModel,blogModel,commentBlogModel,trainerModel), 
             blogModel, 
-            commentBlogModel, userModel, trainerModel);
+            commentBlogModel, userModel, trainerModel, OdmcommentBlogMapper);
 
 
                     

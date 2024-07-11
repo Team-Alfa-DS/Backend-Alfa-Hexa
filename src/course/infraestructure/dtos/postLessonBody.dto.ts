@@ -29,10 +29,4 @@ export class PostLesonBodyDto {
   })
   @IsNumber()
   seconds: number;
-  @ApiProperty({
-    description: "",
-    example: ""
-  })
-  @IsString()
-  videoUrl: string;
 }

@@ -20,9 +20,6 @@ export class PostCourseBodyDto {
     description: "",
     example: ""
   })
-  @IsString()
-  imageUrl: string;
-
   // @ApiProperty({
   //   description: "",
   //   example: ""
