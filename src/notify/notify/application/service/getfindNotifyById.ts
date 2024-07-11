@@ -1,10 +1,10 @@
-import { Notify } from "src/notify/notify/domain/notify";
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
+import { INotifyRepository } from "../repository/INotifyrepository";
+import { NotifyEntity } from "../../Infraestructure/entities/notify.entity";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 
-export class GetNotificationByIdService implements IService<GetNotificationByIdRequest, GetNotificationByIdResponse>{
+export class getfindNotifyById implements IService<getfindNotifyByIdRequest, getfindNotifyByIdResponse> {
     private readonly repository: INotifyRepository;
 
     constructor(repository: INotifyRepository) {
@@ -15,45 +15,47 @@ export class GetNotificationByIdService implements IService<GetNotificationByIdR
         return this.constructor.name;
     }
 
-    async execute(request: GetNotificationByIdRequest): Promise<Result<GetNotificationByIdResponse>> {
-        try {
-            const notify = await this.repository.findNotifyById(request.id);
-            if(!notify.isSuccess) {
-                return Result.fail(notify.Error)
-            }
-            return Result.success(new GetNotificationByIdResponse(
-             notify.Value.Id,
-             notify.Value.Title,
-             notify.Value.Body,
-             notify.Value.Date   
-            ));
-        } catch (error) {
-            return Result.fail(error);
+    async execute(id: getfindNotifyByIdRequest): Promise<Result<getfindNotifyByIdResponse>> {
+        const notify = await this.repository.findNotifyById(id.id);
+        if(!notify) {
+            return Result.fail<getfindNotifyByIdResponse>(notify.Error)
         }
+        const response = new getfindNotifyByIdResponse(
+            notify.Value.id,
+            notify.Value.title,
+            notify.Value.body,
+            notify.Value.date
+        )
+        return Result.success<getfindNotifyByIdResponse>(response);
     }
 }
 
-export class GetNotificationByIdRequest implements ServiceRequestDto {
-    constructor(
-        readonly id: string
-    ) {}
-    
+export class getfindNotifyByIdRequest implements ServiceRequestDto{
+    constructor(readonly id: string) {}
+
     dataToString(): string {
-        return `GetNotificationByIdRequest: {id: ${this.id}}`
+        return `getfindNotifyByIdRequest: {id: ${this.id}}`;
     }
-    
 }
 
-export class GetNotificationByIdResponse implements ServiceResponseDto {
+export class getfindNotifyByIdResponse implements ServiceResponseDto {
+    readonly id: string;
+    readonly title: string;
+    readonly body: string;
+    readonly date: Date;
     constructor(
-        readonly id: string,
-        readonly title: string,
-        readonly body: string,
-        readonly date: Date
-    ) {}
+        id: string,
+        title: string,
+        body: string,
+        date: Date
+    ) {
+        this.id = id;
+        this.title = title;
+        this.body = body;
+        this.date = date;
+    }
 
     dataToString(): string {
-        return `GetNotificationByIdResponse: ${JSON.stringify(this)}`
+        return `getfindNotifyByIdResponse: ${JSON.stringify(this)}`;
     }
-    
 }

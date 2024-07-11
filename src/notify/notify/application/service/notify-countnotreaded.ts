@@ -1,7 +1,6 @@
-import { Notify } from "src/notify/notify/domain/notify";
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
-import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
+import { INotifyRepository } from "../repository/INotifyrepository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 
 export class CountUnreadNotificationService implements IService<CountUnreadNotificationRequest, CountUnreadNotificationResponse>{
