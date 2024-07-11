@@ -1,23 +1,28 @@
-/*import { User } from 'src/user/domain/user';
-import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToOne, JoinColumn} from 'typeorm';
-import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-user.entity';
+import { User } from 'src/user/domain/user';
+import { Entity, PrimaryGeneratedColumn, Column, PrimaryColumn, OneToOne, JoinColumn, ManyToMany, ManyToOne} from 'typeorm';
+import { OrmUserEntity } from 'src/user/infraestructure/entities/orm-entities/orm-user.entity';
 
 @Entity('token')
-export class Token {
+export class TokenEntity {
 
-  @PrimaryColumn()
-  user: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   token: string;
 
+  @ManyToOne(() => OrmUserEntity, user => user.token)
+  @JoinColumn({name : 'user_id'})
+  user: OrmUserEntity;
+
   static create(
     token: string,
-    user: User
+    user: OrmUserEntity
   ) {
-    const tokenEntity = new Token();
+    const tokenEntity = new TokenEntity();
     tokenEntity.token = token;
+    tokenEntity.user = user;
     return tokenEntity;
   }
   
-}*/
+}
