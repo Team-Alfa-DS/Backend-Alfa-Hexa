@@ -22,7 +22,7 @@ import { NotifierServiceSave } from "src/notify/notify/application/service/savet
 
 
 
-@Controller('notify')
+@Controller('notifications')
 export class notifycontroller{
    /* private readonly tokenrepository: TokenRepository;*/
     private readonly notifyrepository: OrmNotifyRepository;
