@@ -1,9 +1,8 @@
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { INotifyRepository } from "../repository/INotifyrepository";
-import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 
-export class CountUnreadNotificationService implements IService<CountUnreadNotificationRequest, CountUnreadNotificationResponse>{
+export class notifycountnotreaded implements IApplicationService<void, number>{
     private readonly repository: INotifyRepository;
 
     constructor(repository: INotifyRepository) {
@@ -14,38 +13,20 @@ export class CountUnreadNotificationService implements IService<CountUnreadNotif
         return 'notifycountnotreaded';
     }
 
-    async execute(input: CountUnreadNotificationRequest): Promise<Result<CountUnreadNotificationResponse>> {
+    async execute(): Promise<Result<number>> {
         try {
             const result = await this.repository.countnotreaded();
-
-            if(!result.isSuccess) {
-                return Result.fail(result.Error)
+            if(!result) {
+                return Result.fail<number>(result.Error)
             }
-
             const count = result.Value;
-            return Result.success(new CountUnreadNotificationResponse(count));
+            return Result.success<number>(count);
         }
         catch(err){
-            return Result.fail(new Error(err.message));
+            return Result.fail<number>(new Error(err.message));
         }
 
     }
-}
 
-export class CountUnreadNotificationRequest implements ServiceRequestDto {
-    
-    dataToString(): string {
-        return `CountUnreadNotificationRequest: { }`;
-    }
-}
-
-export class CountUnreadNotificationResponse implements ServiceResponseDto {
-    constructor(
-        readonly count: number
-    ) {}
-    
-    dataToString(): string {
-        return `CountUnreadNotificationRequest: { count: ${this.count} }`
-    }
 
 }
