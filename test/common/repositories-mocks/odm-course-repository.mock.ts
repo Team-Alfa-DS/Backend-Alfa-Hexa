@@ -32,6 +32,10 @@ import { UserRole } from "src/user/domain/enums/role-user.type";
 
 export class OdmCourseRepositoryMock implements ICourseQueryRepository{
     
+    getCourseByTitle(title: CourseTitle): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    
 
     private readonly coursesOdm: OdmCourseEntity[] = [
         {
