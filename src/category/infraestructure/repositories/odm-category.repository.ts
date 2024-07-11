@@ -39,7 +39,7 @@ export class OdmCategoryRepository implements ICategoryRepository{
 
     async getAllCategory(page: number=0, perpage: number=5): Promise<Result<Category[]>> {
         try {
-            const resp = await this.categoryModel.find().skip(page * perpage).limit(perpage);
+            const resp = await this.categoryModel.find();
             if(!resp) return Result.fail(new CategoryNotFoundException('Categoria no encontrada'));
             const domainCategories: Category[] = []
             for (const category of resp) {

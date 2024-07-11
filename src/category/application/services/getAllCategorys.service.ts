@@ -16,12 +16,12 @@ export class GetAllCategorysService extends IService<GetAllCategoriesRequest, Ge
 
         let categories = result.Value;
 
-        // if (value.perpage) {
-        //     let page = value.page;
-        //     if (!page) {page = 0}
+        if (value.perpage) {
+            let page = value.page;
+            if (!page) {page = 0}
 
-        //     categories = categories.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
-        // }
+            categories = categories.slice((page*value.perpage), (value.perpage) + (page*value.perpage));
+        }
 
         const response = new GetAllCategoriesResponse(categories.map(category => {
             return {
