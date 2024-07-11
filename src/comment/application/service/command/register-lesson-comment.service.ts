@@ -41,6 +41,7 @@ export class RegisterLessonCommentServices extends IService<AddCommentToServiceR
         this.transactionHandler = transactionHandler;
         this.eventPublisher = eventPublisher;
         this.idGenerator = idGenerator;
+        this.courseQueryRepository = courseQueryRepository;
     }
     
     async execute( data: AddCommentToServiceRequestDto ): Promise<Result<AddCommentToServiceResponseDto>> {
