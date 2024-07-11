@@ -19,6 +19,7 @@ import {
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
+
 import { PgDatabaseSingleton } from 'src/common/infraestructure/database/pg-database.singleton';
 import { FindOneTrainerService } from 'src/trainer/application/service/findOneTrainer.service';
 import { OrmTrainerMapper } from '../mapper/orm-trainer.mapper';
