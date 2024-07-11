@@ -20,9 +20,9 @@ describe('User Update', () => {
             new EventBusMock()
         );
         try {
-            await updateUserService.execute(request);
+            const res = await updateUserService.execute(request);
+            expect(res.Error).toEqual(InvalidUserNameException);
         } catch (err) {
-            expect(err).toEqual(InvalidUserNameException);
         }
 
         expect.assertions(1);
@@ -38,9 +38,9 @@ describe('User Update', () => {
             new EventBusMock()
         );
         try {
-            updateUserService.execute(request);
+            const res = await updateUserService.execute(request);
+            expect(res.Error).toEqual(InvalidUserEmailException);
         } catch (err) {
-            expect(err).toEqual(InvalidUserEmailException);
         }
 
         expect.assertions(1);
@@ -56,9 +56,9 @@ describe('User Update', () => {
             new EventBusMock()
         );
         try {
-            updateUserService.execute(request);
+            const res = await updateUserService.execute(request);
+            expect(res.Error).toEqual(InvalidUserPhoneException);
         } catch (err) {
-            expect(err).toEqual(InvalidUserPhoneException);
         }
 
         expect.assertions(1);

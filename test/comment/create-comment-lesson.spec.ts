@@ -46,9 +46,9 @@ describe('Create CommentLesson', () => {
             new UuidGen(),
         )
         try {
-            await registerCommentBlogService.execute(request);
+            const res = await registerCommentBlogService.execute(request);
+            expect(res.Error).toBeInstanceOf(EmptyLessonCommentLessonIdException);
         } catch (err) {
-            expect(err).toBeInstanceOf(EmptyLessonCommentLessonIdException);
         }
         expect.assertions(1)
     })
@@ -65,9 +65,9 @@ describe('Create CommentLesson', () => {
             new UuidGen(),
         )
         try {
-            await registerCommentBlogService.execute(request);
+            const res = await registerCommentBlogService.execute(request);
+            expect(res.Error).toBeInstanceOf(EmptyLessonCommentUserIdException);
         } catch (err) {
-            expect(err).toBeInstanceOf(EmptyLessonCommentUserIdException);
         }
         expect.assertions(1)
     })
@@ -84,9 +84,9 @@ describe('Create CommentLesson', () => {
             new UuidGen(),
         )
         try {
-            await registerCommentBlogService.execute(request);
+            const res = await registerCommentBlogService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidLessonCommentBodyException);
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidLessonCommentBodyException);
         }
         expect.assertions(1)
     })

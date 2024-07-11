@@ -67,10 +67,9 @@ describe('Obtener un curso por id', () => {
             new OdmCategoryRepositoryMock()
         )
         try {
-            await getCourseByIdService.execute(request);
+            const res = await getCourseByIdService.execute(request);
+            expect(res.Error).toBeInstanceOf(NullCourseIdException)
         } catch (err) {
-            console.log(typeof err)
-            expect(err).toBeInstanceOf(NullCourseIdException);
         }
         expect.assertions(1)
     })

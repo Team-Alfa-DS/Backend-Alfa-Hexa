@@ -38,9 +38,9 @@ describe('User Register', () => {
             new EventBusMock()
         )
         try {
-            await registerUserService.execute(request);
+            const res = await registerUserService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidUserEmailException);
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidUserEmailException);
         }
         expect.assertions(1)
     })
@@ -56,9 +56,9 @@ describe('User Register', () => {
             new EventBusMock()
         )
         try {
-            await registerUserService.execute(request);
+            const res = await registerUserService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidUserNameException);
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidUserNameException);
         }
         expect.assertions(1)
     })
@@ -74,9 +74,9 @@ describe('User Register', () => {
             new EventBusMock()
         )
         try {
-            await registerUserService.execute(request);
+            const res = await registerUserService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidUserPasswordException);
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidUserPasswordException);
         }
         expect.assertions(1)
     })
@@ -92,9 +92,9 @@ describe('User Register', () => {
             new EventBusMock()
         )
         try {
-            await registerUserService.execute(request);
+            const res = await registerUserService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidUserPhoneException);
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidUserPhoneException);
         }
         expect.assertions(1)
     })
@@ -110,9 +110,9 @@ describe('User Register', () => {
             new EventBusMock()
         )
         try {
-            await registerUserService.execute(request);
+            const res = await registerUserService.execute(request);
+            expect(res.Error).toBeInstanceOf(InvalidUserEmailException)
         } catch (err) {
-            expect(err).toBeInstanceOf(InvalidUserEmailException);
         }
         expect.assertions(1)
     })

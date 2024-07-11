@@ -11,8 +11,8 @@ describe('Contar curso', () => {
         )
         const response = await getCourseCountService.execute(request);
         expect(response.isSuccess).toBeTruthy();
-        expect(response.Value).toBe(
-            new GetCourseCountResponse(1)
+        expect(response.Value.count).toBe(
+            1
         )
     })
 });
