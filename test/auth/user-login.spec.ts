@@ -57,7 +57,7 @@ describe('User Login', () => {
         )
 
         const response = await loginuserService.execute(request);
-        expect(response.Error).toBe('La contraseña es incorrecta');
+        expect(response.Error.message).toBe('La contraseña es incorrecta');
         expect.assertions(1);
     })
 })
