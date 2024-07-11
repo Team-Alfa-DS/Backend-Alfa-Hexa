@@ -27,9 +27,9 @@ describe('Comment get CommentLesson', () => {
             odmCourseRepositoryMock
         )
         try {
-            await getCommentBlogService.execute(request);
+            const res = await getCommentBlogService.execute(request);
+            expect(res.Error).toBeInstanceOf(EmptyLessonCommentLessonIdException);
         } catch (err) {
-            expect(err).toBeInstanceOf(EmptyLessonCommentLessonIdException);
         }
         expect.assertions(1)
     })
@@ -42,9 +42,9 @@ describe('Comment get CommentLesson', () => {
             odmCourseRepositoryMock
         )
         try {
-            await getCommentBlogService.execute(request);
+            const res = await getCommentBlogService.execute(request);
+            expect(res.Error).toBeInstanceOf(EmptyLessonCommentUserIdException);
         } catch (err) {
-            expect(err).toBeInstanceOf(EmptyLessonCommentUserIdException);
         }
         expect.assertions(1)
     })

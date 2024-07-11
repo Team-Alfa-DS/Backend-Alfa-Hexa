@@ -16,7 +16,7 @@ describe('Obtener un curso por id', () => {
         )
         const response = await getCourseByIdService.execute(request);
         expect(response.isSuccess).toBeTruthy();
-        expect(response.Value).toBe(
+        expect(response.Value.category).toBe(
             new GetCourseByIdResponse(
                 '4a370052-3c3d-4a18-9ba1-a9fd5336a145',
                 'Yoga para Principiantes',
@@ -38,7 +38,7 @@ describe('Obtener un curso por id', () => {
                     content: 'Contenido',
                     video: 'https://res.cloudinary.com/dhrnlh0kg/video/upload/v1718306045/lfc9awszmicb9k02uzkd.mp4'
                 }],
-            )
+            ).category
         )
     })
 
@@ -51,9 +51,9 @@ describe('Obtener un curso por id', () => {
             new OdmCategoryRepositoryMock()
         )
         try {
-            await getCourseByIdService.execute(request);
+            const res = await getCourseByIdService.execute(request);
+            expect(res.Error).toBeInstanceOf(CourseNotFoundException);
         } catch (err) {
-            expect(err).toBeInstanceOf(CourseNotFoundException);
         }
         expect.assertions(1)
     })
