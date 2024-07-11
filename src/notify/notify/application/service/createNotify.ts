@@ -1,4 +1,4 @@
-import { Notify } from "src/notify/notify/domain/notify";
+/*import { Notify } from "src/notify/notify/domain/notify";
 import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
@@ -23,4 +23,4 @@ export class CreateNotify implements IApplicationService<Notify, Notify>{
         }
         return Result.success<Notify>(notifyCreated.Value);
     }
-}
+}*/
