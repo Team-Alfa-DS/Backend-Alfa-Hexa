@@ -12,7 +12,7 @@ export class getfindNotifyById implements IService<getfindNotifyByIdRequest, get
     }
 
     get name(): string {
-        return 'getfindNotifyById';
+        return this.constructor.name;
     }
 
     async execute(id: getfindNotifyByIdRequest): Promise<Result<getfindNotifyByIdResponse>> {

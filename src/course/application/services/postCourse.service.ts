@@ -1,4 +1,4 @@
-import { ICategoryRepository } from "src/category/domain/repositories/category-repository.interface";
+import { ICategoryCommandRepository } from "src/category/domain/repositories/category-repository.interface";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { TypeFile } from "src/common/application/file-uploader/enums/type-file.enum";
 import { IFileUploader } from "src/common/application/file-uploader/file-uploader.interface";
@@ -33,18 +33,19 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
   ) {}
   
   async execute(request: PostCourseRequestDto): Promise<Result<PostCourseResponseDto>> {
-      const course = await this.odmCourseRepository.getCourseByTitle(new CourseTitle(request.title));
-      if (course) throw new CourseAlreadyExistException(`El curso ${request.title} ya existe`);
+      try {
+        const course = await this.odmCourseRepository.getCourseByTitle(new CourseTitle(request.title));
+        // if (course) throw new CourseAlreadyExistException(`El curso ${request.title} ya existe`);
+        if (course) {return Result.fail(new CourseAlreadyExistException(`El curso ${request.title} ya existe`))}
+        const generatedId = await this.idGen.genId();
 
-      const generatedId = await this.idGen.genId();
+        const image = await this.fileUploader.uploadFile(request.image, TypeFile.image);
+        if (!image.isSuccess) return Result.fail(image.Error);
 
-      const image = await this.fileUploader.uploadFile(request.image, TypeFile.image);
-      if (!image.isSuccess) return Result.fail(image.Error);
-
-      const domainTags: CourseTag[] = []
-      for (let tag of request.tags) {
-        domainTags.push(new CourseTag(tag));
-      }
+        const domainTags: CourseTag[] = []
+        for (let tag of request.tags) {
+          domainTags.push(new CourseTag(tag));
+        }
 
       const domainCourse = Course.create(
         new CourseId(generatedId),
@@ -61,14 +62,17 @@ export class PostCourseService implements IService<PostCourseRequestDto, PostCou
         new CourseTrainer(request.trainerId)
       );
 
-      const createdCourse = await this.courseRepository.saveCourse(
-        domainCourse
-      );
+        const createdCourse = await this.courseRepository.saveCourse(
+          domainCourse
+        );
 
-      domainCourse.register(domainCourse.Id, domainCourse.Title, domainCourse.Description, domainCourse.Image, domainCourse.Date, domainCourse.DurationMinutes, domainCourse.DurationWeeks, domainCourse.Level, domainCourse.Lessons, domainCourse.Tags, domainCourse.Category, domainCourse.Trainer);
-      this.eventPublisher.publish(domainCourse.pullDomainEvents());
+        domainCourse.register(domainCourse.Id, domainCourse.Title, domainCourse.Description, domainCourse.Image, domainCourse.Date, domainCourse.DurationMinutes, domainCourse.DurationWeeks, domainCourse.Level, domainCourse.Lessons, domainCourse.Tags, domainCourse.Category, domainCourse.Trainer);
+        this.eventPublisher.publish(domainCourse.pullDomainEvents());
 
-      return Result.success(new PostCourseResponseDto(generatedId));
+        return Result.success(new PostCourseResponseDto(generatedId));
+      } catch (error) {
+        return Result.fail(error);
+      }
   }
   
   get name(): string {

@@ -23,7 +23,7 @@ import { OrmCategoryMapper } from 'src/category/infraestructure/mapper/orm-categ
 import { OrmTrainerRepository } from 'src/trainer/infraestructure/repositories/orm-trainer.repositorie';
 import { OrmTrainerMapper } from 'src/trainer/infraestructure/mapper/orm-trainer.mapper';
 import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-mapper';
-import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
 import { OdmCourseRepository } from 'src/course/infraestructure/repositories/OdmCourse.repository';
@@ -36,6 +36,11 @@ import { OdmTagEntity } from 'src/tag/infraestructure/entities/odm-entities/odm-
 import { OdmLessonEntity } from 'src/course/infraestructure/entities/odm-entities/odm-lesson.entity';
 import { OdmLessonCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity';
 import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmBlogEntity } from 'src/blog/infraestructure/entities/odm-entities/odm-blog.entity';
+import { OdmBlogCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity';
+import { OdmBlogRepository } from 'src/blog/infraestructure/repositories/odmBlog.repository';
+import { OdmBlogMapper } from 'src/blog/infraestructure/mapper/odmBlog.mapper';
+import { OdmBlogCommentMapper } from 'src/blog/infraestructure/mapper/odm-comment-blog.mapper';
 
 
 @ApiTags('Search')
@@ -55,12 +60,15 @@ export class SearchController {
         @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
         @InjectModel('tag') tagModel: Model<OdmTagEntity>,
         @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
-        @InjectModel('lesson_comment') commentModel: Model<OdmLessonCommentEntity>,
-        @InjectModel('user') userModel: Model<OdmUserEntity>
+        @InjectModel('lesson_comment') lessonCommentModel: Model<OdmLessonCommentEntity>,
+        @InjectModel('user') userModel: Model<OdmUserEntity>,
+        @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
+        @InjectModel('blog_comment') blogCommentModel: Model<OdmBlogCommentEntity>,
+        
     ) {
         // const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-        const courseRepo = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentModel, userModel) 
-        const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
+        const courseRepo = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, lessonCommentModel, userModel) 
+        const blogRepo = new OdmBlogRepository(new OdmBlogMapper(userModel, blogModel, blogCommentModel, trainerModel), blogModel, blogCommentModel, userModel, trainerModel, new OdmBlogCommentMapper( userModel, blogModel, blogCommentModel, trainerModel) )
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
         const trainerRepo = new OrmTrainerRepository( this.trainerMapper, PgDatabaseSingleton.getInstance());
@@ -70,14 +78,14 @@ export class SearchController {
             PgDatabaseSingleton.getInstance().createQueryRunner()
         );
 
-        this.searchService =  new ExceptionDecorator(
+        this.searchService =  new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new SearchService(courseRepo, blogRepo, trainerRepo, categoryRepo),
                 logger
             )
         );
 
-        this.searchTagService = new ExceptionDecorator(
+        this.searchTagService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new SearchTagService(tagRepo,this.transacctionHandler),
                 logger
@@ -105,7 +113,9 @@ export class SearchController {
         const request = new SearchRequestDto(page, perPage, term, tag);
         const result = await this.searchService.execute(request);
 
-        return result.Value;
+        if (!result.isSuccess) { throw result.Error }
+
+        return result.Value
     }
 
     @Get( "/popular/tags" )
@@ -117,12 +127,12 @@ export class SearchController {
         const request = new SearchRequestDto(page, perPage);
         const result = await this.searchTagService.execute(request);
 
-        return result.Value;
+        // return result.Value;
         if (result.isSuccess) {
             return result.Value.tagNames;
         } else {
             // throw new HttpException(result.Error, result.StatusCode);
-            throw ExceptionMapper.toHttp(result.Error);
+            throw result.Error;
         }
     }
 

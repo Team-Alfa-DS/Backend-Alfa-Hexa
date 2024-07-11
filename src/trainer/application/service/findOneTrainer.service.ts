@@ -14,20 +14,24 @@ export class FindOneTrainerService extends IService<FindOneTrainerRequest, FindO
   }
 
   async execute(data: FindOneTrainerRequest): Promise<Result<FindOneTrainerResponse>> {
-    let trainerId = TrainerId.create(data.id);
-    
-    const trainer = await this.trainerRepository.findTrainerById(trainerId);
+    try {
+      let trainerId = TrainerId.create(data.id);
+      
+      const trainer = await this.trainerRepository.findTrainerById(trainerId);
 
-    if (!trainer.isSuccess) {
-      return Result.fail(
-        new Error('Trainer not found')
-      );
+      if (!trainer.isSuccess) {
+        return Result.fail(
+          new Error('Trainer not found')
+        );
+      }
+      let userFollow = false;
+      if (trainer.Value.User.find(u => u.trainerFollowerUserId.equals(UserId.create(data.userId)))){
+        userFollow = true;
+      }
+      const response = new FindOneTrainerResponse(trainer.Value.Id.trainerId, trainer.Value.Name.trainerName, trainer.Value.Followers.trainerFollower, userFollow, trainer.Value.Location.trainerLocation);
+      return Result.success(response);
+    } catch (error) {
+      return Result.fail(error);
     }
-    let userFollow = false;
-    if (trainer.Value.User.find(u => u.trainerFollowerUserId.equals(UserId.create(data.userId)))){
-      userFollow = true;
-    }
-    const response = new FindOneTrainerResponse(trainer.Value.Id.trainerId, trainer.Value.Name.trainerName, trainer.Value.Followers.trainerFollower, userFollow, trainer.Value.Location.trainerLocation);
-    return Result.success(response);
   }
 }

@@ -44,7 +44,7 @@ import { OdmCourseRepository } from "src/course/infraestructure/repositories/Odm
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
 import { EventManagerSingleton } from "src/common/infraestructure/events/event-manager/event-manager-singleton";
 import { CreateCommentLessonEvent } from "src/course/infraestructure/events/synchronize/create-commentLesson.event";
-import { IBlogRepository } from "src/blog/domain/repositories/IBlog.repository";
+import { IBlogCommandRepository } from "src/blog/domain/repositories/IBlogCommand.repository";
 import { OdmBlogRepository } from "src/blog/infraestructure/repositories/odmBlog.repository";
 import { OdmBlogMapper } from "src/blog/infraestructure/mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
@@ -52,6 +52,7 @@ import { OrmBlogCommentMapper } from "src/blog/infraestructure/mapper/orm-commen
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
 import { CreateCommentBlogEvent } from "src/blog/infraestructure/events/synchronize/commenBlog-posted.event";
 import { TransactionHandler } from "src/common/infraestructure/database/transaction-handler";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 
 
 @ApiBearerAuth()
@@ -83,7 +84,7 @@ export class CommentController{
         PgDatabaseSingleton.getInstance()
     );
 
-    private readonly blogRepository: IBlogRepository = new OrmBlogRepository(
+    private readonly blogRepository: IBlogCommandRepository = new OrmBlogRepository(
         PgDatabaseSingleton.getInstance()
     );
 
@@ -139,46 +140,54 @@ export class CommentController{
         this.eventPublisher.subscribe('CommentLessonPosted', [new CreateCommentLessonEvent(OdmCourseRepositoryInstance)]);
         this.eventPublisher.subscribe('CommentBlogPosted', [new CreateCommentBlogEvent(odmBlogRepositoryInstance)]);
 
-        this.getCommentBlogService = new LoggerDecorator(
-            new GetCommentBlogService(
-                odmBlogRepositoryInstance
-            ),
-            this.logger
-        );
-        this.getCommentLessonService = new LoggerDecorator(
-            new GetCommentLessonService(
-                OdmCourseRepositoryInstance
-            ),
-            this.logger
-        );
-        this.registerLessonCommentService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterLessonCommentServices(
-                    this.userRepository,
-                    this.courseRepository,
-                    new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentLessonModel, userModel),
-                    this.transactionHandler,
-                    this.eventPublisher,
-                    this.idGenerator
+        this.getCommentBlogService = new ExceptionMapperDecorator(
+            new LoggerDecorator(
+                new GetCommentBlogService(
+                    odmBlogRepositoryInstance
                 ),
-                this.auditRepository
-            ),
-            this.logger
-        );
-        this.registerBlogCommentService = new LoggerDecorator(
-            new ServiceDBLoggerDecorator(
-                new RegisterBlogCommentServices(
-                    odmBlogRepositoryInstance,
-                    this.userRepository,
-                    this.blogRepository,
-                    this.transactionHandler,
-                    this.idGenerator,
-                    this.eventPublisher
+                this.logger
+            )
+        )
+        this.getCommentLessonService = new ExceptionMapperDecorator(
+            new LoggerDecorator(
+                new GetCommentLessonService(
+                    OdmCourseRepositoryInstance
                 ),
-                this.auditRepository
-            ),
-            this.logger
-        );
+                this.logger
+            )
+        )
+        this.registerLessonCommentService = new ExceptionMapperDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterLessonCommentServices(
+                        this.userRepository,
+                        this.courseRepository,
+                        new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, commentLessonModel, userModel),
+                    this.transactionHandler,
+                        this.eventPublisher,
+                        this.idGenerator
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        )
+        this.registerBlogCommentService = new ExceptionMapperDecorator(
+            new LoggerDecorator(
+                new ServiceDBLoggerDecorator(
+                    new RegisterBlogCommentServices(
+                        odmBlogRepositoryInstance,
+                        this.userRepository,
+                        this.blogRepository,
+                        this.transactionHandler,
+                        this.idGenerator,
+                        this.eventPublisher
+                    ),
+                    this.auditRepository
+                ),
+                this.logger
+            )
+        )
 
     
     }
@@ -204,12 +213,16 @@ export class CommentController{
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-            return result.Value.blogComments;
+            
+            if (!result.isSuccess) { throw result.Error }
 
+            return result.Value.blogComments;
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perpage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
+            if (!result.isSuccess) { throw result.Error }
+
             return result.Value.lessonComments;
         }
     }
@@ -226,9 +239,17 @@ export class CommentController{
     @Body() addCommentEntryDto: AddCommentEntryDto){
         const data = new AddCommentToServiceRequestDto(addCommentEntryDto.target, req.user.tokenUser.id, addCommentEntryDto.body); 
 
-        if (addCommentEntryDto.targetType.toUpperCase() === "LESSON") return await this.registerLessonCommentService.execute( data );
+        if (addCommentEntryDto.targetType.toUpperCase() === "LESSON") {
+            const result = await this.registerLessonCommentService.execute( data );
 
-        if (addCommentEntryDto.targetType.toUpperCase() === "BLOG") return await this.registerBlogCommentService.execute( data );
+            if (!result.isSuccess) { throw result.Error }
+        }
+
+        if (addCommentEntryDto.targetType.toUpperCase() === "BLOG") {
+            const result = await this.registerBlogCommentService.execute( data );
+
+            if (!result.isSuccess) { throw result.Error }
+        }
         
     }
 

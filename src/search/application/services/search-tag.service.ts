@@ -20,22 +20,26 @@ export class SearchTagService extends IService<SearchRequestDto, SearchTagRespon
     }
 
     async execute(data: SearchRequestDto): Promise<Result<SearchTagResponseDto>> {
-        let tagNames: string[] = [];
-        
-        let result = await this.tagRepository.getAllTags(this.transactionHandler);
-        
-        if (!result) return Result.fail(result.Error); 
-        
-        tagNames = result.Value;
+        try {
+            let tagNames: string[] = [];
+            
+            let result = await this.tagRepository.getAllTags(this.transactionHandler);
+            
+            if (!result) return Result.fail(result.Error); 
+            
+            tagNames = result.Value;
 
-        if (data.perpage) {
-            let page = data.page;
-            if (!page) {page = 0}
+            if (data.perpage) {
+                let page = data.page;
+                if (!page) {page = 0}
 
-            tagNames = tagNames.slice((page*data.perpage), (data.perpage) + (page*data.perpage));
+                tagNames = tagNames.slice((page*data.perpage), (data.perpage) + (page*data.perpage));
+            }
+
+            const response = new SearchTagResponseDto(tagNames);
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        const response = new SearchTagResponseDto(tagNames);
-        return Result.success(response);
     }
 }

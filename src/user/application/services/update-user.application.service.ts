@@ -32,35 +32,39 @@ export class UpdateUserService extends IService<UpdateUserRequest, UpdateUserRes
     }
 
     async execute(data: UpdateUserRequest): Promise<Result<UpdateUserResponse>> {
-        // await this.transactionHandler.startTransaction();
-        const user = await this.odmUserRepository.findUserById(UserId.create(data.id));
+        try {
+            // await this.transactionHandler.startTransaction();
+            const user = await this.odmUserRepository.findUserById(UserId.create(data.id));
 
-        if (!user.isSuccess) {
-            return Result.fail(user.Error)
-        }
-        const newUser = user.Value;
-        if(data.email) {
-            const userEmailCheck = await this.odmUserRepository.findUserByEmail(UserEmail.create(data.email));
-            if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'));
-            newUser.UpdateEmail(UserEmail.create(data.email));
-        }
-        if(data.name) newUser.UpdateName(UserName.create(data.name));
-        if(data.password) {
-            const hashPassword = await this.encryptor.hash(data.password); 
-            newUser.UpdatePassword(UserPassword.create(hashPassword));
-        }
-        if(data.phone) newUser.UpdatePhone(UserPhone.create(data.phone));
-        if(data.image) newUser.UpdateImage(UserImage.create(data.image));
+            if (!user.isSuccess) {
+                return Result.fail(user.Error)
+            }
+            const newUser = user.Value;
+            if(data.email) {
+                const userEmailCheck = await this.odmUserRepository.findUserByEmail(UserEmail.create(data.email));
+                if (userEmailCheck.isSuccess) return Result.fail(new Error('Ya existe un usuario con este email'));
+                newUser.UpdateEmail(UserEmail.create(data.email));
+            }
+            if(data.name) newUser.UpdateName(UserName.create(data.name));
+            if(data.password) {
+                const hashPassword = await this.encryptor.hash(data.password); 
+                newUser.UpdatePassword(UserPassword.create(hashPassword));
+            }
+            if(data.phone) newUser.UpdatePhone(UserPhone.create(data.phone));
+            if(data.image) newUser.UpdateImage(UserImage.create(data.image));
 
-        const updatedUser = await this.ormUserRepository.saveUser(newUser, this.transactionHandler);
+            const updatedUser = await this.ormUserRepository.saveUser(newUser, this.transactionHandler);
 
-        if (!updatedUser.isSuccess) {
-            return Result.fail(updatedUser.Error)
+            if (!updatedUser.isSuccess) {
+                return Result.fail(updatedUser.Error)
+            }
+            // await this.transactionHandler.commitTransaction();
+            this.eventPublisher.publish(newUser.pullDomainEvents())
+            const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
+            
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-        // await this.transactionHandler.commitTransaction();
-        this.eventPublisher.publish(newUser.pullDomainEvents())
-        const response = new UpdateUserResponse(updatedUser.Value.Id.Id);
-        
-        return Result.success(response);
     }
 }

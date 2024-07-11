@@ -24,7 +24,7 @@ import { OdmBlogMapper } from "../mapper/odmBlog.mapper";
 import { OdmBlogEntity } from "../entities/odm-entities/odm-blog.entity";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 import { OdmTrainerRepository } from '../../../trainer/infraestructure/repositories/odm-trainer.repository';
 import { OdmTrainerEntity } from "src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity";
 import { OdmCategoryEntity } from "src/category/infraestructure/entities/odm-entities/odm-category.entity";
@@ -65,23 +65,23 @@ export class BlogController {
         //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
 
         const logger = new NestLogger();
-        this.getAllBlogService = new LoggerDecorator(
-            new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
-            logger
-        );
-        this.getAllBlogService = new ExceptionDecorator(
+        // this.getAllBlogService = new LoggerDecorator(
+        //     new GetAllBlogService(blogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
+        //     logger
+        // );
+        this.getAllBlogService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetAllBlogService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
                 logger
             )
         );
-        this.getBlogByIdService = new ExceptionDecorator(
+        this.getBlogByIdService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetBlogByIdService(odmBlogRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance),
                 logger
             )
         );
-        this.getBlogsCountService = new ExceptionDecorator(
+        this.getBlogsCountService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetBlogsCountService(odmBlogRepositoryInstance),
                 logger
@@ -114,9 +114,10 @@ export class BlogController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async  getAllBlogs(@Query()getManyBlogsDTO: GetManyBlogsDTO) {
         const result: Result<GetAllBlogsResponseDTO>  =  await this.getAllBlogService.execute(getManyBlogsDTO);
-        if (result.Value)
-            return result.Value.blogs
-        return { message: result.Error.message };
+        
+        if (!result.isSuccess) {throw result.Error}
+
+        return result.Value;
     }
 
     
@@ -135,9 +136,10 @@ export class BlogController {
     @ApiUnauthorizedResponse({description: 'Acceso no autorizado, no se pudo encontrar el token'})
     async  getBlogsCount(@Query()getBlogsCountDTO: GetBlogsCountDTO) {
         const result: Result<GetBlogsCountResponseDTO>  =  await this.getBlogsCountService.execute(getBlogsCountDTO);
-        if (result.Value)
-            return result.Value
-        return { message: result.Error.message };
+        
+        if (!result.isSuccess) {throw result.Error}
+
+        return result.Value;
     }
 
 }

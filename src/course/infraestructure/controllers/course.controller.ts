@@ -39,7 +39,7 @@ import { PostLessonRequestDto, PostLessonResponseDto, PostLessonService } from "
 import { PostLessonEvent } from "../events/synchronize/post-lesson.event";
 import { OdmLessonCommentEntity } from "src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity";
 import { OdmUserEntity } from "src/user/infraestructure/entities/odm-entities/odm-user.entity";
-import { ExceptionDecorator } from "src/common/application/aspects/exceptionDecorator";
+import { ExceptionMapperDecorator } from "src/common/application/aspects/exceptionMapperDecorator";
 import { OdmTrainerRepository } from "src/trainer/infraestructure/repositories/odm-trainer.repository";
 import { OdmTrainerMapper } from "src/trainer/infraestructure/mapper/odm-trainer.mapper";
 import { OdmBlogEntity } from "src/blog/infraestructure/entities/odm-entities/odm-blog.entity";
@@ -85,25 +85,25 @@ export class CourseController {
     this.eventPublisher.subscribe('LessonPosted', [new PostLessonEvent(OdmCourseRepositoryInstance)]);
   
 
-    this.getManyCoursesService = new ExceptionDecorator(
+    this.getManyCoursesService = new ExceptionMapperDecorator(
       new LoggerDecorator( 
         new GetManyCoursesService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
         logger
       )
     );
-    this.getCourseByIdService = new ExceptionDecorator(
+    this.getCourseByIdService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new GetCourseByIdService(OdmCourseRepositoryInstance, trainerRepositoryInstance, categoryRepositoryInstance), 
         logger
       )
     );
-    this.getCourseCountService = new ExceptionDecorator(
+    this.getCourseCountService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new GetCourseCountService(OdmCourseRepositoryInstance),
         logger
       )
     );
-    this.postCourseService = new ExceptionDecorator(
+    this.postCourseService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new ServiceDBLoggerDecorator(
           new PostCourseService(
@@ -119,7 +119,7 @@ export class CourseController {
         logger
       )
     );
-    this.postLessonService = new ExceptionDecorator(
+    this.postLessonService = new ExceptionMapperDecorator(
       new LoggerDecorator(
         new ServiceDBLoggerDecorator(
           new PostLessonService(
@@ -147,8 +147,10 @@ export class CourseController {
   })
   async getCourseById(@Param('id', ParseUUIDPipe) courseId: string) {
     const request = new GetCourseByIdRequest(courseId);
-    const result = await this.getCourseByIdService.execute(request);
-    return result.Value;
+    const response = await this.getCourseByIdService.execute(request);
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -173,8 +175,11 @@ export class CourseController {
       manyCoursesQueryDto.page,
       manyCoursesQueryDto.perpage);
 
-    const result = await this.getManyCoursesService.execute(request);
-    return result.Value;
+    const response = await this.getManyCoursesService.execute(request);
+    
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @Get('/count')
@@ -186,8 +191,10 @@ export class CourseController {
       courseCountQueryDto.trainer
     )
 
-    const result = await this.getCourseCountService.execute(request);
-    return result.Value;
+    const response = await this.getCourseCountService.execute(request);
+    if (!response.isSuccess) { throw response.Error}
+
+    return response.Value;
   }
 
   @Post('create/course')
@@ -210,6 +217,8 @@ export class CourseController {
       postCourseBodyDto.trainerId
     ));
 
+    if (!response.isSuccess) { throw response.Error}
+
     return response.Value;
   }
 
@@ -229,6 +238,8 @@ export class CourseController {
       postLessonBodyDto.seconds,
       video
     ));
+    if (!response.isSuccess) { throw response.Error}
+
     return response.Value;
   }
 }

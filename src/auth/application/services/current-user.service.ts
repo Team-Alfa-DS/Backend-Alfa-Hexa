@@ -15,20 +15,24 @@ export class CurrentUserService extends IService<CurrentUserRequest, CurrentUser
     }
     
     async execute(value: CurrentUserRequest): Promise<Result<CurrentUserResponse>> {
-        const userFound = await this.userRepository.findUserById(UserId.create(value.id));
+        try {
+            const userFound = await this.userRepository.findUserById(UserId.create(value.id));
 
-        if (!userFound.isSuccess) {
-            return Result.fail(userFound.Error);
+            if (!userFound.isSuccess) {
+                return Result.fail(userFound.Error);
+            }
+
+            const response = new CurrentUserResponse(
+                userFound.Value.Id.Id,
+                userFound.Value.Email.Email,
+                userFound.Value.Name.Name,
+                userFound.Value.Phone.Phone,
+                userFound.Value.Image?.Image ? userFound.Value.Image.Image : null
+            );
+
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-
-        const response = new CurrentUserResponse(
-            userFound.Value.Id.Id,
-            userFound.Value.Email.Email,
-            userFound.Value.Name.Name,
-            userFound.Value.Phone.Phone,
-            userFound.Value.Image?.Image ? userFound.Value.Image.Image : null
-        );
-
-        return Result.success(response);
     }
 }

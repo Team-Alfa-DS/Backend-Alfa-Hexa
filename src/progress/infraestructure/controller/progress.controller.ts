@@ -51,7 +51,7 @@ import { EventBus } from 'src/common/infraestructure/events/event-bus';
 import { IEventPublisher } from 'src/common/application/events/event-publisher.abstract';
 import { EventManagerSingleton } from 'src/common/infraestructure/events/event-manager/event-manager-singleton';
 import { SaveProgressEvent } from '../events/save-progress.event';
-import { ExceptionDecorator } from 'src/common/application/aspects/exceptionDecorator';
+import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 import { StartCourseProgressRequest } from 'src/progress/application/dtos/request/start-course-progress.request';
 import { StartCourseProgressResponse } from 'src/progress/application/dtos/response/start-course-progress.response';
 import { StartCourseProgressService } from 'src/progress/application/services/start-course-progress.service';
@@ -123,7 +123,7 @@ export class ProgressController {
         this.courseRepository = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, lessonCommentModel, userModel);
         
         
-        this.markEndProgressService = new ExceptionDecorator(
+        this.markEndProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new MarkEndProgressService(
@@ -138,7 +138,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.getOneProgressService = new ExceptionDecorator(
+        this.getOneProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new GetOneProgressService(
                     this.odmUserRepository,
@@ -149,7 +149,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.trendingProgressService = new ExceptionDecorator(
+        this.trendingProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new TrendingProgressService(
                     this.odmUserRepository,
@@ -159,7 +159,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.coursesProgressService = new ExceptionDecorator(
+        this.coursesProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new CoursesProgressService(
                     this.odmprogressRepository,
@@ -169,7 +169,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.profileProgressService = new ExceptionDecorator(
+        this.profileProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ProfileProgressService(
                     this.odmprogressRepository,
@@ -179,7 +179,7 @@ export class ProgressController {
                 this.logger
             )
         );
-        this.startCourseProgressService = new ExceptionDecorator(
+        this.startCourseProgressService = new ExceptionMapperDecorator(
             new LoggerDecorator(
                 new ServiceDBLoggerDecorator(
                     new StartCourseProgressService(
@@ -208,6 +208,8 @@ export class ProgressController {
         const request = new MarkEndProgressRequest(value.courseId, value.lessonId, req.user.tokenUser.id, value.markAsCompleted, value.time, value.totalTime);
         const response = await this.markEndProgressService.execute(request);
         
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -215,6 +217,8 @@ export class ProgressController {
     async getOneProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new GetOneProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.getOneProgressService.execute(request);
+
+        if (!response.isSuccess) { throw response.Error }
 
         return response.Value;
     }
@@ -224,6 +228,8 @@ export class ProgressController {
         const request = new TrendingProgressRequest(req.user.tokenUser.id);
         const response = await this.trendingProgressService.execute(request);
 
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -231,6 +237,8 @@ export class ProgressController {
     async progressCourses(@Query() queryDto: CoursesProgressDto, @Request() req: JwtRequest) {
         const request = new CoursesProgressRequest(req.user.tokenUser.id, queryDto.page, queryDto.perpage);
         const response = await this.coursesProgressService.execute(request);
+
+        if (!response.isSuccess) { throw response.Error }
 
         return response.Value.courseProgress;
     }
@@ -240,6 +248,8 @@ export class ProgressController {
         const request = new ProfileProgressRequest(req.user.tokenUser.id);
         const response = await this.profileProgressService.execute(request);
 
+        if (!response.isSuccess) { throw response.Error }
+
         return response.Value;
     }
 
@@ -247,6 +257,9 @@ export class ProgressController {
     async startProgress(@Param('courseId', ParseUUIDPipe) courseId: string, @Request() req: JwtRequest) {
         const request = new StartCourseProgressRequest(courseId, req.user.tokenUser.id);
         const response = await this.startCourseProgressService.execute(request);
-        return response.Value
+        
+        if (!response.isSuccess) { throw response.Error }
+
+        return response.Value;
     }
 }

@@ -15,15 +15,19 @@ export class ValidateUserCodeService extends IService<ValidateUserCodeRequest, V
     }
 
     async execute(value: ValidateUserCodeRequest): Promise<Result<ValidateUserCodeResponse>> {
-        const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email));
-        if (!user.isSuccess) {
-            return Result.fail(user.Error)
+        try {
+            const user = await this.userRepository.findUserByEmail(UserEmail.create(value.email));
+            if (!user.isSuccess) {
+                return Result.fail(user.Error)
+            }
+            
+            if (value.code != value.codeSaved) {
+                return Result.fail(new Error('El codigo no es correcto'));
+            }
+            const response = new ValidateUserCodeResponse();
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error)
         }
-        
-        if (value.code != value.codeSaved) {
-            return Result.fail(new Error('El codigo no es correcto'));
-        }
-        const response = new ValidateUserCodeResponse();
-        return Result.success(response);
     }
 }

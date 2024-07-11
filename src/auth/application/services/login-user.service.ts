@@ -21,23 +21,27 @@ export class LoginUserService extends IService<LoginUserRequest, LoginUserRespon
     }
 
     async execute(userLogin: LoginUserRequest): Promise<Result<LoginUserResponse>> {
-        // await this.transactionHandler.startTransaction();
-        const userFound = await this.userRepository.findUserByEmail(UserEmail.create(userLogin.email));
-        if (!userFound.isSuccess) {
-            return Result.fail(userFound.Error);
+        try {
+            // await this.transactionHandler.startTransaction();
+            const userFound = await this.userRepository.findUserByEmail(UserEmail.create(userLogin.email));
+            if (!userFound.isSuccess) {
+                return Result.fail(userFound.Error);
+            }
+            const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password.Password);
+
+            if (!isMatch) {
+                return Result.fail(new Error('La contraseña es incorrecta'))
+            }
+
+            const response = new LoginUserResponse(
+                {id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, 
+                await this.jwtGen.genJwt(userFound.Value.Id.Id), 
+                userFound.Value.Type.Type
+            );
+
+            return Result.success(response);
+        } catch (error) {
+            return Result.fail(error);
         }
-        const isMatch = await this.encryptor.comparePassword(userLogin.password, userFound.Value.Password.Password);
-
-        if (!isMatch) {
-            return Result.fail(new Error('La contraseña es incorrecta'))
-        }
-
-        const response = new LoginUserResponse(
-            {id: userFound.Value.Id.Id, email: userFound.Value.Email.Email, name: userFound.Value.Name.Name, phone: userFound.Value.Phone.Phone}, 
-            await this.jwtGen.genJwt(userFound.Value.Id.Id), 
-            userFound.Value.Type.Type
-        );
-
-        return Result.success(response);
     }
 }

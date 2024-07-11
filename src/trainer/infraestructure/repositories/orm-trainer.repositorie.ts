@@ -47,9 +47,10 @@ export class OrmTrainerRepository
     id: trainerId,
   }});
     if (!trainer) {
-      return Result.fail<Trainer>(
-        new TrainerNotFoundException('Trainer not found')
-      );
+      // return Result.fail<Trainer>(
+      //   new TrainerNotFoundException('Trainer not found')
+      // );
+      throw new TrainerNotFoundException('Trainer not found')
     }
 
     const trainerDomain = await this.ormTrainerMapper.toDomain(trainer);

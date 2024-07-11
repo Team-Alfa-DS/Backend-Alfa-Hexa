@@ -21,24 +21,28 @@ export class FollowTrainerService extends IService<FollowTrainerRequest, FollowT
   }
 
   async execute(data: FollowTrainerRequest): Promise<Result<FollowTrainerResponse>> {
-    let trainerId = TrainerId.create(data.idTrainer);
-    let userId = UserId.create(data.idUser);
-    const trainer = await this.odmTrainerRepository.findTrainerById(trainerId);
+    try {
+      let trainerId = TrainerId.create(data.idTrainer);
+      let userId = UserId.create(data.idUser);
+      const trainer = await this.odmTrainerRepository.findTrainerById(trainerId);
 
-    if (!trainer.isSuccess) return Result.fail(new TrainerNotFoundException('No se encontro al trainer'));
-    const trainerDomain = trainer.Value;
-    const follower = await this.odmTrainerRepository.findFollowByUserId(trainerId, TrainerFollowerUserId.create(userId));
-    if (follower) {
-      trainerDomain.DelUserFollow(TrainerFollowerUserId.create(userId))
-      await this.trainerRepository.unFollowTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
-    }
-    else {
-      trainerDomain.AddUserFollow(TrainerFollowerUserId.create(userId));
-      await this.trainerRepository.followTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
-    }
+      if (!trainer.isSuccess) return Result.fail(new TrainerNotFoundException('No se encontro al trainer'));
+      const trainerDomain = trainer.Value;
+      const follower = await this.odmTrainerRepository.findFollowByUserId(trainerId, TrainerFollowerUserId.create(userId));
+      if (follower) {
+        trainerDomain.DelUserFollow(TrainerFollowerUserId.create(userId))
+        await this.trainerRepository.unFollowTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
+      }
+      else {
+        trainerDomain.AddUserFollow(TrainerFollowerUserId.create(userId));
+        await this.trainerRepository.followTrainer( trainerDomain, TrainerFollowerUserId.create(userId) );
+      }
 
-    this.eventPublisher.publish(trainerDomain.pullDomainEvents());
-    const response = new FollowTrainerResponse()
-    return Result.success(response);
+      this.eventPublisher.publish(trainerDomain.pullDomainEvents());
+      const response = new FollowTrainerResponse()
+      return Result.success(response);
+    } catch (error) {
+      return Result.fail(error);
+    }
   }
 }

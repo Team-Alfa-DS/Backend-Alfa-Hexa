@@ -17,25 +17,21 @@ export class OdmBlogCommentRepository implements IOdmBlogCommentRepository{
     }
     
     async findAllCommentsByBlogId(id: BlogCommentBlogId): Promise<Result<CommentBlog[]>> {
-        try{
-            const r = await this.commentModel.find<OdmBlogCommentEntity>();
+        const r = await this.commentModel.find<OdmBlogCommentEntity>();
             
-            if (!r) return Result.fail<CommentBlog[]>(new CommentsBlogNotFoundException( 
-                `Ha ocurrido un error al encontrar los comentarios` ));
-            
-            const comment = r.filter(e => e.blog.id === id.BlogId.value);
+        // if (!r) return Result.fail<CommentBlog[]>(new CommentsBlogNotFoundException( 
+        //     `Ha ocurrido un error al encontrar los comentarios` ));
+        if (!r) { throw new CommentsBlogNotFoundException(`Ha ocurrido un error al encontrar los comentarios`) }
+        const comment = r.filter(e => e.blog.id === id.BlogId.value);
 
-            const ListMapper = []
-            comment.forEach(async e => {
-                ListMapper.push( 
-                    await this.odmCommentMapper.toDomain(e ))
-            });
+        const ListMapper = []
+        comment.forEach(async e => {
+            ListMapper.push( 
+                await this.odmCommentMapper.toDomain(e ))
+        });
+    
         
-            
-            return Result.success<CommentBlog[]>(ListMapper);
-        }catch(err){
-            return Result.fail(new Error(err.message));
-        }
+        return Result.success<CommentBlog[]>(ListMapper);
     }
 
 }

@@ -25,7 +25,8 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
   ) {}
 
   async execute(request: PostLessonRequestDto): Promise<Result<PostLessonResponseDto>> {
-      const generatedId = await this.idGen.genId();
+      try {
+        const generatedId = await this.idGen.genId();
       
       const courseToPostIn = await this.courseQueryRepository.getCourseById(new CourseId(request.courseId));
       const video = await this.fileUploader.uploadFile(request.video, TypeFile.video);
@@ -38,13 +39,16 @@ export class PostLessonService implements IService<PostLessonRequestDto, PostLes
         new LessonVideo(video.Value)
       );
 
-      const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
+        const lesson = courseToPostIn.getLesson(new LessonId(generatedId));
 
       await this.courseCommandRepository.saveLesson(lesson, courseToPostIn);
 
-      this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
+        this.eventPublisher.publish(courseToPostIn.pullDomainEvents());
 
-      return Result.success(new PostLessonResponseDto(generatedId));
+        return Result.success(new PostLessonResponseDto(generatedId));
+      } catch (error) {
+        return Result.fail(error);
+      }
   }
 
   get name(): string {
