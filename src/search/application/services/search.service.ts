@@ -2,7 +2,6 @@ import { SearchRequestDto } from "../dtos/request/search-request.dto";
 import { IApplicationService } from "src/common/application/application-service/application-service.interface";
 import { SearchResponseDto } from "../dtos/response/search-response.dto";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IBlogCommandRepository } from "src/blog/domain/repositories/IBlogCommand.repository";
 import { IService } from "src/common/application/interfaces/IService";
 import { Blog } from "src/blog/domain/Blog";
@@ -18,11 +17,12 @@ import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { IBlogQueryRepository } from "src/blog/domain/repositories/IBlogQuery.repository";
 import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class SearchService extends IService<SearchRequestDto, SearchResponseDto> {
 
   constructor(
-    private readonly courseRepository: ICourseRepository,
+    private readonly courseRepository: ICourseQueryRepository,
     private readonly blogRepository: IBlogQueryRepository,
     private readonly trainerRepository: ITrainerRepository,
     private readonly categoryRepository: ICategoryQueryRepository

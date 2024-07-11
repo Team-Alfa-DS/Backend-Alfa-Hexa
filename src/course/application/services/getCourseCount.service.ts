@@ -1,11 +1,11 @@
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
-import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
 
 export class GetCourseCountService extends IService<GetCourseCountRequest, GetCourseCountResponse> {
-  constructor(private courseRepository: ICourseRepository) {super()}
+  constructor(private courseRepository: ICourseQueryRepository) {super()}
   
   async execute(request: GetCourseCountRequest): Promise<Result<GetCourseCountResponse>> {
       let courseCategory: CourseCategory; let courseTrainer: CourseTrainer;

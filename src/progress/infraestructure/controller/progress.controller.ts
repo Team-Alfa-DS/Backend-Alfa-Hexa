@@ -55,6 +55,12 @@ import { ExceptionMapperDecorator } from 'src/common/application/aspects/excepti
 import { StartCourseProgressRequest } from 'src/progress/application/dtos/request/start-course-progress.request';
 import { StartCourseProgressResponse } from 'src/progress/application/dtos/response/start-course-progress.response';
 import { StartCourseProgressService } from 'src/progress/application/services/start-course-progress.service';
+import { ICourseQueryRepository } from 'src/course/domain/repositories/ICourseQuery.repository';
+import { OdmCourseRepository } from 'src/course/infraestructure/repositories/OdmCourse.repository';
+import { OdmCategoryEntity } from 'src/category/infraestructure/entities/odm-entities/odm-category.entity';
+import { OdmTrainerEntity } from 'src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity';
+import { OdmTagEntity } from 'src/tag/infraestructure/entities/odm-entities/odm-tag.entity';
+import { OdmLessonCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -79,9 +85,7 @@ export class ProgressController {
     private readonly odmprogressRepository: OdmProgressRepository;
     private readonly odmUserRepository: OdmUserRespository;
 
-    private readonly courseRepository: TOrmCourseRepository = new TOrmCourseRepository(
-        PgDatabaseSingleton.getInstance()
-    );
+    private readonly courseRepository: ICourseQueryRepository;
 
     private readonly auditRepository: OrmAuditRepository = new OrmAuditRepository(
         PgDatabaseSingleton.getInstance()
@@ -98,7 +102,16 @@ export class ProgressController {
     private profileProgressService: IService<ProfileProgressRequest, ProfileProgressResponse>;
     private startCourseProgressService: IService<StartCourseProgressRequest, StartCourseProgressResponse>;
 
-    constructor(@InjectModel('user') userModel: Model<OdmUserEntity>, @InjectModel('progress') progressModel: Model<OdmProgressEntity>, @InjectModel('course') courseModel: Model<OdmCourseEntity>, @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>) {
+    constructor(
+        @InjectModel('user') userModel: Model<OdmUserEntity>, 
+        @InjectModel('progress') progressModel: Model<OdmProgressEntity>, 
+        @InjectModel('course') courseModel: Model<OdmCourseEntity>, 
+        @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>, 
+        @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+        @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+        @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+        @InjectModel('lesson_comment') lessonCommentModel: Model<OdmLessonCommentEntity>
+    ) {
         this.odmUserMapper = new OdmUserMapper();
         this.odmProgressMapper = new OdmProgressMapper(courseModel, userModel, lessonModel);
 
@@ -106,6 +119,8 @@ export class ProgressController {
         this.odmprogressRepository = new OdmProgressRepository(progressModel, this.odmProgressMapper);
 
         this.eventPublisher.subscribe('ProgressRegister', [new SaveProgressEvent(this.odmprogressRepository)]);
+        
+        this.courseRepository = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, lessonCommentModel, userModel);
         
         
         this.markEndProgressService = new ExceptionMapperDecorator(

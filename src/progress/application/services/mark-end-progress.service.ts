@@ -1,6 +1,5 @@
 import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { Progress } from "src/progress/domain/progress";
@@ -17,17 +16,18 @@ import { CourseId } from "src/course/domain/value-objects/course-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class MarkEndProgressService extends IService<MarkEndProgressRequest, MarkEndProgressResponse> {
 
     private readonly progressRepository: IProgressRepository;
-    private readonly courseRepository: ICourseRepository;
+    private readonly courseRepository: ICourseQueryRepository;
     private readonly userRepository: IOdmUserRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly eventPublisher: IEventPublisher;
 
     constructor(progressRepository: IProgressRepository, 
-        courseRepository: ICourseRepository, 
+        courseRepository: ICourseQueryRepository, 
         userRepository: IOdmUserRepository, 
         transactionHandler: ITransactionHandler,
         eventPublisher: IEventPublisher

@@ -36,6 +36,7 @@ import { GetManyBlogsDTO } from "src/blog/application/interfaces/getManyBlogsDTO
 import { GetBlogsCountDTO } from "src/blog/application/interfaces/getBlogsCountDTO";
 import { GetBlogsCountResponseDTO } from "src/blog/application/interfaces/getBlogsCountResponseDTO.interface";
 import { GetBlogsCountService } from "src/blog/application/getBlogsCount.service";
+import { OdmBlogCommentMapper } from "../mapper/odm-comment-blog.mapper";
 
 
 @ApiBearerAuth()
@@ -55,11 +56,11 @@ export class BlogController {
                 @InjectModel('user') userModel: Model<OdmUserEntity>, 
                 @InjectModel('course') courseModel: Model<OdmCourseEntity>,
                 @InjectModel('blog_comment') commentModel: Model<OdmBlogCommentEntity>,){
-
+        const odmBlogComment = new OdmBlogCommentMapper(userModel, blogModel, commentModel, trainerModel);
         const blogRepositoryInstance = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
         const trainerRepositoryInstance = new OrmTrainerRepository(this.trainerMapper, PgDatabaseSingleton.getInstance());
         const categoryRepositoryInstance = new OrmCategoryRepository(new OrmCategoryMapper, PgDatabaseSingleton.getInstance());
-        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(userModel,blogModel,commentModel,trainerModel), blogModel,commentModel, userModel, trainerModel);
+        const odmBlogRepositoryInstance = new OdmBlogRepository(new OdmBlogMapper(userModel,blogModel,commentModel,trainerModel), blogModel,commentModel, userModel, trainerModel, odmBlogComment);
         const odmTrainerRepositoryInstance = new OdmTrainerRepository( trainerModel,  new OdmTrainerMapper(courseModel, blogModel, userModel));
         //const odmCategoryRepositoryInstance = new OdmCategoryEntity(categoryModel);
 

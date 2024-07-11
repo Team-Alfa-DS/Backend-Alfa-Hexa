@@ -4,7 +4,6 @@ import { StartCourseProgressResponse } from "../dtos/response/start-course-progr
 import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { UserId } from "src/user/domain/value-objects/user-id";
 import { CourseId } from "src/course/domain/value-objects/course-id";
 import { Progress } from "src/progress/domain/progress";
@@ -14,16 +13,17 @@ import { ProgressTime } from "src/progress/domain/value-objects/progress-time";
 import { ProgressLastTime } from "src/progress/domain/value-objects/progress-lastTime";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
 import { IEventPublisher } from "src/common/application/events/event-publisher.abstract";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class StartCourseProgressService extends IService<StartCourseProgressRequest, StartCourseProgressResponse> {
 
     private readonly progressRepository: IProgressRepository;
     private readonly odmUserRepository: IOdmUserRepository;
-    private readonly courseRepository: ICourseRepository;
+    private readonly courseRepository: ICourseQueryRepository;
     private readonly transactionHandler: ITransactionHandler;
     private readonly eventPublisher: IEventPublisher;
 
-    constructor(progressRepository: IProgressRepository, odmUserRepository: IOdmUserRepository, courseRepository: ICourseRepository, transactionHandler: ITransactionHandler, eventPublisher: IEventPublisher) {
+    constructor(progressRepository: IProgressRepository, odmUserRepository: IOdmUserRepository, courseRepository: ICourseQueryRepository, transactionHandler: ITransactionHandler, eventPublisher: IEventPublisher) {
         super();
         this.progressRepository = progressRepository;
         this.odmUserRepository = odmUserRepository;

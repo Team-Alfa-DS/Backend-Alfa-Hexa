@@ -5,7 +5,6 @@ import { Result } from "src/common/domain/result-handler/result";
 import { IProgressRepository } from "src/progress/domain/repositories/progress-repository.interface";
 import { IUserRepository } from "src/user/domain/repositories/user-repository.interface";
 import { ITransactionHandler } from "src/common/domain/transaction-handler/transaction-handler.interface";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
 import { CalcPercentService } from "src/progress/domain/services/calc-percent.service";
 import { Course } from "src/course/domain/Course";
 import { Progress } from "src/progress/domain/progress";
@@ -16,18 +15,19 @@ import { UserId } from "src/user/domain/value-objects/user-id";
 import { LessonId } from "src/course/domain/value-objects/lesson-id";
 import { IOdmUserRepository } from "src/user/application/repositories/odm-user-repository.interface";
 import { IOdmProgressRepository } from "../repositories/odm-progress.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class ProfileProgressService extends IService<ProfileProgressRequest, ProfileProgressResponse> {
 
     private readonly progressRepository: IOdmProgressRepository;
-    private readonly courseRepository: ICourseRepository;
+    private readonly courseRepository: ICourseQueryRepository;
     private readonly userRepository: IOdmUserRepository;
     private readonly calcPercent: CalcPercentService;
     private readonly calcTotalCoursesPercent: CalcTotalCoursesPercentService;
 
     constructor(
         progressRepository: IOdmProgressRepository,
-        courseRepository: ICourseRepository,
+        courseRepository: ICourseQueryRepository,
         userRepository: IOdmUserRepository,
     ) {
         super();

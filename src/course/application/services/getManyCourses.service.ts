@@ -1,5 +1,4 @@
 import { Course } from "src/course/domain/Course";
-import { ICourseRepository } from "../../domain/repositories/ICourse.repository";
 import { IService, ServiceRequestDto, ServiceResponseDto } from "src/common/application/interfaces/IService";
 import { Result } from "src/common/domain/result-handler/result";
 import { ITrainerRepository } from "src/trainer/domain/repositories/trainer-repository.interface";
@@ -11,12 +10,14 @@ import { CategoryId } from "src/category/domain/valueObjects/categoryId";
 import { CourseTag } from "src/course/domain/value-objects/course-tag";
 import { CourseCategory } from "src/course/domain/value-objects/course-category";
 import { CourseTrainer } from "src/course/domain/value-objects/course-trainer";
+import { IOdmTrainerRepository } from "src/trainer/domain/repositories/odm-trainer-repository.interface";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 import { ICategoryQueryRepository } from "src/category/domain/repositories/ICategoryQuery.repository";
 
 export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetManyCoursesResponse> {
   constructor(
-    private readonly courseRepository: ICourseRepository,
-    private readonly trainerRepository: ITrainerRepository,
+    private readonly courseRepository: ICourseQueryRepository,
+    private readonly trainerRepository: IOdmTrainerRepository,
     private readonly categoryRepository: ICategoryQueryRepository,
   ){super()}
 
@@ -25,7 +26,6 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       if (request.filter) {courseTag = new CourseTag(request.filter)}
       if (request.category) {courseCategory = new CourseCategory(request.category)}
       if (request.trainer) {courseTrainer = new CourseTrainer(request.trainer)}
-      // console.log(request);//Debug
       
       let r = await this.courseRepository.getManyCourses(
         [courseTag],
@@ -67,12 +67,6 @@ export class GetManyCoursesService extends IService<GetManyCoursesRequest, GetMa
       }
 
       return Result.success(new GetManyCoursesResponse(responseCourses));
-      // if (r.isSuccess) {
-        
-      //   return Result.success(new GetManyCoursesResponse(responseCourses));
-      // } else {
-      //   return Result.fail(r.Error);
-      // }
   }
 }
 

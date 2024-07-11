@@ -1,11 +1,11 @@
 import { IEventSubscriber } from "src/common/application/events/event-subscriber.interface";
 import { Course } from "src/course/domain/Course";
 import { CourseRegistered } from "src/course/domain/events/course-registered.event";
-import { ICourseRepository } from "src/course/domain/repositories/ICourse.repository";
+import { ICourseQueryRepository } from "src/course/domain/repositories/ICourseQuery.repository";
 
 export class SaveCourseEvent implements IEventSubscriber<CourseRegistered> {
   
-  constructor(private odmCourseRepository: ICourseRepository) {}
+  constructor(private odmCourseRepository: ICourseQueryRepository) {}
 
   async on(event: CourseRegistered): Promise<void> {
     const course = Course.create(

@@ -26,14 +26,21 @@ import { ExceptionMapper } from 'src/common/infraestructure/mappers/exception-ma
 import { ExceptionMapperDecorator } from 'src/common/application/aspects/exceptionMapperDecorator';
 import { JwtRequest } from 'src/common/infraestructure/types/jwt-request.type';
 import { TransactionHandler } from 'src/common/infraestructure/database/transaction-handler';
-import { OdmBlogRepository } from 'src/blog/infraestructure/repositories/odmBlog.repository';
+import { OdmCourseRepository } from 'src/course/infraestructure/repositories/OdmCourse.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import { OdmBlogEntity } from 'src/blog/infraestructure/entities/odm-entities/odm-blog.entity';
+import { OdmCourseEntity } from 'src/course/infraestructure/entities/odm-entities/odm-course.entity';
 import { Model } from 'mongoose';
-import { OdmBlogCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity';
-import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmCategoryEntity } from 'src/category/infraestructure/entities/odm-entities/odm-category.entity';
 import { OdmTrainerEntity } from 'src/trainer/infraestructure/entities/odm-entities/odm-trainer.entity';
+import { OdmTagEntity } from 'src/tag/infraestructure/entities/odm-entities/odm-tag.entity';
+import { OdmLessonEntity } from 'src/course/infraestructure/entities/odm-entities/odm-lesson.entity';
+import { OdmLessonCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.lesson.entity';
+import { OdmUserEntity } from 'src/user/infraestructure/entities/odm-entities/odm-user.entity';
+import { OdmBlogEntity } from 'src/blog/infraestructure/entities/odm-entities/odm-blog.entity';
+import { OdmBlogCommentEntity } from 'src/comment/infraestructure/entities/odm-entities/odm-comment.blog.entity';
+import { OdmBlogRepository } from 'src/blog/infraestructure/repositories/odmBlog.repository';
 import { OdmBlogMapper } from 'src/blog/infraestructure/mapper/odmBlog.mapper';
+import { OdmBlogCommentMapper } from 'src/blog/infraestructure/mapper/odm-comment-blog.mapper';
 
 
 @ApiTags('Search')
@@ -48,15 +55,20 @@ export class SearchController {
     private trainerMapper: OrmTrainerMapper = new OrmTrainerMapper();
 
     constructor(
-        @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
-        @InjectModel('blog_comment') commentModel: Model<OdmBlogCommentEntity>,
+        @InjectModel('course') courseModel: Model<OdmCourseEntity>,
+        @InjectModel('category') categoryModel: Model<OdmCategoryEntity>,
+        @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>,
+        @InjectModel('tag') tagModel: Model<OdmTagEntity>,
+        @InjectModel('lesson') lessonModel: Model<OdmLessonEntity>,
+        @InjectModel('lesson_comment') lessonCommentModel: Model<OdmLessonCommentEntity>,
         @InjectModel('user') userModel: Model<OdmUserEntity>,
-        @InjectModel('trainer') trainerModel: Model<OdmTrainerEntity>
-        )
-     {
-        const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
-        // const blogRepo = new OrmBlogRepository(PgDatabaseSingleton.getInstance());
-        const blogRepo = new OdmBlogRepository(new OdmBlogMapper(userModel, blogModel, commentModel, trainerModel), blogModel, commentModel, userModel, trainerModel);
+        @InjectModel('blog') blogModel: Model<OdmBlogEntity>,
+        @InjectModel('blog_comment') blogCommentModel: Model<OdmBlogCommentEntity>,
+        
+    ) {
+        // const courseRepo = new TOrmCourseRepository(PgDatabaseSingleton.getInstance());
+        const courseRepo = new OdmCourseRepository(courseModel, categoryModel, trainerModel, tagModel, lessonModel, lessonCommentModel, userModel) 
+        const blogRepo = new OdmBlogRepository(new OdmBlogMapper(userModel, blogModel, blogCommentModel, trainerModel), blogModel, blogCommentModel, userModel, trainerModel, new OdmBlogCommentMapper( userModel, blogModel, blogCommentModel, trainerModel) )
         const tagRepo: ITagRepository = new OrmTagRepository(PgDatabaseSingleton.getInstance());
         const categoryRepo = new OrmCategoryRepository( new OrmCategoryMapper(), PgDatabaseSingleton.getInstance());
         const trainerRepo = new OrmTrainerRepository( this.trainerMapper, PgDatabaseSingleton.getInstance());
