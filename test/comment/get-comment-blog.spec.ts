@@ -6,7 +6,7 @@ import { OdmBlogRepositoryMock } from "test/common/repositories-mocks/odm-blog-r
 
 
 
-describe('Comment get CommentBlog', async () => {
+describe('Comment get CommentBlog', () => {
     it('Debe obtener comentarios de Blog', async () => {
         let comments: BlogComment[] = [
             {

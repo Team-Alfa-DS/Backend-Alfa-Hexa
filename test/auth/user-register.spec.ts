@@ -12,7 +12,7 @@ import { OdmUserRepositoryMock } from "test/common/repositories-mocks/odm-user-r
 import { OrmUserRepositoryMock } from "test/common/repositories-mocks/orm-user-repository.mock";
 import { TransactionHandlerMock } from "test/common/transaction-handler-mock/transaction-handler.mock";
 
-describe('User Register', async () => {
+describe('User Register', () => {
     it('debe registrar un usuario', async () => {
         const request = new RegisterUserRequest('dbcd@gmail.com', 'Daniel Bortot', '12345', '12345678910', UserRole.CLIENT);
         const registerUserService = new RegisterUserService(

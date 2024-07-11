@@ -17,7 +17,7 @@ import { TransactionHandlerMock } from "test/common/transaction-handler-mock/tra
 
 
 
-describe('Create CommentLesson', async () => {
+describe('Create CommentLesson', () => {
     it('Se debe crear correctamente un comentario de Leccion ', async () => {
         let ormCourseRepositoryMock = new OrmCourseRepositoryMock();
         const request = new AddCommentToServiceRequestDto('17ae64e6-6ac4-4ca9-9272-9726578b83cf', `244fbecc-2127-433d-ba76-762fb2fee1c8`, `Buenas tardes`);

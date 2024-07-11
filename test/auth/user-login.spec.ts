@@ -8,7 +8,7 @@ import { EncryptMock } from "test/common/encrypt-mock/encrypt.mock"
 import { JwtGenMock } from "test/common/jwt-gen-mock/jwt-gen.mock"
 import { OdmUserRepositoryMock } from "test/common/repositories-mocks/odm-user-repository.mock"
 
-describe('User Login', async () => {
+describe('User Login', () => {
     it('debe de fallar si se envia un formato incorrecto de email', async () => {
         const request = new LoginUserRequest('dbcd@gmail', '12345')
         const loginuserService = new LoginUserService(

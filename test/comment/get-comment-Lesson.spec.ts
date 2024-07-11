@@ -6,7 +6,7 @@ import { OdmCourseRepositoryMock } from "test/common/repositories-mocks/odm-cour
 
 
 
-describe('Comment get CommentLesson', async () => {
+describe('Comment get CommentLesson', () => {
     
     it('Debe obtener comentarios de Leccion', async () => {
         let odmCourseRepositoryMock = new OdmCourseRepositoryMock();

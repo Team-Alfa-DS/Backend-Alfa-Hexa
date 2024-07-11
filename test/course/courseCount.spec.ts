@@ -2,7 +2,7 @@ import { GetCourseCountRequest, GetCourseCountResponse, GetCourseCountService } 
 import { OdmCourseRepositoryMock } from "test/common/repositories-mocks/odm-course-repository.mock";
 
 
-describe('Contar curso', async () => {
+describe('Contar curso', () => {
     it('Se debe obtener correctamente un conteo de cursos ', async () => {
         let odmBlogRepositoryMock =  new OdmCourseRepositoryMock();
         const request = new GetCourseCountRequest('','');

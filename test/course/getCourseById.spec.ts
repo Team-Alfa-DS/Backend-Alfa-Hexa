@@ -5,7 +5,7 @@ import { OdmCategoryRepositoryMock } from "test/common/repositories-mocks/odm-ca
 import { OdmCourseRepositoryMock } from "test/common/repositories-mocks/odm-course-repository.mock";
 import { OdmTrainerRepositoryMock } from "test/common/repositories-mocks/odm-trainer-repository.mok";
 
-describe('Obtener un curso por id', async () => {
+describe('Obtener un curso por id', () => {
     it('Se debe obtener correctamente un curso ', async () => {
         let odmBlogRepositoryMock =  new OdmCourseRepositoryMock();
         const request = new GetCourseByIdRequest('4a370052-3c3d-4a18-9ba1-a9fd5336a145');
@@ -69,6 +69,7 @@ describe('Obtener un curso por id', async () => {
         try {
             await getCourseByIdService.execute(request);
         } catch (err) {
+            console.log(typeof err)
             expect(err).toBeInstanceOf(NullCourseIdException);
         }
         expect.assertions(1)

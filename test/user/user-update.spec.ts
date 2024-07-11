@@ -9,7 +9,7 @@ import { OdmUserRepositoryMock } from "test/common/repositories-mocks/odm-user-r
 import { OrmUserRepositoryMock } from "test/common/repositories-mocks/orm-user-repository.mock"
 import { TransactionHandlerMock } from "test/common/transaction-handler-mock/transaction-handler.mock"
 
-describe('User Update', async () => {
+describe('User Update', () => {
     it('debe fallar si no se envia un formato de nombre correcto a un usuario existente', async () => {
         const request = new UpdateUserRequest('244fbecc-2127-433d-ba76-762fb2fee1c8', 'an', null, null, null, null);
         const updateUserService = new UpdateUserService(
