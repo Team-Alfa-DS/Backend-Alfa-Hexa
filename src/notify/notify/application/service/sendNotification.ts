@@ -1,4 +1,4 @@
-import { IApplicationService } from "../application-service/application-service.interface";
+/*import { IApplicationService } from "../application-service/application-service.interface";
 import { Result } from "src/common/domain/result-handler/result";
 import { INotifyRepository } from "../../domain/repositories/notify-repository.interface";
 import { NotifierDto } from "src/common/application/notification-handler/dto/entry/entry";
@@ -10,12 +10,12 @@ import { Value } from "firebase-admin/lib/remote-config/remote-config-api";
 
 export class NotifierServiceSend implements IApplicationService<string, NotifierDto>{
     /*private readonly repository: TokenRepository;*/
-    private readonly firebaseNotifier: FirebaseNotifier;
+    /*private readonly firebaseNotifier: FirebaseNotifier;
 
 
-    constructor(/*repository: TokenRepository*/ firebaseNotifier: FirebaseNotifier){
+    constructor(/*repository: TokenRepository*/ /*firebaseNotifier: FirebaseNotifier){
         /*this.repository = repository;*/
-        this.firebaseNotifier = firebaseNotifier;
+        /*this.firebaseNotifier = firebaseNotifier;
     }
 
     get name(): string{
@@ -27,4 +27,4 @@ export class NotifierServiceSend implements IApplicationService<string, Notifier
         return response;
     }
     
-}
+}*/

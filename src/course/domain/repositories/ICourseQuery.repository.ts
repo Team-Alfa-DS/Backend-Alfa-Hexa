@@ -7,6 +7,7 @@ import { CourseTag } from "../value-objects/course-tag";
 import { CourseTrainer } from "../value-objects/course-trainer";
 import { LessonId } from "../value-objects/lesson-id";
 import { CommentLesson } from "../entities/comment-lesson";
+import { CourseTitle } from "../value-objects/course-title";
 
 export interface ICourseQueryRepository {
   getManyCourses(filter?: CourseTag[], category?: CourseCategory, trainer?: CourseTrainer): Promise<Course[]>;
@@ -19,4 +20,5 @@ export interface ICourseQueryRepository {
   saveLesson(lesson: Lesson, course: Course): Promise<Lesson>;
   findAllCommentsByLessonId(id: LessonCommentLessonId): Promise<CommentLesson[]>;
   saveComment(comment: CommentLesson): Promise<CommentLesson>;
+  getCourseByTitle(title: CourseTitle): Promise<boolean>;
 }

@@ -1,5 +1,5 @@
 // import {user} from 'src/user/domain/user';
-import { Entity } from 'src/common/domain/entity';
+/*import { Entity } from 'src/common/domain/entity';
 
 export class Notify extends Entity<string> {
     private title: string;
@@ -48,4 +48,4 @@ UpdateuserReaded(userReaded: boolean): void{
     this.userReaded = userReaded;
 }
 
- }
+ }*/

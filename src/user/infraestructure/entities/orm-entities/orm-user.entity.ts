@@ -11,6 +11,7 @@ import { OrmTrainerEntity } from 'src/trainer/infraestructure/entities/orm-entit
 import { NotifyEntity } from 'src/notify/notify/Infraestructure/entities/notify.entity';
 import { OrmBlogCommentEntity } from 'src/comment/infraestructure/entities/orm-entities/orm-comment.blog.entity';
 import { OrmLessonCommentEntity } from 'src/comment/infraestructure/entities/orm-entities/orm-comment.lesson.entity';
+import { TokenEntity } from 'src/notify/notify/Infraestructure/entities/token.entity';
 
 @Entity('user')
 export class OrmUserEntity {
@@ -50,6 +51,9 @@ export class OrmUserEntity {
 
   @OneToMany(() => NotifyEntity, notify => notify.user)
   notify: NotifyEntity[];
+
+  @OneToMany(()=> TokenEntity, token => token.user)
+  token: TokenEntity[];
 
   static create(
     id: string,
