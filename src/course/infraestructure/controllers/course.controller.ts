@@ -174,7 +174,7 @@ export class CourseController {
       manyCoursesQueryDto.perPage);
 
     const result = await this.getManyCoursesService.execute(request);
-    return result.Value;
+    return result.Value.courses;
   }
 
   @Get('/count')
