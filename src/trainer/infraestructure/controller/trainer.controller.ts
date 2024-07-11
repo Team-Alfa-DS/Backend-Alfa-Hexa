@@ -192,7 +192,7 @@ export class TrainerController {
   @ApiBearerAuth('token')
   async getAllTrainers(@Query() GetManyTrainerQueryDto: GetManyTrainerQueryDto, @Request() req: JwtRequest) {
     const request = new GetAllTrainersRequest(
-      GetManyTrainerQueryDto.userfollow,
+      GetManyTrainerQueryDto.userFollow,
       req.user.tokenUser.id,
       GetManyTrainerQueryDto.page,  
       GetManyTrainerQueryDto.perPage
