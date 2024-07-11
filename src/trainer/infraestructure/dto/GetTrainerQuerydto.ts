@@ -28,5 +28,5 @@ export class GetManyTrainerQueryDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  perpage?: number;
+  perPage?: number;
 }

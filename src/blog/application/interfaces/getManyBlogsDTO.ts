@@ -5,7 +5,7 @@ import { ServiceRequestDto } from "src/common/application/interfaces/IService";
 
 export class GetManyBlogsDTO implements ServiceRequestDto {
   dataToString(): string {
-      return `filter: ${this.filter}, category: ${this.category}, trainer: ${this.trainer}, page: ${this.page}, perpage: ${this.perpage}`;
+      return `filter: ${this.filter}, category: ${this.category}, trainer: ${this.trainer}, page: ${this.page}, perpage: ${this.perPage}`;
   }
   @ApiProperty({
     description: 'filtros del blog',
@@ -50,5 +50,5 @@ export class GetManyBlogsDTO implements ServiceRequestDto {
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
-  perpage?: number;
+  perPage?: number;
 }

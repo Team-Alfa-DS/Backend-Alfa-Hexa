@@ -195,7 +195,7 @@ export class TrainerController {
       GetManyTrainerQueryDto.userfollow,
       req.user.tokenUser.id,
       GetManyTrainerQueryDto.page,  
-      GetManyTrainerQueryDto.perpage
+      GetManyTrainerQueryDto.perPage
     );
     const result = await this.findAllTrainersService.execute(request);
     
