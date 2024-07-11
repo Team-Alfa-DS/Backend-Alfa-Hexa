@@ -178,7 +178,7 @@ export class ExceptionMapper {
       case (TrainerNotFoundException): return new HttpException(error.message, 404);
 
 
-      default: return new HttpException('Ocurrió un error desconocido', HttpStatus.INTERNAL_SERVER_ERROR);
+      default: return new HttpException('Ocurrió un error desconocido', 404);
     }
   }
 }
