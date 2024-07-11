@@ -1,6 +1,39 @@
-version: '3'
 
 services:
+  app:
+    build:
+      context: .
+      target: dev
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app/
+      - /app/node_modules
+    container_name: backend-alfa-hexa
+    ports:
+      - ${PORT}:3000
+    environment:
+      - PORT=${PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - PG_EMAIL=${PG_EMAIL}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - JWT=${JWT}
+      - CLOUDINARY_NAME=${CLOUDINARY_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OAUTH_REFRESH_TOKEN=${OAUTH_REFRESH_TOKEN}
+      - EMAIL_USERNAME=${EMAIL_USERNAME}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - MAILJET_API_KEY=${MAILJET_API_KEY}
+      - MAILJET_API_SECRET=${MAILJET_API_SECRET}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
   postgres:
     image: postgres:16
     container_name: pg-test-hex
