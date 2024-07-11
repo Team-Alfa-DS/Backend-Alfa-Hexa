@@ -1,6 +1,6 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 import { EmptyBlogCommentBlogIdException } from "../../exceptions/blog/empty-comment-blog-blogid-exception";
-import { BlogId } from "src/blog/domain/valueObjects/blogId";
+import { BlogId } from "../../../../../src/blog/domain/valueObjects/blogId";
 
 export class BlogCommentBlogId extends ValueObject<BlogCommentBlogId> {
     private readonly blogId: BlogId;

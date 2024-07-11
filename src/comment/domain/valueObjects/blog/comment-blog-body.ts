@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 import { InvalidBlogCommentBodyException } from "../../exceptions/blog/invalid-comment-blog-body-exception";
 
 

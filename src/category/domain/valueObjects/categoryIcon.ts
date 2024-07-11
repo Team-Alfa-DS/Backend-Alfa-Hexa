@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { EmptyCategoryIconException } from "../exceptions/empty-category-icon.exception";
 
 export class CategoryIcon extends ValueObject<CategoryIcon>{

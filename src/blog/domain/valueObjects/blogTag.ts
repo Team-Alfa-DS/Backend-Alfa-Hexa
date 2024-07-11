@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { InvalidBlogTag } from "../exceptions/invalidBlogTag";
 import { Value } from 'firebase-admin/lib/remote-config/remote-config-api';
 

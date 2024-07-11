@@ -1,6 +1,6 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { EmptyTrainerCourseException } from "../exceptions/empty-trainer-courses-trainer";
-import { CourseId } from "src/course/domain/value-objects/course-id";
+import { CourseId } from "../../../../src/course/domain/value-objects/course-id";
 
 
 export class TrainerCourseId extends ValueObject<TrainerCourseId>{

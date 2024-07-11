@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { EmptyTrainerUserFollowerException } from "../exceptions/empty-trainer-userFollower-exceptio";
 
 

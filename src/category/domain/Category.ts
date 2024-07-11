@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 
-import { AggregateRoot } from "src/common/domain/aggregate-root";
+import { AggregateRoot } from "../../../src/common/domain/aggregate-root";
 import { CategoryIcon } from "./valueObjects/categoryIcon";
 import { CategoryId } from "./valueObjects/categoryId";
 import { CategoryName } from "./valueObjects/categoryName";
-import { DomainEvent } from "src/common/domain/domain-event";
+import { DomainEvent } from "../../../src/common/domain/domain-event";
 import { CategoryCreated } from "./events/category-created.event";
 import { CategoryInvalidException } from "./exceptions/category-invalid-exception";
 import { CategoryRegister } from "./events/category-register.event";

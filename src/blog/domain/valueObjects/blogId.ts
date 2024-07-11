@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { InvalidBlogId } from "../exceptions/invalidBlogId";
 
 export class BlogId extends ValueObject<BlogId> {

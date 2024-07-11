@@ -1,5 +1,5 @@
-import { CategoryId } from "src/category/domain/valueObjects/categoryId";
-import { DomainEvent } from "src/common/domain/domain-event";
+import { CategoryId } from "../../../../src/category/domain/valueObjects/categoryId";
+import { DomainEvent } from "../../../../src/common/domain/domain-event";
 import { BlogContent } from "../valueObjects/blogContent";
 import { BlogId } from "../valueObjects/blogId";
 import { BlogImage } from "../valueObjects/blogImage";
@@ -7,8 +7,8 @@ import { BlogPublicationDate } from "../valueObjects/blogPublicationDate";
 import { BlogTag } from "../valueObjects/blogTag";
 import { BlogTitle } from "../valueObjects/blogTitle";
 import { Blog } from "../Blog";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
+import { TrainerId } from "../../../../src/trainer/domain/valueObjects/trainer-id";
+import { BlogCommentId } from "../../../../src/comment/domain/valueObjects/blog/comment-blog-id";
 
 export class BlogCreated extends DomainEvent {
     protected constructor(

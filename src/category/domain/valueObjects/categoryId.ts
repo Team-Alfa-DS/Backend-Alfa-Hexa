@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { NotCorrectFormatCategoryIDException } from "../exceptions/not-correct-format-category-id.exception";
 import { EmptyCategoryIdException } from "../exceptions/empty-category-id.exception";
 

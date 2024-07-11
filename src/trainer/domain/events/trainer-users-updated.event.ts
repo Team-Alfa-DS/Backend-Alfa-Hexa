@@ -1,4 +1,4 @@
-import { DomainEvent } from "src/common/domain/domain-event";
+import { DomainEvent } from "../../../../src/common/domain/domain-event";
 import { TrainerId } from "../valueObjects/trainer-id";
 import { TrainerFollowerUserId } from "../valueObjects/trainer-userid";
 

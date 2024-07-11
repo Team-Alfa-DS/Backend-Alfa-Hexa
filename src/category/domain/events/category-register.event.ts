@@ -1,4 +1,4 @@
-import { DomainEvent } from "src/common/domain/domain-event";
+import { DomainEvent } from "../../../../src/common/domain/domain-event";
 import { CategoryId } from "../valueObjects/categoryId";
 import { CategoryName } from "../valueObjects/categoryName";
 import { CategoryIcon } from "../valueObjects/categoryIcon";

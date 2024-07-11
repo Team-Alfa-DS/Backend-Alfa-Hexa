@@ -1,4 +1,4 @@
-import { Entity } from "src/common/domain/entity";
+import { Entity } from "../../../src/common/domain/entity";
 import { BlogCommentBlogId } from "./valueObjects/blog/comment-blog-blogId";
 import { CommentBlogBody } from "./valueObjects/blog/comment-blog-body";
 import { BlogCommentId } from "./valueObjects/blog/comment-blog-id";

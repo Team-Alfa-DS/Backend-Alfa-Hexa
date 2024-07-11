@@ -1,9 +1,9 @@
-import { AggregateRoot } from 'src/common/domain/aggregate-root';
+import { AggregateRoot } from '../../../src/common/domain/aggregate-root';
 import { TrainerFollower } from './valueObjects/trainer-followers';
 import { TrainerId } from './valueObjects/trainer-id';
 import { TrainerLocation } from './valueObjects/trainer-location';
 import { TrainerName } from './valueObjects/trainer-name';
-import { DomainEvent } from 'src/common/domain/domain-event';
+import { DomainEvent } from '../../../src/common/domain/domain-event';
 import { TrainerCreated } from './events/trainer-created.events';
 import { InvalidTrainerException } from './exceptions/Invalid-trainer-exception';
 import { TrainerFollowerUserId } from './valueObjects/trainer-userid';

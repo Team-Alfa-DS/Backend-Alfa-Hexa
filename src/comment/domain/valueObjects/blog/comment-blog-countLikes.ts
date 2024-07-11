@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 
 export class CommentBlogCountLike extends ValueObject<CommentBlogCountLike> {
     private readonly countLike: number;

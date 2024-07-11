@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 import { EmptyBlogCommentIdException } from "../../exceptions/blog/empty-comment-blog-id-exception";
 
 export class BlogCommentId extends ValueObject<BlogCommentId> {

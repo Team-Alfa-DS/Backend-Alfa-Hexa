@@ -1,4 +1,4 @@
-import { DomainException } from "src/common/domain/domain-exception";
+import { DomainException } from "../../../../src/common/domain/domain-exception";
 
 
 export class InvalidBlogPublicationDate extends DomainException {

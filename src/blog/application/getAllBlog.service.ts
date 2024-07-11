@@ -1,8 +1,8 @@
 import { IBlogRepository } from '../domain/repositories/IBlog.repository';
 import { Blog } from '../domain/Blog';
-import { IService } from 'src/common/application/interfaces/IService';
+import { IService } from '../../common/application/interfaces/IService';
 import { GeneralBlogDTO, GetAllBlogsResponseDTO } from './interfaces/getAllBlogsResponseDTO.interface';
-import { Result } from 'src/common/domain/result-handler/result';
+import { Result } from '../../common/domain/result-handler/result';
 import { ITrainerRepository } from 'src/trainer/domain/repositories/trainer-repository.interface';
 import { ICategoryRepository } from 'src/category/domain/repositories/category-repository.interface';
 import { GetAllBlogsRequestDTO } from './interfaces/getAllBlogsRequestDTO.interface';

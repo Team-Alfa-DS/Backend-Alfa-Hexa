@@ -1,6 +1,6 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import {EmptyuserIdExceptionTrainer} from '../exceptions/empty-trainer-userid-exception';
-import { UserId } from "src/user/domain/value-objects/user-id";
+import { UserId } from "../../../../src/user/domain/value-objects/user-id";
 
 
 export class TrainerFollowerUserId extends ValueObject<TrainerFollowerUserId>{

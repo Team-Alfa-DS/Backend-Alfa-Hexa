@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../src/common/domain/value-object";
 import { InvalidTrainerNameException } from "../exceptions/invalid-trainer-name-exception";
 import { EmptyTrainerNameException } from "../exceptions/empty-trainer-name-exception";
 

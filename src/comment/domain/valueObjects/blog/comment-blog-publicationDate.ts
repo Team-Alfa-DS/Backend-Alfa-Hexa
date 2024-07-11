@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 import { EmptyBlogCommentPublicationDateException } from "../../exceptions/blog/empty-comment-blog-publicationDate-exception";
 import { ExceededBlogCommentPublicationDateException } from "../../exceptions/blog/exceeded-comment-blog-publicationDate-exception";
 

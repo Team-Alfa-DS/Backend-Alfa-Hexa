@@ -1,9 +1,9 @@
-import { DomainEvent } from "src/common/domain/domain-event";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { TrainerName } from "src/trainer/domain/valueObjects/trainer-name";
-import { TrainerFollower } from "src/trainer/domain/valueObjects/trainer-followers";
-import { TrainerUserFollow } from "src/trainer/domain/valueObjects/trainer-userFollow";
-import { TrainerLocation } from "src/trainer/domain/valueObjects/trainer-location";
+import { DomainEvent } from "../../../../src/common/domain/domain-event";
+import { TrainerId } from "../../../../src/trainer/domain/valueObjects/trainer-id";
+import { TrainerName } from "../../../../src/trainer/domain/valueObjects/trainer-name";
+import { TrainerFollower } from "../../../../src/trainer/domain/valueObjects/trainer-followers";
+import { TrainerUserFollow } from "../../../../src/trainer/domain/valueObjects/trainer-userFollow";
+import { TrainerLocation } from "../../../../src/trainer/domain/valueObjects/trainer-location";
 import { TrainerCourseId } from "../valueObjects/trainer-courseid";
 import { TrainerBlogId } from "../valueObjects/trainer-blogid";
 import { TrainerFollowerUserId } from "../valueObjects/trainer-userid";

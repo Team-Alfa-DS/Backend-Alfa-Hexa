@@ -5,20 +5,20 @@ import { BlogPublicationDate } from "./valueObjects/blogPublicationDate";
 import { BlogTitle } from "./valueObjects/blogTitle";
 import { BlogTag } from "./valueObjects/blogTag";
 import { BlogImage } from "./valueObjects/blogImage";
-import { AggregateRoot } from "src/common/domain/aggregate-root";
-import { DomainEvent } from "src/common/domain/domain-event";
+import { AggregateRoot } from "../../../src/common/domain/aggregate-root";
+import { DomainEvent } from "../../../src/common/domain/domain-event";
 import { BlogCreated } from './events/blogCreated.event';
 import { InvalidBlogException } from "./exceptions/invalidBlogException";
-import { TrainerId } from "src/trainer/domain/valueObjects/trainer-id";
-import { BlogCommentId } from "src/comment/domain/valueObjects/blog/comment-blog-id";
-import { CommentBlogBody } from "src/comment/domain/valueObjects/blog/comment-blog-body";
-import { CommentBlogPublicationDate } from "src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
-import { BlogCommentBlogId } from "src/comment/domain/valueObjects/blog/comment-blog-blogId";
-import { CommentBlogUserId } from "src/comment/domain/valueObjects/blog/comment-blog-userId";
-import { CommentBlogUserDisliked } from "src/comment/domain/valueObjects/blog/comment-blog-userDisliked";
-import { CommentBlogUserLiked } from "src/comment/domain/valueObjects/blog/comment-blog-userLiked";
+import { TrainerId } from "../../../src/trainer/domain/valueObjects/trainer-id";
+import { BlogCommentId } from "../../../src/comment/domain/valueObjects/blog/comment-blog-id";
+import { CommentBlogBody } from "../../../src/comment/domain/valueObjects/blog/comment-blog-body";
+import { CommentBlogPublicationDate } from "../../../src/comment/domain/valueObjects/blog/comment-blog-publicationDate";
+import { BlogCommentBlogId } from "../../../src/comment/domain/valueObjects/blog/comment-blog-blogId";
+import { CommentBlogUserId } from "../../../src/comment/domain/valueObjects/blog/comment-blog-userId";
+import { CommentBlogUserDisliked } from "../../../src/comment/domain/valueObjects/blog/comment-blog-userDisliked";
+import { CommentBlogUserLiked } from "../../../src/comment/domain/valueObjects/blog/comment-blog-userLiked";
 import { CommentBlogPosted } from "./events/comment-blog-posted.event";
-import { CommentBlog } from "src/comment/domain/comment-blog";
+import { CommentBlog } from "../../../src/comment/domain/comment-blog";
 
 
 

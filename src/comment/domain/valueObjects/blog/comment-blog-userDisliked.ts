@@ -1,4 +1,4 @@
-import { ValueObject } from "src/common/domain/value-object";
+import { ValueObject } from "../../../../../src/common/domain/value-object";
 
 export class CommentBlogUserDisliked extends ValueObject<CommentBlogUserDisliked> {
     private readonly userDisliked: boolean;
