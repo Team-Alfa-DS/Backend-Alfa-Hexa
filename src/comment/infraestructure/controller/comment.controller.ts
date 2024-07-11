@@ -204,13 +204,15 @@ export class CommentController{
         if(commentsQueryParams.blog !== undefined && commentsQueryParams.blog !== null && commentsQueryParams.blog !== ""){
             const data = new GetBlogCommentsServiceRequestDto(commentsQueryParams.blog, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id)
             const result = await this.getCommentBlogService.execute( data );
-            return result.Value.blogComments;
+            if (result.isSuccess) return result.Value.blogComments;
+            ExceptionMapper.toHttp(result.Error)
 
         }else {
             const data = new GetLessonCommentsServiceRequestDto(commentsQueryParams.lesson, {page: commentsQueryParams.page, perPage: commentsQueryParams.perPage}, req.user.tokenUser.id);
 
             const result = await this.getCommentLessonService.execute( data );
-            return result.Value.lessonComments;
+            if (result.isSuccess) return result.Value.lessonComments;
+            ExceptionMapper.toHttp(result.Error)
         }
     }
 
