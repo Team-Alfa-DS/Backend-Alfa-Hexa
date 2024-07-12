@@ -59,4 +59,9 @@ $ npm run test
 ```
 
 # Documentacion de la Arquitectura
-## Diagrama del modelo de dominio
+## Diagrama Modelo de Dominio
+![Modelo de Dominio - Alpha - Página 1](https://github.com/user-attachments/assets/dc82d2ca-b335-4362-9eb0-bec8dc158bd6)
+
+## Diagrama Arquitectura Hexagonal
+![Modelo de Dominio - Alpha - Modelo de arquitectura](https://github.com/user-attachments/assets/14df3149-9e8d-4f93-acf7-9f264d366277)
+
