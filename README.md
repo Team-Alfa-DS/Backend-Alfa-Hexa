@@ -1,37 +1,35 @@
-## .env
+# Bienvenidos a Gymnastic Center Alfa
 
-Crear el archivo ".env" usando las variables de ".env.template" y llenar las variables.
+![logo](https://github.com/user-attachments/assets/e5e468f3-1973-40a4-ac80-9cac06e813f0)
 
-- PORT - 3000 por defecto
-- DB_HOST
-- DB_PORT
-- DB_USERNAME
-- DB_PASSWORD
-- DB_NAME
-- PG_EMAIL
-- PG_PASSWORD
-- JWT
-- CLOUDINARY_NAME
-- CLOUDINARY_API_KEY
-- CLOUDINARY_API_SECRET
-- OAUTH_CLIENT_ID
-- OAUTH_CLIENT_SECRET
-- OAUTH_REFRESH_TOKEN
-- EMAIL_USERNAME
-- EMAIL_PASSWORD
-- MAILJET_API_KEY
-- MAILJET_API_SECRET
-- FIREBASE_PROJECT_ID
-- FIREBASE_PRIVATE_KEY
-- FIREBASE_CLIENT_EMAIL
+Repositorio Backend de la app Gymnastic Center del equipo Alfa. Esta aplicacion posee contenido como cursos y blogs sobre yoga. Todas las funcionalidades vienen dadas por nuestra API desarrollada en Nestjs.
 
-## Installation
+# Arquitectura
+
+Nuestra aplicación Backend utiliza varias arquitecturas y patrones de diseño que garantizan la mantenibilidad, escalabilidad y eficiencia de la aplicación:
+
+- **Arquitectura Hexagonal**: Esta arquitectura separa los detalles del negocio (capa de dominio) de los detalles tecnicos (capa de infraestructura) comunicandolos a traves de un mediador (capa de aplicación). Facilitando el mantenimiento y las pruebas sobre la aplicación.
+
+- **Arquitectura Orientada a Eventos**: Esta arquitectura nos permite manejar acciones de forma asincrona y operaciones en tiempo real, principalmente aprovechado, en nuestro caso, para el manejo de notificaciones mediante correo electronico y sincronización de las bases de datos relacional y no relacional.
+
+- **Patron Command and Query Responsibility Segregation**: Este patron le permite a la aplicación hacer consultas con una mayor velocidad haciendo uso de una base de datos relacional para mantener la integridad de los datos al hacer escritura (commands) y una base de datos no relacional la cual posee una gran eficiencia a la hora de consultas (querys). Para la base de datos relacional se utilizo PostgresSQL y para la no relacional, MongoDB.
+
+- **Programación Orientada a Aspectos (AOP)**: Se implemento este patrón de diseño utilizando decoradores, lo cual nos permite añadir funcionalidades adicionales a nuestras clases y métodos de una manera limpia y reutilizable.
+
+- **Diseño Guiado por el Dominio (DDD)**: Este enfoque nos ayuda a modelar la lógica de negocio de nuestra aplicación de una manera que refleja el dominio del problema.
+
+## Requisitos para su instalación
+- Copiar las variables de entorno del .env.template
+- Se debe poseer instalado en el equipo MongoDB y PostgresSQL, o utilizar imagenes de Docker.
+- Tener una cuenta de MailJet
+
+## Instalacion de dependencias
 
 ```bash
 $ npm install
 ```
 
-## Running the app
+## Correr la aplicación
 
 ```bash
 # development
@@ -44,7 +42,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Documentation
+## Documentación de endpoints
 ```bash
 #local
 localhost:<PORT>/documentation
@@ -58,10 +56,7 @@ https://backend-alfa-hexa-production.up.railway.app/documentation
 ```bash
 # unit tests
 $ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
+
+# Documentacion de la Arquitectura
+## Diagrama del modelo de dominio
